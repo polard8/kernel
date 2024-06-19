@@ -23,7 +23,7 @@ void panic( const char *format, ... )
 // Se podemos usar o console virtual para log.
     if (Initialization.is_console_log_initialized == TRUE)
     {
-        printf("panic: KERNEL PANIC\n");
+        printk("panic: KERNEL PANIC\n");
         print( 0, varg );
     }
 // Hang

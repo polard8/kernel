@@ -1,5 +1,5 @@
 
-// fat16.c
+// fat/fat16.c
 // FAT16 file system support.
 // ring 0.
 
@@ -46,7 +46,7 @@ void test_fat16_find_volume_info(void)
     vol_label_directory_entry = 
         (void*) kmalloc( sizeof(struct fat16_directory_entry_d) );
     if ((void*) vol_label_directory_entry == NULL){
-        printf("on kmalloc\n");
+        printk("on kmalloc\n");
         goto fail;  
     }
 
@@ -77,7 +77,7 @@ void test_fat16_find_volume_info(void)
     };
 
 // Show info:    
-    printf("Disk name: {%s}\n",name_buffer);
+    printk("Disk name: {%s}\n",name_buffer);
     refresh_screen();
 
     return;
@@ -355,7 +355,7 @@ fsGetFileSize (
 //Carrega o diretório raiz na memória.
 
 //#ifdef KERNEL_VERBOSE
-    //printf ("fsRootDirGetFileSize: Loading root..\n"); 
+    //printk ("fsRootDirGetFileSize: Loading root..\n"); 
 //#endif
 
 // #bugbug
@@ -430,7 +430,7 @@ fsGetFileSize (
 
 // #debug
 // vamos mostrar a string.
-    //printf ("fsGetFileSize: file_name={%s}\n", file_name);
+    //printk ("fsGetFileSize: file_name={%s}\n", file_name);
 
 // Busca simples pelo arquivo no diretório raiz.
 // todo: Essa busca pode ser uma rotina mais sofisticada. 
@@ -451,7 +451,7 @@ fsGetFileSize (
 
     size_t szFileName = (size_t) strlen(file_name); 
     if (szFileName > 11){
-        printf ("fsGetFileSize: [FIXME] name size fail %d\n",
+        printk ("fsGetFileSize: [FIXME] name size fail %d\n",
             szFileName );   
         szFileName = 11;
     }
@@ -487,11 +487,11 @@ fsGetFileSize (
 fail:
 
     if ( (void*) file_name != NULL ){
-        printf ("fsGetFileSize: [FAIL] %s not found\n", file_name );
+        printk ("fsGetFileSize: [FAIL] %s not found\n", file_name );
      }
 
     //if ( (void*) NameX != NULL )
-        // printf ("fsRootDirGetFileSize: %s not found\n", NameX );
+        // printk ("fsRootDirGetFileSize: %s not found\n", NameX );
 
     //refresh_screen();
     return (unsigned long) 0;
@@ -501,7 +501,7 @@ fail:
 found:
 
     // #debug
-    // printf("arquivo encontrado\n");
+    // printk("arquivo encontrado\n");
     // refresh_screen();
     // while(1){}
 
@@ -514,22 +514,20 @@ found:
 
     FileSize = (unsigned long) intFileSize;
 
-	//printf ("%d \n" , root[ z+14 ]);
-	//printf ("%d \n" , root[ z+15 ]);
-	//printf ("done: FileSize=%d \n" , FileSize);
+	//printk ("%d \n" , root[ z+14 ]);
+	//printk ("%d \n" , root[ z+15 ]);
+	//printk ("done: FileSize=%d \n" , FileSize);
 
 	//#debug
 	//refresh_screen();
 	//while(1){ asm("hlt"); }
 
     // #debug
-    // printf ("fsRootDirGetFileSize: FileSize=%d \n" , FileSize );
+    // printk ("fsRootDirGetFileSize: FileSize=%d \n" , FileSize );
     // refresh_screen ();
 
     return (unsigned long) ( FileSize & 0x00000000FFFFFFFF );
 }
-
-
 
 /*
  * fsFAT16ListFiles:
@@ -562,12 +560,12 @@ fsFAT16ListFiles (
     unsigned char  *charBuffer  = (unsigned char *)  dir_address;
 
     if ( (void *) dir_name == NULL ){
-        printf ("fsFAT16ListFiles: [FAIL] dir_name\n");
+        printk ("fsFAT16ListFiles: [FAIL] dir_name\n");
         goto fail;
     }
 
     if ( *dir_name == 0 ){
-        printf ("fsFAT16ListFiles: [FAIL] *dir_name\n");
+        printk ("fsFAT16ListFiles: [FAIL] *dir_name\n");
         goto fail;
     }
 
@@ -575,7 +573,7 @@ fsFAT16ListFiles (
 // #bugbug
 // Missing string finalization.
         
-    // printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
+    // printk ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
     //        dir_name );
             
 // Number of entries.
@@ -607,7 +605,7 @@ fsFAT16ListFiles (
                  (const char *) &charBuffer[j],
                  11 );
              NameString[11] = 0;  //finalize string
-             printf("%s\n", NameString );
+             printk ("%s\n", NameString );
         }
 
         // (32/2) proxima entrada! 

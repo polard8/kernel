@@ -84,7 +84,7 @@ struct socket_d *create_socket_object(void)
 // Create and clean the structure.
     s = (void *) kmalloc( sizeof(struct socket_d) );
     if ((void *) s ==  NULL){
-        printf("create_socket_object: s\n");
+        printk("create_socket_object: s\n");
         goto fail;
     }
     memset( s, 0, sizeof(struct socket_d) );
@@ -172,21 +172,21 @@ void show_socket_for_a_process (pid_t pid)
     struct process_d  *p;
     struct socket_d   *s;
 
-    printf ("Socket info for pid %d: \n", pid);
+    printk ("Socket info for pid %d: \n", pid);
 
     if (pid<0 || pid >= PROCESS_COUNT_MAX){
-        printf ("pid limits\n");
+        printk ("pid limits\n");
         goto fail;
     }
 
 // process
     p = (struct process_d *) processList[pid];
     if ((void *) p == NULL){
-        printf("p\n");
+        printk("p\n");
         goto fail;
     }
     if ( p->used != TRUE || p->magic != 1234 ){
-        printf("p validation\n");
+        printk("p validation\n");
         goto fail;
     }
 
@@ -194,22 +194,22 @@ void show_socket_for_a_process (pid_t pid)
 // Pega o ponteiro para a estrutura privada de soquete.
     s = (struct socket_d *) p->priv;
     if ( (void *) s == NULL ){
-        printf("s\n");
+        printk("s\n");
         goto fail;
     }
     if ( s->used != TRUE || s->magic != 1234 ){
-        printf ("s validation\n");
+        printk ("s validation\n");
         goto fail;
     }
 
 // Show
 // sockaddr structure.
 
-    printf ("family %d \n",s->addr.sa_family);
-    printf ("data %s   \n",s->addr.sa_data);
-    //printf ("",s->);
-    //printf ("",s->);
-    //printf ("",s->);
+    printk ("family %d \n",s->addr.sa_family);
+    printk ("data %s   \n",s->addr.sa_data);
+    //printk ("",s->);
+    //printk ("",s->);
+    //printk ("",s->);
 
 //done:
     //refresh_screen();
@@ -318,7 +318,7 @@ socket_dialog (
     unsigned long arg4 )
 {
 
-    printf ("socket_dialog: number=%d \n", number);
+    printk ("socket_dialog: number=%d \n", number);
 
     if ( number < 7000 || number >= 8000 ){
         //message
@@ -347,7 +347,7 @@ socket_dialog (
 
         default:
             debug_print ("socket_dialog: default\n");
-            printf      ("socket_dialog: default\n");
+            printk      ("socket_dialog: default\n");
             refresh_screen();
             break;
     };
@@ -500,7 +500,7 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     case 4000:
         debug_print ("socket_ioctl: [4000]\n");
-        printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
+        printk("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
         //refresh_screen();
         // Is it a valid pid?
         f->sync.sender_pid = (pid_t) arg;
@@ -579,16 +579,16 @@ socket_gramado (
 // Process
     pid_t current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
-        printf ("socket_gramado: current_process\n");
+        printk ("socket_gramado: current_process\n");
         goto fail;
     }
     Process = (void *) processList[current_process];
     if ( (void *) Process == NULL ){
-        printf("socket_gramado: Process\n");
+        printk("socket_gramado: Process\n");
         goto fail;
     }
     if (Process->used != TRUE || Process->magic != 1234){
-        printf("socket_gramado: Process validation\n");
+        printk("socket_gramado: Process validation\n");
         goto fail;
     }
 
@@ -621,7 +621,7 @@ socket_gramado (
 // Check slot validation. 
     if (__slot == -1)
     {
-        printf ("socket_gramado: [FAIL] No free slots\n");
+        printk ("socket_gramado: [FAIL] No free slots\n");
         goto fail;
     }
 
@@ -632,16 +632,16 @@ socket_gramado (
     if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_gramado: buff fail\n");
-        printf      ("socket_gramado: buff fail\n");
+        printk      ("socket_gramado: buff fail\n");
         goto fail;
     }
 
 // File
     _file = (void *) kmalloc ( sizeof(file) );
-    if ( (void *) _file == NULL  ){
+    if ((void *) _file == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_gramado: [FAIL] _file fail\n");
-        printf      ("socket_gramado: [FAIL] _file fail\n");
+        printk      ("socket_gramado: [FAIL] _file fail\n");
         goto fail;
     }
     memset( _file, 0, sizeof(struct file_d) );
@@ -766,17 +766,17 @@ socket_unix (
 // Process
     pid_t current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
-        printf ("socket_unix: current_process\n");
+        printk ("socket_unix: current_process\n");
         goto fail;
     }
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
-        printf("socket_unix: Process\n");
+        printk("socket_unix: Process\n");
         goto fail;
 
     }
     if ( Process->used != TRUE || Process->magic != 1234 ){
-        printf("socket_unix: Process validation\n");
+        printk("socket_unix: Process validation\n");
         goto fail;
     }
 
@@ -806,7 +806,7 @@ socket_unix (
 
 // Check slot validation. 
     if ( __slot == -1 ){
-        printf ("socket_unix: No free slots\n");
+        printk ("socket_unix: No free slots\n");
         goto fail;
     }
 
@@ -816,7 +816,7 @@ socket_unix (
     if ((void *) buff == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_unix: [FAIL] Buffer allocation fail\n");
-        printf      ("socket_unix: [FAIL] Buffer allocation fail\n");
+        printk      ("socket_unix: [FAIL] Buffer allocation fail\n");
         goto fail;
     }
 
@@ -824,7 +824,7 @@ socket_unix (
     _file = (void *) kmalloc( sizeof(file) );
     if ((void *) _file == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
-        printf ("socket_unix: _file fail\n");
+        printk ("socket_unix: _file fail\n");
         goto fail;
     }
     memset( _file, 0, sizeof(struct file_d) );
@@ -964,16 +964,16 @@ socket_inet (
 // Process
     pid_t current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
-        printf ("socket_inet: current_process\n");
+        printk ("socket_inet: current_process\n");
         goto fail;
     }
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
-        printf("socket_inet: Process\n");
+        printk("socket_inet: Process\n");
         goto fail;
     }
     if ( Process->used != TRUE || Process->magic != 1234 ){
-        printf("socket_inet: Process validation\n");
+        printk("socket_inet: Process validation\n");
         goto fail;
     }
 
@@ -1003,7 +1003,7 @@ socket_inet (
 
 // Fail
     if ( __slot == -1 ){
-        printf ("socket_inet: No free slots\n");
+        printk ("socket_inet: No free slots\n");
         goto fail;
     }
 
@@ -1013,7 +1013,7 @@ socket_inet (
     if ((void *) buff == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_inet: [FAIL] Buffer allocation fail\n");
-        printf      ("socket_inet: [FAIL] Buffer allocation fail\n");
+        printk      ("socket_inet: [FAIL] Buffer allocation fail\n");
         goto fail;
     }
 
@@ -1021,7 +1021,7 @@ socket_inet (
     _file = (void *) kmalloc( sizeof(file) );
     if ((void *) _file == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
-        printf ("socket_inet: _file fail\n");
+        printk ("socket_inet: _file fail\n");
         goto fail;
     }
 // Clear the structure.

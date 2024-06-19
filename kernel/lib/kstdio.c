@@ -235,7 +235,7 @@ unsigned long kinput(unsigned long ch)
     {
         if (prompt_pos >= PROMPT_SIZE)
         {
-            //printf ("kstdio-input: [FAIL] INPUT_MODE_LINE full buffer!\n");
+            //printk ("kstdio-input: [FAIL] INPUT_MODE_LINE full buffer!\n");
             goto fail;
             // refresh_screen ();
             //return (unsigned long) 0; 
@@ -247,7 +247,7 @@ unsigned long kinput(unsigned long ch)
     {
         if (prompt_pos >= PROMPT_SIZE)
         {
-            //printf("kstdio-input: [FAIL] INPUT_MODE_MULTIPLE_LINES full buffer\n");
+            //printk("kstdio-input: [FAIL] INPUT_MODE_MULTIPLE_LINES full buffer\n");
             goto fail;
             //refresh_screen();
             //return (unsigned long) 0; 
@@ -405,16 +405,16 @@ fail:
 
 
 /*
- *  == Segue aqui o suporte a função 'printf' ====
+ *  == Segue aqui o suporte a função 'printk' ====
  *
  * #obs:
- * Em user mode temos uma modelo mais tradicional de printf,
+ * Em user mode temos uma modelo mais tradicional de printk,
  * talvez seja bom implementa-lo aqui também.
  */
 
 /*
  * prints:
- *     Rotina de suporta a printf. 
+ *     Rotina de suporta a printk. 
  */
  
 // #bugbug
@@ -473,7 +473,7 @@ prints (
 
 /*
  * printi:
- *     Rotina de suporta a printf.
+ *     Rotina de suporta a printk.
  */
 // '**out' #dangerdanger
 int 
@@ -542,7 +542,7 @@ printi (
 
 
 // print:
-// Rotina de suporta a printf.
+// Rotina de suporta a printk.
 // #bugbug
 // E se essa rotina for chamada com o primeiro argumento nulo?
 // vai escrever na IVT ?
@@ -657,14 +657,14 @@ int print ( char **out, int *varg )
 /*
  * printk:
  *     @field 2
- *     The printf function.
+ *     The printk function.
  *     Assuming sizeof(void *) == sizeof(int).
- * Em user mode temos uma modelo mais tradicional de printf,
+ * Em user mode temos uma modelo mais tradicional de printk,
  * talvez seja bom implementa-lo aqui tambem.
  */
 // #bugbug
 // #todo:
-// Devemos tentar usar o mesmo printf implementado na libc
+// Devemos tentar usar o mesmo printk implementado na libc
 // Essa aqui não está no padrão.
 // #todo:
 // Vamos substtuir essa função por uma de licensa bsd.
@@ -896,7 +896,7 @@ void kinguio_puts(const char* str)
     };
 }
 
-// printf
+// printk worker.
 // Credits: Nelson Cole. Project Sirius/Kinguio.
 
 int kinguio_printf(const char *fmt, ...)
@@ -931,7 +931,7 @@ int kputs(const char *str)
         return -1;
     }
     return (int) printk("%s",str);
-    //return (int) printf ("%s",str);
+    //return (int) printk ("%s",str);
 }
 
 /*
@@ -939,7 +939,7 @@ int kputs(const char *str)
  *     @field 2
  *     int sprintf ( char * str, const char * format, ... );
  *     Composes a string with the same text that would be 
- * printed if format was used on printf, 
+ * printed if format was used on printk, 
  * but instead of being printed, the content is stored 
  * as a C string in the buffer pointed by str.
  */
@@ -1012,7 +1012,7 @@ int k_fgetc(file *f)
     int ch=0;
 
     if ((void *) f == NULL){
-        printf ("k_fgetc: f\n");
+        printk ("k_fgetc: f\n");
         goto fail;
     }
 
@@ -1029,10 +1029,10 @@ int k_fgetc(file *f)
 			stream->_flags = (stream->_flags | _IOEOF); 
 			stream->_cnt = 0;
 			
-		    //printf ("#debug: fgetc: $\n");
+		    //printk ("#debug: fgetc: $\n");
 			
 			//isso funciona, significa que a estrutura tem ponteiro e base validos.
-			//printf("show fgetc:: %s @\n", stream->_base );
+			//printk("show fgetc:: %s @\n", stream->_base );
 		    //refresh_screen();
 			
 			return EOF;
@@ -1042,10 +1042,9 @@ int k_fgetc(file *f)
 		//#debug
 		//nao podemos acessar um ponteiro nulo... no caso endereço.
 
-
 // Buffer pointer
     if ( f->_p == 0 ){
-        printf ("k_fgetc: [FAIL] f->_p \n");
+        printk ("k_fgetc: [FAIL] f->_p \n");
         goto fail;
     }
 
@@ -1065,7 +1064,7 @@ int k_fgetc(file *f)
 fail:
     //#debug
     // #bugbug: Slow
-    printf ("k_fgetc: fail\n");
+    printk ("k_fgetc: fail\n");
     refresh_screen();
     return EOF;
 }
@@ -1159,7 +1158,7 @@ SEEK_END
         f->_r = offset;
         f->_w = offset;
         f->_p = (f->_base + offset); 
-        //printf("offset: %d\n",offset);
+        //printk("offset: %d\n",offset);
         //refresh_screen();
         //while(1){}
         goto done;
@@ -1241,13 +1240,13 @@ SEEK_END
 
 // Default
     default:
-        //printf ("default:\n");
+        //printk ("default:\n");
         goto fail;
         break;
     };
 
 fail:
-    printf ("k_fseek fail\n");
+    printk ("k_fseek fail\n");
     refresh_screen();
     return (int) (-1);
 done:
@@ -1514,16 +1513,13 @@ void k_setbuffer (file *f, char *buf, size_t size)
     };
 }
 
-
-void k_setlinebuf (file *f)
+void k_setlinebuf(file *f)
 {
-    printf ("k_setlinebuf: #todo\n");
-
-    if ( (void *) f == NULL ){
+    printk ("k_setlinebuf: #todo\n");
+    if ((void *) f == NULL){
         return;
     }
 }
-
 
 // #todo
 // Not implemented yet.
@@ -2096,7 +2092,7 @@ static void __initialize_virtual_consoles(void)
  *     Inicializa as estruturas do fluxo padrão.
  *     Quem chamou essa inicialização ?? Em que hora ??
  * #bugbug: Pelo jeito somente depois dessa inicialização é que temos mensagens 
- * com printf decentes. Então a inicialização do kernel precisa disso.
+ * com printk decentes. Então a inicialização do kernel precisa disso.
  * >> precisamos antecipar essa inicilização. Mas ela precisa ser depois da
  * inicialização da paginação.
  */
@@ -2119,7 +2115,7 @@ int kstdio_initialize(void)
 // refaremos as configurações de console.
 
     debug_print("kstdio_initialize: [TODO]\n");
-    //printf   ("kstdio_initialize: [TODO]\n");
+    //printk   ("kstdio_initialize: [TODO]\n");
 
 // ??
 // Input mode

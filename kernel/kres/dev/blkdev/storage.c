@@ -3,7 +3,6 @@
 
 #include <kernel.h>
 
-
 // The number of sectors in the boot disk.
 // See: storage_set_total_lba_for_boot_disk().
 unsigned long gNumberOfSectorsInBootDisk=0;
@@ -97,45 +96,45 @@ static int __ShowDiskInfo(int index)
     struct disk_d  *d;
     register int n = index;
 
-    printf("\n");
-    printf("\n");
+    //printk("\n");
+    printk("\n");
 
     //#debug
-    //printf ("__ShowDiskInfo:\n\n");
+    //printk ("__ShowDiskInfo:\n\n");
 
     if ( n<0 || n >= DISK_COUNT_MAX )
     {
-        printf("n fail\n");
+        printk("n fail\n");
         goto fail;
     }
     d = (struct disk_d *) diskList[n];
     if ((void *) d == NULL){
-        printf("d fail\n");
+        printk("d fail\n");
         goto fail;
     }
     if ( d->used != TRUE || d->magic != 1234 )
     {
-        printf("d validation\n");
+        printk("d validation\n");
         goto fail;
     }
 
 // Show data
 
-    printf("Disk (%d): Name {%s}\n", 
+    printk("Disk (%d): Name {%s}\n", 
         d->id, d->name );
 // Basics
-    printf("Bootdisk {%d}\n", d->boot_disk_number );
-    printf("Type     {%d}\n", d->diskType );
+    printk("Bootdisk {%d}\n", d->boot_disk_number );
+    printk("Type     {%d}\n", d->diskType );
     // ...
 // Capacity
-    printf("Number of blocks {%d}\n", d->number_of_blocks );
-    printf("Byte per sector  {%d}\n", d->bytes_per_sector );
-    printf("Size in bytes    {%d}\n", d->size_in_bytes );
+    printk("Number of blocks {%d}\n", d->number_of_blocks );
+    printk("Byte per sector  {%d}\n", d->bytes_per_sector );
+    printk("Size in bytes    {%d}\n", d->size_in_bytes );
     // ...
-    printf("Done\n");
+    printk("Done\n");
     return 0;
 fail:
-    printf("Fail\n");
+    printk("Fail\n");
     return (int) -1;
 }
 
@@ -328,7 +327,7 @@ int init_storage_support(void)
     storage = (void *) kmalloc( sizeof(struct storage_d) );
     if ((void *) storage == NULL)
     {
-       printf("init_storage_support: storage\n");
+       printk("init_storage_support: storage\n");
        return FALSE;
     }
     memset( storage, 0, sizeof(struct storage_d) );
@@ -446,9 +445,9 @@ struct partition_table_d *disk_get_partition_table(int index)
     // #debug
     int i=0;
     for (i=0; i<512; i++){
-        printf("%c",mbr_base[i]);
+        printk("%c",mbr_base[i]);
     };
-    printf("\n");
+    printk("\n");
     */
 
 // Partition table
@@ -472,10 +471,10 @@ struct partition_table_d *disk_get_partition_table(int index)
     };
 
     //#debug
-    //printf("Partition %d:\n",index);
-    //printf("active %x\n", pt->active );
-    //printf("start lba %d\n", pt->start_lba );
-    //printf("size %x\n", pt->size );
+    //printk("Partition %d:\n",index);
+    //printk("active %x\n", pt->active );
+    //printk("start lba %d\n", pt->start_lba );
+    //printk("size %x\n", pt->size );
     // ...
 
     return (struct partition_table_d *) pt;
@@ -492,7 +491,7 @@ int disk_initialize_mbr_info(void)
 // Get all the info in the mbr sector
 // And save it in some variable and structures.
 
-    printf ("disk_get_mbr_info:\n");
+    printk ("disk_get_mbr_info:\n");
 
     if (g_ata_driver_initialized != TRUE){
         panic("disk_get_mbr_info: g_ata_driver_initialized\n");
@@ -518,7 +517,7 @@ int disk_initialize_mbr_info(void)
     if ( (void*) system_disk_pt3 == NULL )
         return -1;
 
-    printf("done\n");
+    printk("done\n");
     //while(1){}
     return 0;
 }
@@ -531,12 +530,12 @@ void disk_show_mbr_info(void)
         return;
 
     //#debug
-    //printf("Partition %d:\n",index);
-    printf("active %x\n", 
+    //printk("Partition %d:\n",index);
+    printk("active %x\n", 
         system_disk_pt0->active );
-    printf("start lba %d\n", 
+    printk("start lba %d\n", 
         system_disk_pt0->start_lba );
-    printf("size %x\n", 
+    printk("size %x\n", 
         system_disk_pt0->size );
     // ...
 }
@@ -595,14 +594,12 @@ storage_write_sector(
 int disk_init (void)
 {
     struct disk_d *d;
-
     unsigned char BootDisk=0;
     int i=0;
 
 //#ifdef KERNEL_VERBOSE
-    //printf ("disk_init: Initializing..\n");
+    //printk ("disk_init: Initializing..\n");
 //#endif
-
 
 //
 //  storage structure
@@ -689,7 +686,7 @@ int disk_init (void)
    //more?
 
 //done:
-    printf("Done\n");
+    printk("Done\n");
     return 0;
 }
 
@@ -714,7 +711,7 @@ void diskShowCurrentDiskInfo(void)
 {
     if (current_disk<0)
         return;
-    printf("The current disk is {%d}.\n", current_disk );
+    printk("The current disk is {%d}.\n", current_disk );
     __ShowDiskInfo(current_disk);
 }
 
@@ -786,49 +783,49 @@ static int __ShowVolumeInfo(int index)
 {
     struct volume_d *v;
 
-    printf("\n");
-    printf("\n");
+    printk("\n");
+    printk("\n");
 
-    //printf ("__ShowVolumeInfo:\n");
+    //printk ("__ShowVolumeInfo:\n");
 
 
     if ( index < 0 || 
          index >= VOLUME_COUNT_MAX )
     {
-        printf("index fail\n");
+        printk("index fail\n");
         goto fail;
     }
 
 // Structure validation
     v = (struct volume_d *) volumeList[index];
     if ( (void *) v == NULL ){
-        printf ("struct fail\n");
+        printk ("struct fail\n");
         goto fail;
     }
     if ( v->used != 1 || v->magic != 1234 )
     {
-        printf("flags fail\n");
+        printk("flags fail\n");
         goto fail;
     }
 
 // Show data
 
-    printf ("Volume (%d): Name {%s}\n", v->id, v->name);
+    printk ("Volume (%d): Name {%s}\n", v->id, v->name);
 // Basics
-    printf ("Type     {%d}\n", v->volumeType);
+    printk ("Type     {%d}\n", v->volumeType);
 // LBAs
-    printf ("VBR_lba  {%d}\n", v->VBR_lba );
-    printf ("FAT2_lba {%d}\n", v->FAT1_lba);
-    printf ("FAT2_lba {%d}\n", v->FAT2_lba);
-    printf ("ROOT_lba {%d}\n", v->ROOT_lba);
-    printf ("DATA_lba {%d}\n", v->DATA_lba);
+    printk ("VBR_lba  {%d}\n", v->VBR_lba );
+    printk ("FAT2_lba {%d}\n", v->FAT1_lba);
+    printk ("FAT2_lba {%d}\n", v->FAT2_lba);
+    printk ("ROOT_lba {%d}\n", v->ROOT_lba);
+    printk ("DATA_lba {%d}\n", v->DATA_lba);
     // ...
 
 //done
     return 0;
 
 fail:
-    printf("Fail\n");
+    printk("Fail\n");
     return (int) -1;
 }
 
@@ -841,7 +838,7 @@ void volumeShowCurrentVolumeInfo(void)
 {
     if (current_volume<0)
         return;
-    printf ("The current volume is %d\n", current_volume );
+    printk ("The current volume is %d\n", current_volume );
 
 // #bugbug
 // Valume is not a disk.
@@ -903,11 +900,11 @@ int storage_set_total_lba_for_boot_disk(void)
 // Get the boot disk
     disk = (struct disk_d *) ____boot____disk;
     if ( (void*) disk == NULL ){
-        printf("disk\n");
+        printk("disk\n");
         goto fail;
     }
     if (disk->magic != 1234){
-        printf("disk validation\n");
+        printk("disk validation\n");
         goto fail;
     }
 
@@ -915,17 +912,17 @@ int storage_set_total_lba_for_boot_disk(void)
     // Get the ata device information
     ata_device = (struct ata_device_d *) disk->ata_device;
     if ( (void*) ata_device == NULL ){
-        printf("ata_device\n");
+        printk("ata_device\n");
         goto fail;
     }
     if (ata_device->magic != 1234){
-        printf("ata_device validation\n");
+        printk("ata_device validation\n");
         goto fail;
     }
 
 // --------------------------------
     // Show the number of blocks.
-    printf("Number of blocks: %d\n",
+    printk("Number of blocks: %d\n",
         ata_device->dev_total_num_sector );
 
 // Set global variable.
@@ -934,7 +931,7 @@ int storage_set_total_lba_for_boot_disk(void)
 
 // Save it in the main storage structure.
     if ((void*) storage == NULL){
-        printf("storage\n");
+        printk("storage\n");
         goto fail;
     }
     storage->mumber_of_sectors_in_boot_disk = 

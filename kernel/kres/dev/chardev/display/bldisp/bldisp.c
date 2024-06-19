@@ -1,7 +1,7 @@
 
 // bldisp.c
 // bl display device device driver.
-
+// Created by Fred Nora.
 // Rotinas paga gerenciar os controladores de video.
 // Crt, Vga ...
 // See:
@@ -722,7 +722,7 @@ int bldisp_initialize(void)
     bl_display_device->initialized = TRUE;
 
     //PROGRESS("bldisp_initialize: Setup display device\n");
-    //printf  ("bldisp_initialize: Setup display device\n");
+    //printk  ("bldisp_initialize: Setup display device\n");
 
     return 0;
 }
@@ -740,11 +740,11 @@ void bldisp_show_info(void)
     if (bl_display_device->initialized != TRUE)
         return;
 // Print
-    printf ("Width: %d | Height: %d | BPP: %d \n",
+    printk ("Width: %d | Height: %d | BPP: %d \n",
         bl_display_device->framebuffer_width,
         bl_display_device->framebuffer_height,
         bl_display_device->framebuffer_bpp );
-    printf("Screen size: %d KB\n",
+    printk ("Screen size: %d KB\n",
         bl_display_device->framebuffer_size_in_kb );
 }
 

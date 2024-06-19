@@ -1,5 +1,5 @@
-
 // user.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -31,7 +31,7 @@ void init_zh(void)
     register int i=0;
 
     debug_print ("init_zh:\n");
-    //printf("init_zh: Initializing..\n");
+    //printk("init_zh: Initializing..\n");
 
     zh_count = 0;
 // List
@@ -203,10 +203,9 @@ void SetCurrentUserId(uid_t user_id)
 {
     if ( user_id < 0 || user_id >= USER_COUNT_MAX )
     {
-        printf ("SetCurrentUserId: [FAIL]\n");
+        printk ("SetCurrentUserId: [FAIL]\n");
         return;
     }
-
     current_user = (uid_t) user_id;
 }
 
@@ -373,7 +372,7 @@ struct user_info_d *CreateUser(char *name, int type)
             // User Id. 
             New->userId = (uid_t) Index;
             userList[Index] = (unsigned long) New;
-            // printf("CreateUser: Done.\n");
+            // printk("CreateUser: Done.\n");
             New->initialized = TRUE;
             return (struct user_info_d *) New;
         }
@@ -389,7 +388,6 @@ fail:
     return NULL;
 }
 
-
 // Called by I_kmain() in kmain.c.
 int userCreateRootUser(void)
 {
@@ -403,10 +401,10 @@ int userCreateRootUser(void)
         (struct user_info_d *) CreateUser("root",USER_TYPE_INTERACTIVE);
 
     if ((void*) RootUser == NULL){
-        printf("userCreateRootUser: RootUser\n");
+        printk("userCreateRootUser: RootUser\n");
     }
     if (RootUser->magic != 1234){
-        printf("userCreateRootUser: RootUser validation\n");
+        printk("userCreateRootUser: RootUser validation\n");
     }
 
 // User ID.
@@ -414,10 +412,9 @@ int userCreateRootUser(void)
         panic("userCreateRootUser: root is not 0\n");
     }
 
-
 // #debug
 // Print the username.
-    printf("Username: {%s}\n",RootUser->__username);
+    printk("Username: {%s}\n",RootUser->__username);
     //refresh_screen();
     //while(1){}
 
@@ -462,7 +459,7 @@ int User_initialize(void)
     current_zh      = 0;
 
 // Initialize user info structure
-    printf ("User_initialize: init_user_info\n");
+    printk ("User_initialize: init_user_info\n");
     //init_user_info ();   
 
 //
@@ -471,11 +468,11 @@ int User_initialize(void)
 
 // Initialize User Session, and zh.
 // user section
-    //printf ("User_initialize: initializing user session\n");
+    //printk ("User_initialize: initializing user session\n");
     //init_user_session();
 
     // zh
-    printf ("User_initialize: initializing zh\n");   
+    printk ("User_initialize: initializing zh\n");   
     init_zh();
 
     //debug_print("User_initialize: done\n");
@@ -505,13 +502,13 @@ int init_logon_manager (void)
 // As mensagens do kernel precisam usar esses parametros.
 // o kernel usa a tty0.
 
-     // Limpa a lista
-     printf ("init_logon_manager: Initializing tty module\n");
-     //tty_init_module();
+    // Limpa a lista
+    printk ("init_logon_manager: Initializing tty module\n");
+    //tty_init_module();
 
-     // Limpa a lista de terminais virtuais tamb�m.
-     printf ("init_logon_manager: Initializing vt module\n");
-     //vt_init_module();
+    // Limpa a lista de terminais virtuais tamb�m.
+    printk ("init_logon_manager: Initializing vt module\n");
+    //vt_init_module();
 
 // See: userenv.c
     User_initialize();

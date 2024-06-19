@@ -1,5 +1,6 @@
 
 // pciinfo.c
+// Created by Fred Nora.
 
 #include <kernel.h>  
 
@@ -52,7 +53,7 @@ int pciInfo(void)
     register int i=0;
     int Max = PCI_DEVICE_LIST_SIZE;
 
-    printf ("pciInfo:\n");
+    printk ("pciInfo:\n");
 
     for (i=0; i<Max; i++)
     {
@@ -61,8 +62,8 @@ int pciInfo(void)
         {
             if ( D->used == TRUE && D->magic == 1234 )
             {
-                printf ("\n");
-                printf ("[%d/%d/%d] Vend=%x Dev=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
+                printk ("\n");
+                printk ("[%d/%d/%d] Vend=%x Dev=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
                     D->bus, D->dev , D->func,
                     D->Vendor, D->Device, 
                     pci_class_strings[ D->classCode ], D->subclass, 
@@ -71,7 +72,7 @@ int pciInfo(void)
         }
     };
 
-    printf ("Done\n");
+    printk ("Done\n");
     return 0; 
 }
 
@@ -104,7 +105,7 @@ int pciShowDeviceInfo(int number)
         goto fail;
 
 // print
-    printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x}\n",
+    printk ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x}\n",
         D->Vendor, D->Device, D->classCode, D->irq_line );
 
 // done

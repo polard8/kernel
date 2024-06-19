@@ -4,7 +4,6 @@
 // Credits:
 //   + Ported from Sirius-x86-64, created by Nelson Cole.
 
-
 #include <kernel.h>
 
 // Initialization control.
@@ -320,12 +319,11 @@ static int __setup_ioapic(void)
     return 0;
 }
 
-
 void enable_ioapic(void)
 {
 // Called by I_kmain() in kmain.c.
 
-    printf("enable_ioapic:\n");
+    printk("enable_ioapic:\n");
 
 // It depends on LAPIC.
     if (LAPIC.initialized != TRUE)

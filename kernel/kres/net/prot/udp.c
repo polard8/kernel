@@ -50,7 +50,7 @@ network_handle_udp(
     struct udp_d *udp;
     register int i=0;
 
-    //printf ("UDP: Received\n");
+    //printk ("UDP: Received\n");
 
 // #warning
 // It's ok to use pointer here.
@@ -58,14 +58,14 @@ network_handle_udp(
 // a pre-allocated buffer.
     udp = (struct udp_d *) buffer;
     if ((void*) udp == NULL){
-        printf("network_handle_udp: udp\n");
+        printk("network_handle_udp: udp\n");
         return;
     }
 
 // The minimum size.
 // Only the udp header.
     //if (size < UDP_HEADER_LENGHT){
-    //    printf("network_handle_udp: size\n");
+    //    printk("network_handle_udp: size\n");
     //    return;
     //}
 
@@ -74,10 +74,10 @@ network_handle_udp(
 
 /*
     //#debug
-    printf ("sp ={%d}\n",sport);
-    printf ("dp ={%d}\n",dport);
-    printf ("len={%d}\n",udp->uh_ulen);
-    printf ("sum={%d}\n",udp->uh_sum);
+    printk ("sp ={%d}\n",sport);
+    printk ("dp ={%d}\n",dport);
+    printk ("len={%d}\n",udp->uh_ulen);
+    printk ("sum={%d}\n",udp->uh_sum);
 */
 
 // Clean the payload local buffer.
@@ -109,7 +109,7 @@ network_handle_udp(
 
     //#debug
     // A lot of noise.
-    //printf("UDP: dport{%d} #debug\n",dport);
+    //printk("UDP: dport{%d} #debug\n",dport);
 
 // Don't print every message.
 // Is it a valid port?
@@ -125,7 +125,7 @@ network_handle_udp(
 // Handle dhcp protocol.
     if (dport == 68 || dport == 67)
     {
-        //printf("UDP: dport{%d}   #debug\n",dport);
+        //printk("UDP: dport{%d}   #debug\n",dport);
         //die();
         network_handle_dhcp(
             (buffer + UDP_HEADER_LENGHT),
@@ -155,8 +155,8 @@ network_handle_udp(
 
         // #debug
         if (dport == 11888){
-            printf ("------------------------\n");
-            printf ("---- UDP -> [11888] ----\n");
+            printk ("------------------------\n");
+            printk ("---- UDP -> [11888] ----\n");
         }
 
         // Print the message for these ports.
@@ -167,7 +167,7 @@ network_handle_udp(
             // the udp's payloads.
             network_push_packet( udp_payload, 512 );
         } else {
-            printf("UDP: MESSAGE: {%s}\n", udp_payload );
+            printk("UDP: MESSAGE: {%s}\n", udp_payload );
 
             // #test
             // Send a command to the init process.
@@ -312,7 +312,7 @@ network_send_udp (
 
     if ((void *) currentNIC == NULL)
     {
-        printf("network_send_udp: currentNIC\n");
+        printk("network_send_udp: currentNIC\n");
         goto fail;
     }
 
@@ -327,7 +327,7 @@ network_send_udp (
 
 //==============================================
     if ((void*) data == NULL){
-        printf ("network_send_udp: Invalid data buffer\n");
+        printk ("network_send_udp: Invalid data buffer\n");
         goto fail;
     }
 
@@ -340,7 +340,7 @@ network_send_udp (
     struct ether_header  *eh;
     eh = (void *) kmalloc( sizeof(struct ether_header ) );
     if ((void *) eh == NULL){
-        printf("network_send_udp: eh fail\n");
+        printk("network_send_udp: eh fail\n");
         goto fail;
     }
     */
@@ -365,7 +365,7 @@ network_send_udp (
     struct ip_d  *ipv4;
     ipv4 = (void *) kmalloc( sizeof(struct ip_d) );
     if ((void *) ipv4 == NULL){
-        printf("network_send_udp: ipv4 fail\n");
+        printk("network_send_udp: ipv4 fail\n");
         goto fail;
     }
     */
@@ -432,7 +432,7 @@ network_send_udp (
         (const void *) &target_ip[0], 
         4 );
     //ipv4->ip_dst.s_addr = (unsigned int) ToNetByteOrder32(ipv4->ip_dst.s_addr);
-    //printf ("ip %x\n", ipv4->ip_dst.s_addr);
+    //printk ("ip %x\n", ipv4->ip_dst.s_addr);
 */
 
     //unsigned char *spa = (unsigned char *) &ipv4->ip_src.s_addr;
@@ -461,9 +461,9 @@ network_send_udp (
     Lipv4.ip_sum =
          (uint16_t) ToNetByteOrder16(Lipv4.ip_sum);
 
-    printf("ip_sum={%x} \n",Lipv4.ip_sum);
+    printk("ip_sum={%x} \n",Lipv4.ip_sum);
 
-    //printf ("size %d\n", sizeof (struct ip_d) );
+    //printk ("size %d\n", sizeof (struct ip_d) );
     //refresh_screen();
     //while(1){}
 
@@ -474,7 +474,7 @@ network_send_udp (
     struct udp_d  *udp;
     udp = (void *) kmalloc( sizeof(struct udp_d) );
     if ((void *) udp == NULL){
-        printf("network_send_udp: udp fail\n");
+        printk("network_send_udp: udp fail\n");
         goto fail;
     }
     */
@@ -500,7 +500,7 @@ network_send_udp (
 // # UDP lets us set the checksum to 0 to ignore it?
     Ludp.uh_sum = 0;  //#todo
 
-    //printf ("size %d\n", sizeof (struct  udp_d) );
+    //printk ("size %d\n", sizeof (struct  udp_d) );
     //refresh_screen();
     //while(1){}
 
@@ -529,7 +529,7 @@ network_send_udp (
         (unsigned char *) currentNIC->tx_buffers_virt[buffer_index];
 
     //#debug
-    //printf ("buffer_index {%d}\n",buffer_index);
+    //printk ("buffer_index {%d}\n",buffer_index);
 
 // #importante:
 // Preparando ponteiros para manipularmos as 
@@ -632,10 +632,10 @@ network_send_udp (
     //kfree(udp);
     //kfree(udp);
 
-    printf("Done\n");
+    printk("Done\n");
     return 0;
 fail:
-    printf ("Fail\n");
+    printk ("Fail\n");
     return -1;
 }
 

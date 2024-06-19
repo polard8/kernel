@@ -3,7 +3,6 @@
 
 #include <kernel.h>
 
-
 /*
  * hal_probe_cpu:
  *     Detectar qual é o tipo de processador. 
@@ -73,7 +72,7 @@ int hal_probe_processor_type (void)
 
     //debug.
     debug_print("hal_probe_processor_type:\n");
-    //printf("Scaning x86 CPU ...\n");
+    //printk("Scaning x86 CPU ...\n");
 
 // Check processor structure.
     if ((void *) processor == NULL){

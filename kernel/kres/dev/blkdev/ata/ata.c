@@ -515,7 +515,7 @@ static int __ide_identify_device(uint8_t nport)
     unsigned long rw_size_in_sectors=0;
     rw_size_in_sectors = in8( ata_port[nport].cmd_block_base_address + ATA_REG_SECCOUNT );
     if (rw_size_in_sectors>0){
-       printf("::#breakpoint NumberOfSectors %d \n",rw_size_in_sectors);
+       printk("::#breakpoint NumberOfSectors %d \n",rw_size_in_sectors);
        refresh_screen();
        while(1){}
     }
@@ -611,7 +611,7 @@ static int __ide_identify_device(uint8_t nport)
 
     if( Max_LBA > 0 )
     {
-        printf("::#breakpoint Max_LBA %d \n",Max_LBA);
+        printk("::#breakpoint Max_LBA %d \n",Max_LBA);
         //refresh_screen();
         //while(1){}
         
@@ -949,7 +949,7 @@ static int ata_initialize_ide_device(char port)
 // Limits
 // 4 ports only    
     if (port < 0 || port >= 4){
-        printf("ata_initialize_ide_device: port\n");
+        printk("ata_initialize_ide_device: port\n");
         goto fail;
     }
 
@@ -995,7 +995,7 @@ static int ata_initialize_ide_device(char port)
     new_dev = 
         (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
     if ((void *) new_dev ==  NULL){
-        printf("ata_initialize_ide_device: new_dev\n");
+        printk("ata_initialize_ide_device: new_dev\n");
         goto fail;
     }
     memset(new_dev, 0, sizeof(struct ata_device_d) );
@@ -1126,7 +1126,7 @@ static int ata_initialize_ide_device(char port)
 
         //if ( new_dev->dev_total_num_sector > 0 )
         //{
-        //     printf ("#debug: >>>> ata Size %d\n", 
+        //     printk ("#debug: >>>> ata Size %d\n", 
         //         new_dev->dev_total_num_sector );
         //     refresh_screen();
         //     while(1){}
@@ -1227,7 +1227,7 @@ static int ata_initialize_ide_device(char port)
 
         //if ( new_dev->dev_total_num_sector > 0 )
         //{
-        //   printf ("#debug: >>>> atapi Size %d\n", 
+        //   printk ("#debug: >>>> atapi Size %d\n", 
         //       new_dev->dev_total_num_sector );
         //   refresh_screen();
         //   while(1){}
@@ -1325,7 +1325,7 @@ static int ata_initialize_ide_device(char port)
 
 //#ifdef KERNEL_VERBOSE
     // #todo
-    // kprintf("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
+    // printk("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
     // refresh_screen ();
 //#endif
 
@@ -1337,7 +1337,7 @@ static int ata_initialize_ide_device(char port)
     struct ata_device_d *tmp;
     tmp = (struct ata_device_d *) ready_queue_dev;
     if ((void *) tmp ==  NULL){
-        printf("ata_initialize_ide_device: [FAIL] tmp\n");
+        printk("ata_initialize_ide_device: [FAIL] tmp\n");
         goto fail;
     }
 
@@ -1505,8 +1505,8 @@ static int __ata_initialize(int ataflag)
 
 /*
     //#debug
-    printf ("kernel CONFIG:     IDE port: %d\n",boottime_ideport_index);   // from config.h
-    printf ("kernel xBootBlock: IDE port: %d\n",xBootBlock.ide_port_number);  // from bootblock, from bl.bin
+    printk ("kernel CONFIG:     IDE port: %d\n",boottime_ideport_index);   // from config.h
+    printk ("kernel xBootBlock: IDE port: %d\n",xBootBlock.ide_port_number);  // from bootblock, from bl.bin
     refresh_screen();
     while(1){}
 */
@@ -1526,8 +1526,8 @@ static int __ata_initialize(int ataflag)
 //
 
 //#ifdef KERNEL_VERBOSE
-    //printf ("ata_initialize:\n");
-    //printf ("Initializing IDE/AHCI support ...\n");
+    //printk ("ata_initialize:\n");
+    //printk ("Initializing IDE/AHCI support ...\n");
 //#endif
 
 // #test
@@ -1561,8 +1561,8 @@ static int __ata_initialize(int ataflag)
     }
 
 //#debug
-    // printf (": IDE device found\n");
-    // printf ("[ Vendor=%x Device=%x ]\n", PCIDeviceATA->Vendor, PCIDeviceATA->Device );
+    // printk (": IDE device found\n");
+    // printk ("[ Vendor=%x Device=%x ]\n", PCIDeviceATA->Vendor, PCIDeviceATA->Device );
 
 // Vamos saber mais sobre o dispositivo encontrado. 
 // #bugbug: 
@@ -1640,7 +1640,7 @@ static int __ata_initialize(int ataflag)
     // Type
     if (AtaController.controller_type == ATA_IDE_CONTROLLER){
 
-        printf ("__ata_initialize: [IDE] Initialize ports\n");
+        printk ("__ata_initialize: [IDE] Initialize ports\n");
         //while(1){}
         
         // Soft Reset, defina IRQ.
@@ -1661,7 +1661,7 @@ static int __ata_initialize(int ataflag)
         ata_record_dev     = 0xff;
         ata_record_channel = 0xff;
 
-        //printf ("Initializing IDE Mass Storage device ...\n");
+        //printk ("Initializing IDE Mass Storage device ...\n");
         //refresh_screen ();
 
         // As estruturas de disco serão colocadas em uma lista encadeada.
@@ -1678,7 +1678,7 @@ static int __ata_initialize(int ataflag)
             (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
 
         if ((void*) ready_queue_dev == NULL){
-            printf("__ata_initialize: ready_queue_dev\n");
+            printk("__ata_initialize: ready_queue_dev\n");
             Status = (int) -1;
             goto fail;
         }
@@ -1705,7 +1705,7 @@ static int __ata_initialize(int ataflag)
         // Is this buffer enough?
         ata_identify_dev_buf = (unsigned short *) kmalloc(4096);
         if ((void *) ata_identify_dev_buf == NULL){
-            printf ("ata_initialize: ata_identify_dev_buf\n");
+            printk ("ata_initialize: ata_identify_dev_buf\n");
             Status = (int) -1;
             goto fail;
         }
@@ -1752,7 +1752,7 @@ static int __ata_initialize(int ataflag)
     if (AtaController.controller_type == ATA_RAID_CONTROLLER)
     {
         // #debug
-        printf ("__ata_initialize: [RAID] Unsupported type\n");
+        printk ("__ata_initialize: [RAID] Unsupported type\n");
         die();
         while (1){
         };
@@ -1769,7 +1769,7 @@ static int __ata_initialize(int ataflag)
 // see: https://wiki.qemu.org/Features/Q35
 
     if (AtaController.controller_type == ATA_AHCI_CONTROLLER){
-        printf ("__ata_initialize: [AHCI] Unsupported type\n");
+        printk ("__ata_initialize: [AHCI] Unsupported type\n");
         while(1){}
         Status = (int) -1;
         goto fail;
@@ -1779,7 +1779,7 @@ static int __ata_initialize(int ataflag)
 // Unknown controller type.
 
     if (AtaController.controller_type == ATA_UNKNOWN_CONTROLLER){
-        printf ("__ata_initialize: [UNKNOWN] Unsupported type\n");
+        printk ("__ata_initialize: [UNKNOWN] Unsupported type\n");
         while(1){}
         Status = (int) -1;
         goto fail;
@@ -1788,9 +1788,9 @@ static int __ata_initialize(int ataflag)
 // ==============================================
 // Nem IDE, nem RAID, nem AHCI.
     Status = (int) -1;
-    printf("__ata_initialize: IDE, RAID or AHCI were not found\n");
+    printk("__ata_initialize: IDE, RAID or AHCI were not found\n");
 fail:
-    printf ("__ata_initialize: fail\n");
+    printk ("__ata_initialize: fail\n");
     return -1;
     //return (int) Status;
 

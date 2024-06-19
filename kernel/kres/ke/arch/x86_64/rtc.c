@@ -1,5 +1,5 @@
-
 // rtc.c
+// Created by Fred Nora.
 
 #include <kernel.h>  
 
@@ -8,9 +8,7 @@ struct rtc_d  *rtc;
 static void DeviceInterface_RTC(void);
 int __rtc_init_datastructure(void);
 
-
 // ===========================
-
 
 // read_cmos_bcd:
 // Lê da CMOS um determinado registro. 
@@ -195,7 +193,7 @@ int __rtc_init_datastructure(void)
 // Global struct
     rtc = (void *) kmalloc( sizeof(struct rtc_d) );
     if ((void *) rtc == NULL){
-        printf("get_cmos_info: rtc\n");
+        printk("get_cmos_info: rtc\n");
         goto fail;
     }
     memset( rtc, 0, sizeof(struct rtc_d) );
@@ -219,17 +217,16 @@ int __rtc_init_datastructure(void)
     //if ( (void *) Hardware == NULL )
     //{
         // #bugbug
-    //    printf("get_cmos_info: Hardware\n");
+    //    printk("get_cmos_info: Hardware\n");
     //    goto fail;
     //}
     
 // Save
     //Hardware->rtc = rtc;
 
-
     //#debug
-    //printf("Time=%d:%d:%d\n", rtc->Hours, rtc->Minutes, rtc->Seconds );
-    //printf("Date=%d/%d/%d\n", rtc->DayOfMonth, rtc->Month, rtc->Year );
+    //printk("Time=%d:%d:%d\n", rtc->Hours, rtc->Minutes, rtc->Seconds );
+    //printk("Date=%d/%d/%d\n", rtc->DayOfMonth, rtc->Month, rtc->Year );
     //refresh_screen();
     //while(1){}
 
@@ -269,8 +266,8 @@ int init_rtc(void)
     //unsigned long Time, Date;
     //Time = get_time();
     //Date = get_date();  
-    //printf("CLOCK INFORMATION:\n");
-    //printf("Time=%d Date=%d\n", Time, Date);
+    //printk("CLOCK INFORMATION:\n");
+    //printk("Time=%d Date=%d\n", Time, Date);
 
     __breaker_rtc_initialized = TRUE;
 

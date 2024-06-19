@@ -141,7 +141,7 @@ int processDeferredKernelRequest(void)
 
     if (r >= KERNEL_REQUEST_MAX){
         // msg ...
-        printf ("processDeferredKernelRequest: Invalid request\n");
+        printk ("processDeferredKernelRequest: Invalid request\n");
         return -1;
     }
 
@@ -251,7 +251,7 @@ int processDeferredKernelRequest(void)
         // também sairemos do processo.
         case 12:
             //debug_print ("processDeferredKernelRequest: [12] Exit thread\n");
-            //printf      ("request: [12] [DEBUG] Exiting thread %d\n", 
+            //printk      ("request: [12] [DEBUG] Exiting thread %d\n", 
             //    REQUEST.target_tid);
             //do_request_12( (int) REQUEST.target_tid );
             break;
@@ -298,7 +298,7 @@ int processDeferredKernelRequest(void)
 
         default:
             debug_print ("processDeferredKernelRequest: Default\n");  
-            printf      ("processDeferredKernelRequest: Default request {%d}\n", r );
+            printk      ("processDeferredKernelRequest: Default request {%d}\n", r );
             break;
     };
 

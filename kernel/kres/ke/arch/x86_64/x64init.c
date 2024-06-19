@@ -92,7 +92,7 @@ static int __setup_stdin_cmdline(void)
 // Put the command line string into the local buffer.
 
     // #debug
-    //printf("k: Initializing cmdline\n"); 
+    //printk("k: Initializing cmdline\n"); 
     //refresh_screen();
 
 // Run both modes, cmdline and then server mode.
@@ -202,7 +202,7 @@ static int __load_initbin_image(void)
                             BUGBUG_IMAGE_SIZE_LIMIT );     // buffer limits
 
     if (Status != 0){
-        printf("__load_initbin_image: on fsLoadFile()\n");
+        printk("__load_initbin_image: on fsLoadFile()\n");
         goto fail;
     }
 
@@ -229,13 +229,13 @@ static int I_x64CreateInitialProcess(void)
 
 // #debug
     //debug_print ("I_x64CreateInitialProcess: \n");
-    //printf      ("I_x64CreateInitialProcess:\n");
+    //printk      ("I_x64CreateInitialProcess:\n");
     //refresh_screen();
 
     InitialProcessInitialized = FALSE;
 
     if (system_state != SYSTEM_BOOTING){
-        printf ("I_x64CreateInitialProcess: system_state\n");
+        printk ("I_x64CreateInitialProcess: system_state\n");
         return FALSE;
     }
 
@@ -254,7 +254,7 @@ static int I_x64CreateInitialProcess(void)
     int ret0 = -1;
     ret0 = (int) __load_initbin_image();
     if (ret0 != 0){
-        printf("I_x64CreateInitialProcess: Coldn't load INIT.BIN\n");
+        printk("I_x64CreateInitialProcess: Coldn't load INIT.BIN\n");
         return FALSE;
     }
 
@@ -270,7 +270,7 @@ static int I_x64CreateInitialProcess(void)
     void *init_pml4_va = (void *) CloneKernelPML4();
 
     if (init_pml4_va == 0){
-        printf("I_x64CreateInitialProcess: init_pml4_va\n");
+        printk("I_x64CreateInitialProcess: init_pml4_va\n");
         return FALSE;
     }
 
@@ -281,7 +281,7 @@ static int I_x64CreateInitialProcess(void)
                             gKernelPML4Address );
 
     if (init_mm_data.pml4_pa == 0){
-        printf("I_x64CreateInitialProcess: init_mm_data.pml4_pa\n");
+        printk("I_x64CreateInitialProcess: init_mm_data.pml4_pa\n");
         return FALSE;
     }
 
@@ -317,13 +317,13 @@ static int I_x64CreateInitialProcess(void)
 
 // validation
     if ((void *) InitProcess == NULL){
-        printf("I_x64CreateInitialProcess: InitProcess\n");
+        printk("I_x64CreateInitialProcess: InitProcess\n");
         return FALSE;
     }
     if ( InitProcess->used != TRUE || 
          InitProcess->magic != 1234 )
     {
-        printf("I_x64CreateInitialProcess: InitProcess validation\n");
+        printk("I_x64CreateInitialProcess: InitProcess validation\n");
         return FALSE;
     }
 
@@ -331,7 +331,7 @@ static int I_x64CreateInitialProcess(void)
 // #bugbug: Who gave this pid to this process?
     if ( InitProcess->pid != GRAMADO_PID_INIT )
     {
-        printf ("I_x64CreateInitialProcess: pid\n");
+        printk ("I_x64CreateInitialProcess: pid\n");
         return FALSE;
     }
 
@@ -362,7 +362,7 @@ static int I_x64CreateInitialProcess(void)
     if ( init_mm_data.used != TRUE || 
          init_mm_data.magic != 1234 )
     {
-        printf ("I_x64CreateInitialProcess: init_mm_data validation\n");
+        printk ("I_x64CreateInitialProcess: init_mm_data validation\n");
         return FALSE;
     }
 
@@ -391,25 +391,25 @@ static int I_x64CreateInitialProcess(void)
 
     InitThread = (struct thread_d *) create_init_thread();
     if ((void *) InitThread == NULL){
-        printf ("I_x64CreateInitialProcess: InitThread\n");
+        printk ("I_x64CreateInitialProcess: InitThread\n");
         return FALSE;
     }
     if ( InitThread->used != TRUE || InitThread->magic != 1234 )
     {
-        printf("I_x64CreateInitialProcess: InitThread validation\n");
+        printk("I_x64CreateInitialProcess: InitThread validation\n");
         return FALSE;
     }
 // Invalid TID.
 // Tem que ser a primeira thread.
 // INIT_TID
     if (InitThread->tid != 0){
-        printf("I_x64CreateInitialProcess: InitThread->tid\n");
+        printk("I_x64CreateInitialProcess: InitThread->tid\n");
         return FALSE;
     }
 // Invalid PID.
 // owner pid
     if ( InitThread->owner_pid != GRAMADO_PID_INIT ){
-        printf ("I_x64CreateInitialProcess: GRAMADO_PID_INIT\n");
+        printk ("I_x64CreateInitialProcess: GRAMADO_PID_INIT\n");
         return FALSE;
     }
 
@@ -486,7 +486,7 @@ void I_x64ExecuteInitialProcess(void)
     //PROGRESS("::(3)\n");   
     //debug_print("I_x64ExecuteInitialProcess:\n");
     // For real machine.
-    //printf      ("I_x64ExecuteInitialProcess: [TODO]\n");
+    //printk      ("I_x64ExecuteInitialProcess: [TODO]\n");
     
     // #debug
     //panic("I_x64ExecuteInitialProcess: breakpoint :)");
@@ -541,7 +541,7 @@ void I_x64ExecuteInitialProcess(void)
 // State
 // The thread needs to be in Standby state.
     if (t->state != STANDBY){
-        printf("I_x64ExecuteInitialProcess: state tid={%d}\n", t->tid );
+        printk("I_x64ExecuteInitialProcess: state tid={%d}\n", t->tid );
         die();
     }
 
@@ -676,13 +676,11 @@ void I_x64ExecuteInitialProcess(void)
     // The header is in the top.
     elf_header = (struct elf_header_64bit_d *) CONTROLTHREAD_BASE;
 
-
 // signature
-    printf ("Signature: %c %c %c \n",
+    printk ("Signature: %c %c %c \n",
         elf_header->e_ident[1],     // 'E'
         elf_header->e_ident[2],     // 'L'
         elf_header->e_ident[3] );   // 'F'
-
 
 // file class
 // 1 = 32 bit, 2 = 64 bit
@@ -690,7 +688,7 @@ void I_x64ExecuteInitialProcess(void)
     {
         //
     } 
-    printf ("Class: %x\n", elf_header->e_ident[EI_CLASS]);
+    printk ("Class: %x\n", elf_header->e_ident[EI_CLASS]);
 
 // type
 // 1 = relocatable, 2 = executable, 3 = shared, 4 = core
@@ -698,7 +696,7 @@ void I_x64ExecuteInitialProcess(void)
     {
         //
     }
-    printf ("Type: %x\n", elf_header->e_type);
+    printk ("Type: %x\n", elf_header->e_type);
 
 // machine
 // x86  3 | IA-64  0x32 | x86-64  0x3E(62)
@@ -706,15 +704,14 @@ void I_x64ExecuteInitialProcess(void)
     {
         //
     }
-    printf ("Machine: %x\n", elf_header->e_machine);
+    printk ("Machine: %x\n", elf_header->e_machine);
 
 // entry
     if( elf_header->e_entry != CONTROLTHREAD_ENTRYPOINT )
     {
         //
     }
-    printf ("Entry: %x\n", elf_header->e_entry);
-
+    printk ("Entry: %x\n", elf_header->e_entry);
 
     //#breakpoint
     refresh_screen();
@@ -726,7 +723,7 @@ void I_x64ExecuteInitialProcess(void)
 // #debug
 
     //debug_print("I_x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
-    //printf     ("I_x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
+    //printk     ("I_x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
     //refresh_screen();
 
 // Here is where the boot routine ends.
@@ -762,7 +759,7 @@ void I_x64ExecuteInitialProcess(void)
 
     //PROGRESS(":: Go to ring3!\n");
 
-    //printf("go!\n");
+    //printk("go!\n");
     //while(1){}
 
 // Entry point and ring3 stack.
@@ -845,7 +842,7 @@ static int __load_mod_image(void)
                             BUGBUG_IMAGE_SIZE_LIMIT ); 
 
     if (fileret != 0){
-        printf("__load_mod_image: on fsLoadFile()\n");
+        printk("__load_mod_image: on fsLoadFile()\n");
         goto fail;
     }
 
@@ -906,11 +903,11 @@ static int I_x64CreateKernelProcess(void)
 
 // Struct and struct validation.
     if ((void *) KernelProcess == NULL){
-        printf("I_x64CreateKernelProcess: KernelProcess\n");
+        printk("I_x64CreateKernelProcess: KernelProcess\n");
         return FALSE;
     }
     if (KernelProcess->used != TRUE || KernelProcess->magic != 1234){
-        printf("I_x64CreateKernelProcess: KernelProcess validation\n");
+        printk("I_x64CreateKernelProcess: KernelProcess validation\n");
         return FALSE;
     }
 
@@ -920,7 +917,7 @@ static int I_x64CreateKernelProcess(void)
 // It's because the kernel was the first
 // process created. Then the pid is equal 0.
     if ( KernelProcess->pid != GRAMADO_PID_KERNEL ){
-        printf ("I_x64CreateKernelProcess: pid\n");
+        printk ("I_x64CreateKernelProcess: pid\n");
         return FALSE;
     }
 
@@ -952,7 +949,7 @@ static int I_x64CreateKernelProcess(void)
 // kernel_mm_data validation.
 
     if (kernel_mm_data.used != TRUE || kernel_mm_data.magic != 1234){
-        printf ("I_x64CreateKernelProcess: kernel_mm_data validation\n");
+        printk ("I_x64CreateKernelProcess: kernel_mm_data validation\n");
         return FALSE;
     }
 
@@ -977,7 +974,7 @@ static int I_x64CreateKernelProcess(void)
     /*
     Status = I_x64CreateTID0();
     if ( Status != TRUE ){
-        printf("Couldn't Create the WS thread\n");
+        printk("Couldn't Create the WS thread\n");
         return FALSE;
     }
     */
@@ -1030,26 +1027,26 @@ static int I_x64CreateTID0(void)
     tid0_thread = (void *) create_tid0();
 
     if ( (void *) tid0_thread == NULL ){
-        printf ("I_x64CreateTID0: tid0_thread\n");
+        printk ("I_x64CreateTID0: tid0_thread\n");
         return FALSE;
     }
 
     if ( tid0_thread->used != TRUE || 
          tid0_thread->magic != 1234 )
     {
-        printf ("I_x64CreateTID0: tid0_thread validation\n");
+        printk ("I_x64CreateTID0: tid0_thread validation\n");
         return FALSE;
     }
 
 // tid
     if ( tid0_thread->tid != TID0_TID ){
-        printf ("I_x64CreateTID0: TID0_TID");
+        printk ("I_x64CreateTID0: TID0_TID");
         return FALSE;
     }
 
 // owner pid
     if ( tid0_thread->ownerPID != GRAMADO_PID_KERNEL ){
-        printf ("I_x64CreateTID0: GRAMADO_PID_KERNEL");
+        printk ("I_x64CreateTID0: GRAMADO_PID_KERNEL");
         return FALSE;
     }
 
@@ -1147,7 +1144,7 @@ static int I_initKernelComponents(void)
 // Check kernel phase.
 
     if (Initialization.current_phase != 1){
-        printf ("I_initKernelComponents: Initialization phase is Not 1.\n");
+        printk ("I_initKernelComponents: Initialization phase is Not 1.\n");
         return FALSE;
     }
 
@@ -1176,7 +1173,7 @@ static int I_initKernelComponents(void)
     int st_status=FALSE;
     st_status = init_storage_support();
     if (st_status != TRUE){
-       printf("I_initKernelComponents: init_storage_support fail\n");
+       printk("I_initKernelComponents: init_storage_support fail\n");
        return FALSE;
     }
 // Disks and volumes.
@@ -1193,7 +1190,7 @@ static int I_initKernelComponents(void)
 // hal
     Status = halInitialize();
     if (Status != TRUE){
-        printf("I_initKernelComponents: halInitialize fail\n");
+        printk("I_initKernelComponents: halInitialize fail\n");
         return FALSE;
     }
     //PROGRESS("halInitialize ok\n"); 
@@ -1203,7 +1200,7 @@ static int I_initKernelComponents(void)
 // mm, ipc, ps ...
     Status = psInitializeMKComponents();
     if (Status != TRUE){
-        printf ("I_initKernelComponents: psInitializeMKComponents fail\n");
+        printk ("I_initKernelComponents: psInitializeMKComponents fail\n");
         return FALSE;
     }
     //PROGRESS("psInitializeMKComponents ok\n"); 
@@ -1213,7 +1210,7 @@ static int I_initKernelComponents(void)
 // Initialize pci, rtc and ata.
     Status = zeroInitializeSystemComponents();
     if (Status != TRUE){
-        printf ("I_initKernelComponents: zeroInitializeSystemComponents fail\n"); 
+        printk ("I_initKernelComponents: zeroInitializeSystemComponents fail\n"); 
         return FALSE;
     }
     //PROGRESS("zeroInitializeSystemComponents ok\n"); 
@@ -1223,7 +1220,7 @@ static int I_initKernelComponents(void)
 // So, now we can do this.
     Status = (int) storage_set_total_lba_for_boot_disk();
     if (Status != TRUE){
-        printf ("I_initKernelComponents: storage_set_total_lba_for_boot_disk fail\n"); 
+        printk ("I_initKernelComponents: storage_set_total_lba_for_boot_disk fail\n"); 
         return FALSE;
     }
     //PROGRESS("storage_set_total_lba_for_boot_disk ok\n"); 
@@ -1250,7 +1247,7 @@ static int I_initKernelComponents(void)
 // 'processor' structuture initialization.
     processor = (void *) kmalloc( sizeof(struct processor_d) ); 
     if ((void *) processor == NULL){
-        printf("I_initKernelComponents: processor\n");
+        printk("I_initKernelComponents: processor\n");
         return FALSE;
     }
     memset( processor, 0, sizeof(struct processor_d) );
@@ -1304,7 +1301,7 @@ static int I_initKernelComponents(void)
         //Initialize fpu/see support.
         fpu_status = (int) x64_init_fpu_support();
         if (fpu_status<0){
-            printf("I_initKernelComponents: [FAIL] FPU Initialization fail\n");
+            printk("I_initKernelComponents: [FAIL] FPU Initialization fail\n");
             return FALSE;
         }
 
@@ -1319,14 +1316,14 @@ static int I_initKernelComponents(void)
         hv_probe_info();
 
         //#breakpoint
-        //printf("#breakpoint in I_init()\n");
+        //printk("#breakpoint in I_init()\n");
         //refresh_screen();
         //while(1){}
 
         break;
     // ...
     default:
-        printf ("I_initKernelComponents: [ERROR] default ProcessorType\n");
+        printk ("I_initKernelComponents: [ERROR] default ProcessorType\n");
         return FALSE;
         break;
     };
@@ -1342,7 +1339,7 @@ static int I_initKernelComponents(void)
 // in x64init.c
 
 //fail1:
-    // If we already have printf verbose.
+    // If we already have printk verbose.
 fail0:
     PROGRESS("::(5)(3)(?): Fail");
     debug_print ("I_initKernelComponents: fail\n");
@@ -1383,7 +1380,7 @@ int I_x64_initialize(void)
 
 // #debug
 // For real machine.
-    //printf      ("I_x64main: [TODO]\n");
+    //printk      ("I_x64main: [TODO]\n");
     //refresh_screen();
 
 // System State
@@ -1456,7 +1453,7 @@ int I_x64_initialize(void)
 
     Status = (int) I_initKernelComponents(); 
     if (Status != TRUE){
-        printf("I_x64_initialize: on I_initKernelComponents\n");
+        printk("I_x64_initialize: on I_initKernelComponents\n");
         return FALSE;
     }
 

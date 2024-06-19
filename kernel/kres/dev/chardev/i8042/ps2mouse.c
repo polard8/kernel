@@ -147,7 +147,7 @@ void i8042_mouse_expect_ack (void)
     if ( ack_value != 0xFA )
     {
         //#debug
-        //printf ("expect_ack: not ack\n");
+        //printk ("expect_ack: not ack\n");
         return;
         //return -1;
     }
@@ -671,10 +671,10 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
 // Get the device id for the first time.
     device_id = (int) __get_device_id();
     if( device_id == 0xFA ){ 
-        printf("ps2 mouse: device id fail\n");
+        printk("ps2 mouse: device id fail\n");
     }
     PS2Mouse.device_id = device_id;
-    printf("ps2 mouse: [FIRST TIME] device id %d\n",PS2Mouse.device_id);
+    printk("ps2 mouse: [FIRST TIME] device id %d\n",PS2Mouse.device_id);
 
 // Se ele não é inteligente,
 // vamos fazer a inicialização e ver se vira inteligente.
@@ -702,7 +702,7 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         if( device_id != 0xFA ){ 
             PS2Mouse.device_id = device_id;
         }
-        printf("ps2 mouse: [SECOND TIME] device id %d\n",PS2Mouse.device_id);
+        printk("ps2 mouse: [SECOND TIME] device id %d\n",PS2Mouse.device_id);
     }
 
     // Vamos ver se ficou inteligente depois
@@ -713,7 +713,7 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         PS2Mouse.device_id == PS2MOUSE_INTELLIMOUSE_EXPLORER_ID )
     {
         PS2Mouse.has_wheel = TRUE;
-        printf ("ps2mouse_initialize_device: Mouse wheel enabled!\n");
+        printk ("ps2mouse_initialize_device: Mouse wheel enabled!\n");
     } 
 
     // NO, ele ainda é burro.
@@ -722,7 +722,7 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         PS2Mouse.device_id != PS2MOUSE_INTELLIMOUSE_EXPLORER_ID )
     {
         PS2Mouse.has_wheel = FALSE;
-        printf ("ps2mouse_initialize_device: No mouse wheel detected!\n");
+        printk ("ps2mouse_initialize_device: No mouse wheel detected!\n");
     }
 //=============
 
@@ -754,14 +754,14 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         if( device_id != 0xFA ){ 
             PS2Mouse.device_id = device_id;
         }
-        printf("ps2 mouse: [THIRD TIME] device id %d\n",PS2Mouse.device_id);
+        printk("ps2 mouse: [THIRD TIME] device id %d\n",PS2Mouse.device_id);
     }
 
     // 4
     if (PS2Mouse.device_id == PS2MOUSE_INTELLIMOUSE_EXPLORER_ID)
     {
         PS2Mouse.has_five_buttons = TRUE;
-        printf ("ps2mouse_initialize_device: Mouse has five buttons\n");
+        printk("ps2mouse_initialize_device: Mouse has five buttons\n");
     }
 
 //=================================================
@@ -888,7 +888,7 @@ void DeviceInterface_PS2Mouse(void)
 // ??? Resend é comando e não estatus.
     if (_byte == 0xFE){
         //debug_print ("[0xFE]: RESEND\n");
-        printf ("DeviceInterface_PS2Mouse: resend\n");
+        printk ("DeviceInterface_PS2Mouse: resend\n");
         refresh_screen();
         //mouse_stage = 0;
         return;

@@ -90,7 +90,7 @@ int gre_initialize(void)
 void kgws_enable(void)
 {
     debug_print("kgws_enable: Enable KGWS\n");
-         printf("kgws_enable: Enable KGWS\n");
+         printk("kgws_enable: Enable KGWS\n");
     refresh_screen();
 
     // Sending event messages to the thread associated with the wwf.
@@ -103,7 +103,7 @@ void kgws_enable(void)
 void kgws_disable(void)
 {
     debug_print("kgws_disable:\n");
-         printf("kgws_disable:\n");
+         printk("kgws_disable:\n");
 
     displayInitializeBackground(COLOR_RED,TRUE);
 
@@ -617,10 +617,10 @@ static int __gre_initialize_globals(void)
     return 0;
 }
 
-
 // ?? Not used yet ??
 // Registrar um window server.
 // See: register_ws_process
+// #todo: Change name to kgwsRegisterDisplayServer()
 int kgwsRegisterWindowServer (pid_t pid)
 {
     int Status = 0;
@@ -640,7 +640,7 @@ int kgwsRegisterWindowServer (pid_t pid)
     };
 
 fail:
-    printf("kgwsRegisterWindowServer: fail\n");
+    printk("kgwsRegisterWindowServer: fail\n");
 done:
     return 0;
 }

@@ -140,8 +140,8 @@ static void __test_path(void)
     unsigned long BufferSize = (4096);  //One page!
 
     b = (void *) allocPages(1); 
-    if ( (void*) b == NULL ){
-        printf("b fail\n");
+    if ((void*) b == NULL){
+        printk("b fail\n");
         return;
     }
 
@@ -153,11 +153,11 @@ static void __test_path(void)
                   (unsigned long) b,
                   (unsigned long) BufferSize ); 
     if (status<0){
-        printf("__test_path: fs_load_path fail\n");
+        printk("__test_path: fs_load_path fail\n");
         return;
     }
-    if ( (void*)b != NULL ){
-        printf("OUTPUT: {%s}\n",b);
+    if ((void*) b != NULL){
+        printk("OUTPUT: {%s}\n",b);
     }
 }
 
@@ -785,9 +785,8 @@ void jobcontrol_switch_console(int n)
     clear_console( bg_color, fg_color, n );
 
 // banner
-    printf ("Console number {%d}\n", n);
+    printk ("Console number {%d}\n", n);
 }
-
 
 /*
  * set_up_cursor:
@@ -1080,7 +1079,7 @@ void console_outbyte (int c, int console_number)
 
             // Verbose mode do kernel.
             // permite que a tela do kernel funcione igual a um 
-            // terminal, imprimindo os printfs um abaixo do outro.
+            // terminal, imprimindo os printk um abaixo do outro.
             // sempre reiniciando x.
             if (stdio_verbosemode_flag == 1){
                 CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
@@ -1339,7 +1338,7 @@ void console_outbyte2 (int c, int console_number)
 
             // Verbose mode do kernel.
             // permite que a tela do kernel funcione igual a um 
-            // terminal, imprimindo os printfs um abaixo do outro.
+            // terminal, imprimindo os printk um abaixo do outro.
             // sempre reiniciando x.
             if (stdio_verbosemode_flag == 1){
                 CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
@@ -1737,8 +1736,8 @@ void __test_process(void)
             "no-name",              // name
             RING3 );                // iopl 
 
-    if ( (void*)p==NULL ){
-        printf("p fail\n");
+    if ((void*) p == NULL){
+        printk("p fail\n");
         return;
     }
 
@@ -1746,11 +1745,8 @@ void __test_process(void)
         
 // ok, it is working.
 // Create and initialize a process structure.
-
     //__create_and_initialize_process_object();
-
 }
-
 
 // #test
 // Creating a ring0 thread.
@@ -1774,13 +1770,12 @@ void __test_thread(void)
                                 "no-name",
                                 RING0 ); 
     if ((void*) t == NULL){
-        printf("fail\n");
+        printk("fail\n");
         return;
     }
 
     //show_slots();
 }
-
 
 void DANGER_VGA_clear_screen(void)
 {
@@ -1793,7 +1788,7 @@ void DANGER_VGA_clear_screen(void)
     unsigned int VGA_width = 320;
     unsigned int VGA_height = 200;
 
-    //printf ("VGA_clear_screen:\n");
+    //printk ("VGA_clear_screen:\n");
     
     for(y=0; y<VGA_height; y++)
     {
@@ -1807,10 +1802,9 @@ void DANGER_VGA_clear_screen(void)
     while(1){}
 */
 
-    printf("done\n");
+    printk("done\n");
     refresh_screen();
 }
-
 
 void __vga_test1(void)
 {
@@ -1851,9 +1845,9 @@ static void __test_tty(void)
     __tty_read (KernelProcess->tty,data1,3);
 
 // Print the buffer.
-    printf("%c\n",data1[0]);
-    printf("%c\n",data1[1]);
-    printf("%c\n",data1[2]);
+    printk("%c\n",data1[0]);
+    printk("%c\n",data1[1]);
+    printk("%c\n",data1[2]);
 
 // -------------------------
 // #test
@@ -1863,24 +1857,24 @@ static void __test_tty(void)
     if ((void*) legacy_pty_master == NULL)
         return;
     if (legacy_pty_master->magic == 1234)
-        printf("legacy_pty_master OK\n");
+        printk("legacy_pty_master OK\n");
     //if (legacy_pty_master->subtype == TTY_SUBTYPE_PTY_MASTER)
-        //printf("legacy_pty_master OK\n");
-    printf("type %d\n",legacy_pty_master->type);
-    printf("subtype %d\n",legacy_pty_master->subtype);
+        //printk("legacy_pty_master OK\n");
+    printk("type %d\n",legacy_pty_master->type);
+    printk("subtype %d\n",legacy_pty_master->subtype);
 
 // slave
     if ((void*) legacy_pty_slave == NULL)
         return;
     if (legacy_pty_slave->magic == 1234)
-        printf("legacy_pty_slave OK\n");
+        printk("legacy_pty_slave OK\n");
     //if (legacy_pty_slave->subtype == TTY_SUBTYPE_PTY_SLAVE)
-        //printf("legacy_pty_slave OK\n");
-    printf("type %d\n",legacy_pty_slave->type);
-    printf("subtype %d\n",legacy_pty_slave->subtype);
+        //printk("legacy_pty_slave OK\n");
+    printk("type %d\n",legacy_pty_slave->type);
+    printk("subtype %d\n",legacy_pty_slave->subtype);
 
 // 
-    printf("Done\n");
+    printk("Done\n");
 }
 
 // consolePrompt:
@@ -1902,8 +1896,8 @@ void consolePrompt(void)
     prompt_pos = 0;
     prompt_status = 0;
     prompt_max = PROMPT_MAX_DEFAULT;  
-    printf("\n");
-    printf("$ ");
+    printk("\n");
+    printk("$ ");
     refresh_screen();
     //invalidate_screen();
 
@@ -1943,19 +1937,19 @@ __console_write (
 // Console number
     if ( n < 0 || n > 3 )
     {
-       printf ("__console_write: n\n");
+       printk ("__console_write: n\n");
        goto fail;
     }
 // Buffer pointer
     if ( (void *) buf == NULL )
     {
-        printf ("__console_write: buf\n");
+        printk ("__console_write: buf\n");
         goto fail;
     }
 // Max size.
     //if (count==0 || count > ?)
     if (!count){
-        printf ("__console_write: count\n");
+        printk ("__console_write: count\n");
         goto fail;
     }
 
@@ -1986,17 +1980,17 @@ console_read (
 
 // Console number
     if (console_number < 0 || console_number > 3){
-        printf ("console_read: [FAIL] console_number\n");
+        printk ("console_read: [FAIL] console_number\n");
         goto fail;
     }
 // Buffer
-    if ( (void *) buf == NULL ){
-        printf ("console_read: buf\n");
+    if ((void *) buf == NULL){
+        printk ("console_read: buf\n");
         goto fail;
     }
 // Count
     if (!count){
-        printf ("console_read: count\n");
+        printk ("console_read: count\n");
         goto fail;
     }
 
@@ -2048,17 +2042,17 @@ console_write (
 
 // Console number
     if (console_number < 0 || console_number > 3){
-        printf ("console_write: [FAIL] console_number\n");
+        printk ("console_write: [FAIL] console_number\n");
         goto fail;
     }
 // Buffer
-    if ( (void *) buf == NULL ){
-        printf ("console_write: buf\n");
+    if ((void *) buf == NULL){
+        printk ("console_write: buf\n");
         goto fail;
     }
 // Count
     if (!count){
-        printf ("console_write: count\n");
+        printk ("console_write: count\n");
         goto fail;
     }
 
@@ -2458,7 +2452,7 @@ console_write (
                     // Essa rotina cheaca os parametros e configura o atributo
                     // de acordo com o ultimo parametro.
                     case 'm': 
-                        //printf ("m found\n");
+                        //printk ("m found\n");
                         //csi_m(); // Set some attributes based on the parameters found.
                         // Limpando o array de parametros.
                         for ( npar=0; npar<NPAR; npar++ ){ 
@@ -2509,7 +2503,7 @@ console_write (
 
             // Stage fail
             default:
-                printf ("console_write: default\n");
+                printk ("console_write: default\n");
                 goto fail;
                 break;
         };
@@ -2792,10 +2786,10 @@ console_banner(
             CONSOLE_TTYS[fg_console].fg_color,
             fg_console );
         set_up_cursor(0,0);
-        printf ("%s\n", product_string );
-        printf ("%s\n", build_string );
+        printk ("%s\n", product_string );
+        printk ("%s\n", build_string );
         // Print gcc version
-        printf("gcc: %d\n",GCC_VERSION);
+        printk("gcc: %d\n",GCC_VERSION);
     }
 }
 
@@ -2817,9 +2811,8 @@ console_ioctl (
     //struct process_d *p;
     //file *f;
 
-
     debug_print ("console_ioctl: TODO\n");
-    //printf ("console_ioctl: TODO\n");
+    //printk ("console_ioctl: TODO\n");
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
@@ -2835,9 +2828,9 @@ console_ioctl (
     }
 
     //#debug
-    //printf ("console_ioctl:  fd=1\n");
+    //printk ("console_ioctl:  fd=1\n");
 
-//----------------------------------------------------------------------
+//--------------------------------------------
 // Setup the foreground console.
 // We operate only on the fg_console!
 
@@ -2860,7 +2853,7 @@ console_ioctl (
 // Flushes data received, but not read.
     case TCIFLUSH:
         debug_print ("console_ioctl: TCIFLUSH\n");
-        printf ("console_ioctl: TCIFLUSH\n");
+        printk ("console_ioctl: TCIFLUSH\n");
         refresh_screen();  //#test
         break;
 
@@ -2868,7 +2861,7 @@ console_ioctl (
 // Flush accumulated output data.
 // Flushes data written but not transmitted.
     case TCOFLUSH:
-        printf ("console_ioctl: TCOFLUSH\n");
+        printk ("console_ioctl: TCOFLUSH\n");
         refresh_screen();  //#test
         break;
 
@@ -2877,7 +2870,7 @@ console_ioctl (
 // Flushes both data received but not read, and 
 // data written but not transmitted.
     case TCIOFLUSH:
-        printf ("console_ioctl: TCIOFLUSH\n");
+        printk ("console_ioctl: TCIOFLUSH\n");
         refresh_screen();  //#test
         break;
 
@@ -3087,7 +3080,7 @@ console_ioctl (
 
 // REdirecionando o output do console para pty slave.
     case TIOCCONS:
-        printf ("console_ioctl: TIOCCONS\n");
+        printk ("console_ioctl: TIOCCONS\n");
         break;
 
     // ...
@@ -3158,7 +3151,7 @@ void console_refresh_screen(file *f)
     stdio_terminalmode_flag = TRUE; 
     for ( i=0; i<j; i++ )
     {
-        printf ("%c", *ptr );
+        printk ("%c", *ptr );
         // #bugbug
         // It is very wrong!
         refresh_rectangle ( 

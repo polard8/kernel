@@ -55,8 +55,8 @@ void mmShowPML4Entry(int index, unsigned long pml4_va)
 
     unsigned long value = dir[index];
 
-    printf (" DirVA = %x ", (unsigned long) pd_va );
-    printf (" DirEntry %d = %x ", index, (unsigned long) value );
+    printk (" DirVA = %x ", (unsigned long) pd_va );
+    printk (" DirEntry %d = %x ", index, (unsigned long) value );
 
 //
 // pt
@@ -66,10 +66,10 @@ void mmShowPML4Entry(int index, unsigned long pml4_va)
 	unsigned long pt_address = (unsigned long) (value & 0xFFFFF800);
 	unsigned long *pt = (unsigned long *) pt_address;
 	
-	printf (" PT_Address = %x ", (unsigned long) pt_address );
+	printk (" PT_Address = %x ", (unsigned long) pt_address );
 	
 	//primeira entrada da pt.
-	printf (" PT_Entry_0 = %x \n", (unsigned long) pt[0] );	
+	printk (" PT_Entry_0 = %x \n", (unsigned long) pt[0] );	
 
 */
 }
@@ -83,64 +83,64 @@ void mmShowMemoryInfo(void)
     unsigned long StackTotal = 
         ((kernel_stack_start - kernel_stack_end)/1024);
 
-    printf ("RAM Memory info:\n");
+    printk ("RAM Memory info:\n");
 
-    printf ("\n");
-    printf ("BaseMemory     (%d KB)\n", memorysizeBaseMemory );
-    printf ("OtherMemory    (%d KB)\n", memorysizeOtherMemory );
-    printf ("ExtendedMemory (%d KB)\n", memorysizeExtendedMemory );
-    printf ("TotalMemory    (%d KB)\n", memorysizeTotal );
+    printk ("\n");
+    printk ("BaseMemory     (%d KB)\n", memorysizeBaseMemory );
+    printk ("OtherMemory    (%d KB)\n", memorysizeOtherMemory );
+    printk ("ExtendedMemory (%d KB)\n", memorysizeExtendedMemory );
+    printk ("TotalMemory    (%d KB)\n", memorysizeTotal );
 
-    printf ("\n");
-    printf ("TotalUsed      (%d KB)\n", memorysizeUsed );
-    printf ("TotalFree      (%d KB)\n", memorysizeFree );
+    printk ("\n");
+    printk ("TotalUsed      (%d KB)\n", memorysizeUsed );
+    printk ("TotalFree      (%d KB)\n", memorysizeFree );
 
-    printf ("\n");    
-    printf ("ring0 area     (%d KB)\n", mm_used_ring0_area );
-    printf ("ring3 area     (%d KB)\n", mm_used_ring3_area );
-    printf ("kernel image area  (%d KB)\n", mm_used_kernelimage );
-    printf ("backbuffer     (%d KB)\n", mm_used_backbuffer );
-    printf ("paged pool     (%d KB)\n", mm_used_pagedpool );
-    printf ("heap pool      (%d KB)\n", mm_used_heappool );
-    printf ("extraheap1     (%d KB)\n", mm_used_extraheap1 );
-    printf ("extraheap2     (%d KB)\n", mm_used_extraheap2 );
-    printf ("extraheap3     (%d KB)\n", mm_used_extraheap3 );
-    printf ("frame table    (%d KB)\n", mm_used_frame_table );
+    printk ("\n");    
+    printk ("ring0 area     (%d KB)\n", mm_used_ring0_area );
+    printk ("ring3 area     (%d KB)\n", mm_used_ring3_area );
+    printk ("kernel image area  (%d KB)\n", mm_used_kernelimage );
+    printk ("backbuffer     (%d KB)\n", mm_used_backbuffer );
+    printk ("paged pool     (%d KB)\n", mm_used_pagedpool );
+    printk ("heap pool      (%d KB)\n", mm_used_heappool );
+    printk ("extraheap1     (%d KB)\n", mm_used_extraheap1 );
+    printk ("extraheap2     (%d KB)\n", mm_used_extraheap2 );
+    printk ("extraheap3     (%d KB)\n", mm_used_extraheap3 );
+    printk ("frame table    (%d KB)\n", mm_used_frame_table );
 
 //==================================
 // System type. (size)
-    printf ("\n");
-    printf ("=======================\n");
-    printf ("This is a ");
+    printk ("\n");
+    printk ("=======================\n");
+    printk ("This is a ");
 
     if( g_mm_system_type == stSmallSystem ){
-        printf ("SMALL system ");
+        printk ("SMALL system ");
     }else if( g_mm_system_type == stMediumSystem ){
-        printf ("MEDIUM system ");
+        printk ("MEDIUM system ");
     }else if( g_mm_system_type == stLargeSystem ){
-        printf ("LARGE system ");
+        printk ("LARGE system ");
     }else{
-         printf ("(Undefined) system ");
+        printk ("(Undefined) system ");
     };
 
-    printf ("with %d MB \n", (memorysizeTotal/1024) );
+    printk ("with %d MB \n", (memorysizeTotal/1024) );
 
 //==================================
 // Other info:
 // see: pages.c
-    printf("\n");
+    printk("\n");
     pages_print_info(g_mm_system_type);
 
 //==================================
 // Frame table
 
-    printf ("\n");
-    printf ("Frame Table:\n");
-    printf ("Start PA: %xH | End PA: %xH\n", FT.start_pa, FT.end_pa );
-    printf ("Size: %d KB\n", FT.size_in_kb );
-    printf ("Total frames:     [%d]\n",    FT.size_in_frames );
-    printf ("Used frames:      [%d]\n",    FT.number_of_used_frames );
-    printf ("Reserved frames:  [%d]\n",    FT.number_of_reserved_frames );
+    printk ("\n");
+    printk ("Frame Table:\n");
+    printk ("Start PA: %xH | End PA: %xH\n", FT.start_pa, FT.end_pa );
+    printk ("Size: %d KB\n", FT.size_in_kb );
+    printk ("Total frames:     [%d]\n",    FT.size_in_frames );
+    printk ("Used frames:      [%d]\n",    FT.number_of_used_frames );
+    printk ("Reserved frames:  [%d]\n",    FT.number_of_reserved_frames );
     // ...
 
 //==================================
@@ -149,14 +149,14 @@ void mmShowMemoryInfo(void)
     //See: gramnt/kernel/include/mm/x86mm.h
 
 	//system zone
-	//printf("systemzoneStart  = 0x%x\n", systemzoneStart);
-	//printf("systemzoneEnd    = 0x%x\n", systemzoneEnd);
-	//printf("systemzoneSize   = 0x%x\n", systemzoneSize);
+	//printk("systemzoneStart  = 0x%x\n", systemzoneStart);
+	//printk("systemzoneEnd    = 0x%x\n", systemzoneEnd);
+	//printk("systemzoneSize   = 0x%x\n", systemzoneSize);
 
 	//window zone.
-	//printf("windowzoneStart  = 0x%x\n", windowzoneStart);
-	//printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
-	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
+	//printk("windowzoneStart  = 0x%x\n", windowzoneStart);
+	//printk("windowzoneEnd    = 0x%x\n", windowzoneEnd);
+	//printk("windowzoneSize   = 0x%x\n", windowzoneSize);
 
 	// #Suspenso
 	// Suspendemos o uso de variáveis importadas do makefile.
@@ -182,11 +182,11 @@ void mmShowMemoryInfo(void)
 	extern unsigned long bss_begin;
 	extern unsigned long bss_end;
 	
-	printf("\n");
-	printf("code_begin={%x} code_end={%x} \n", &code_begin, &code_end );
-	printf("rodata_begin={%x} rodata_end={%x} \n", &rodata_begin, &rodata_end );
-	printf("data_begin={%x} data_end={%x} \n", &data_begin, &data_end );
-	printf("bss_begin={%x}  bss_end={%x}\n", &bss_begin, &bss_end );
+	printk("\n");
+	printk("code_begin={%x} code_end={%x} \n", &code_begin, &code_end );
+	printk("rodata_begin={%x} rodata_end={%x} \n", &rodata_begin, &rodata_end );
+	printk("data_begin={%x} data_end={%x} \n", &data_begin, &data_end );
+	printk("bss_begin={%x}  bss_end={%x}\n", &bss_begin, &bss_end );
 	
 #endif
 */
@@ -207,9 +207,9 @@ void mmShowMemoryInfo(void)
     unsigned long imageAvailableAreaSize_in_KB = 
         (imageAvailableAreaSize_in_Bytes/1024);
 
-    printf("\n");
-    printf("KERNEL IMAGE SIZE: #todo \n");
-    printf("KERNEL IMAGE AVAILABLE AREA VA:  [%x...%x] Total={%d KB} \n",
+    printk("\n");
+    printk("KERNEL IMAGE SIZE: #todo \n");
+    printk("KERNEL IMAGE AVAILABLE AREA VA:  [%x...%x] Total={%d KB} \n",
         imageAvailableAreaStart, 
         imageAvailableAreaEnd, 
         imageAvailableAreaSize_in_KB );
@@ -218,12 +218,12 @@ void mmShowMemoryInfo(void)
 //  heap e stack 
 //
     
-    //printf("\n[Kernel Heap and Stack info:]\n");
+    //printk("\n[Kernel Heap and Stack info:]\n");
 
-    printf("\n");
-    printf("KERNEL HEAP VA:  [%x...%x] Total={%d KB} \n",
+    printk("\n");
+    printk("KERNEL HEAP VA:  [%x...%x] Total={%d KB} \n",
         kernel_heap_start, kernel_heap_end, HeapTotal );
-    printf("AvailableHeap={%d KB}\n", (g_available_heap/1024) );
+    printk("AvailableHeap={%d KB}\n", (g_available_heap/1024) );
 
 // @todo:
 // Mostrar o tamanho da pilha..
@@ -234,10 +234,10 @@ void mmShowMemoryInfo(void)
 // Pois bem, é mais digno mostrar aqui o endereço da pilha, 
 // indicado no TSS.
 
-    printf("\n");
-    printf("KERNEL STACK VA: [%x...%x] Total={%d KB} \n", 
+    printk("\n");
+    printk("KERNEL STACK VA: [%x...%x] Total={%d KB} \n", 
         kernel_stack_start, kernel_stack_end, StackTotal );
-    printf("KERNEL STACK PA: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );
+    printk("KERNEL STACK PA: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );
 
 //==================================
 // Video info.
@@ -246,13 +246,12 @@ void mmShowMemoryInfo(void)
     //...
 }
 
-
 void mmShowPML4EntryForAllProcesses (int entry_number)
 {
     struct process_d  *p;
     int i=0;
 
-    printf ("mmShowPML4EntryForAllProcesses:\n");
+    printk ("mmShowPML4EntryForAllProcesses:\n");
 
     if (entry_number < 0 || entry_number >= 512 )
     {
@@ -271,7 +270,7 @@ void mmShowPML4EntryForAllProcesses (int entry_number)
             // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
             //if ( p->DirectoryVA != 0 )
             //{
-            //    printf ("Process %d: ", i);
+            //    printk ("Process %d: ", i);
             //    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
             //}
         }
@@ -298,7 +297,7 @@ void mmShowPagedMemoryList(int max)
 
         if ( (void *) p != NULL )
         {
-            printf ("id=%d free=%d frameno=%d ref=%d \n", 
+            printk ("id=%d free=%d frameno=%d ref=%d \n", 
                 p->id,            // Número do slot.
                 p->free,          // ?
                 p->absolute_frame_number,  // 
@@ -335,8 +334,8 @@ void mmShowMemoryBlocksForTheKernelAllocator(void)
     struct mmblock_d *B;
     register int i = 0;
 
-// Title.
-    printf("Memory Block Information:\n");
+// Title
+    printk("Memory Block Information:\n");
 
     // Mostra os heap da lista.
     while (i < MMBLOCK_COUNT_MAX) 
@@ -348,7 +347,7 @@ void mmShowMemoryBlocksForTheKernelAllocator(void)
         {
             if ( B->Used == 1 && B->Magic == 1234 )
             {
-                printf ("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
+                printk ("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
                     B->Id, B->Header, B->userArea, B->Footer );
             }
             //Nothing.
@@ -357,7 +356,7 @@ void mmShowMemoryBlocksForTheKernelAllocator(void)
     };
 
 // Quantos slots estão sendo usados?
-    //printf ("used slots: %d/%d\n",
+    //printk ("used slots: %d/%d\n",
     //    mmblockCount, MMBLOCK_COUNT_MAX );
 
 // Aqui podemos aprentar informações sobre o heap.

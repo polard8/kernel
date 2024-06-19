@@ -281,17 +281,17 @@ void restore_current_context (void)
     unsigned long *contextr15 = (unsigned long *) &contextR15;
 
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
-        printf ("restore_current_context: TID=%d\n", current_thread );
+        printk ("restore_current_context: TID=%d\n", current_thread );
         goto fail0;
     }
 
     t = (void *) threadList[current_thread]; 
-    if ( (void *) t == NULL ){
-        printf("restore_current_context error: t\n");
+    if ((void *) t == NULL){
+        printk("restore_current_context error: t\n");
         goto fail1;
     }
     if ( t->used != TRUE || t->magic != 1234 ){
-        printf("restore_current_context error: t validation\n");
+        printk("restore_current_context error: t validation\n");
         goto fail1;
     }
 

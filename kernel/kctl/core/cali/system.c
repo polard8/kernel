@@ -466,7 +466,7 @@ unsigned long doGetSystemMetrics(int index)
         // #todo: We need a structure for that.
         // and the name needs to be DisplayServer.xxx.
         case 200:
-           //printf ("#type: %d\n",WindowServer_type);
+           //printk ("#type: %d\n",WindowServer_type);
            //refresh_screen();
            return (unsigned long) WindowServer_type;
            break;
@@ -475,7 +475,7 @@ unsigned long doGetSystemMetrics(int index)
         // #todo: We need a structure for that.
         // and the name needs to be DisplayServer.xxx.
         case 201:
-           //printf ("#pid: %d\n",WindowServer_pid);
+           //printk ("#pid: %d\n",WindowServer_pid);
            //refresh_screen();
            return (unsigned long) WindowServer_pid; 
            break;
@@ -484,7 +484,7 @@ unsigned long doGetSystemMetrics(int index)
         // #todo: We need a structure for that.
         // and the name needs to be DisplayServer.xxx.
         case 202:
-           //printf ("#virtual_console: %d\n",WindowServer_virtual_console);
+           //printk ("#virtual_console: %d\n",WindowServer_virtual_console);
            //refresh_screen();
            // #todo
            // What is this ??
@@ -495,7 +495,7 @@ unsigned long doGetSystemMetrics(int index)
         // #todo: We need a structure for that.
         // and the name needs to be DisplayServer.xxx.
         case 203:
-           //printf ("#initialized: %d\n",WindowServer_initialized);
+           //printk ("#initialized: %d\n",WindowServer_initialized);
            //refresh_screen();
            return (unsigned long) WindowServer_initialized; 
            break;
@@ -528,7 +528,7 @@ void die(void)
         PROGRESS("die:\n");
     }
     if (Initialization.is_console_log_initialized == TRUE){
-        printf("die: System Halted\n");
+        printk("die: System Halted\n");
         refresh_screen();
     }
     __a_soft_place_to_fall();

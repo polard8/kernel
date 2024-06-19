@@ -44,7 +44,7 @@ network_SendIPV4_UDP (
 
     if ( (void *) currentNIC == NULL ){
         debug_print ("network_SendIPV4_UDP: currentNIC fail\n");
-        //printf ("network_SendIPV4_UDP: currentNIC fail\n");
+        //printk ("network_SendIPV4_UDP: currentNIC fail\n");
         return (int) (-1);
 
     }else{
@@ -68,7 +68,7 @@ network_SendIPV4_UDP (
 
     if ( (void *) eh == NULL){
         debug_print ("network_SendIPV4_UDP: eh fail");
-        //printf ("network_SendIPV4_UDP: eh fail");
+        //printk ("network_SendIPV4_UDP: eh fail");
         return (int) (-1);
 
     }else{
@@ -98,7 +98,7 @@ network_SendIPV4_UDP (
 
     if ( (void *) ipv4 == NULL){
         debug_print ("network_SendIPV4_UDP: ipv4 fail\n");
-        //printf ("network_SendIPV4_UDP: ipv4 fail\n");
+        //printk ("network_SendIPV4_UDP: ipv4 fail\n");
         return (int) (-1);
 
     }else{
@@ -142,7 +142,7 @@ network_SendIPV4_UDP (
     udp = (void *) kmalloc ( sizeof(struct udp_header_d) );
 
     if ( (void *) udp == NULL){
-        printf ("network_SendIPV4_UDP: udp fail\n");
+        printk ("network_SendIPV4_UDP: udp fail\n");
         return -1;
 
     }else{
@@ -297,7 +297,7 @@ network_SendIPV4_UDP (
 	// Pois precisamos implementar algum contador no while para n�o
 	// ficarmos preso nele pra sempre.
 
-    printf ("network_SendIPV4_UDP: Sending UDP/IP. *debug *while\n");
+    printk ("network_SendIPV4_UDP: Sending UDP/IP. *debug *while\n");
     refresh_screen ();
 
 	// #perigo:
@@ -312,7 +312,7 @@ network_SendIPV4_UDP (
     {
          if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
          {
-              printf ("Ok");
+              printk ("Ok");
               debug_print ("network_SendIPV4_UDP: done\n");
               return 0;
          }
@@ -326,7 +326,7 @@ network_SendIPV4_UDP (
     };
     */    
 
-    printf (">>>> fail timeout\n");
+    printk (">>>> fail timeout\n");
     debug_print ("network_SendIPV4_UDP: timeout\n");
     debug_print ("network_SendIPV4_UDP: done\n");
     

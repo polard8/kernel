@@ -1,5 +1,6 @@
 
 // pci.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -642,7 +643,7 @@ pciHandleDevice (
 
     // #debug
     //debug_print("pciHandleDevice:\n");
-    //printf ("bus=%d dev=%d fun=%d \n", bus, dev, fun);
+    //printk ("bus=%d dev=%d fun=%d \n", bus, dev, fun);
 
     unsigned short Vendor = (unsigned short) pciCheckVendor(bus,dev);
     unsigned short Device = (unsigned short) pciCheckDevice(bus,dev);
@@ -688,7 +689,7 @@ pciHandleDevice (
     D->name = "pcidevice-noname";
 
     // #debug
-    // printf ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
+    // printk ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
 
 // Getting device info.
 // #todo: 
@@ -861,7 +862,7 @@ pciHandleDevice (
         // Suspendendo isso porque esta sujando muito a tela
         // na maquina real.
         //debug_print ("pciHandleDevice: [FAIL] No more slots!\n");
-        printf ("pciHandleDevice: [FAIL] No more slots!\n");
+        printk ("pciHandleDevice: [FAIL] No more slots!\n");
         return (int) (-1);
     }
  
@@ -870,7 +871,7 @@ pciHandleDevice (
     pciListOffset++;
 
     // #debug
-    //printf("$");
+    //printk("$");
 
 // =============================================================
 // Register the device structure.
@@ -912,7 +913,7 @@ pciHandleDevice (
     memset( newname, 0, SizeOfNameBuffer );
 
     if (SizeOfNewName >= SizeOfNameBuffer){
-        printf("pciHandleDevice: SizeOfNewName\n");
+        printk("pciHandleDevice: SizeOfNewName\n");
     }
     // Save!
     strcpy( newname, __tmpname );

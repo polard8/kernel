@@ -3,9 +3,7 @@
 // See:
 // fs/exec_elf.h
 
-
 #include <kernel.h>
-
 
 int elfCheckSignature(unsigned long address)
 {
@@ -14,7 +12,7 @@ int elfCheckSignature(unsigned long address)
     unsigned char *buf = (unsigned char *) address;
 
     if ((void *) buf == NULL){
-        printf ("elfCheckSignature: buf \n");
+        printk ("elfCheckSignature: buf \n");
         return (int) (-1);
     }
 
@@ -22,7 +20,7 @@ int elfCheckSignature(unsigned long address)
     if ( buf[0] != 0x7F ||
          buf[1] != 0x45 || buf[2] != 0x4C || buf[3] != 0x46 )
     {
-        printf ("elfCheckSignature: Sig \n");
+        printk ("elfCheckSignature: Sig \n");
         return (int) (-1);
     }
 

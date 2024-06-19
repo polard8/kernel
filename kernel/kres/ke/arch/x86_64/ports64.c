@@ -4,7 +4,6 @@
 
 #include <kernel.h>
 
-
 unsigned char 
 in8 (unsigned short port)
 {

@@ -241,7 +241,7 @@ void lapic_initializing(unsigned long lapic_pa)
 // Called by I_init in x64init.c
 // Called by x64_probe_smp_via_acpi() in x64.c
 
-    printf("lapic_initializing: \n");
+    printk("lapic_initializing: \n");
 
     LAPIC.initialized = FALSE;
 
@@ -252,7 +252,7 @@ void lapic_initializing(unsigned long lapic_pa)
     {
         LAPIC.initialized = FALSE;
         //panic("lapic_initializing: lapic_pa\n");
-        printf("lapic_initializing: lapic_pa\n");
+        printk("lapic_initializing: lapic_pa\n");
         return;
     }
 
@@ -310,7 +310,7 @@ void lapic_initializing(unsigned long lapic_pa)
 // ID
     int localid = (int) local_apic_get_id();
     LAPIC.local_id = (int) (localid & 0xFF);
-    //printf("localid: %d\n",LAPIC.local_id);
+    //printk("localid: %d\n",LAPIC.local_id);
 
 // ---------------
 // Version
@@ -318,7 +318,7 @@ void lapic_initializing(unsigned long lapic_pa)
 // 10H~15H
     int localversion = (int) local_apic_get_version();
     LAPIC.local_version = (int) (localversion & 0xFF);
-    //printf("localversion: %xH\n", LAPIC.local_version);
+    //printk("localversion: %xH\n", LAPIC.local_version);
 
 //=====================================
 // Destination Format Register (DFR)
@@ -330,9 +330,8 @@ void lapic_initializing(unsigned long lapic_pa)
     //*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0x01000000; 
     //*(volatile unsigned int*)(LAPIC.lapic_va + 0x20) = 8;
 
-
 // Print:
-    printf("ID: %d | VERSION: %xH\n",
+    printk("ID: %d | VERSION: %xH\n",
         LAPIC.local_id,
         LAPIC.local_version );
 
@@ -431,7 +430,7 @@ void enable_apic(void)
 // We need to setup a lot of registers 
 // before enabling the apic.
 
-    printf("enable_apic:\n");
+    printk("enable_apic:\n");
 
 // #todo
 // Do we have apic support in this processor?
@@ -440,7 +439,6 @@ void enable_apic(void)
 
     if (LAPIC.initialized != TRUE)
         panic("enable_apic: LAPIC not initialized\n");
-
 
 // Hardware enable the Local APIC if it wasn't enabled.
 // Went to the end of this routine.
@@ -581,15 +579,14 @@ So:
 // Enable APIC by setting up the bit 11.
     cpu_set_apic_base( cpu_get_apic_base() );
 
-
 /*
  // #debug
-    printf("APIC Global enable 0x%x \n",
+    printk("APIC Global enable 0x%x \n",
         getapicbase() );
 */
 
 /*
-    printf("Setup APIC Timer 0 ...\\\\\n");
+    printk("Setup APIC Timer 0 ...\\\\\n");
     apic_timer(lapicbase);
 */
 // see: apictim.c
@@ -724,7 +721,7 @@ static void __apic_disable_legacy_pic(void)
 {
 // Legacy PIC mask all off.
 
-    printf("apic_disable_legacy_pic:\n");
+    printk("apic_disable_legacy_pic:\n");
 
 // Envia ICW1 reset
     out8(0x20,0x11);	// reset PIC 1

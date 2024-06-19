@@ -82,7 +82,7 @@ void arp_table_show_index(int index)
     uint8_t b = ARP_Table.arpTable[index].ipv4_address[1]; 
     uint8_t c = ARP_Table.arpTable[index].ipv4_address[2];
     uint8_t d = ARP_Table.arpTable[index].ipv4_address[3];
-    printf("IP: %c.%c.%c.%c | ",
+    printk("IP: %c.%c.%c.%c | ",
         a,b,c,d );
 
     uint8_t a2 = ARP_Table.arpTable[index].mac_address[0];
@@ -91,10 +91,10 @@ void arp_table_show_index(int index)
     uint8_t d2 = ARP_Table.arpTable[index].mac_address[3];
     uint8_t e2 = ARP_Table.arpTable[index].mac_address[4];
     uint8_t f2 = ARP_Table.arpTable[index].mac_address[5];
-    printf("MAC: %c.%c.%c.%c.%c.%c ",
+    printk("MAC: %c.%c.%c.%c.%c.%c ",
         a2,b2,c2,d2,e2,f2 );
 
-    printf("INDEX: %d\n",index);
+    printk("INDEX: %d\n",index);
 }
 
 void arp_show_table(void)
@@ -104,13 +104,13 @@ void arp_show_table(void)
     if (ARP_Table.initialized != TRUE)
         return;
 
-    printf("ARP table:\n");
-    printf("-------------------------------------\n");
+    printk("ARP table:\n");
+    printk("-------------------------------------\n");
     for (i=0; i<ARP_TABLE_COUNT_MAX; i++)
     {
         arp_table_show_index(i);
     };
-    printf("-------------------------------------\n");
+    printk("-------------------------------------\n");
 }
 
 // When receving ARP packet from NIC device.
@@ -134,13 +134,13 @@ network_handle_arp(
 // a pre-allocated buffer.
     ar = (struct ether_arp *) buffer;
     if ((void*) ar == NULL){
-        printf("network_handle_arp: ar\n");
+        printk("network_handle_arp: ar\n");
         goto fail;
     }
 
 // The minimum size.
     //if (size < ARP_HEADER_LENGHT){
-    //    printf("network_handle_arp: size\n");
+    //    printk("network_handle_arp: size\n");
     //    goto fail;
     //}
 
@@ -148,14 +148,14 @@ network_handle_arp(
 // Show data.
 // Bytes: Net-style.
 // Hardware type (HTYPE)   (00 01) = Ethernet.
-    printf("Hardware type: {%x}\n",ar->type);
+    printk("Hardware type: {%x}\n",ar->type);
 // Protocol type (PTYPE)   (08 00) = ipv4.
 // In the case of Ethernet, a 0x0806 EtherType value 
 // is used to identify ARP frames.
-    printf("Protocol type: {%x}\n",ar->proto);
-    printf("Hardware address lenght: {%x}\n",ar->hlen);
-    printf("Protocol address lenght: {%x}\n",ar->plen);
-    printf("ARP operation {%x}\n",ar->op);
+    printk("Protocol type: {%x}\n",ar->proto);
+    printk("Hardware address lenght: {%x}\n",ar->hlen);
+    printk("Protocol address lenght: {%x}\n",ar->plen);
+    printk("ARP operation {%x}\n",ar->op);
     // continua: macs e ips ... 
 */
 
@@ -168,7 +168,7 @@ network_handle_arp(
 // sha is the [mac] of the machine that sent us a request.
 // spa is the [ip]  of the machine that sent us a request.
     if (op == ARP_OPC_REQUEST){
-        //printf("ARP: REQUEST\n");
+        //printk("ARP: REQUEST\n");
         network_send_arp_reply( 
             ar->arp_sha,     // Target mac
             ar->arp_spa );   // Target ip
@@ -187,7 +187,7 @@ network_handle_arp(
         //   ar->arp_sha );
 
         // #debug
-        printf("ARP: REPLY from %d.%d.%d.%d\n",
+        printk("ARP: REPLY from %d.%d.%d.%d\n",
             ar->arp_spa[0], 
             ar->arp_spa[1], 
             ar->arp_spa[2], 
@@ -202,7 +202,7 @@ network_handle_arp(
              ar->arp_spa[3] == 1 )
         {
             // Show MAC
-            //printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+            //printk("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
                 //ar->arp_sha[0], 
                 //ar->arp_sha[1], 
                 //ar->arp_sha[2], 
@@ -216,7 +216,7 @@ network_handle_arp(
                 if (CurrentNetwork->initialized == TRUE)
                 {
                     // #debug
-                    printf("Saving gateway info\n");
+                    printk("Saving gateway info\n");
                     network_fill_ipv4( 
                         CurrentNetwork->gateway_ipv4,
                         ar->arp_spa );
@@ -225,7 +225,7 @@ network_handle_arp(
                         ar->arp_sha );
 
                     // Show saved MAC
-                    //printf("ARP:  Saved MAC %x.%x.%x.%x.%x.%x\n",
+                    //printk("ARP:  Saved MAC %x.%x.%x.%x.%x.%x\n",
                         //CurrentNetwork->gateway_mac[0], 
                         //CurrentNetwork->gateway_mac[1], 
                         //CurrentNetwork->gateway_mac[2], 
@@ -238,15 +238,15 @@ network_handle_arp(
         }
 
         // Show IP
-        //printf("ARP: REPLY to %d.%d.%d.%d\n",
+        //printk("ARP: REPLY to %d.%d.%d.%d\n",
         //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
 
         /*
         // to me
         if ( ar->arp_tpa[3] == 12 )
         {
-            printf("ARP: Reply to ME!\n");
-            printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+            printk("ARP: Reply to ME!\n");
+            printk("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
                 ar->arp_sha[0], 
                 ar->arp_sha[1], 
                 ar->arp_sha[2], 
@@ -270,7 +270,7 @@ network_handle_arp(
 
     return;
 fail:
-    printf("network_handle_arp: Fail\n");
+    printk("network_handle_arp: Fail\n");
     return;
 }
 
@@ -288,12 +288,12 @@ network_send_arp(
     register int i=0;
 
     // #debug
-    //printf("network_send_arp:\n");
+    //printk("network_send_arp:\n");
     //refresh_screen();
 
 // The structure for the Intel NIC device.
     if ((void*) currentNIC == NULL){
-        printf("network_send_arp: currentNIC fail\n");
+        printk("network_send_arp: currentNIC fail\n");
         goto fail;
     }
 
@@ -312,7 +312,7 @@ network_send_arp(
     struct ether_header *eh;
     eh = (void *) kmalloc( sizeof(struct ether_header) );
     if ( (void *) eh == NULL){
-        printf ("network_send_arp: eh struct fail\n");
+        printk ("network_send_arp: eh struct fail\n");
         goto fail;
     }
     */
@@ -334,7 +334,7 @@ network_send_arp(
     struct ether_arp *h;
     h = (void *) kmalloc ( sizeof(struct  ether_arp) );
     if ((void *) h == NULL){
-        printf ("network_send_arp: struct h fail");
+        printk ("network_send_arp: struct h fail");
         goto fail;
     }
     */
@@ -383,18 +383,18 @@ network_send_arp(
 // show arp header.
 
 /*
-    printf("\n\n");
-    printf("[arp]\n\n");
-    printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
+    printk("\n\n");
+    printk("[arp]\n\n");
+    printk("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
         h->type ,h->proto ,h->hlen ,h->plen ,h->op);
-    printf("\n sender: mac ");
-    for( i=0; i<6; i++){ printf("%x ",h->arp_sha[i]); }
-    printf("\n sender: ip ");
-    for( i=0; i<4; i++){ printf("%d ",h->arp_spa[i]); }
-    printf("\n target: mac ");
-    for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
-    printf("\n target: ip ");
-    for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
+    printk("\n sender: mac ");
+    for( i=0; i<6; i++){ printk("%x ",h->arp_sha[i]); }
+    printk("\n sender: ip ");
+    for( i=0; i<4; i++){ printk("%d ",h->arp_spa[i]); }
+    printk("\n target: mac ");
+    for( i=0; i<6; i++){ printk("%x ",h->arp_tha[i]); }
+    printk("\n target: ip ");
+    for( i=0; i<4; i++){ printk("%d ",h->arp_tpa[i]); }
     refresh_screen();
     while(1){}
 */
@@ -419,7 +419,7 @@ network_send_arp(
     uint16_t buffer_index = (uint16_t) currentNIC->tx_cur;
 
     //#debug
-    //printf ("buffer_index {%d}\n",buffer_index);
+    //printk ("buffer_index {%d}\n",buffer_index);
 
 //
 // Buffer
@@ -471,7 +471,7 @@ network_send_arp(
     //kfree(eh);
     //kfree(h);
 
-    //printf ("Done\n");
+    //printk ("Done\n");
     return;
 fail:
     return;

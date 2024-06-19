@@ -199,13 +199,14 @@ Please make some comments on Github or send messages to Fred Nora.
 
 # Folders
 
+ Stating with code and ending with data and binary images.
+
 ```
-  * base/      - Files to install into the virtual disk.
   * boot/      - Gramado boot loader.
   * kernel/    - The core kernel.
   * mods/      - Kernel modules.
   * userland/  - Init process and ring3 services.
-  * usernet/   - Documentation and network stuff.
+  * your/      - Your stuff.
 ```
 
 

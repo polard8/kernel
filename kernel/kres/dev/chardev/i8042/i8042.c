@@ -233,7 +233,7 @@ void ps2(void)
     int is_dual_channel=0;
 
     // #debug
-    printf ("ps2: Initializing..\n");
+    printk ("ps2: Initializing..\n");
     //refresh_screen();
 
     // The main structure fisrt of all.
@@ -292,8 +292,8 @@ void ps2(void)
 // #todo: Create a flag in the structure to indicate this feature.
 
     is_dual_channel = (configuration & (1 << 5)) != 0;
-    if (is_dual_channel == 1){ printf("Dual\n");   }
-    if (is_dual_channel == 0){ printf("Single\n"); }
+    if (is_dual_channel == 1){ printk("Dual\n");   }
+    if (is_dual_channel == 0){ printk("Single\n"); }
 
     // #define SELF_TEST_SUCCESS 0x55
 
@@ -304,7 +304,7 @@ void ps2(void)
     wait_then_write(I8042_STATUS, 0xAA);
     
     if (wait_then_read(I8042_BUFFER) == 0x55){
-        printf( "I8042: Self test OK\n");
+        printk( "I8042: Self test OK\n");
         // Restore configuration in case the controller reset
         // At the very least, the Controller Configuration Byte 
         // should be restored for compatibility with such hardware.
@@ -360,8 +360,8 @@ void ps2(void)
 // imprimir o resultado da disponibilidade.
 
     if (keyboard_available == 1){
-        //printf("----\n");
-        printf("~ Keyboard available\n");
+        //printk("----\n");
+        printk("~ Keyboard available\n");
         ps2kbd_initialize_device();
         PS2.keyboard_initialized = TRUE;
         wait_then_write(I8042_STATUS, 0xae);  // enable keyboard port
@@ -379,8 +379,8 @@ void ps2(void)
 
     if (mouse_available == 1 ){
 
-        //printf("----\n");
-        printf("~ Mouse available\n");
+        //printk("----\n");
+        printk("~ Mouse available\n");
 
         // #todo
         //ps2mouse_initialize_device();
@@ -431,7 +431,7 @@ void ps2(void)
     //__ps2_wait(1);
 
     //#debug
-    printf("ps2: done\n");
+    printk("ps2: done\n");
 }
 
 // #todo

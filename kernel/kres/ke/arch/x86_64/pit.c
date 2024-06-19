@@ -320,7 +320,7 @@ void timerInit8253 (unsigned int freq)
     PITInfo.initialized = TRUE;
 
     // #debug
-    //printf("Dev freq: %d | Clocks per sec: %d HZ| Period: %d\n",
+    //printk("Dev freq: %d | Clocks per sec: %d HZ| Period: %d\n",
     //    PITInfo.dev_freq,
     //    PITInfo.clocks_per_sec,
     //    PITInfo.period );
@@ -618,13 +618,10 @@ struct timer_d *create_timer (
     struct timer_d   *Timer;
     struct process_d *Process;
     struct thread_d  *Thread;
-
     int ID = -1;  //erro;
 
-    //debug_print("=============\n");
     debug_print("create_timer:\n");
-    
-    //printf     ("create_timer: pid=%d ms=%d type=%d\n",
+    //printk     ("create_timer: pid=%d ms=%d type=%d\n",
     //    pid,ms,type);
 
 // --------------
@@ -657,7 +654,7 @@ struct timer_d *create_timer (
     // ms
     if (ms < (JIFFY_FREQ/sys_time_hz) )
     {
-        printf ("create_timer: Ajust ms\n");
+        printk ("create_timer: Ajust ms\n");
         ms = (JIFFY_FREQ/sys_time_hz);
     }
 
@@ -665,7 +662,7 @@ struct timer_d *create_timer (
     if ( type < 1 || type > 10 )
     {
         panic ("create_timer: type fail\n");
-        //printf("create_timer: type fail\n");
+        //printk("create_timer: type fail\n");
         //refresh_screen ();
         //return NULL;
     }
@@ -675,7 +672,7 @@ struct timer_d *create_timer (
     Timer = (void *) kmalloc( sizeof(struct timer_d) );
     if ((void *) Timer == NULL){
         panic("create_timer: Timer fail \n");
-        //printf ("create_timer: Timer fail \n");
+        //printk ("create_timer: Timer fail \n");
         //refresh_screen ();
         //return NULL; 
     }else{
@@ -686,7 +683,7 @@ struct timer_d *create_timer (
         // Erro ao obter um novo id.
         if (  ID < 0 || ID > 32 ){
             panic ("create_timer: ID fail \n");
-            //printf("create_timer: ID fail \n");
+            //printk("create_timer: ID fail \n");
             //refresh_screen ();
             //return NULL;
         }else{
@@ -712,7 +709,7 @@ struct timer_d *create_timer (
             Timer->pid     = pid;
             Timer->tid     = current_thread;
 
-            //printf("create_timer: done t={%d} :) \n",
+            //printk("create_timer: done t={%d} :) \n",
             //    Timer->initial_count_down);
 
             // Coloca na lista.
@@ -728,7 +725,7 @@ struct timer_d *create_timer (
 
 fail:
     debug_print("create_timer: [FAIL]\n");
-    printf     ("create_timer: [FAIL]\n");
+    printk     ("create_timer: [FAIL]\n");
     refresh_screen();
     return NULL;
 }

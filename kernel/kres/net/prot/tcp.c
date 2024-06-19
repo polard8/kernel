@@ -19,7 +19,7 @@ network_handle_tcp(
     register int i=0;
     uint16_t flags=0;
 
-    printf("network_handle_tcp: #todo\n");
+    printk("network_handle_tcp: #todo\n");
 
 // #warning
 // It's ok to use pointer here.
@@ -27,7 +27,7 @@ network_handle_tcp(
 // a pre-allocated buffer.
     tcp = (struct tcp_d *) buffer;
     if ((void*) tcp == NULL){
-        printf("network_handle_tcp: tcp\n");
+        printk("network_handle_tcp: tcp\n");
         return;
     }
 
@@ -75,7 +75,7 @@ network_handle_tcp(
     flags = (uint16_t) FromNetByteOrder16(tcp->do_res_flags);
 
     //#debug
-    //printf("Flags={%x}\n",flags);
+    //printk("Flags={%x}\n",flags);
 
 // Control flags (6 bits)
     uint16_t fFIN=0;
@@ -112,37 +112,37 @@ network_handle_tcp(
 //
 
     //#debug
-    //printf("TCP: sport{%d}   #debug\n",sport);
-    printf("TCP: dport{%d}   #debug\n",dport);
+    //printk("TCP: sport{%d}   #debug\n",sport);
+    printk("TCP: dport{%d}   #debug\n",dport);
 
 // Show
    
     if (dport == 11888)
     {
-        printf ("------------------------\n");
-        printf ("---- TCP -> [11888] ----\n");
+        printk ("------------------------\n");
+        printk ("---- TCP -> [11888] ----\n");
 
         // >> Connection request: 
         // SYN=1, ACK=0
         // >> Reply: 
         // SYN=1, ACK=1
 
-        printf("SYN={%d} ACK={%d}\n",fSYN,fACK);
+        printk("SYN={%d} ACK={%d}\n",fSYN,fACK);
 
         // (1) SYN
         if ( fSYN == 1 && fACK == 0 ){
-            printf("\n");
-            printf(">>>> [TCP] SYN     (1)\n");
-            printf("SEQ={%d} | ACK={%d}\n",
+            printk("\n");
+            printk(">>>> [TCP] SYN     (1)\n");
+            printk("SEQ={%d} | ACK={%d}\n",
                 _seq_number, _ack_number);
             // #todo
             // Connect to the process that is listening at 11888.
         }
         // (2) SYN/ACK
         if ( fSYN == 1 && fACK == 1 ){
-            printf("\n");
-            printf(">>>> [TCP] SYN/ACK (2)\n");
-            printf("SEQ={%d} | ACK={%d}\n",
+            printk("\n");
+            printk(">>>> [TCP] SYN/ACK (2)\n");
+            printk("SEQ={%d} | ACK={%d}\n",
                 _seq_number, _ack_number);
             // #todo
             // We received a syn/ack as a response to
@@ -150,9 +150,9 @@ network_handle_tcp(
         }
         // (3) ACK
         if ( fSYN == 0 && fACK == 1 ){
-            printf("\n");
-            printf(">>>> [TCP] ACK     (3)\n");
-            printf("SEQ={%d} | ACK={%d}\n",
+            printk("\n");
+            printk(">>>> [TCP] ACK     (3)\n");
+            printk("SEQ={%d} | ACK={%d}\n",
                 _seq_number, _ack_number);
             // #todo
             // We received an ack as a response to
@@ -162,7 +162,7 @@ network_handle_tcp(
 
     //if (dport == 11888)
     //{
-        //printf("TCP: MESSAGE: {%s}\n", tcp_payload );
+        //printk("TCP: MESSAGE: {%s}\n", tcp_payload );
         //memset(tcp_payload,0,sizeof(tcp_payload));
     //}
 }

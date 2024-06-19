@@ -154,15 +154,14 @@ static int __x64_probe_smp_via_acpi(void)
     unsigned char c7=0;
     unsigned char c8=0;
 
-
 //
 // Probe ebda address at bda base.
 //
 
-    printf("EBDA short Address: %x\n", bda[0] ); 
+    printk("EBDA short Address: %x\n", bda[0] ); 
     ebda_address = (unsigned long) ( bda[0] << 4 );
     ebda_address = (unsigned long) ( ebda_address & 0xFFFFFFFF);
-    printf("EBDA Address: %x\n", ebda_address ); 
+    printk("EBDA Address: %x\n", ebda_address ); 
 
 // base
 // between 0xF0000 and 0xFFFFF.
@@ -194,7 +193,7 @@ static int __x64_probe_smp_via_acpi(void)
              c7 == 'R' &&
              c8 == ' '  )
         {
-            printf (":: Found [RSD PTR ] at index %d. :)\n",i);
+            printk (":: Found [RSD PTR ] at index %d. :)\n",i);
             Found=TRUE;
             break;
         }
@@ -202,7 +201,7 @@ static int __x64_probe_smp_via_acpi(void)
 
 // Signature not found.
     if (Found != TRUE){
-        printf("__x64_probe_smp_via_acpi: [RSD PTR ] wasn't found!\n");
+        printk("__x64_probe_smp_via_acpi: [RSD PTR ] wasn't found!\n");
         goto fail;
     }
 
@@ -221,15 +220,14 @@ static int __x64_probe_smp_via_acpi(void)
     rsdp = (struct rsdp_d *) __rsdp_Pointer;  // 1.0
     xsdp = (struct xsdp_d *) __rsdp_Pointer;  // 2.0
 
-
 // #debug ok
-    printf("RSDP signature: \n");
-    printf ("%c %c %c %c\n",
+    printk("RSDP signature: \n");
+    printk ("%c %c %c %c\n",
         rsdp->Signature[0],
         rsdp->Signature[1],
         rsdp->Signature[2],
         rsdp->Signature[3] );
-    printf ("%c %c %c %c\n",
+    printk ("%c %c %c %c\n",
         rsdp->Signature[4],
         rsdp->Signature[5],
         rsdp->Signature[6],
@@ -243,7 +241,7 @@ static int __x64_probe_smp_via_acpi(void)
 
     // Use xsdp
     if (rsdp->Revision == 0x02){
-        printf("ACPI version 2.0\n");
+        printk("ACPI version 2.0\n");
         // #maybe 0xFFF00000 ?
         __rsdt_address = 
             (unsigned long) (rsdp->RsdtAddress & 0xFFFFFFFF);
@@ -252,12 +250,12 @@ static int __x64_probe_smp_via_acpi(void)
         
         // #breakpoint
         //panic("x64smp.c: Revision 2.0 #todo\n");
-        printf("x64smp.c: Revision 2.0 #todo\n");
+        printk("x64smp.c: Revision 2.0 #todo\n");
         goto do_lapic;
 
     // Use rsdp
     }else if (rsdp->Revision == 0){
-        printf("ACPI version 1.0\n");
+        printk("ACPI version 1.0\n");
         __rsdt_address = 
             (unsigned long) (rsdp->RsdtAddress & 0xFFFFFFFF);
         __xsdt_address = 0;
@@ -285,11 +283,11 @@ static int __x64_probe_smp_via_acpi(void)
 
     if (rsdp->Revision == 0x02){
         //panic("x64smp.c: #todo 2.0\n");
-        printf("x64smp.c: #todo 2.0\n");
+        printk("x64smp.c: #todo 2.0\n");
         goto do_lapic;
     }else if (rsdp->Revision == 0){
         // Print the address we have.
-        //printf("rsdt address: %x \n", __rsdt_address);
+        //printk("rsdt address: %x \n", __rsdt_address);
         //while(1){ asm("hlt"); }
 
         // Mapping the rsdt address.
@@ -304,8 +302,8 @@ static int __x64_probe_smp_via_acpi(void)
         // Now we have a valid pointer.
         rsdt = (struct rsdt_d *) RSDT_VA;
         // #debug
-        printf("RSDT signature: \n");
-        printf ("%c %c %c %c\n",
+        printk("RSDT signature: \n");
+        printk ("%c %c %c %c\n",
             rsdt->Signature[0],
             rsdt->Signature[1],
             rsdt->Signature[2],
@@ -337,17 +335,17 @@ do_lapic:
     // #debug
     // #breakpoint
 
-    //printf("#breakpoint\n");
+    //printk("#breakpoint\n");
     //while(1){ asm("hlt"); }
 
     // 0xFEE00000
     lapic_initializing(LAPIC_DEFAULT_ADDRESS);
 
     if (LAPIC.initialized == TRUE){
-        printf("__x64_probe_smp_via_acpi: lapic initialization ok\n");
+        printk("__x64_probe_smp_via_acpi: lapic initialization ok\n");
         return TRUE;
     }else if (LAPIC.initialized != TRUE){
-        printf("__x64_probe_smp_via_acpi: lapic initialization fail\n");
+        printk("__x64_probe_smp_via_acpi: lapic initialization fail\n");
         return FALSE;
     };
 
@@ -397,7 +395,7 @@ static int __x64_probe_smp_via_mptable(void)
     unsigned char c3=0;
     unsigned char c4=0;
 
-    printf("__x64_probe_smp:\n");
+    printk("__x64_probe_smp:\n");
 
 // #todo
 // We can use a structure and put all these variable together,
@@ -414,14 +412,11 @@ static int __x64_probe_smp_via_mptable(void)
         panic("__x64_probe_smp_via_mptable: No APIC\n");
     }
 
-//
 // Probe ebda address at bda base.
-//
-
-    printf("EBDA short Address: %x\n", bda[0] ); 
+    printk("EBDA short Address: %x\n", bda[0] ); 
     ebda_address = (unsigned long) ( bda[0] << 4 );
     ebda_address = (unsigned long) ( ebda_address & 0xFFFFFFFF);
-    printf("EBDA Address: %x\n", ebda_address ); 
+    printk("EBDA Address: %x\n", ebda_address ); 
 
     // #debug
     // refresh_screen();
@@ -430,7 +425,6 @@ static int __x64_probe_smp_via_mptable(void)
 // Probe 0x5F504D5F signature. 
 // "_MP_".
 //
-
 
 // base
 // between 0xF0000 and 0xFFFFF.
@@ -451,7 +445,7 @@ static int __x64_probe_smp_via_mptable(void)
         c4 = p[i+3];
         if ( c1 == '_' && c2 == 'M' && c3 == 'P' && c4 == '_' )
         {
-            printf (":: Found _MP_ at index %d. :)\n",i);
+            printk (":: Found _MP_ at index %d. :)\n",i);
             mp_found=TRUE;
             break;
         }
@@ -459,7 +453,7 @@ static int __x64_probe_smp_via_mptable(void)
 
 // Signature not found.
     if (mp_found != TRUE){
-        printf("__x64_probe_smp_via_mptable: MP table wasn't found!\n");
+        printk("__x64_probe_smp_via_mptable: MP table wasn't found!\n");
         goto fail;
     }
 
@@ -490,7 +484,7 @@ static int __x64_probe_smp_via_mptable(void)
 // + OK on qemu.
 // + OK on kvm.
 // + FAIL on Virtualbox. #todo: try APIC.
-    printf("Signature: %c %c %c %c\n",
+    printk("Signature: %c %c %c %c\n",
         MPTable->signature[0],
         MPTable->signature[1],
         MPTable->signature[2],
@@ -508,28 +502,28 @@ static int __x64_probe_smp_via_mptable(void)
         (unsigned long) (MPTable->configuration_table & 0xFFFFFFFF);
 
 // Pointer for the configuration table.
-    printf("Configuration table address: {%x}\n",
+    printk("Configuration table address: {%x}\n",
         configurationtable_address);
 // Lenght: n*16 bytes
 // The length of the floating point structure table, 
 // in 16 byte units. 
 // This field *should* contain 0x01, meaning 16-bytes.
-    printf("Lenght: {%d}\n", MPTable->length);
+    printk("Lenght: {%d}\n", MPTable->length);
 // Revision: 1.x
 // The version number of the MP Specification. 
 // A value of 1 indicates 1.1, 4 indicates 1.4, and so on.
-    printf("Revision: {%d}\n", MPTable->mp_specification_revision);
+    printk("Revision: {%d}\n", MPTable->mp_specification_revision);
 // Checksum
 // The checksum of the Floating Point Structure. 
-    printf("Checksum: {%d}\n", MPTable->checksum);
+    printk("Checksum: {%d}\n", MPTable->checksum);
 // Default configuration flag.
 // If this is not zero then configuration_table should be 
 // ignored and a default configuration should be loaded instead.
-    printf("Default configuration flag: {%d}\n",
+    printk("Default configuration flag: {%d}\n",
         MPTable->default_configuration );
 
     if ( MPTable->default_configuration != 0 ){
-        printf("todo: The configuration table should be ignored\n");
+        printk("todo: The configuration table should be ignored\n");
     }
 
 // Features
@@ -538,14 +532,14 @@ static int __x64_probe_smp_via_mptable(void)
 // then the IMCR is present and PIC mode is being used, 
 // otherwise virtual wire mode is. 
 // All other bits are reserved.
-    printf("Features: {%d}\n", MPTable->features);
+    printk("Features: {%d}\n", MPTable->features);
 // Se o bit 7 está ligado.
     if ( MPTable->features & (1 << 7) ){
-         printf("The IMCR is present and PIC mode is being used.\n");
+        printk("The IMCR is present and PIC mode is being used.\n");
     }
 // Se o bit 7 está desligado.
     if ( (MPTable->features & (1 << 7)) == 0 ){
-         printf("Using the virtual wire mode.\n");
+        printk("Using the virtual wire mode.\n");
     }
 
     //#debug
@@ -562,22 +556,20 @@ static int __x64_probe_smp_via_mptable(void)
         (struct mp_configuration_table_d *) configurationtable_address;
 
     if ((void*) MPConfigurationTable == NULL){
-        printf("__x64_probe_smp: Invalid Configuration table address\n");
+        printk("__x64_probe_smp: Invalid Configuration table address\n");
         goto fail;
     }
 // Saving
     smp_info.mp_configuration_table = 
         (struct mp_configuration_table_d *) MPConfigurationTable;
 
-
 // Signature
 // "PCMP"
-    printf("Signature: %c %c %c %c\n",
+    printk("Signature: %c %c %c %c\n",
         MPConfigurationTable->signature[0],
         MPConfigurationTable->signature[1],
         MPConfigurationTable->signature[2],
         MPConfigurationTable->signature[3] );
-
 
 // Intel strings: 
 // "OEM00000" "PROD00000000"
@@ -588,7 +580,7 @@ static int __x64_probe_smp_via_mptable(void)
         oemid_string[i] = MPConfigurationTable->oem_id[i];
     };
     oemid_string[8]=0;  // finish
-    printf("OEM ID STRING: {%s}\n",oemid_string);
+    printk("OEM ID STRING: {%s}\n",oemid_string);
 
 // PRODUCT ID STRING
     char productid_string[12+1];
@@ -596,17 +588,17 @@ static int __x64_probe_smp_via_mptable(void)
         productid_string[i] = MPConfigurationTable->product_id[i];
     };
     productid_string[12]=0;  // finish
-    printf("PRODUCT ID STRING: {%s}\n",productid_string);
+    printk("PRODUCT ID STRING: {%s}\n",productid_string);
 
 // Lapic address
-    printf("lapic address: {%x}\n",
+    printk("lapic address: {%x}\n",
         MPConfigurationTable->lapic_address );
 
 // Is this the standard lapic address?
     if ( MPConfigurationTable->lapic_address != LAPIC_BASE )
     {
-        printf("fail: Not standard lapic address\n");
-        printf("Found={%x} Standard{%x}\n",
+        printk("fail: Not standard lapic address\n");
+        printk("Found={%x} Standard{%x}\n",
             MPConfigurationTable->lapic_address,
             LAPIC_BASE );
     }
@@ -623,20 +615,18 @@ static int __x64_probe_smp_via_mptable(void)
     register int EntryCount = 
         (int) MPConfigurationTable->entry_count;
 
-    printf("\n");
-    printf("------------------\n");
-    printf("Entry count: {%d}\n",
+    printk("\n");
+    printk("------------------\n");
+    printk("Entry count: {%d}\n",
         MPConfigurationTable->entry_count);
 
     //#debug
     //refresh_screen();
     //while(1){};
 
-
 // #bugbug
 // Talvez essas entradas estão erradas.
 // Talvez não haja entrada alguma nesse endereço aqui.
-
 
 // =======================================================
 // Entries
@@ -694,7 +684,7 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
 // EntryCount has the max number of entries.
     if (EntryCount > 32)
     {
-        printf("#bugbug: EntryCount > 32\n");
+        printk("#bugbug: EntryCount > 32\n");
         EntryCount = 32;
     }
 
@@ -709,8 +699,8 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
     for (i=0; i<EntryCount; i++)
     {
         // Tracing
-        //printf("\n");
-        //printf(":::: Entry %d:\n",i);
+        //printk("\n");
+        //printk(":::: Entry %d:\n",i);
         
         // #bugbug
         // Actually, here we need to get not only the processor
@@ -725,32 +715,31 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
         // Size = 20.
         if (e->type == 0){
 
-            printf("\n");
-            printf("------------------\n");
-            printf (">>>>> PROCESSOR found! in entry %d\n",i);
+            printk("\n");
+            printk("------------------\n");
+            printk(">>>>> PROCESSOR found! in entry %d\n",i);
 
             smp_info.processors[NumberOfProcessors] = (unsigned long) e;
             NumberOfProcessors += 1;
 
-
             // apic id.
-            printf("local_apic_id %d\n", e->local_apic_id);
+            printk("local_apic_id %d\n", e->local_apic_id);
             // apic version
-            printf("local_apic_version %d\n", e->local_apic_version);
+            printk("local_apic_version %d\n", e->local_apic_version);
             // Flags:
             // If bit 0 is clear then the processor must be ignored.
             // If bit 1 is set then the processor is the bootstrap processor.
             // Ignore the processor.
-            if( (e->flags & (1<<0)) == 0 ){
-                printf("Processor must be ignored\n");
+            if ( (e->flags & (1<<0)) == 0 ){
+                printk("Processor must be ignored\n");
             }
             // BSP processor.
-            if( e->flags & (1<<1) ){
-                printf("__x64_probe_smp: The processor is a BSP\n");
+            if ( e->flags & (1<<1) ){
+                printk("__x64_probe_smp: The processor is a BSP\n");
             }
-            printf ("stepping: %d\n", (e->signature & 0x00F));
-            printf ("   model: %d\n",((e->signature & 0x0F0) >> 4) );
-            printf ("  family: %d\n",((e->signature & 0xF00) >> 8) );
+            printk ("stepping: %d\n", (e->signature & 0x00F));
+            printk ("   model: %d\n",((e->signature & 0x0F0) >> 4) );
+            printk ("  family: %d\n",((e->signature & 0xF00) >> 8) );
 
             entry_base = (unsigned long) (entry_base + 20);
 
@@ -758,7 +747,7 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
         // Not a processor entry.
         // Size = 8.
         } else if (e->type != 0){
-            //printf ("Device type %d in entry %d\n", e->type, i );
+            //printk ("Device type %d in entry %d\n", e->type, i );
 
             // #todo
             // OK, at this moment, we know that this entry is not
@@ -769,9 +758,9 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
             // #test
             // This is the type for i/o apic entries.
             if (e->type == 2){
-                printf("\n");
-                printf("------------------\n");
-                printf (">>>>> IOAPIC found! in entry %d\n",i);
+                printk("\n");
+                printk("------------------\n");
+                printk(">>>>> IOAPIC found! in entry %d\n",i);
                 // #debug:
                 // Checking if we found the i/o apic entry.
                 // panic("#debug: ioapic\n");
@@ -785,8 +774,8 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
 
 //done:
 
-    printf("\n");
-    printf("------------------\n");
+    printk("\n");
+    printk("------------------\n");
 
 // Global number of processors.
     g_processor_count = 
@@ -797,12 +786,12 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
         (unsigned int) NumberOfProcessors;
 
 // #debug
-    printf("Processor count: {%d}\n",
+    printk("Processor count: {%d}\n",
         smp_info.number_of_processors );
 
 // smp done.
     smp_info.initialized = TRUE;
-    printf("__x64_probe_smp_via_mptable: done\n");
+    printk("__x64_probe_smp_via_mptable: done\n");
 
     // #debug
     //refresh_screen();
@@ -840,10 +829,9 @@ int x64_initialize_smp(void)
     //PROGRESS("x64_initialize_smp:\n");
 
     // #debug
-    //printf("\n");
-    //printf("---- SMP START ----\n");
-    printf("x64_initialize_smp:\n");
-
+    //printk("\n");
+    //printk("---- SMP START ----\n");
+    printk("x64_initialize_smp:\n");
 
 // ----------------------
 // ACPI
@@ -853,7 +841,7 @@ int x64_initialize_smp(void)
     smp_info.probe_via = SMP_VIA_ACPI;
     smp_status = (int) __x64_probe_smp_via_acpi();
     if (smp_status != TRUE){
-        printf("x64_initialize_smp: [x64_probe_smp_via_acpi] fail\n");
+        printk("x64_initialize_smp: [x64_probe_smp_via_acpi] fail\n");
     }
 
     // #debug
@@ -874,7 +862,7 @@ int x64_initialize_smp(void)
 
     if (smp_status == TRUE)
     {
-        printf("x64_initialize_smp: [x64_probe_smp] ok\n");
+        printk("x64_initialize_smp: [x64_probe_smp] ok\n");
         // Initialize LAPIC based on the address we found before.
         if ((void*) MPConfigurationTable != NULL)
         {
@@ -883,9 +871,9 @@ int x64_initialize_smp(void)
                 // see: apic.c
                 lapic_initializing( MPConfigurationTable->lapic_address );
                 if (LAPIC.initialized == TRUE){
-                    printf("??: lapic initialization ok\n");
+                    printk("??: lapic initialization ok\n");
                 }else if (LAPIC.initialized != TRUE){
-                    printf("??: lapic initialization fail\n");
+                    printk("??: lapic initialization fail\n");
                 };
             }
         }
@@ -895,13 +883,11 @@ int x64_initialize_smp(void)
     // #breakpoint
     // while (1){ asm("hlt"); };
 
-    //printf("---- SMP END ----\n");
-    //printf("\n");
+    //printk("---- SMP END ----\n");
+    //printk("\n");
     
     return (int) smp_status;
 }
-
-
 
 /*
 // #todo
@@ -1102,12 +1088,9 @@ detect_cores(rsd_ptr->rsdt_address);
 */
 
 /*
-printf("Found %d cores, IOAPIC %lx, LAPIC %lx, Processor IDs:", numcore, ioapic_ptr, lapic_ptr);
+printk("Found %d cores, IOAPIC %lx, LAPIC %lx, Processor IDs:", numcore, ioapic_ptr, lapic_ptr);
 for(i = 0; i < numcore; i++)
-  printf(" %d", lapic_ids[i]);
-printf("\n");
+  printk(" %d", lapic_ids[i]);
+printk("\n");
 */
-
-
-
 

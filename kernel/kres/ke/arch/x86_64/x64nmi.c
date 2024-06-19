@@ -132,14 +132,14 @@ void x64_nmi(unsigned long number)
 
     debug_print("x64_nmi:\n");
 
-    //printf("\n");
-    printf("\n");
-    printf("\n");
-    printf ("number: %d\n",number);
+    //printk("\n");
+    printk("\n");
+    printk("\n");
+    printk ("number: %d\n",number);
 
 // see: clone.c    
     if (copy_process_in_progress == TRUE){
-        printf("Fault while copying a process\n");
+        printk("Fault while copying a process\n");
     }
 
 //#debug: 
@@ -253,7 +253,7 @@ void x64_nmi(unsigned long number)
          number == 13 || 
          number == 14 )
     {
-        printf("x64_nmi: {%d}\n",number);
+        printk("x64_nmi: {%d}\n",number);
 
         // Kill process
         // #bugbug: Precisamos checar o ring que o processo
@@ -266,7 +266,7 @@ void x64_nmi(unsigned long number)
         }
         if (killstatus == 0)
         {
-            printf("The process was killed\n");
+            printk("The process was killed\n");
             
             //
             // Resume init thread
@@ -291,7 +291,7 @@ void x64_nmi(unsigned long number)
             set_current_process((pid_t)target_pid);
             
             // Final message.
-            printf("Resuming the init thread\n");
+            printk("Resuming the init thread\n");
             refresh_screen();
             
             // Retorna pra assembly para efetuar iretq.
@@ -332,8 +332,8 @@ void x64_nmi(unsigned long number)
         // So, we need to put some arguments in the faults() function.
         // #todo: faults(number,arg1,arg2,arg3).
         case 3: 
-            printf("\n");
-            printf ("== 3 ==\n");  
+            printk("\n");
+            printk ("== 3 ==\n");  
             save_current_context();
             //show_slots();
             show_reg(current_thread);
@@ -391,7 +391,7 @@ void x64_nmi(unsigned long number)
 
         // (GP) - General Protection Fault
         case 13: 
-            printf ("== GP ==\n");  
+            printk ("== GP ==\n");  
             //show_slots();
             refresh_screen();
             // Esse tipo funciona mesmo antes do console
@@ -402,9 +402,9 @@ void x64_nmi(unsigned long number)
         // (PF) - Page Fault
         // #todo: Com assembly inline podemos pegar cr2 e cr3.
         case 14: 
-            printf ("== PF ==\n");  
+            printk ("== PF ==\n");  
             //if(user_thread==TRUE){
-            //    printf("It's an user thread!\n");
+            //    printk("It's an user thread!\n");
             //}
             show_slots();
             refresh_screen();

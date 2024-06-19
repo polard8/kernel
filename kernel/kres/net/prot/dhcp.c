@@ -49,7 +49,7 @@ network_handle_dhcp(
     uint8_t your_ipv4[4];    // yiaddr: Your IP address.
     uint8_t server_ipv4[4];  // siaddr: Server IP address.
 
-    //printf ("DHCP: Received\n");
+    //printk ("DHCP: Received\n");
 
 // #warning
 // It's ok to use pointer here.
@@ -69,7 +69,7 @@ network_handle_dhcp(
     your_ipv4[1] = (uint8_t) ( (dhcp->yiaddr >> 8)  & 0xFF);
     your_ipv4[2] = (uint8_t) ( (dhcp->yiaddr >> 16) & 0xFF);
     your_ipv4[3] = (uint8_t) ( (dhcp->yiaddr >> 24) & 0xFF);
-    printf ("network_handle_dhcp: Your IP %d.%d.%d.%d  <<< ---------\n",
+    printk ("network_handle_dhcp: Your IP %d.%d.%d.%d  <<< ---------\n",
         your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
 
 // siaddr: Server IP address.
@@ -77,12 +77,12 @@ network_handle_dhcp(
     server_ipv4[1] = (uint8_t) ( (dhcp->siaddr >> 8)  & 0xFF);
     server_ipv4[2] = (uint8_t) ( (dhcp->siaddr >> 16) & 0xFF);
     server_ipv4[3] = (uint8_t) ( (dhcp->siaddr >> 24) & 0xFF);
-    printf ("network_handle_dhcp: Server IP %d.%d.%d.%d  <<< ---------\n",
+    printk ("network_handle_dhcp: Server IP %d.%d.%d.%d  <<< ---------\n",
         server_ipv4[0], server_ipv4[1], server_ipv4[2], server_ipv4[3] );
 
 // chaddr: Client hardware address.
 // Pra certificar que a mensagem foi pra nós.
-    printf("network_handle_dhcp: Client MAC %x.%x.%x.%x.%x.%x\n",
+    printk("network_handle_dhcp: Client MAC %x.%x.%x.%x.%x.%x\n",
         dhcp->chaddr[0],
         dhcp->chaddr[1],
         dhcp->chaddr[2],
@@ -96,7 +96,7 @@ network_handle_dhcp(
     //if (dhcp->op == 1)
         //return;
     if (dhcp->op == 2)
-        printf ("DHCP: Reply received\n");
+        printk ("DHCP: Reply received\n");
 
 // 53 = DHCP Message type.
 
@@ -117,12 +117,12 @@ network_handle_dhcp(
 // + Let's send a Request.
     if (dhcp->options[2] == DORA_O)
     {
-        printf("\n");
-        printf("--2-- DHCP-RECEIVE: DORA_O\n");
-        printf("DHCP: Send Dora Request\n");
+        printk("\n");
+        printk("--2-- DHCP-RECEIVE: DORA_O\n");
+        printk("DHCP: Send Dora Request\n");
 
         // #debug
-        //printf ("When receiving Offer: Your IP %d.%d.%d.%d\n",
+        //printk ("When receiving Offer: Your IP %d.%d.%d.%d\n",
         //    your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
         //while (1){}
 
@@ -151,16 +151,16 @@ network_handle_dhcp(
 // Set the online status.
     if ( dhcp->options[2] == DORA_A )
     {
-        printf("\n");
-        printf("--4-- DHCP-RECEIVE: DORA_A\n");
+        printk("\n");
+        printk("--4-- DHCP-RECEIVE: DORA_A\n");
 
         // #debug
-        //printf ("When receiving ack: Your IP %d.%d.%d.%d\n",
+        //printk ("When receiving ack: Your IP %d.%d.%d.%d\n",
         //    your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
         //while (1){}
 
         // #debug
-        //printf ("When receiving ack: Server IP %d.%d.%d.%d\n",
+        //printk ("When receiving ack: Server IP %d.%d.%d.%d\n",
         //    server_ipv4[0], server_ipv4[1], server_ipv4[2], server_ipv4[3] );
         //while (1){}
 
@@ -181,7 +181,7 @@ network_handle_dhcp(
 // Decline
 // The server declined our request.
     if ( dhcp->options[2] == DHCP_DECLINE ){
-        printf ("DHCP: Decline received\n");
+        printk ("DHCP: Decline received\n");
         return;
     }
 
@@ -214,7 +214,7 @@ network_dhcp_send(
     int opt_size = 0;
 
     if ((void*) dhcp == NULL){
-        printf("network_dhcp_send: dhcp\n");
+        printk("network_dhcp_send: dhcp\n");
         goto fail;
     }
 
@@ -264,7 +264,7 @@ network_dhcp_send(
     memset( dhcp->chaddr, 0, 16 );
     register int i=0;
     if ((void*) currentNIC == NULL){
-        printf("network_dhcp_send: currentNIC\n");
+        printk("network_dhcp_send: currentNIC\n");
         goto fail;
     }
     if ((void*) currentNIC != NULL)
@@ -325,7 +325,7 @@ network_dhcp_send(
     if ( message_type != DORA_D && 
          message_type != DORA_R )
     {
-        printf("Invalide DORA message type\n");
+        printk("Invalide DORA message type\n");
         goto fail;
     }
 
@@ -335,8 +335,8 @@ network_dhcp_send(
 
     // Discovering and IP.
     case DORA_D:
-        printf("\n");
-        printf("--1-- DHCP-SEND: DORA_D\n");
+        printk("\n");
+        printk("--1-- DHCP-SEND: DORA_D\n");
         
         //++
         // Parameter Request list
@@ -354,8 +354,8 @@ network_dhcp_send(
 
     // Requesting an IP.
     case DORA_R:
-        printf("\n");
-        printf("--3-- DHCP-SEND: DORA_R\n");
+        printk("\n");
+        printk("--3-- DHCP-SEND: DORA_R\n");
 
         //++
         // Requested IP address
@@ -416,7 +416,7 @@ network_dhcp_send(
         break;
 
     default:
-        printf("network_dhcp_send: default message_type\n");
+        printk("network_dhcp_send: default message_type\n");
         goto fail;
         break;   
     };
@@ -425,7 +425,7 @@ network_dhcp_send(
 // Sending UDP packet.
 //
 
-    printf("network_dhcp_send: Sending udp ...\n");
+    printk("network_dhcp_send: Sending udp ...\n");
 
 // UDP payload is the base of the dhcp structure.
     char *__udp_payload = (char *) dhcp;
@@ -442,7 +442,7 @@ network_dhcp_send(
         __udp_payload_size ); 
 
 // done:
-    printf("network_dhcp_send: done :)\n");
+    printk("network_dhcp_send: done :)\n");
     return;
 
 fail:
@@ -467,7 +467,7 @@ int network_initialize_dhcp(void)
 // Can't initialize the dhcp because 
 // the network support was not initialized yet.
     if (networkGetStatus() != TRUE){
-       printf("network_initialize_dhcp: Network not initialized\n");
+       printk("network_initialize_dhcp: Network not initialized\n");
        return (int) -1;
     }
 
@@ -476,7 +476,7 @@ int network_initialize_dhcp(void)
 //
 
     // #debug
-    // printf("network_initialize_dhcp: Sending Discover\n");
+    // printk("network_initialize_dhcp: Sending Discover\n");
 
     network_dhcp_send( 
         (struct dhcp_d *) &Ldhcp,    // dhcp header 
@@ -486,14 +486,14 @@ int network_initialize_dhcp(void)
         68,                          // src port
         67 );                        // dst port
 
-    printf("network_initialize_dhcp: done\n");
+    printk("network_initialize_dhcp: done\n");
     //dhcp_info.initialized =  TRUE;
     
     //while(1){}
     return 0;
 
 fail:
-    printf("network_initialize_dhcp: fail\n");
+    printk("network_initialize_dhcp: fail\n");
     dhcp_info.initialized =  FALSE;
     
     // #debug
@@ -506,15 +506,15 @@ fail:
 void network_show_dhcp_info(void)
 {
     if (dhcp_info.initialized != TRUE){
-        printf("DHCP: Not initialized\n");
+        printk("DHCP: Not initialized\n");
         return;
     }
-    printf ("DHCP: Your IP is %d.%d.%d.%d\n",
+    printk ("DHCP: Your IP is %d.%d.%d.%d\n",
         dhcp_info.your_ipv4[0], 
         dhcp_info.your_ipv4[1], 
         dhcp_info.your_ipv4[2], 
         dhcp_info.your_ipv4[3] );
-    printf ("DHCP: Server IP is %d.%d.%d.%d\n",
+    printk ("DHCP: Server IP is %d.%d.%d.%d\n",
         dhcp_info.server_ipv4[0], 
         dhcp_info.server_ipv4[1], 
         dhcp_info.server_ipv4[2], 

@@ -3,7 +3,6 @@
 
 #include <kernel.h>
 
-
 // See: kpid.h
 pid_t __gpidBoot=0;
 pid_t __gpidInclude=0;
@@ -21,7 +20,6 @@ pid_t __gpidSysMK=0;
 pid_t __gpidSysSM=0;
 pid_t __gpidWindowManager=0;
 pid_t __gpidWindowServer=0;
-
 
 // GLOBAL
 // ------
@@ -318,13 +316,13 @@ copy_process_struct(
 
     /*
     if ( p1 == p2 ){
-        printf ("copy_process_struct: [FAIL] same PID\n");  goto fail;
+        printk ("copy_process_struct: [FAIL] same PID\n");  goto fail;
     }
     if ( p1 < 0 ){
-        printf ("copy_process_struct: [FAIL] p1 limits\n"); goto fail;
+        printk ("copy_process_struct: [FAIL] p1 limits\n"); goto fail;
     }
     if ( p2 < 0 ){
-        printf ("copy_process_struct: [FAIL] p2 limits\n"); goto fail;
+        printk ("copy_process_struct: [FAIL] p2 limits\n"); goto fail;
     }
     */
 
@@ -332,24 +330,24 @@ copy_process_struct(
 // Check process 1
     Process1 = (struct process_d *) p1;
     if ((void *) Process1 == NULL){
-        printf("copy_process_struct: Process1\n"); 
+        printk("copy_process_struct: Process1\n"); 
         goto fail;
     }
     if ( Process1->used != TRUE || Process1->magic != 1234 )
     {
-        printf("copy_process_struct: Process1 validation\n");
+        printk("copy_process_struct: Process1 validation\n");
         goto fail;
     }
 // ===========================
 // Check process 2
     Process2 = (struct process_d *) p2;     
     if ((void *) Process2 == NULL){
-        printf("copy_process_struct: Process1\n");
+        printk("copy_process_struct: Process1\n");
         goto fail; 
     }
     if ( Process2->used != TRUE || Process2->magic != 1234 )
     {
-        printf("copy_process_struct: Process2 validation\n");
+        printk("copy_process_struct: Process2 validation\n");
         goto fail;
     }
 
@@ -647,7 +645,7 @@ copy_process_struct(
     Process2->_is_child_of_terminal = TRUE;
 
     //#debug
-    //printf("A terminal created two connectors\n");
+    //printk("A terminal created two connectors\n");
     //refresh_screen();
     //while(1){}
 
@@ -702,10 +700,9 @@ copy_process_struct(
 // Fail
 fail:
     Status = 1;  //-1 ??
-    printf ("copy_process_struct: Fail\n");
+    printk ("copy_process_struct: Fail\n");
     return (int) Status;
 }
-
 
 /*
  * processObject:
@@ -1043,7 +1040,7 @@ struct process_d *create_process (
     int Personality = personality;
 
     debug_print ("create_process: #todo\n");
-    printf      ("create_process: #todo\n");
+    printk      ("create_process: #todo\n");
 
 //=================================
 // check parameters
@@ -1126,7 +1123,7 @@ struct process_d *create_process (
         if ( PID < GRAMADO_PID_BASE || PID >= PROCESS_COUNT_MAX )
         {
             debug_print ("create_process: [FAIL] getNewPID\n");
-            printf      ("create_process: [FAIL] getNewPID %d\n", PID);
+            printk      ("create_process: [FAIL] getNewPID %d\n", PID);
             goto fail;
         }
         EmptyEntry = (void *) processList[PID];
@@ -1244,7 +1241,7 @@ struct process_d *create_process (
     if (pml4_va == 0)
     {
         debug_print("create_process: [FAIL] pml4_va\n");
-        printf     ("create_process: [FAIL] pml4_va\n");
+        printk     ("create_process: [FAIL] pml4_va\n");
         goto fail;
     }
 
@@ -1492,7 +1489,7 @@ struct process_d *create_process (
 
     // #debug
     //debug_print ("create_process: done\n");
-    //printf      ("create_process: done\n");
+    //printk      ("create_process: done\n");
 
     // ok
     return (void *) Process;
@@ -1532,7 +1529,7 @@ unsigned long GetProcessHeapStart (pid_t pid)
 
 // #debug
     debug_print ("GetProcessHeapStart:\n");
-    //printf ("GetProcessHeapStart: [DEBUG] pid %d\n", pid);
+    //printk ("GetProcessHeapStart: [DEBUG] pid %d\n", pid);
     //refresh_screen();
 
 // pid.
@@ -1809,7 +1806,7 @@ int alloc_memory_for_image_and_stack(struct process_d *process)
 
     if (new_base_PA == 0)
     {
-        //printf("processCopyMemory: new_base_PA\n");
+        //printk("processCopyMemory: new_base_PA\n");
         //refresh_screen();
 
         panic("alloc_memory_for_image_and_stack: new_base_PA\n");
@@ -1817,10 +1814,10 @@ int alloc_memory_for_image_and_stack(struct process_d *process)
     }
     if (new_stack_PA == 0)
     {
-        //printf("processCopyMemory: new_stack_PA\n");
+        //printk("processCopyMemory: new_stack_PA\n");
         //refresh_screen();
 
-        printf("alloc_memory_for_image_and_stack: new_stack_PA\n");
+        printk("alloc_memory_for_image_and_stack: new_stack_PA\n");
         return -1;
     }
 
@@ -1854,12 +1851,12 @@ int alloc_memory_for_image_and_stack(struct process_d *process)
 // #debug
 // Showing the addresses of base and stack pointers.
 
-    //printf("processCopyMemory: new base PA %x | new stack PA %x \n",
+    //printk("processCopyMemory: new base PA %x | new stack PA %x \n",
         //new_base_PA, new_stack_PA );
 
 // Done.
     //#debug
-    //printf ("processCopyMemory: ok\n");
+    //printk ("processCopyMemory: ok\n");
     //refresh_screen ();
     
     return 0;
@@ -1994,25 +1991,24 @@ int process_get_tty (int pid)
     }
 
     p = (struct process_d *) processList[pid];
-
-    if ( (void *) p == NULL )
+    if ((void *) p == NULL)
     {
         debug_print ("process_get_tty: p \n");
-        //printf ("p fail\n");
+        //printk ("p fail\n");
         //refresh_screen();
         return -1;
     }
 
 // Get the private tty.
     tty = p->tty;
-    if ( (void *) tty == NULL ){
+    if ((void *) tty == NULL){
         debug_print ("process_get_tty: tty fail\n");
-        //printf ("tty fail\n");
+        //printk ("tty fail\n");
         //refresh_screen();
         return -1;
     }
 
-    //printf ("tty %d belongs to %d\n", tty->index, p->pid );
+    //printk ("tty %d belongs to %d\n", tty->index, p->pid );
     //refresh_screen ();
 
 // #bugbug
@@ -2041,16 +2037,14 @@ struct process_d *create_and_initialize_process_object(void)
     new_process = (struct process_d *) processObject();
     if ((void *) new_process == NULL){
         debug_print("create_and_initialize_process_object: [FAIL] new_process\n");
-        printf     ("create_and_initialize_process_object: [FAIL] new_process\n");
+        printk     ("create_and_initialize_process_object: [FAIL] new_process\n");
         goto fail;
     }
 
 // Default personality
     new_process->personality = PERSONALITY_GRAMADO;
-
 // see: layer.h
     new_process->_layer = LAYER_UNDEFINED;
-
 // #test
 // No environment yet.
     new_process->env_subsystem = UnknownSubsystem;
@@ -2076,7 +2070,7 @@ struct process_d *create_and_initialize_process_object(void)
          NewPID >= PROCESS_COUNT_MAX )
     {
         debug_print("create_and_initialize_process_object: [FAIL] NewPID\n");
-        printf     ("create_and_initialize_process_object: [FAIL] NewPID={%d}\n", 
+        printk     ("create_and_initialize_process_object: [FAIL] NewPID={%d}\n", 
             NewPID );
         goto fail;
     }
@@ -2138,21 +2132,17 @@ struct process_d *create_and_initialize_process_object(void)
 
 //===========================================================
 
-//
-// Heap
-//
-
+// Heap support
     new_process->HeapStart = 
         (unsigned long) (g_heappool_va + (g_heap_count * g_heap_size));
     new_process->HeapSize = 
         (unsigned long) g_heap_size;
     new_process->HeapEnd = 
         (unsigned long) (new_process->HeapStart + new_process->HeapSize); 
-    
     g_heap_count++;
 
 //#debug
-    //printf ("clone_and_execute_process: HeapStart %x | HeadSize %x | HeapEnd %x \n",
+    //printk ("clone_and_execute_process: HeapStart %x | HeadSize %x | HeapEnd %x \n",
     //    new_process->HeapStart, new_process->HeapSize, new_process->HeapEnd );
 
 //#breakpoint
@@ -2161,15 +2151,11 @@ struct process_d *create_and_initialize_process_object(void)
 
 //===========================================================
 
-//
-// Stack
-//
-
+// Stack support
 // Stack for the clone. 
 // #bugbug: The stack size?
     new_process->control->context.rsp = 
         (unsigned long) CONTROLTHREAD_STACK;
-
     new_process->StackStart = 
         (unsigned long) CONTROLTHREAD_STACK;
     new_process->StackSize = 

@@ -5,7 +5,6 @@
 
 #include <kernel.h>
 
-
 #define APIC_TIMER_NULL  0
 
 #define APIC_TIMER_CONFIG_DATA_LVT(TimerMode,Mask,TriggerMode,Remote,InterruptInput,DeliveryMode,Vector)(\
@@ -177,8 +176,8 @@ int apic_timer(void)
     apic_timer_ticks = 0xFFFFFFFF - apic_timer_ticks;
     apic_timer_ticks++;
 
-    //printf("apic_timer_ticks %d\n", apic_timer_ticks);
-    printf("Current count: {%d}\n", apic_timer_ticks);
+    //printk("apic_timer_ticks %d\n", apic_timer_ticks);
+    printk("Current count: {%d}\n", apic_timer_ticks);
 
     apic_timer_ticks = 1000;
 

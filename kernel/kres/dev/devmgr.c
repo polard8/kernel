@@ -74,7 +74,7 @@ file *devmgr_search_in_dev_list(char *path)
                     if ( kstrncmp( p, path, PathSize ) == 0 )
                     {
                         // #debug
-                        printf("Device found!\n");
+                        printk("Device found!\n");
                         //refresh_screen();
                         // OUT:
                         // Return the file pointer for 
@@ -109,8 +109,8 @@ void devmgr_show_device_list(int object_type)
     struct device_d  *d;  // Device
     file *fp;  // Object
 
-    printf("\n");
-    printf("devmgr_show_device_list:\n");
+    printk("\n");
+    printk("devmgr_show_device_list:\n");
 
 // Get the structure pointer and
 // show the info if it's a valid device structure.
@@ -130,12 +130,12 @@ void devmgr_show_device_list(int object_type)
 
                         //#debug
                         //if ( fp->____object == ObjectTypeTTY )
-                        //    printf ("TTY DEVICE: ");
+                        //    printk ("TTY DEVICE: ");
                         //if ( fp->____object == ObjectTypePciDevice )
-                        //    printf ("PCI DEVICE: ");
+                        //    printk ("PCI DEVICE: ");
 
                         //#todo: more ...
-                        printf("id=%d class=%d type=%d name={%s} mount_point={%s}\n", 
+                        printk("id=%d class=%d type=%d name={%s} mount_point={%s}\n", 
                             d->index, 
                             d->__class,  // char | block | network
                             d->__type,   // pci  | legacy
@@ -144,11 +144,11 @@ void devmgr_show_device_list(int object_type)
                     }
                 }
             }
-            //printf (".");
+            //printk (".");
         }
     };
 
-    printf("Done\n");
+    printk("Done\n");
 }
 
 // OUT: 

@@ -90,14 +90,14 @@ static void do_user(void)
     }
 
 // Print the username.
-    printf("Username: {%s}\n",CurrentUser->__username);
+    printk("Username: {%s}\n",CurrentUser->__username);
 
 // is it really the current user?
     if ( CurrentUser->userId == current_user )
     {
         // Is it the super user?
         if ( is_superuser() == TRUE )
-            printf("It's super\n");
+            printk("It's super\n");
     }
 }
 
@@ -110,7 +110,7 @@ static int __CompareStrings(void)
     int fpu_status = -1;
 
     //debug_print("consoleCompareStrings: \n");
-    printf("\n");
+    printk("\n");
 
 // smp
 // #todo
@@ -118,7 +118,7 @@ static int __CompareStrings(void)
 // to show the information about the smp initialization.
     if ( kstrncmp(prompt,"smp",3) == 0 )
     {
-        printf("Processor count: {%d}\n",
+        printk("Processor count: {%d}\n",
             smp_info.number_of_processors );
         goto exit_cmp;
     }
@@ -206,7 +206,7 @@ static int __CompareStrings(void)
 /*
     if ( kstrncmp(prompt,"vga1",4) == 0 )
     {
-        printf ("vga1: This is a work in progress ...\n");
+        printk ("vga1: This is a work in progress ...\n");
         goto exit_cmp;
     }
 */
@@ -248,12 +248,12 @@ static int __CompareStrings(void)
 // See: atainfo.c
     if ( kstrncmp( prompt, "ata", 3 ) == 0 )
     {
-        //printf("ATA controller information:\n");
+        //printk("ATA controller information:\n");
         //ata_show_ata_controller_info();
         //ata_show_ide_info();
         //ata_show_device_list_info();
         ata_show_ata_info_for_boot_disk();
-        printf("Number of sectors in boot disk: {%d}\n",
+        printk("Number of sectors in boot disk: {%d}\n",
             gNumberOfSectorsInBootDisk );
         goto exit_cmp;
     }
@@ -278,11 +278,11 @@ static int __CompareStrings(void)
 // See: devmgr.c
     if ( kstrncmp(prompt,"device",6) == 0 )
     {
-        printf("tty devices:\n");
+        printk("tty devices:\n");
         devmgr_show_device_list(ObjectTypeTTY);
-        printf("pci devices:\n");
+        printk("pci devices:\n");
         devmgr_show_device_list(ObjectTypePciDevice);
-        printf("devices with regular files:\n");
+        printk("devices with regular files:\n");
         devmgr_show_device_list(ObjectTypeFile);
         //...
         goto exit_cmp;
@@ -290,7 +290,7 @@ static int __CompareStrings(void)
 
 // pci:
     if ( kstrncmp( prompt, "pci", 3 ) == 0 ){
-        printf("~pci:\n");
+        printk("~pci:\n");
         pciInfo();
         goto exit_cmp;
     }
@@ -299,7 +299,7 @@ static int __CompareStrings(void)
     if ( kstrncmp( prompt, "about", 5 ) == 0 ){
         // Crear screen and print version string.
         zero_show_banner();
-        printf("About: The kernel console\n");
+        printk("About: The kernel console\n");
         goto exit_cmp;
     }
 
@@ -333,7 +333,7 @@ static int __CompareStrings(void)
     if ( kstrncmp( prompt, "pit", 3 ) == 0 )
     {
         // #todo: Create pitShowInfo() in pit.c.
-        printf("Dev freq: %d | Clocks per sec: %d HZ | Period: %d\n",
+        printk("Dev freq: %d | Clocks per sec: %d HZ | Period: %d\n",
             PITInfo.dev_freq,
             PITInfo.clocks_per_sec,
             PITInfo.period );
@@ -342,7 +342,7 @@ static int __CompareStrings(void)
 
 // help:
     if ( kstrncmp( prompt, "help", 4 ) == 0 ){
-        printf("Commands: about, help, reboot, cpu, memory, ...\n");
+        printk("Commands: about, help, reboot, cpu, memory, ...\n");
         goto exit_cmp;
     }
 
@@ -375,7 +375,7 @@ static int __CompareStrings(void)
     {
         if (HVInfo.initialized == TRUE){
             if (HVInfo.type == HV_TYPE_TCG){
-                printf("#test: PS2 full initialization on qemu\n");
+                printk("#test: PS2 full initialization on qemu\n");
                 PS2_initialization();
             }
         }
@@ -387,10 +387,10 @@ static int __CompareStrings(void)
 // The initialization is not working on kvm.
     if ( kstrncmp( prompt, "ps2-kvm", 7 ) == 0 )
     {
-        printf ("#todo: Initialization not working on kvm\n");
+        printk ("#todo: Initialization not working on kvm\n");
         if (HVInfo.initialized == TRUE){
             if (HVInfo.type == HV_TYPE_TCG){
-                //printf("#test: PS2 full initialization on kvm\n");
+                //printk("#test: PS2 full initialization on kvm\n");
                 //PS2_initialization();
             }
         }
@@ -426,13 +426,13 @@ static int __CompareStrings(void)
     {
         //#todo: Create serialShowInfo in serial.c.
         //#todo: Only com1 for now.
-        printf("com1.divisor:       %d\n",
+        printk("com1.divisor:       %d\n",
             SerialPortInfo.com1.divisor);
-        printf("com1.divisorLoByte: %d\n",
+        printk("com1.divisorLoByte: %d\n",
             SerialPortInfo.com1.divisorLoByte);
-        printf("com1.divisorHiByte: %d\n",
+        printk("com1.divisorHiByte: %d\n",
             SerialPortInfo.com1.divisorHiByte);
-        printf("com1.baudrate:      %d\n",
+        printk("com1.baudrate:      %d\n",
             SerialPortInfo.com1.baudrate);
         goto exit_cmp;
     }
@@ -446,9 +446,9 @@ static int __CompareStrings(void)
 
 // Invalid command
 
-    //printf("\n");
-    printf ("Error: Command not found!\n");
-    //printf("\n");
+    //printk("\n");
+    printk ("Error: Command not found!\n");
+    //printk("\n");
 
 exit_cmp:
    //nothing
@@ -456,8 +456,6 @@ done:
     consolePrompt();
     return 0;
 }
-
-
 
 static void __enter_embedded_shell(int kernel_in_debug_mode)
 {
@@ -468,10 +466,10 @@ static void __enter_embedded_shell(int kernel_in_debug_mode)
     jobcontrol_switch_console(0);
 // Message
     if (kernel_in_debug_mode){
-        printf("[[ KERNEL IN DEBUG MODE ]]\n");
+        printk("[[ KERNEL IN DEBUG MODE ]]\n");
     }
-    printf("kernel console number %d\n",console_index);
-    printf("Prompt ON: Type something\n");
+    printk("kernel console number %d\n",console_index);
+    printk("Prompt ON: Type something\n");
     consolePrompt();  // It will refresh the screen.
 // Flag
     ShellFlag = TRUE;
@@ -480,9 +478,9 @@ static void __enter_embedded_shell(int kernel_in_debug_mode)
 static void __exit_embedded_shell(void)
 {
 // log
-    printf("\n");
-    printf ("Prompt OFF: Bye\n");
-    printf("\n");
+    printk("\n");
+    printk("Prompt OFF: Bye\n");
+    printk("\n");
     refresh_screen();
 // done
     ShellFlag = FALSE;
@@ -535,8 +533,8 @@ __ProcessExtendedKeyboardKeyStroke(
  altgr     = 0x38 | 0xB8
  */
 
-    //printf("kgwm.c: #todo Extended keyboard\n");
-    //printf("sc={%x}\n",scancode);
+    //printk("kgwm.c: #todo Extended keyboard\n");
+    //printk("sc={%x}\n",scancode);
     //refresh_screen();
 
     if (rawbyte >= 0xFF){
@@ -694,8 +692,8 @@ wmMouseEvent(
 // mouse move events:
 
     //#debug
-    //printf ("w:%d h:%d\n",deviceWidth, deviceHeight);
-    //printf ("x:%d y:%d\n",long1, long2);
+    //printk ("w:%d h:%d\n",deviceWidth, deviceHeight);
+    //printk ("x:%d y:%d\n",long1, long2);
     //refresh_screen();
     //while(1){}
 
@@ -908,7 +906,7 @@ wmKeyEvent(
     /*
     scStatus = FALSE;
     if (scStatus == TRUE){
-        printf ("raw byte {%d,%x} \n", 
+        printk ("raw byte {%d,%x} \n", 
             Keyboard_RawByte, Keyboard_RawByte );
         // Refresh screen?
         refresh_screen();
@@ -1599,7 +1597,7 @@ keProcessInput (
          //    break;
 
         //case VK_TAB: 
-            //printf("TAB\n"); 
+            //printk("TAB\n"); 
             //invalidate_screen();
             //break;
 

@@ -22,7 +22,7 @@ network_handle_ipv4(
 // The protocol for the payload.
     uint8_t Protocol=0;
 
-    //printf ("IP: received\n");
+    //printk ("IP: received\n");
 
 // #warning
 // It's ok to use pointer here.
@@ -30,14 +30,14 @@ network_handle_ipv4(
 // a pre-allocated buffer.
     ip = (struct ip_d *) buffer;
     if ((void*) ip == NULL){
-        printf("network_handle_ipv4: ip\n");
+        printk("network_handle_ipv4: ip\n");
         goto fail;
     }
 
 // The minimum size.
 // Only the ip header.
     //if (size < IP_HEADER_LENGHT){
-    //    printf("network_handle_ipv4: size\n");
+    //    printk("network_handle_ipv4: size\n");
     //    goto fail;
     //}
 
@@ -53,11 +53,11 @@ network_handle_ipv4(
     uint8_t Version = (uint8_t) ((v_hl >> 4) & 0x0F);
     uint8_t Lenght  = (uint8_t) (v_hl & 0x0F);  // Header lenght. 5=20bytes.
 
-    //printf("IP Version: {%d}\n", Version);
-    //printf("Header lenght: {%d}\n", Lenght);
+    //printk("IP Version: {%d}\n", Version);
+    //printk("Header lenght: {%d}\n", Lenght);
 
     if (Version != 4){
-        printf("IP: Not version 4\n");
+        printk("IP: Not version 4\n");
         goto fail;
     }
 
@@ -65,7 +65,7 @@ network_handle_ipv4(
 // ip header + ip payload.
 // (IP + (TCP + data)) given in bytes.
 // 20~65535
-    //printf("Total lenght: {%d}\n",ip->ip_len);
+    //printk("Total lenght: {%d}\n",ip->ip_len);
 
 // #bugbug
 // What is the style of this information?
@@ -77,8 +77,8 @@ network_handle_ipv4(
          ip_lenght > 65535 )
     {
         //#debug
-        printf("IP: size={%d}\n",size);
-        printf("IP: ip_lenght={%d}\n",ip_lenght);
+        printk("IP: size={%d}\n",size);
+        printk("IP: ip_lenght={%d}\n",ip_lenght);
         
         // #todo:
         // Maybe simply drop it for now.
@@ -94,7 +94,7 @@ network_handle_ipv4(
 // https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 
     Protocol = (uint8_t) ip->ip_p;
-    //printf("Protocol: {%xH}\n",Protocol);
+    //printk("Protocol: {%xH}\n",Protocol);
 
 // 0x01 -  1 - ICMP - Internet Control Message Protocol
 // 0x06 -  6 - TCP  - Transmission Control Protocol
@@ -103,9 +103,9 @@ network_handle_ipv4(
 // UDP
     if (Protocol == PROTOCOL_IP_UDP)
     {
-        //printf ("target: %d.%d.%d.%d \n",
+        //printk ("target: %d.%d.%d.%d \n",
         //    dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
-        //printf("ip_sum={%x} \n",ip->ip_sum);
+        //printk("ip_sum={%x} \n",ip->ip_sum);
         
         network_handle_udp(
             (buffer + IP_HEADER_LENGHT),
@@ -118,14 +118,14 @@ network_handle_ipv4(
 // ping?
     if (Protocol == PROTOCOL_IP_ICMP)
     {
-        //printf("IP: ICMP Protocol\n");
+        //printk("IP: ICMP Protocol\n");
         //network_handle_icmp(..);
         goto drop;
     }
 // TCP
     if (Protocol == PROTOCOL_IP_TCP)
     {
-        //printf("IP: TCP Protocol\n");        
+        //printk("IP: TCP Protocol\n");        
         network_handle_tcp(
             (buffer + IP_HEADER_LENGHT),
             (ip->ip_len - IP_HEADER_LENGHT) );
@@ -147,29 +147,29 @@ drop:
          dst_ipv4[1] != 168 ||
          dst_ipv4[0] != 192 )
     {
-        printf ("IP: NOT TO ME. Drop it\n");
+        printk ("IP: NOT TO ME. Drop it\n");
         return;
     }
     */
 
 // ---------------
 // To me.
-    //printf ("IP: TO ME!\n");
-    //printf("Src IPV4: {%x}\n", ip->ip_src.s_addr);
-    //printf("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
+    //printk ("IP: TO ME!\n");
+    //printk("Src IPV4: {%x}\n", ip->ip_src.s_addr);
+    //printk("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
     // destination
-    printf ("Src: %d.%d.%d.%d\n",
+    printk ("Src: %d.%d.%d.%d\n",
         src_ipv4[0], src_ipv4[1], src_ipv4[2], src_ipv4[3]);
-    printf ("Dst:  %d.%d.%d.%d\n",
+    printk ("Dst:  %d.%d.%d.%d\n",
         dst_ipv4[0], dst_ipv4[1], dst_ipv4[2], dst_ipv4[3]);
 
     // hang
-    printf("network_handle_ipv4: #breakpoint :)\n");
+    printk("network_handle_ipv4: #breakpoint :)\n");
     while (1){
     };
 
 fail:
-    printf("network_handle_ipv4: Fail\n");
+    printk("network_handle_ipv4: Fail\n");
     return;
 }
 

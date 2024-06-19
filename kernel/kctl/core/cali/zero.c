@@ -50,7 +50,7 @@ void zero_initialize_default_kernel_font(void)
 
 // =================================
 // Console:
-// We have a virtual console and we can use the printf.
+// We have a virtual console and we can use the printk.
 // This is the first message in the screen.
 // see: tty/console.c
 void zero_show_banner(void)

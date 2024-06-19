@@ -10,7 +10,6 @@
 // This way we can change it in the case of repetitions.
 //struct msg_d *last_msg;
 
-
 int
 post_message_to_tid2 ( 
     tid_t sender_tid,
@@ -267,7 +266,7 @@ post_message_to_tid (
 
 fail2:
     if ((void*) t == NULL){
-        return -1;
+        return (int) -1;
     }
     t->MsgQueueTail++;
     if (t->MsgQueueTail >= MSG_QUEUE_MAX){
@@ -363,8 +362,8 @@ post_message_to_ws (
         return -1;
     }
 
-    //if(msg==MSG_MOUSEMOVE){
-    //    printf ("x:%d y:%d\n",long1, long2);
+    //if(msg == MSG_MOUSEMOVE){
+    //    printk ("x:%d y:%d\n",long1, long2);
     //    refresh_screen();
     //}
 
@@ -406,8 +405,8 @@ post_message_to_init (
         return -1;
     }
 
-    //if(msg==MSG_MOUSEMOVE){
-    //    printf ("x:%d y:%d\n",long1, long2);
+    //if(msg == MSG_MOUSEMOVE){
+    //    printk ("x:%d y:%d\n",long1, long2);
     //    refresh_screen();
     //}
 
@@ -487,7 +486,7 @@ void *sys_get_message(unsigned long ubuf)
     }
 // structure
     t = (void *) threadList[current_thread];
-    if ( (void *) t == NULL ){
+    if ((void *) t == NULL){
         panic ("sys_get_message: t\n");
     }
     if (t->used != TRUE || t->magic != 1234){
@@ -562,25 +561,28 @@ void *sys_get_message(unsigned long ubuf)
     m->sender_pid = 0;
     m->receiver_pid = 0;
 
-// Done
-// Yes, We have a message.
-// round
+    // End of queue. Round it.
     t->MsgQueueHead++;
     if (t->MsgQueueHead >= MSG_QUEUE_MAX){
         t->MsgQueueHead=0;
     }
-    return (void *) 1;  //#bugbug
+    // Yes, We have a message.
+    // #bugbug: 
+    // Maybe we can do this in a different way.
+    // But it could break the user application.
+    return (void *) 1;
 
 fail0:
-// No message
-// round
+    // Invalid message pointer.
     if ((void*) t == NULL){
         return NULL;
     }
+    // End of queue. Round it.
     t->MsgQueueHead++;
     if (t->MsgQueueHead >= MSG_QUEUE_MAX){
         t->MsgQueueHead=0;
     }
+    // No message.
     return NULL;
 }
 

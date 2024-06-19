@@ -3,7 +3,6 @@
 
 #include <kernel.h>  
 
-
 void do_credits(struct thread_d *thread)
 {
     if ((void*) thread == NULL)
@@ -201,7 +200,7 @@ void do_thread_waiting(tid_t tid, unsigned long ms)
     struct thread_d *t;
     unsigned long JiffiesToWait = ms;
 
-    printf("do_thread_waiting: %dms\n", ms);
+    printk("do_thread_waiting: %dms\n", ms);
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return;
@@ -209,7 +208,7 @@ void do_thread_waiting(tid_t tid, unsigned long ms)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
+    if ((void*) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -220,18 +219,16 @@ void do_thread_waiting(tid_t tid, unsigned long ms)
     }
 
     t->state = WAITING;
-
 // Start
     t->waiting_jiffy = (unsigned long) jiffies;
-
 // End
     if (JiffiesToWait == 0){
         JiffiesToWait = 1;
     }
     t->wake_jiffy = (unsigned long) (jiffies + JiffiesToWait);
 
-    printf ("do_thread_waiting: j1=%d | j2=%d |\n", jiffies, t->wake_jiffy);
-    printf("do_thread_waiting: done\n");
+    printk ("do_thread_waiting: j1=%d | j2=%d |\n", jiffies, t->wake_jiffy);
+    printk("do_thread_waiting: done\n");
 }
 
 // 12, 7
@@ -361,12 +358,11 @@ void drop_quantum(struct thread_d *thread)
 
 int do_waitpid (pid_t pid, int *status, int options)
 {
-    struct process_d *p;  
-
+    struct process_d *p;
     pid_t current_process = (pid_t) get_current_process();
 
     //#debug
-    //printf ( "do_waitpid: current_process=%d pid=%d \n", 
+    //printk ( "do_waitpid: current_process=%d pid=%d \n", 
         //current_process, pid );
 
     // #todo
@@ -374,11 +370,9 @@ int do_waitpid (pid_t pid, int *status, int options)
     // processos filhos seja fechado.
 
     p = (struct process_d *) processList[current_process];
-
-    if ( (void *) p == NULL ){
-        printf ("do_waitpid: Current process struct fail\n");
+    if ((void *) p == NULL){
+        printk ("do_waitpid: Current process struct fail\n");
         return -1;
-   
     }else{
 
         if ( p->used != 1 || p->magic != 1234 ){
@@ -390,10 +384,9 @@ int do_waitpid (pid_t pid, int *status, int options)
         {
 
             //#debug
-            //printf ("blocking process\n");
+            //printk ("blocking process\n");
             
             p->state = PROCESS_BLOCKED;
-
 
 			//significa que está esperando por qualquer
 			//um dos filhos.
@@ -403,17 +396,16 @@ int do_waitpid (pid_t pid, int *status, int options)
             if (current_thread == p->control->tid )
             {
                 //#debug
-                //printf ("the current thread is also the control thread\n");
+                //printk ("the current thread is also the control thread\n");
             }
            
-            //printf ("blocking thread\n");
+            //printk ("blocking thread\n");
             //tem que bloquear todas as threads do pai.
             //Isso pode estar falhando;
             //block_for_a_reason ( (int) p->control, (int) WAIT_REASON_WAIT4PID );
             p->control->state = BLOCKED; 
        }
    };
-
 
 	//aqui precisamos dar informações sobre o status 
 	//do processo
@@ -422,9 +414,8 @@ int do_waitpid (pid_t pid, int *status, int options)
     //fake value. 
     //*status = 1; 
 
-
     //#debug
-    //printf ("do_waitpid: done. \n");
+    //printk ("do_waitpid: done. \n");
     //refresh_screen();
 
     return (int) (-1);
@@ -490,18 +481,14 @@ void set_foreground_thread(tid_t tid)
     foreground_thread = (tid_t) tid;
 }
 
-
-/*
- * wait_for_a_reason:
- *     Faz a thread esperar  por um motivo.
- */
-
+// wait_for_a_reason:
+//   Faz a thread esperar  por um motivo.
 void wait_for_a_reason ( int tid, int reason )
 {
     struct thread_d  *t;
 
     // #debug
-    printf ("wait_for_a_reason: %d\n", reason);
+    printk ("wait_for_a_reason: %d\n", reason);
 
 // tid
     if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
@@ -542,15 +529,11 @@ void wait_for_a_reason ( int tid, int reason )
    //psScheduler ();
 
    // #debug
-   printf ("wait_for_a_reason: done\n");
+   printk ("wait_for_a_reason: done\n");
    //refresh_screen();
 }
 
-/*
- * wakeup_thread_reason:
- * 
- */
-
+// wakeup_thread_reason:
 //acordar uma determinada thread se ela estiver 
 //esperando por um evento desse tipo.
 //uma outra função pode fazer um loop acordando 
@@ -650,14 +633,10 @@ done:
     return 0;
 }
 
-/*
- * wakeup_scan_thread_reason:
- * 
- */
+// wakeup_scan_thread_reason:
 // Acorda todas as threads da lista que estão esperando por 
 // evento de determinado tipo.
-
-int wakeup_scan_thread_reason ( int reason )
+int wakeup_scan_thread_reason (int reason)
 {
     panic("wakeup_scan_thread_reason: #todo\n");
 
@@ -666,7 +645,7 @@ int wakeup_scan_thread_reason ( int reason )
     register int i=0;
 
     // #debug ??
-    // printf ("wakeup_scan_thread_reason: %d", reason);
+    // printk ("wakeup_scan_thread_reason: %d", reason);
     // refresh_screen();
 
     // reason
@@ -681,27 +660,18 @@ int wakeup_scan_thread_reason ( int reason )
         wakeup_thread_reason ( i, reason );
     };
 
-
 //done:
-
     // #debug
-    printf ("wakeup_scan_thread_reason: done\n");
-    refresh_screen();
-    
+    printk ("wakeup_scan_thread_reason: done\n");
+    refresh_screen();    
     return 0;
-
-// Fail
-
 fail:
-
     // #debug
-    printf ("wakeup_scan_thread_reason: fail\n");
+    printk ("wakeup_scan_thread_reason: fail\n");
     refresh_screen();
-
 */
     return (int) 1;
 }
-
 
 /*
  * wakeup_thread: 
@@ -801,14 +771,13 @@ void sys_yield(tid_t tid)
     yield(tid);
 }
 
-
 // Called by __task_switch() in ts.c
 void sleep_until (tid_t tid, unsigned long ms)
 {
 // Dormimos e agendamos a hora de acordarmos.
 // Worker. Do not call it in a sci.
 
-    printf("sleep_until:\n");
+    printk("sleep_until:\n");
 
     if (tid<0 || tid >= THREAD_COUNT_MAX){
         return;
@@ -839,7 +808,7 @@ void sleep(tid_t tid, unsigned long ms)
 
     struct thread_d  *t;
 
-    //printf ("sleep\n");
+    //printk ("sleep\n");
 
 // tid
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
@@ -848,7 +817,7 @@ void sleep(tid_t tid, unsigned long ms)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void *) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if ( t->used != TRUE || t->magic != 1234 ){
@@ -864,7 +833,7 @@ void sleep(tid_t tid, unsigned long ms)
 void sys_sleep(tid_t tid, unsigned long ms)
 {
     // #debug
-    printf("sci2: [266] Sleep until\n");
+    printk("sci2: [266] Sleep until\n");
 // tid
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return;

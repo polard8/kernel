@@ -138,8 +138,8 @@ static int __init_heap(void)
     register int i=0;
 
     // #bugbug
-    // não usar printf
-    // printf ainda não funciona nesse momento.
+    // não usar printk
+    // printk ainda não funciona nesse momento.
 
     KernelHeap.initialized = FALSE;
 
@@ -454,7 +454,7 @@ unsigned long heapAllocateMemory(unsigned long size)
 // 0 bytes.
     if (g_available_heap == 0){
         debug_print ("heapAllocateMemory: g_available_heap={0}\n");
-        printf      ("heapAllocateMemory: g_available_heap={0}\n");
+        printk      ("heapAllocateMemory: g_available_heap={0}\n");
         goto fail;
     }
 
@@ -467,7 +467,7 @@ unsigned long heapAllocateMemory(unsigned long size)
     if (UserAreaInBytes >= g_available_heap)
     {
         debug_print ("heapAllocateMemory error: UserAreaInBytes >= g_available_heap\n");
-        printf ("heapAllocateMemory error: UserAreaInBytes >= g_available_heap\n");
+        printk ("heapAllocateMemory error: UserAreaInBytes >= g_available_heap\n");
 
         // #todo: 
         // Tentar crescer o heap para atender o size requisitado.
@@ -526,7 +526,7 @@ unsigned long heapAllocateMemory(unsigned long size)
     Current = (void *) g_heap_pointer;
     if ((void *) Current == NULL){
         debug_print("heapAllocateMemory: [FAIL] struct\n");
-        printf     ("heapAllocateMemory: [FAIL] struct\n");
+        printk     ("heapAllocateMemory: [FAIL] struct\n");
         goto fail;
     }
 
@@ -690,18 +690,18 @@ unsigned long get_process_heap_pointer (pid_t pid)
     unsigned long heapLimit=0;
 
     if (pid < 0 || pid >= PROCESS_COUNT_MAX){
-        printf ("get_process_heap_pointer: pid\n");
+        printk ("get_process_heap_pointer: pid\n");
         goto fail;
     }
 
 // Process
     p = (void *) processList[pid];
     if ( (void *) p == NULL ){
-        printf ("get_process_heap_pointer: p\n");
+        printk ("get_process_heap_pointer: p\n");
         goto fail;
     }
     if (p->used != TRUE || p->magic != 1234){
-        printf ("get_process_heap_pointer: p validation\n");
+        printk ("get_process_heap_pointer: p validation\n");
         goto fail;
     }
 
@@ -715,7 +715,7 @@ unsigned long get_process_heap_pointer (pid_t pid)
     if ( p->HeapPointer < p->HeapStart || 
          p->HeapPointer >= heapLimit )
     {
-        printf("get_process_heap_pointer: heapLimit\n");
+        printk("get_process_heap_pointer: heapLimit\n");
         goto fail;
     }
 

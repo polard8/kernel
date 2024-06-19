@@ -4,11 +4,9 @@
 
 #include <kernel.h>
 
-
 // 
 // Imports
 //
-
 
 //--------------------------------------
 // Ponteiros para ícones
@@ -105,7 +103,6 @@ int sys_signal(void)
     return (int) -1;
 }
 
-
 // windowLoadGramadoIcons:
 // Carrega alguns ícones do sistema.
 // It's a part of the window system's initialization.
@@ -116,7 +113,7 @@ int windowLoadGramadoIcons(void)
     icon_cache.initialized = FALSE;
 
     //#debug
-    //printf("windowLoadGramadoIcons:\n");
+    //printk("windowLoadGramadoIcons:\n");
 
 // ## Icon support ##
 // iconSupport:
@@ -143,28 +140,28 @@ int windowLoadGramadoIcons(void)
     // ...
 
     if ( (void *) icon_cache.app == NULL ){
-        printf ("windowLoadGramadoIcons: app\n");
+        printk ("windowLoadGramadoIcons: app\n");
         goto fail;
     }
     if ( (void *) icon_cache.file == NULL ){
-        printf ("windowLoadGramadoIcons: file\n");
+        printk ("windowLoadGramadoIcons: file\n");
         goto fail;
     }
     if ( (void *) icon_cache.folder == NULL ){
-        printf ("windowLoadGramadoIcons: folder\n");
+        printk ("windowLoadGramadoIcons: folder\n");
         goto fail;
     }
     if ( (void *) icon_cache.terminal == NULL ){
-        printf ("windowLoadGramadoIcons: terminal\n");
+        printk ("windowLoadGramadoIcons: terminal\n");
         goto fail;
     }
     if ( (void *) icon_cache.cursor == NULL ){
-        printf ("windowLoadGramadoIcons: cursor\n");
+        printk ("windowLoadGramadoIcons: cursor\n");
         goto fail;
     }
 
 //
-// Load .BMP images.
+// Load .BMP images
 //
 
 // app icon
@@ -177,7 +174,7 @@ int windowLoadGramadoIcons(void)
                             (unsigned long) icon_cache.app,
                             tmp_size );
     if (fRet != 0){
-        printf("windowLoadGramadoIcons: APP.BMP\n");
+        printk("windowLoadGramadoIcons: APP.BMP\n");
         goto fail;
     }
 
@@ -191,7 +188,7 @@ int windowLoadGramadoIcons(void)
                             (unsigned long) icon_cache.file,
                             tmp_size );
     if (fRet != 0){
-        printf("windowLoadGramadoIcons: FILE.BMP\n");
+        printk("windowLoadGramadoIcons: FILE.BMP\n");
         goto fail;
     }
 
@@ -205,7 +202,7 @@ int windowLoadGramadoIcons(void)
                             (unsigned long) icon_cache.folder,
                             tmp_size );
     if (fRet != 0){
-        printf("windowLoadGramadoIcons: FOLDER.BMP\n");
+        printk("windowLoadGramadoIcons: FOLDER.BMP\n");
         goto fail;
     }
 
@@ -219,7 +216,7 @@ int windowLoadGramadoIcons(void)
                             (unsigned long) icon_cache.terminal,
                             tmp_size );
     if (fRet != 0){
-        printf("windowLoadGramadoIcons: TERMINAL.BMP\n");
+        printk("windowLoadGramadoIcons: TERMINAL.BMP\n");
         goto fail;
     }
 
@@ -233,7 +230,7 @@ int windowLoadGramadoIcons(void)
                             (unsigned long) icon_cache.cursor,
                             tmp_size );
     if (fRet != 0){
-        printf("windowLoadGramadoIcons: CURSOR.BMP\n");
+        printk("windowLoadGramadoIcons: CURSOR.BMP\n");
         goto fail;
     }
 
@@ -508,7 +505,7 @@ static void __check_refresh_support(void)
         (unsigned long) ( (pitch * xBootBlock.deviceHeight)/1024 );
 
     // #debug
-    //printf ("Screen size: %d KB\n", screen_size_in_kb);
+    //printk ("Screen size: %d KB\n", screen_size_in_kb);
  
 // Se a quantidade usada por uma tela nessa resoluçao
 // for maior que o que temos disponivel.
@@ -579,7 +576,7 @@ static void __check_refresh_support(void)
 static void __print_resolution_info(void)
 {
 // Print device info.
-    printf ("Width:%d Height:%d BPP:%d\n",
+    printk ("Width:%d Height:%d BPP:%d\n",
         xBootBlock.deviceWidth,
         xBootBlock.deviceHeight,
         xBootBlock.bpp );
@@ -603,7 +600,7 @@ static void __check_gramado_mode(void)
 // gramado mode.
 
 // Show gramado mode.
-    printf("gramado mode: %d\n",current_mode);
+    printk("gramado mode: %d\n",current_mode);
 
     // #debug
     //refresh_screen();
@@ -652,10 +649,10 @@ static void __import_data_from_linker(void)
 
     if (ImportDataFromLinker == TRUE)
     {
-        //printf("\n");
+        //printk("\n");
  
         //KernelImageSize = (start_of_kernel_image - end_of_kernel_image);
-        //printf ("Image Size %d KB \n",KernelImageSize/1024);
+        //printk ("Image Size %d KB \n",KernelImageSize/1024);
 
         //-------------
 
@@ -663,23 +660,23 @@ static void __import_data_from_linker(void)
         // exceda o tamanho da região de memória mapeada para ela.
 
         KernelImage_Size = (kernel_end - kernel_begin);
-        //printf ("Image Size %d KB \n",KernelImage_Size/1024);
+        //printk ("Image Size %d KB \n",KernelImage_Size/1024);
 
         // .text
         KernelImage_CODE_Size = (code_end - code_begin);
-        //printf ("CODE Size %d KB \n",KernelImage_CODE_Size/1024);
+        //printk ("CODE Size %d KB \n",KernelImage_CODE_Size/1024);
 
         // .rodata
         KernelImage_RODATA_Size = (rodata_end - rodata_begin);
-        //printf ("RODATA Size %d KB \n",KernelImage_RODATA_Size/1024);
+        //printk ("RODATA Size %d KB \n",KernelImage_RODATA_Size/1024);
 
         // .data
         KernelImage_DATA_Size = (data_end - data_begin);
-        //printf ("DATA Size %d KB \n",KernelImage_DATA_Size/1024);
+        //printk ("DATA Size %d KB \n",KernelImage_DATA_Size/1024);
 
         // .bss
         KernelImage_BSS_Size = (bss_end - bss_begin);
-        //printf ("BSS Size %d KB \n",KernelImage_BSS_Size/1024);
+        //printk ("BSS Size %d KB \n",KernelImage_BSS_Size/1024);
 
         // Limit 1 MB
         // The kernel image is too long.
@@ -734,7 +731,7 @@ int keCloseInitProcess(void)
     }
 
     // #debug
-    printf("#test: Sending CLOSE to init.bin\n");
+    printk("#test: Sending CLOSE to init.bin\n");
     refresh_screen();
 
 // Send
@@ -795,8 +792,8 @@ int psInitializeMKComponents(void)
     DispatchCountBlock = 
         (void *) kmalloc( sizeof(struct dispatch_count_d) );
 
-    if ( (void *) DispatchCountBlock == NULL ){
-        printf ("init_microkernel: DispatchCountBlock\n");
+    if ((void *) DispatchCountBlock == NULL){
+        printk ("init_microkernel: DispatchCountBlock\n");
         return FALSE;
     }
 
@@ -817,7 +814,7 @@ int psInitializeMKComponents(void)
 // por isso não deu pra limpar a tela antes.
 
 #ifdef BREAKPOINT_TARGET_AFTER_MK
-    printf ("#breakpoint: after init_microkernel");
+    printk ("#breakpoint: after init_microkernel");
     die();
 #endif
 
@@ -947,7 +944,7 @@ int keInitialize(int phase)
 
         // Final message before jumping to init process.
         //PROGRESS("keInitialize: phase 2\n");
-        //printf("keInitialize:  phase 2\n");
+        //printk("keInitialize:  phase 2\n");
         //#debug
         //refresh_screen();
         //while(1){}

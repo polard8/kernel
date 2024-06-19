@@ -69,7 +69,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
     //PROGRESS("__spawn_thread_by_tid_imp:\n");
 
     // #debug
-    //printf ("spawn_thread: SPAWN !\n");
+    //printk ("spawn_thread: SPAWN !\n");
     //refresh_screen();
 
 //
@@ -78,13 +78,13 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
 
     if ( next_tid < 0 || next_tid >= THREAD_COUNT_MAX )
     {
-        printf("__spawn_thread_by_tid_imp: next_tid=%d", next_tid );  
+        printk("__spawn_thread_by_tid_imp: next_tid=%d", next_tid );  
         keDie();
     }
     target_thread = (void *) threadList[next_tid]; 
     if ((void *) target_thread == NULL)
     {
-        printf("__spawn_thread_by_tid_imp: target_thread, next_tid={%d}", 
+        printk("__spawn_thread_by_tid_imp: target_thread, next_tid={%d}", 
             next_tid );  
         keDie();
     }
@@ -106,14 +106,14 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
 
 // State: Needs to be in Standby.
     if (target_thread->state != STANDBY){
-        printf("__spawn_thread_by_tid_imp: TID={%d} not in Standby\n", next_tid );
+        printk("__spawn_thread_by_tid_imp: TID={%d} not in Standby\n", next_tid );
         keDie();
     }
 
 // Saved:
 // If the context is saved, so it is not the first time.
     if (target_thread->saved == TRUE){
-        printf ("__spawn_thread_by_tid_imp: Saved TID={%d}\n", next_tid );
+        printk ("__spawn_thread_by_tid_imp: Saved TID={%d}\n", next_tid );
         keDie();
     }
 
@@ -181,7 +181,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
 
 // Paranoia: Check state.
     if (target_thread->state != RUNNING){
-        printf ("__spawn_thread_by_tid_imp: State TID={%d}\n", next_tid );
+        printk ("__spawn_thread_by_tid_imp: State TID={%d}\n", next_tid );
         keDie();
     }
 
@@ -285,7 +285,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
 
         //#debug
         debug_print("__spawn_thread_by_tid_imp: RING0\n");
-        //printf     ("spawn_thread: RING0\n");
+        //printk     ("spawn_thread: RING0\n");
         //debug_print("spawn_thread: RING0 not supported yet\n");
         panic      ("__spawn_thread_by_tid_imp: RING0 not supported yet\n");
 
@@ -397,7 +397,7 @@ spawn_enter_kernelmode(
     unsigned long rsp0  = (unsigned long) rsp0_va;
 
     // #debug
-    //printf("rsp0: %x \n",rsp0);
+    //printk("rsp0: %x \n",rsp0);
     //refresh_screen();
     //while(1){}
 
@@ -439,7 +439,7 @@ void psSpawnThreadByTID(tid_t tid)
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
-        printf("psSpawnThreadByTID: TID=%d\n", tid );
+        printk("psSpawnThreadByTID: TID=%d\n", tid );
         keDie();
     }
     __spawn_thread_by_tid_imp(tid);

@@ -39,8 +39,8 @@ void *mi80h (
     }
 
     if (cpl == 0){
-        printf("number=%d\n",number);
-        printf("pid=%d\n",current_process);
+        printk("number=%d\n",number);
+        printk("pid=%d\n",current_process);
         //if(current_process != 0){
             panic("mi80h: cpl 0\n");
         //}

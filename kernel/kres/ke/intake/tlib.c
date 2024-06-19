@@ -4,7 +4,6 @@
 
 #include <kernel.h>
 
-
 int 
 link_two_threads( 
     struct thread_d *primary,
@@ -63,7 +62,6 @@ fail:
     return (int) -1;
 }
 
-// -------------------------
 // show_slot:
 // Show info about a thread.
 void show_slot(int tid)
@@ -71,21 +69,21 @@ void show_slot(int tid)
     struct thread_d  *t;
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        printf ("show_slot: tid\n");
+        printk ("show_slot: tid\n");
         goto fail;
     }
 // structure
     t = (void *) threadList[tid];
     if ((void *) t == NULL){
-        printf ("show_slot: t\n");
+        printk ("show_slot: t\n");
         goto fail;
     }
 
 // Show one slot
-    printf ("\n");
-    printf ("TID   PID   pdPA  Prio  State Quan Jiffies initial_rip rflags   tName \n");
-    printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
-    printf ("%d    %d    %x   %d    %d    %d    %d      %x          %x      %s      \n", 
+    printk ("\n");
+    printk ("TID   PID   pdPA  Prio  State Quan Jiffies initial_rip rflags   tName \n");
+    printk ("====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
+    printk ("%d    %d    %x   %d    %d    %d    %d      %x          %x      %s      \n", 
         t->tid, 
         t->owner_pid,
         t->pml4_PA,
@@ -97,20 +95,20 @@ void show_slot(int tid)
         t->context.rflags,
         t->name_address );
 
-    printf(":: to supervisor{%d} | to user{%d}\n",
+    printk(":: to supervisor{%d} | to user{%d}\n",
         t->transition_counter.to_supervisor,
         t->transition_counter.to_user);
 
     if (t->tid == foreground_thread)
-        printf("[__FOREGROUND__]\n");
+        printk("[__FOREGROUND__]\n");
     if (t->state == ZOMBIE)
-        printf("[__ZOMBIE__]\n");
+        printk("[__ZOMBIE__]\n");
     if (t->state == DEAD)
-        printf("[__DEAD__]\n");
+        printk("[__DEAD__]\n");
 
     goto done;
 fail:
-    printf ("Fail\n");
+    printk ("Fail\n");
 done:
     return; 
 }
@@ -126,15 +124,15 @@ void show_slots(void)
     struct thread_d   *t;
     register int i=0;
 
-    printf("\n");
-    //printf("Thread info: jiffies{%d} sec{%d} min{%d}\n", 
+    printk("\n");
+    //printk("Thread info: jiffies{%d} sec{%d} min{%d}\n", 
         //jiffies, seconds, (seconds/60));
 
-    printf("Thread info: jiffies{%d}\n", 
+    printk("Thread info: jiffies{%d}\n", 
         jiffies );
-    printf("Threads running: %d\n", 
+    printk("Threads running: %d\n", 
         UPProcessorBlock.threads_counter );
-    printf("Foreground thread: {%d}\n",
+    printk("Foreground thread: {%d}\n",
         foreground_thread );
 
     for ( i=0; i<THREAD_COUNT_MAX; i++ )
@@ -166,25 +164,25 @@ void show_reg(int tid)
     struct thread_d  *t;
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        printf("show_reg: fail\n");
+        printk("show_reg: fail\n");
         return;
     }
 // structure
     t = (void *) threadList[tid];
     if ((void *) t == NULL){
-        printf ("show_reg: fail\n");
+        printk ("show_reg: fail\n");
         return;
     } 
 
 // Show registers
-    printf("\n");
-    printf("rflags=[%x]\n", 
+    printk("\n");
+    printk("rflags=[%x]\n", 
         t->context.rflags);
-    printf("cs:rip=[%x:%x] ss:rsp=[%x:%x]\n", 
+    printk("cs:rip=[%x:%x] ss:rsp=[%x:%x]\n", 
         t->context.cs, t->context.rip, t->context.ss, t->context.rsp );
-    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
+    printk("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
         t->context.ds, t->context.es, t->context.fs, t->context.gs );
-    printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",
+    printk("a=[%x] b=[%x] c=[%x] d=[%x]\n",
         t->context.rax, t->context.rbx, t->context.rcx, t->context.rdx );
 // r8~r12
 // ...
@@ -450,8 +448,8 @@ void kill_thread(tid_t tid)
 // #debug
 // This is a test yet.
 
-    printf ("kill_thread: {%d}\n", tid);
-    printf ("This is a test yet\n");
+    printk ("kill_thread: {%d}\n", tid);
+    printk ("This is a test yet\n");
     panic ("kill_thread: #debug\n");
 
 // Can't kill the control thread of the init process.

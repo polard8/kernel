@@ -1,6 +1,7 @@
 
-// vt.c
-// Virtual terminal support.
+// pty.c
+// Psedoterminal
+// Virtual terminal support. 
 
 #include <kernel.h>
 

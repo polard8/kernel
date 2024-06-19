@@ -72,9 +72,9 @@ static void __on_finished_executing(struct thread_d *t)
     {
         //#test
         //if ( t->signal & (1<<(SIGALRM-1)) )
-        //    printf("SIGALRM\n");
+        //    printk("SIGALRM\n");
         //if ( t->signal & (1<<(SIGKILL-1)) )
-        //    printf("SIGKILL\n");
+        //    printk("SIGKILL\n");
 
         //refresh_screen();    
         //panic("__on_finished_executing: t->signal\n");
@@ -370,14 +370,14 @@ The remainder ??
         if ( CurrentThread->state == RUNNING && 
              CurrentThread->sleep_in_progress == TRUE )
         {
-            printf ("ts: Do sleep until\n");
+            printk ("ts: Do sleep until\n");
             CurrentThread->runningCount = CurrentThread->quantum;  // Esgoto
             // set waiting
             sleep_until(
                 CurrentThread->tid, 
                 CurrentThread->desired_sleep_ms );
             CurrentThread->sleep_in_progress = FALSE;
-            printf ("ts: Status=%d\n",CurrentThread->state);
+            printk ("ts: Status=%d\n",CurrentThread->state);
         }
 
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
@@ -660,18 +660,18 @@ dispatch_current:
     if ( targetthread_OwnerPID < 0 || 
          targetthread_OwnerPID >= THREAD_COUNT_MAX )
     {
-       printf ("ts: targetthread_OwnerPID ERROR\n", targetthread_OwnerPID );
+       printk ("ts: targetthread_OwnerPID ERROR\n", targetthread_OwnerPID );
        die();
     }
 
 // Target process 
     TargetProcess = (void *) processList[targetthread_OwnerPID];
     if ((void *) TargetProcess == NULL){
-        printf ("ts: TargetProcess %s struct fail\n", TargetProcess->name );
+        printk ("ts: TargetProcess %s struct fail\n", TargetProcess->name );
         die();
     }
     if ( TargetProcess->used != TRUE || TargetProcess->magic != 1234 ){
-        printf ("ts: TargetProcess %s validation\n", 
+        printk ("ts: TargetProcess %s validation\n", 
             TargetProcess->name );
         die();
     }
@@ -689,7 +689,7 @@ dispatch_current:
 
 // check pml4_PA
     if ( (unsigned long) TargetProcess->pml4_PA == 0 ){
-        printf ("ts: Process %s pml4 fail\n", TargetProcess->name );
+        printk ("ts: Process %s pml4 fail\n", TargetProcess->name );
         die();
     }
 
@@ -751,7 +751,7 @@ void psTaskSwitch(void)
     if ( current_process_pid < 0 || 
          current_process_pid >= PROCESS_COUNT_MAX )
     {
-        printf ("psTaskSwitch: current_process_pid %d", 
+        printk ("psTaskSwitch: current_process_pid %d", 
             current_process_pid);
         die();
     }
@@ -762,7 +762,7 @@ void psTaskSwitch(void)
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
     {
-        printf ("psTaskSwitch: current_thread %d", current_thread); 
+        printk ("psTaskSwitch: current_thread %d", current_thread); 
         die();
     }
 

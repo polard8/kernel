@@ -8,7 +8,6 @@ static void __show_cpu_intel_parameters(void);
 
 // =====================================================
 
-
 /*
  * __show_cpu_intel_parameters:
  *     Mostra os parametros da CPU intel.
@@ -19,42 +18,41 @@ static void __show_cpu_intel_parameters(void);
  */
 void __show_cpu_intel_parameters(void)
 {
-
-    printf("\n");
+    printk("\n");
 
 // #todo
 // Check the pointer validation?
 
-    if ( (void*) processor == NULL )
+    if ((void*) processor == NULL)
         panic("show_cpu_intel_parameters: processor\n");
 
 // Vendor and brand.
-    printf("        Vendor: {%s}\n", &processor->Vendor[0] );
-    printf("           Cpu: {%s}\n", &processor->BrandName[0] );
+    printk("        Vendor: {%s}\n", &processor->Vendor[0] );
+    printk("           Cpu: {%s}\n", &processor->BrandName[0] );
 
 // HV - Hypervisor
 // #todo: pegamos o vhName apenas para AMD, precisamos
 // fazer o mesmo para intel.
 
-    printf("             HV: {%s}\n", &processor->hvName[0] );
+    printk("             HV: {%s}\n", &processor->hvName[0] );
 
-    printf("       Stepping: {%d}\n", 
+    printk("       Stepping: {%d}\n", 
         (unsigned long) processor->Stepping_ID );
-    printf("          Model: {%d}\n", 
+    printk("          Model: {%d}\n", 
         (unsigned long) processor->Model );
-    printf("         Family: {%d}\n", 
+    printk("         Family: {%d}\n", 
         (unsigned long) processor->Family_ID );
-    printf(" Processor Type: {%d}\n", 
+    printk(" Processor Type: {%d}\n", 
         (unsigned long) processor->Processor_Type );
-    printf(" Extended Model: {%d}\n", 
+    printk(" Extended Model: {%d}\n", 
         (unsigned long) processor->Extended_Model_ID );
-    printf("Extended Family: {%d}\n", 
+    printk("Extended Family: {%d}\n", 
         (unsigned long) processor->Extended_Family_ID );
-    //printf("ApicSupport={%x}\n", processor->isApic);
-    printf("    Max feature: {%d}\n", 
+    //printk("ApicSupport={%x}\n", processor->isApic);
+    printk("    Max feature: {%d}\n", 
         (unsigned long) processor->MaxFeatureId );
     //Bits 0-7: Cache Line Size.
-    printf("   L2 line size: {%d Byte}\n", 
+    printk("   L2 line size: {%d Byte}\n", 
         (unsigned long) processor->L2LineSize ); 
 
 // L2 Associativity. 
@@ -63,13 +61,13 @@ void __show_cpu_intel_parameters(void)
     unsigned long L2Associativity = processor->L2Associativity;
 
     switch (L2Associativity){
-    case 0x00:  printf ("L2 Associativity: {Disabled}\n");           break; 
-    case 0x01:  printf ("L2 Associativity: {Direct mapped}\n");      break; 
-    case 0x02:  printf ("L2 Associativity: {2-way associative}\n");  break; 
-    case 0x04:  printf ("L2 Associativity: {4-way associative}\n");  break; 
-    case 0x06:  printf ("L2 Associativity: {8-way associative}\n");  break; 
-    case 0x08:  printf ("L2 Associativity: {16-way associative}\n"); break; 
-    case 0x0F:  printf ("L2 Associativity: {Fully associative}\n");  break; 
+    case 0x00:  printk ("L2 Associativity: {Disabled}\n");           break; 
+    case 0x01:  printk ("L2 Associativity: {Direct mapped}\n");      break; 
+    case 0x02:  printk ("L2 Associativity: {2-way associative}\n");  break; 
+    case 0x04:  printk ("L2 Associativity: {4-way associative}\n");  break; 
+    case 0x06:  printk ("L2 Associativity: {8-way associative}\n");  break; 
+    case 0x08:  printk ("L2 Associativity: {16-way associative}\n"); break; 
+    case 0x0F:  printk ("L2 Associativity: {Fully associative}\n");  break; 
     };
 
 //
@@ -77,7 +75,7 @@ void __show_cpu_intel_parameters(void)
 //
 
 //Bits 16-31: Cache size in 1K units.
-    printf("    L2 cache size: {%d KB}\n", 
+    printk("    L2 cache size: {%d KB}\n", 
         (unsigned long) processor->L2Cachesize ); 
 
 //
@@ -90,69 +88,67 @@ void __show_cpu_intel_parameters(void)
 // maximum physical address bits  
 //maximum linear (virtual) address bits 
 
-    printf("          PA Lim: {%d}\n", 
+    printk("          PA Lim: {%d}\n", 
         (unsigned long) processor->Physical_Address_Size );
-    printf("          VA Lim: {%d}\n", 
+    printk("          VA Lim: {%d}\n", 
         (unsigned long) processor->Virtual_Address_Size );
-
     
-    //printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
+    //printk("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
 
 // apic
     if (processor->hasAPIC == TRUE){
-        printf("It has APIC\n");
+        printk("It has APIC\n");
     }
     if (processor->hasAPIC != TRUE){
-        printf("No APIC!\n");
+        printk("No APIC!\n");
     }
 
 // x87
     if (processor->hasX87FPU == TRUE){
-        printf("It has a x87 FPU\n");
+        printk("It has a x87 FPU\n");
     }
     if (processor->hasX87FPU != TRUE){
-        printf("No x87 FPU!\n");
+        printk("No x87 FPU!\n");
     }
 
 // HTT
     if (processor->hasHTT == TRUE){
-        printf("It has a HTT\n");
+        printk("It has a HTT\n");
     }
     if (processor->hasHTT != TRUE){
-        printf("No HTT!\n");
+        printk("No HTT!\n");
     }
 
 // VMX
     if (processor->hasVMX == TRUE){
-        printf("It has VMX\n");
+        printk("It has VMX\n");
     }
     if (processor->hasVMX != TRUE){
-        printf("No VMX!\n");
+        printk("No VMX!\n");
     }
 
 // LAPIC
     if(LAPIC.initialized == TRUE){
-        printf("LAPIC.lapic_pa %x \n",LAPIC.lapic_pa);
-        printf("LAPIC.lapic_va %x \n",LAPIC.lapic_va);
-        printf("LAPIC.local_id %d \n",LAPIC.local_id);
+        printk("LAPIC.lapic_pa %x \n",LAPIC.lapic_pa);
+        printk("LAPIC.lapic_va %x \n",LAPIC.lapic_va);
+        printk("LAPIC.local_id %d \n",LAPIC.local_id);
     }else{
-        printf("[ERROR] LAPIC not initialized\n");
+        printk("[ERROR] LAPIC not initialized\n");
     };
 
 // IOAPIC
     if(IOAPIC.initialized == TRUE){
-        printf("[IOAPIC initialized\n");
+        printk("[IOAPIC initialized\n");
     }else{
-        printf("[ERROR] IOAPIC not initialized\n");
+        printk("[ERROR] IOAPIC not initialized\n");
     };
 
 // smp_info
     if(smp_info.initialized == TRUE){
-        printf("[smp_info initialized\n");
+        printk("[smp_info initialized\n");
     }else{
-        printf("[ERROR] smp_info not initialized\n");
+        printk("[ERROR] smp_info not initialized\n");
     };
-
 
     // Continua ...
 
@@ -166,11 +162,10 @@ void __show_cpu_intel_parameters(void)
 
 void x64_info(void)
 {
-    printf("\n");
-    printf("x64 CPU Info:\n");
-    printf("\n");
-    printf("Number of processors: {%d}\n", g_processor_count);
-
+    printk("\n");
+    printk("x64 CPU Info:\n");
+    printk("\n");
+    printk("Number of processors: {%d}\n", g_processor_count);
     __show_cpu_intel_parameters();
 }
 

@@ -167,12 +167,12 @@ static void __enter_debug_mode(void)
 
     if (Initialization.is_console_log_initialized == TRUE)
     {
-        //printf("kmain.c: The kernel is in debug mode.\n");
+        //printk("kmain.c: The kernel is in debug mode.\n");
         // kgwm_early_kernel_console();  //#deprecated
-        //printf("kmain.c: End of debug mode.\n");
+        //printk("kmain.c: End of debug mode.\n");
         
         // #panic
-        printf("__enter_debug_mode: [PANIC] console log ok\n");
+        printk("__enter_debug_mode: [PANIC] console log ok\n");
         refresh_screen();
         die();
     }
@@ -252,9 +252,9 @@ static void preinit_OutputSupport(void)
 {
 // #important: 
 // We do not have all the runtime support yet.
-// We can't use printf yet.
+// We can't use printk yet.
 // We only initialized some console structures,
-// not the full support for printf functions.
+// not the full support for printk functions.
 
     //PROGRESS("::(2)(1)(4)\n");
     //PROGRESS("preinit_OutputSupport:\n");
@@ -270,7 +270,7 @@ static void preinit_OutputSupport(void)
 
 // #important: 
 // We do not have all the runtime support yet.
-// We can't use printf yet.
+// We can't use printk yet.
 }
 
 // ===================
@@ -282,7 +282,7 @@ static void kernel_final_messages(void)
         PROGRESS("::(2)(3): [final message] FAILURE\n");
     }
     if ( Initialization.is_console_log_initialized == TRUE ){
-        printf("init: [final message] FAILURE\n");
+        printk("init: [final message] FAILURE\n");
         refresh_screen();
     }
 }
@@ -357,8 +357,8 @@ void init_globals(void)
 // Reinitializing ... we already printed the banner.
     screenInit();
 
-    //debug_print("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
-    //printf     ("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
+    //debug_print("init_globals: [printk] WE HAVE MESSAGES NOW!\n");
+    //printk     ("init_globals: [printk] WE HAVE MESSAGES NOW!\n");
 
 // ===================
 
@@ -546,12 +546,12 @@ static int preinit(void)
 // ::(2)(1)(4)
 // Initialize the virtual console structures.
 // We do not have all the runtime support yet.
-// We can't use printf yet.
+// We can't use printk yet.
 // #important: 
 // We do not have all the runtime support yet.
-// We can't use printf yet.
+// We can't use printk yet.
 // We only initialized some console structures,
-// not the full support for printf functions.
+// not the full support for printk functions.
     preinit_OutputSupport();
 
     return 0;
@@ -571,7 +571,7 @@ void early_ring0_IdleThread (void)
 // #danger: Do NOT change this function.
 // #bugbug: This thread can't execute complex routine for now.
 
-    //printf("");  //fail
+    //printk("");  //fail
 
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
@@ -640,7 +640,7 @@ void I_kmain(int arch_type)
 // Preinit
 // We don't have any print support yet.
 // We initialized the serial debug support, and console structures, 
-// but we still can't use the printf functions.
+// but we still can't use the printk functions.
 
     system_state = SYSTEM_PREINIT;
     preinit();
@@ -733,7 +733,7 @@ void I_kmain(int arch_type)
     eisa_p = 0x000FFFD9;
 	if (kstrncmp(eisa_p, "EISA", 4) == 0)
 		EISA_bus = 1;
-    printf("EISA_bus %d\n",EISA_bus);
+    printk("EISA_bus %d\n",EISA_bus);
     while(1){}
 //----------
 //--
@@ -771,7 +771,7 @@ void I_kmain(int arch_type)
 // Creating the legacy pty maste and pty slave.
 // see: pty.c
     // #debug
-    //printf (":: Creating legacy ptys\n");
+    //printk (":: Creating legacy ptys\n");
     //refresh_screen();
 
     PROGRESS(":: Create lecacy PTYs\n");
@@ -847,7 +847,7 @@ void I_kmain(int arch_type)
             // Show cpu info.
             //x64_info();
 
-            //printf(">>>> breakpoint\n");
+            //printk(">>>> breakpoint\n");
             //while(1){asm ("cli"); asm ("hlt");}
         }
     }

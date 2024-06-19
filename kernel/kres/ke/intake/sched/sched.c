@@ -5,15 +5,12 @@
 
 #include <kernel.h>
 
-
 // Scheduler main structure.
 // see: sched.h
 struct scheduler_info_d  SchedulerInfo;
 
-
 //Status do scheduler.
 unsigned long g_scheduler_status = LOCKED;
-
 
 // Normal priorities
 static struct thread_d  *p1q;
@@ -23,7 +20,6 @@ static struct thread_d  *p3q;
 static struct thread_d  *p4q;
 static struct thread_d  *p5q;
 static struct thread_d  *p6q;  // Higher
-
 
 // The flexible conductor to create the list.
 //static struct thread_d  *tmpConductor;
@@ -209,10 +205,10 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 if (jiffies >= TmpThread->wake_jiffy)
                 {
                      // #debug
-                    printf ("sched: j1=%d | j2=%d |\n", 
+                    printk ("sched: j1=%d | j2=%d |\n", 
                         jiffies, TmpThread->wake_jiffy);
                     //panic ("Wake!\n");
-                    printf("sched: Waking up\n");
+                    printk("sched: Waking up\n");
                     do_thread_ready(TmpThread->tid);
                     //panic("Wake ok\n");
                 } 

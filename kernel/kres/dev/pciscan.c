@@ -1,5 +1,6 @@
 
 // pciscan.c
+// Created by Fred Nora.
 
 #include <kernel.h>  
 
@@ -42,7 +43,7 @@ int pci_setup_devices (void)
             if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
             {
                 //#debug
-                //printf ("vendor=%x\n",Vendor);
+                //printk ("vendor=%x\n",Vendor);
 
                 // Multifunction?
                 // Se o bit 7 estiver acionado, então é multifunction.
@@ -60,9 +61,8 @@ int pci_setup_devices (void)
         };    // Device for.
     };    // Bus for.
 
-
     //#debug
-    //printf("Detecting PCI Devices completes..\n");
+    //printk("Detecting PCI Devices completes..\n");
     //refresh_screen();
     //while(1){}
 

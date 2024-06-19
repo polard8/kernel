@@ -84,9 +84,9 @@ int sys_socket( int family, int type, int protocol )
     // Slow.
 
     /*
-    if ( Verbose == TRUE ){
-        printf ("\n======================================\n");
-        printf ("sys_socket: PID %d | family %d | type %d | protocol %d \n",
+    if (Verbose == TRUE){
+        printk ("\n======================================\n");
+        printk ("sys_socket: PID %d | family %d | type %d | protocol %d \n",
             current_process, family, type, protocol );
         refresh_screen();
     }
@@ -161,7 +161,7 @@ int sys_socket( int family, int type, int protocol )
     __socket = (struct socket_d *) create_socket_object();
     if ( (void *) __socket == NULL ){
         debug_print ("sys_socket: __socket\n");
-        printf      ("sys_socket: __socket\n");
+        printk      ("sys_socket: __socket\n");
         goto fail;
     }
 // family, type and protocol.
@@ -345,19 +345,19 @@ sys_accept (
 
     if ( current_process < 0  || current_process >= PROCESS_COUNT_MAX ){
         debug_print ("sys_accept: [FAIL] current_process\n");
-        printf      ("sys_accept: [FAIL] current_process\n");
+        printk      ("sys_accept: [FAIL] current_process\n");
         goto fail;
     }
 // Server process
     sProcess = (struct process_d *) processList[current_process];
     if ( (void *) sProcess == NULL ){
         debug_print ("sys_accept: [FAIL] sProcess\n");
-        printf      ("sys_accept: [FAIL] sProcess\n");
+        printk      ("sys_accept: [FAIL] sProcess\n");
         goto fail;
     }
     if ( sProcess->used != TRUE || sProcess->magic != 1234 ){
         debug_print ("sys_accept: [FAIL] sProcess validation\n");
-        printf      ("sys_accept: [FAIL] sProcess validation\n");
+        printk      ("sys_accept: [FAIL] sProcess validation\n");
         goto fail;
     }
 
@@ -368,23 +368,23 @@ sys_accept (
     sFile = (file *) sProcess->Objects[fdServer];
     if ( (void *) sFile == NULL ){
         debug_print ("sys_accept: sFile fail\n");
-        printf      ("sys_accept: sFile fail\n");
+        printk      ("sys_accept: sFile fail\n");
         goto fail;
     }
     if ( sFile->used != TRUE || sFile->magic != 1234 ){
         debug_print ("sys_accept: [FAIL] sFile validation\n");
-        printf      ("sys_accept: [FAIL] sFile validation\n");
+        printk      ("sys_accept: [FAIL] sFile validation\n");
         goto fail;
     }
 // Is this file a socket?
     if ( is_socket(sFile) != TRUE ){
         debug_print ("sys_accept: sFile is not a socket object\n");
-             printf ("sys_accept: sFile is not a socket object\n");
+             printk ("sys_accept: sFile is not a socket object\n");
         goto fail;
     }
     if (sFile->sync.can_accept != TRUE){
         debug_print ("sys_accept: sFile can NOT accept connections\n");
-             printf ("sys_accept: sFile can NOT accept connections\n");
+             printk ("sys_accept: sFile can NOT accept connections\n");
         goto fail;
     }
 
@@ -394,12 +394,12 @@ sys_accept (
     sSocket = (struct socket_d *) sFile->socket;
     if ( (void *) sSocket == NULL ){
         debug_print ("sys_accept: [FAIL] sSocket\n");
-        printf      ("sys_accept: [FAIL] sSocket\n");
+        printk      ("sys_accept: [FAIL] sSocket\n");
         goto fail;
     }
     if ( sSocket->used != TRUE || sSocket->magic != 1234 ){
         debug_print ("sys_accept: [FAIL] sSocket validation\n");
-        printf      ("sys_accept: [FAIL] sSocket validation\n");
+        printk      ("sys_accept: [FAIL] sSocket validation\n");
         goto fail;
     }
 
@@ -408,7 +408,7 @@ sys_accept (
 
 /*
     if (sSocket->state == SS_CONNECTED){
-        printf("sys_accept: [FAIL] socket is already SS_CONNECTED\n");
+        printk("sys_accept: [FAIL] socket is already SS_CONNECTED\n");
         refresh_screen();
         return -1;
     }
@@ -443,7 +443,7 @@ sys_accept (
 // ja que listen ainda nao funciona
 
     // #debug
-    //printf ("sys_accept: process %d | family %d | len %d \n", 
+    //printk ("sys_accept: process %d | family %d | len %d \n", 
         //current_process, addr->sa_family, addrlen  );
 
 // sys_accept deve apenas pegar um fd da lista de conexoes
@@ -464,7 +464,7 @@ sys_accept (
 /*
     if (sSocket->state == SS_CONNECTED){
         debug_print ("sys_accept: Already connected!\n");
-        //printf      ("sys_accept: Already connected!\n");
+        //printk      ("sys_accept: Already connected!\n");
         //refresh_screen();
         //return -1;
         return (int) fdServer;
@@ -561,7 +561,7 @@ sys_accept (
             if ( cSocket->magic_string[0] == 'C' )
             {
                 //debug_print("MAGIC C\n");
-                //printf ("magic: %s\m",cSocket->magic_string);
+                //printk ("magic: %s\m",cSocket->magic_string);
             }
 
             //ok: usar isso só para debug
@@ -588,9 +588,9 @@ sys_accept (
 
             if (Verbose == TRUE)
             {
-                printf("sys_accept: Server's pid {%d}\n",current_process);
-                printf("sys_accept: Server's socket fd {%d}\n",sockfd);
-                printf("sys_accept: Breakpoint\n");
+                printk("sys_accept: Server's pid {%d}\n",current_process);
+                printk("sys_accept: Server's socket fd {%d}\n",sockfd);
+                printk("sys_accept: Breakpoint\n");
                 refresh_screen();
                 while (1){
                     asm (" hlt ");
@@ -616,7 +616,7 @@ fail:
 
     // #debug
     //debug_print ("sys_accept: [FAIL] Something is wrong!\n");
-    //printf    ("sys_accept: [FAIL] Something is wrong!\n");
+    //printk    ("sys_accept: [FAIL] Something is wrong!\n");
     //refresh_screen();
     
     if (Verbose == TRUE){
@@ -660,7 +660,7 @@ sys_bind (
 
     // #debug
     if (Verbose==TRUE){
-        printf("sys_bind: PID %d | fd %d | \n",
+        printk("sys_bind: PID %d | fd %d | \n",
             current_process, sockfd );
     }
 
@@ -668,7 +668,7 @@ sys_bind (
     if ( sockfd < 0 || sockfd >= OPEN_MAX )
     {
         debug_print("sys_bind: sockfd\n");
-        printf     ("sys_bind: sockfd\n");
+        printk     ("sys_bind: sockfd\n");
         return (int) (-EINVAL);
     }
 
@@ -676,25 +676,25 @@ sys_bind (
     if ((void *) addr == NULL)
     {
         debug_print("sys_bind: addr\n");
-        printf     ("sys_bind: addr\n");
+        printk     ("sys_bind: addr\n");
         goto fail;
     }
 
 // Process
 
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
-        printf("sys_bind: current_process\n");
+        printk("sys_bind: current_process\n");
         goto fail;
     }
 
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
         debug_print("sys_bind: p\n");
-        printf     ("sys_bind: p\n");
+        printk     ("sys_bind: p\n");
         goto fail;
     }
     if (p->magic != 1234){
-        printf("sys_bind: p validation\n");
+        printk("sys_bind: p validation\n");
         goto fail;
     }
 
@@ -704,18 +704,18 @@ sys_bind (
     f = (file *) p->Objects[sockfd];
     if ((void *) f == NULL){
         debug_print ("sys_bind: f\n");
-        printf      ("sys_bind: f\n");
+        printk      ("sys_bind: f\n");
         goto fail;
     }
     if (f->magic != 1234){
-       printf("sys_bind: f validation\n");
+       printk("sys_bind: f validation\n");
        goto fail; 
     }
 
 // Is it a socket file?
     if ( is_socket(f) != TRUE ){
         debug_print ("sys_bind: f is not a socket\n");
-        printf      ("sys_bind: f is not a socket\n");
+        printk      ("sys_bind: f is not a socket\n");
         goto fail;
     }
 
@@ -724,7 +724,7 @@ sys_bind (
     s = (struct socket_d *) f->socket;
     if ((void *) s == NULL){
         debug_print("sys_bind: s\n");
-        printf     ("sys_bind: s\n");
+        printk     ("sys_bind: s\n");
         goto fail; 
     }
 
@@ -765,7 +765,7 @@ sys_bind (
         };
         // #debug
         if (Verbose==TRUE){
-            printf ("sys_bind: process %d | family %d | len %d\n", 
+            printk ("sys_bind: process %d | family %d | len %d\n", 
                 current_process, addr->sa_family, addrlen  );
         }
         return 0;
@@ -777,7 +777,7 @@ sys_bind (
     if (s->addr.sa_family == AF_UNIX)
     {
         debug_print ("sys_bind: AF_UNIX not supported yet\n");
-        printf      ("sys_bind: AF_UNIX not supported yet\n");
+        printk      ("sys_bind: AF_UNIX not supported yet\n");
         // Copy.
         //for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
         return -1;
@@ -788,7 +788,7 @@ sys_bind (
     if (s->addr.sa_family == AF_INET)
     {
         debug_print ("sys_bind: AF_INET not supported yet\n");
-        printf      ("sys_bind: AF_INET not supported yet\n");
+        printk      ("sys_bind: AF_INET not supported yet\n");
         // Copy.
         //for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
         return -1;
@@ -797,12 +797,12 @@ sys_bind (
 // #fail
 // A família é de um tipo não suportado.
     debug_print ("sys_bind: [FAIL] family not valid\n");
-    printf      ("sys_bind: [FAIL] family not valid\n");
+    printk      ("sys_bind: [FAIL] family not valid\n");
 
 // fail
 fail:
     debug_print ("sys_bind: [FAIL] Something is wrong!\n");
-    printf      ("sys_bind: [FAIL] Something is wrong!\n");
+    printk      ("sys_bind: [FAIL] Something is wrong!\n");
     //refresh_screen();
     return (int) (-1);
 }
@@ -891,8 +891,8 @@ __connect_inet (
     pid_t current_process = (pid_t) get_current_process();
 
     if (Verbose == TRUE){
-        printf ("__connect_inet: Client's pid {%d}\n", current_process );
-        printf ("__connect_inet: Client's socket id {%d}\n", sockfd );
+        printk ("__connect_inet: Client's pid {%d}\n", current_process );
+        printk ("__connect_inet: Client's socket id {%d}\n", sockfd );
     }
 
 // Client fd.
@@ -901,7 +901,7 @@ __connect_inet (
     client_socket_fd = sockfd;
     if ( client_socket_fd < 0 || client_socket_fd >= OPEN_MAX ){
         debug_print ("__connect_inet: client_socket_fd\n");
-        printf      ("__connect_inet: client_socket_fd\n");
+        printk      ("__connect_inet: client_socket_fd\n");
         //refresh_screen();
         return (int) (-EINVAL);
     }
@@ -909,7 +909,7 @@ __connect_inet (
 // addr
 // Usando a estrutura que nos foi passada.
     if ((void *) addr == NULL){
-        printf ("__connect_inet: addr\n");
+        printk ("__connect_inet: addr\n");
         //refresh_screen();
         return (int) (-EINVAL);
     }
@@ -976,7 +976,7 @@ __connect_inet (
 
         debug_print("__connect_inet: AF_INET\n");
         //#debug
-        //printf("sys_connect: AF_INET port {%d}\n", addr_in->sin_port);
+        //printk("sys_connect: AF_INET port {%d}\n", addr_in->sin_port);
 
         // Is this the localhost ip address?
         given_ip = &addr_in->sin_addr.s_addr;
@@ -989,7 +989,7 @@ __connect_inet (
         {
              in_localhost = TRUE;
              // #debug
-             //printf("It's the localhost\n");
+             //printk("It's the localhost\n");
              //refresh_screen();
              //while(1){}
         }
@@ -1005,31 +1005,31 @@ __connect_inet (
 
         // 21 - FTP
         if (addr_in->sin_port == 21){
-            printf("__connect_inet: [21] FTP #todo\n");
+            printk("__connect_inet: [21] FTP #todo\n");
             goto fail;
         }
 
         // 23 - Telnet
         if (addr_in->sin_port == 23){
-            printf("__connect_inet: [23] Telnet #todo\n");
+            printk("__connect_inet: [23] Telnet #todo\n");
             goto fail;
         }
 
         // 67 - DHCP
         if (addr_in->sin_port == 67){
-            printf("__connect_inet: [67] DHCP #todo\n");
+            printk("__connect_inet: [67] DHCP #todo\n");
             goto fail;
         }
 
         // 80 - HTTP
         if (addr_in->sin_port == 80){
-            printf("__connect_inet: [80] HTTP #todo\n");
+            printk("__connect_inet: [80] HTTP #todo\n");
             goto fail;
         }
 
         // 443 - HTTPS 
         if (addr_in->sin_port == 443){
-            printf("__connect_inet: [443] HTTPS #todo\n");
+            printk("__connect_inet: [443] HTTPS #todo\n");
             goto fail;
         }
 
@@ -1040,10 +1040,10 @@ __connect_inet (
             target_pid = (pid_t) socket_get_gramado_port(GRAMADO_PORT_WS);
             if (Verbose==TRUE)
             {
-                printf("__connect_inet: [AF_INET] Connecting to the Window Server\n");
-                printf("__connect_inet: IP {%x}\n", 
+                printk("__connect_inet: [AF_INET] Connecting to the Window Server\n");
+                printk("__connect_inet: IP {%x}\n", 
                     addr_in->sin_addr.s_addr );
-                printf("__connect_inet: PORT {%d}\n", 
+                printk("__connect_inet: PORT {%d}\n", 
                     addr_in->sin_port);
                 //#debug
                 //while(1){}
@@ -1058,10 +1058,10 @@ __connect_inet (
             target_pid = (pid_t) socket_get_gramado_port(GRAMADO_PORT_NS);
             if (Verbose==TRUE)
             {
-                printf("__connect_inet: [AF_INET] Connecting to the Network Server\n");
-                printf("__connect_inet: IP {%x}\n", 
+                printk("__connect_inet: [AF_INET] Connecting to the Network Server\n");
+                printk("__connect_inet: IP {%x}\n", 
                     addr_in->sin_addr.s_addr );
-                printf("__connect_inet: PORT {%d}\n", 
+                printk("__connect_inet: PORT {%d}\n", 
                     addr_in->sin_port);
                 //#debug
                 //while(1){}
@@ -1075,7 +1075,7 @@ __connect_inet (
         // Telnet server #todo
 
         // #debug
-        printf("__connect_inet: [FAIL] Port not valid {%d}\n",
+        printk("__connect_inet: [FAIL] Port not valid {%d}\n",
             addr_in->sin_port);
 
         goto fail;
@@ -1085,7 +1085,7 @@ __connect_inet (
 
     default:
         debug_print("__connect_inet: domain not supported\n");
-        printf("__connect_inet: [FAIL] Family not supported {%d}\n",
+        printk("__connect_inet: [FAIL] Family not supported {%d}\n",
             addr_in->sin_family);
         goto fail;
         break;
@@ -1103,7 +1103,7 @@ __connect_inet (
 // se a intenção do cliente foi conectar-se com um servidor
 // dentro do localhost.
     if (in_localhost != TRUE){
-        printf ("__connect_inet: #todo Trying to connect to another machine\n");
+        printk ("__connect_inet: #todo Trying to connect to another machine\n");
         goto fail;
     }
 
@@ -1114,7 +1114,7 @@ __connect_inet (
 // Vamos obter o arquivo do tipo soquete que pertence ao sender.
 
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
-        printf ("__connect_inet: current_process\n");
+        printk ("__connect_inet: current_process\n");
         goto fail;
     }
 
@@ -1123,7 +1123,7 @@ __connect_inet (
     cProcess = (struct process_d *) processList[current_process];
     if ((void *) cProcess == NULL){
         debug_print("__connect_inet: cProcess fail\n");
-        printf     ("__connect_inet: cProcess fail\n");
+        printk     ("__connect_inet: cProcess fail\n");
         goto fail;
     }
 
@@ -1148,7 +1148,7 @@ __connect_inet (
 
     f = (file *) cProcess->Objects[client_socket_fd];
     if ((void *) f == NULL){
-        printf("__connect_inet: [FAIL] f. The client's socket\n");
+        printk("__connect_inet: [FAIL] f. The client's socket\n");
         goto fail;
     }
 
@@ -1157,7 +1157,7 @@ __connect_inet (
     int __is = -1;
     __is = is_socket((file *) f);
     if (__is != TRUE){
-        printf("__connect_inet: [FAIL] f is not a socket\n");
+        printk("__connect_inet: [FAIL] f is not a socket\n");
         goto fail;
     }
 
@@ -1166,7 +1166,7 @@ __connect_inet (
 // This way we can reject connections before the server binds with an address.
 
     if (f->sync.can_connect != TRUE){
-        printf("__connect_inet: [PERMISSION FAIL] Client doesn't accept connections.\n");
+        printk("__connect_inet: [PERMISSION FAIL] Client doesn't accept connections.\n");
         goto fail;
     }
 
@@ -1176,7 +1176,7 @@ __connect_inet (
 
     client_socket = (struct socket_d *) f->socket;
     if ((void *) client_socket == NULL){
-        printf("__connect_inet: [FAIL] client_socket\n");
+        printk("__connect_inet: [FAIL] client_socket\n");
         goto fail;
     }
 
@@ -1188,7 +1188,7 @@ __connect_inet (
 // naõ conseguirmos mais conectar.
 
     if (client_socket->state != SS_UNCONNECTED) {
-        printf("__connect_inet: [FAIL] client socket is not SS_UNCONNECTED\n");
+        printk("__connect_inet: [FAIL] client socket is not SS_UNCONNECTED\n");
         goto fail;
     }
 
@@ -1210,7 +1210,7 @@ __connect_inet (
     if (target_pid<0 || target_pid >= PROCESS_COUNT_MAX)
     {
         debug_print("__connect_inet: target_pid\n");
-        printf     ("__connect_inet: target_pid\n");
+        printk     ("__connect_inet: target_pid\n");
         goto fail;
     }
 
@@ -1222,7 +1222,7 @@ __connect_inet (
     sProcess = (struct process_d *) processList[target_pid];
     if ((void *) sProcess == NULL){
         debug_print("__connect_inet: sProcess fail\n");
-        printf     ("__connect_inet: sProcess fail\n");
+        printk     ("__connect_inet: sProcess fail\n");
         goto fail;
     }
 
@@ -1251,7 +1251,7 @@ __connect_inet (
 __OK_new_slot:
 
     if (__slot == -1){
-        printf("__connect_inet: No empty slot\n");
+        printk("__connect_inet: No empty slot\n");
         goto fail;
     }
 
@@ -1261,7 +1261,7 @@ __OK_new_slot:
 
     server_socket = (struct socket_d *) sProcess->priv;
     if ((void *) server_socket == NULL){
-        printf ("__connect_inet: [FAIL] server_socket\n");
+        printk ("__connect_inet: [FAIL] server_socket\n");
         goto fail;
     }
 
@@ -1379,7 +1379,7 @@ __OK_new_slot:
 
     // #debug
     //if (Verbose==TRUE){
-    //printf     ("sys_connect: Pending connection\n");
+    //printk     ("sys_connect: Pending connection\n");
     //refresh_screen();
     //}
 
@@ -1387,7 +1387,7 @@ __OK_new_slot:
     // #breakpoint
     if (Verbose == TRUE)
     {
-        printf("__connect_inet: Breakpoint :)\n");
+        printk("__connect_inet: Breakpoint :)\n");
         refresh_screen();
         while (1){
             asm (" hlt ");
@@ -1397,7 +1397,7 @@ __OK_new_slot:
     return 0;
 fail:
     debug_print("__connect_inet: Fail\n");
-    printf     ("__connect_inet: Fail\n");
+    printk     ("__connect_inet: Fail\n");
     return (int) -1;
 }
 
@@ -1487,8 +1487,8 @@ __connect_local (
     pid_t current_process = (pid_t) get_current_process();
 
     if (Verbose == TRUE){
-        printf ("__connect_local: Client's pid {%d}\n", current_process );
-        printf ("__connect_local: Client's socket id {%d}\n", sockfd );
+        printk ("__connect_local: Client's pid {%d}\n", current_process );
+        printk ("__connect_local: Client's socket id {%d}\n", sockfd );
     }
 
 // Client fd.
@@ -1497,7 +1497,7 @@ __connect_local (
     client_socket_fd = sockfd;
     if ( client_socket_fd < 0 || client_socket_fd >= OPEN_MAX ){
         debug_print ("__connect_local: client_socket_fd\n");
-        printf      ("__connect_local: client_socket_fd\n");
+        printk      ("__connect_local: client_socket_fd\n");
         //refresh_screen();
         return (int) (-EINVAL);
     }
@@ -1505,7 +1505,7 @@ __connect_local (
 // addr
 // Usando a estrutura que nos foi passada.
     if ((void *) addr == NULL){
-        printf ("__connect_local: addr\n");
+        printk ("__connect_local: addr\n");
         //refresh_screen();
         return (int) (-EINVAL);
     }
@@ -1543,7 +1543,7 @@ __connect_local (
     case AF_UNIX:
         // Trabalhando com pathname.
         debug_print ("__connect_local: AF_UNIX\n");
-        printf      ("__connect_local: AF_UNIX\n");        
+        printk      ("__connect_local: AF_UNIX\n");        
         goto fail;
         break;
 
@@ -1582,17 +1582,17 @@ __connect_local (
         //}
 
         if ( target_pid<0 || target_pid >= PROCESS_COUNT_MAX ){
-            printf ("__connect_local: AF_GRAMADO target_pid\n");
+            printk ("__connect_local: AF_GRAMADO target_pid\n");
             goto fail;
         }
         if (Verbose == TRUE){
-            printf ("__connect_local: target pid %d \n", target_pid);
+            printk ("__connect_local: target pid %d \n", target_pid);
         }
         break;
 
         // Not a local domains
         default:
-            printf("__connect_local: This is not a valid local domain\n");
+            printk("__connect_local: This is not a valid local domain\n");
             goto fail;
             break;
     };
@@ -1612,7 +1612,7 @@ __connect_local (
 // Vamos obter o arquivo do tipo soquete que pertence ao sender.
 
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
-        printf ("__connect_local: current_process\n");
+        printk ("__connect_local: current_process\n");
         goto fail;
     }
 
@@ -1621,7 +1621,7 @@ __connect_local (
     cProcess = (struct process_d *) processList[current_process];
     if ((void *) cProcess == NULL){
         debug_print("__connect_local: cProcess fail\n");
-        printf     ("__connect_local: cProcess fail\n");
+        printk     ("__connect_local: cProcess fail\n");
         goto fail;
     }
 
@@ -1646,7 +1646,7 @@ __connect_local (
 
     f = (file *) cProcess->Objects[client_socket_fd];
     if ((void *) f == NULL){
-        printf("__connect_local: [FAIL] f. The client's socket\n");
+        printk("__connect_local: [FAIL] f. The client's socket\n");
         goto fail;
     }
 
@@ -1655,7 +1655,7 @@ __connect_local (
     int __is = -1;
     __is = is_socket((file *) f);
     if (__is != TRUE){
-        printf("__connect_local: [FAIL] f is not a socket\n");
+        printk("__connect_local: [FAIL] f is not a socket\n");
         goto fail;
     }
 
@@ -1664,7 +1664,7 @@ __connect_local (
 // This way we can reject connections before the server binds with an address.
 
     if (f->sync.can_connect != TRUE){
-        printf("__connect_local: [PERMISSION FAIL] Client doesn't accept connections.\n");
+        printk("__connect_local: [PERMISSION FAIL] Client doesn't accept connections.\n");
         goto fail;
     }
 
@@ -1674,7 +1674,7 @@ __connect_local (
 
     client_socket = (struct socket_d *) f->socket;
     if ((void *) client_socket == NULL){
-        printf("__connect_local: [FAIL] client_socket\n");
+        printk("__connect_local: [FAIL] client_socket\n");
         goto fail;
     }
 
@@ -1686,7 +1686,7 @@ __connect_local (
 // naõ conseguirmos mais conectar.
 
     if (client_socket->state != SS_UNCONNECTED) {
-        printf("__connect_local: [FAIL] client socket is not SS_UNCONNECTED\n");
+        printk("__connect_local: [FAIL] client socket is not SS_UNCONNECTED\n");
         goto fail;
     }
 
@@ -1708,7 +1708,7 @@ __connect_local (
     if (target_pid<0 || target_pid >= PROCESS_COUNT_MAX)
     {
         debug_print("__connect_local: target_pid\n");
-        printf     ("__connect_local: target_pid\n");
+        printk     ("__connect_local: target_pid\n");
         goto fail;
     }
 
@@ -1720,7 +1720,7 @@ __connect_local (
     sProcess = (struct process_d *) processList[target_pid];
     if ((void *) sProcess == NULL){
         debug_print("__connect_local: sProcess fail\n");
-        printf     ("__connect_local: sProcess fail\n");
+        printk     ("__connect_local: sProcess fail\n");
         goto fail;
     }
 
@@ -1749,7 +1749,7 @@ __connect_local (
 __OK_new_slot:
 
     if (__slot == -1){
-        printf("__connect_local: No empty slot\n");
+        printk("__connect_local: No empty slot\n");
         goto fail;
     }
 
@@ -1759,7 +1759,7 @@ __OK_new_slot:
 
     server_socket = (struct socket_d *) sProcess->priv;
     if ((void *) server_socket == NULL){
-        printf ("__connect_local: [FAIL] server_socket\n");
+        printk ("__connect_local: [FAIL] server_socket\n");
         goto fail;
     }
 
@@ -1877,7 +1877,7 @@ __OK_new_slot:
 
     // #debug
     //if (Verbose==TRUE){
-    //printf     ("sys_connect: Pending connection\n");
+    //printk     ("sys_connect: Pending connection\n");
     //refresh_screen();
     //}
 
@@ -1885,7 +1885,7 @@ __OK_new_slot:
     // #breakpoint
     if (Verbose == TRUE)
     {
-        printf("__connect_local: Breakpoint :)\n");
+        printk("__connect_local: Breakpoint :)\n");
         refresh_screen();
         while (1){
             asm (" hlt ");
@@ -1895,7 +1895,7 @@ __OK_new_slot:
     return 0;
 fail:
     debug_print("__connect_local: Fail\n");
-    printf     ("__connect_local: Fail\n");
+    printk     ("__connect_local: Fail\n");
     return (int) -1;
 }
 
@@ -1914,7 +1914,7 @@ sys_connect (
 
 // Invalid address.
     if ((void *) addr == NULL){
-        printf ("sys_connect: addr\n");
+        printk ("sys_connect: addr\n");
         return (int) (-EINVAL);
     }
 
@@ -1973,7 +1973,7 @@ sys_getsockname (
     pid_t current_process = (pid_t) get_current_process();
 
     if ( sockfd < 0 || sockfd >= OPEN_MAX ){
-        printf ("sys_getsockname: [FAIL ] sockfd\n");
+        printk ("sys_getsockname: [FAIL ] sockfd\n");
         refresh_screen();
         return -1;
     }
@@ -1981,7 +1981,7 @@ sys_getsockname (
 // process
     p = (struct process_d *) processList[current_process]; 
     if ( (void *) p == NULL ){
-        printf ("sys_getsockname: p fail\n");
+        printk ("sys_getsockname: p fail\n");
         refresh_screen();
         return -1;
     }
@@ -1989,7 +1989,7 @@ sys_getsockname (
 // file
     f = (file *) p->Objects[sockfd];
     if ( (void *) f == NULL ){
-        printf ("sys_getsockname: f fail\n");
+        printk ("sys_getsockname: f fail\n");
         refresh_screen();
         return -1;
     }
@@ -1997,7 +1997,7 @@ sys_getsockname (
 //socket
     s = (struct socket_d *) p->priv;
     if ( (void *) s == NULL ){
-        printf ("sys_getsockname: s fail\n");
+        printk ("sys_getsockname: s fail\n");
         refresh_screen();
         return -1;
     }
@@ -2005,7 +2005,7 @@ sys_getsockname (
 // addr
 // Usando a estrutura que nos foi passada.
     if ( (void *) addr == NULL ){
-        printf ("sys_getsockname: addr fail\n");
+        printk ("sys_getsockname: addr fail\n");
         refresh_screen();
         return -1;
     }
@@ -2018,7 +2018,7 @@ sys_getsockname (
     if (s->addr.sa_family == AF_GRAMADO)
     {
         // Binding the name to the socket.
-        printf ("sys_getsockname: Getting the name and the size\n");
+        printk ("sys_getsockname: Getting the name and the size\n");
         addrlen[0] = n;
         // Always 14.
         for (n=0; n<14; n++){
@@ -2035,11 +2035,11 @@ sys_getsockname (
     //if ( ...
     // ...
     
-    printf ("sys_getsockname: process %d ; family %d ; len %d \n", 
+    printk ("sys_getsockname: process %d ; family %d ; len %d \n", 
         current_process, addr->sa_family, addrlen  );
  
  fail:
-    printf ("sys_getsockname: fail\n");
+    printk ("sys_getsockname: fail\n");
     refresh_screen();
     return (int) -1;
 }
@@ -2083,14 +2083,14 @@ int sys_listen(int sockfd, int backlog)
 
 // #debug
     //debug_print ("sys_listen: [TODO]\n");
-    //printf      ("sys_listen: [TODO] fd=%d backlog=%d\n",
+    //printk      ("sys_listen: [TODO] fd=%d backlog=%d\n",
         //sockfd, backlog);
 
 // The fd of the server's socket.
     if ( sockfd < 0 || sockfd >= OPEN_MAX )
     {
         debug_print ("sys_listen: sockfd\n");
-        printf      ("sys_listen: sockfd\n");
+        printk      ("sys_listen: sockfd\n");
         return (int) (-EINVAL);
     }
 
@@ -2121,7 +2121,7 @@ int sys_listen(int sockfd, int backlog)
     if ( current_process < 0 || 
          current_process >= PROCESS_COUNT_MAX )
     {
-        printf("sys_listen: current_process\n");
+        printk("sys_listen: current_process\n");
         goto fail;
     }
 
@@ -2129,7 +2129,7 @@ int sys_listen(int sockfd, int backlog)
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
         debug_print("sys_listen: p fail\n");
-        printf     ("sys_listen: p fail\n");
+        printk     ("sys_listen: p fail\n");
         goto fail;
     }
 
@@ -2139,7 +2139,7 @@ int sys_listen(int sockfd, int backlog)
     f = (file *) p->Objects[sockfd];
     if ((void *) f == NULL){
         debug_print("sys_listen: f fail\n");
-        printf     ("sys_listen: f fail\n");
+        printk     ("sys_listen: f fail\n");
         goto fail;
     }
 
@@ -2148,7 +2148,7 @@ int sys_listen(int sockfd, int backlog)
     IsSocket = (int) is_socket((file *) f);
     if (IsSocket != TRUE){
         debug_print ("sys_listen: f is not a socket\n");
-        printf      ("sys_listen: f is not a socket\n");
+        printk      ("sys_listen: f is not a socket\n");
         //return (int) (-EINVAL);
         goto fail;
     }
@@ -2165,7 +2165,7 @@ int sys_listen(int sockfd, int backlog)
     s = (struct socket_d *) f->socket;
     if ((void *) s == NULL){
         debug_print("sys_listen: s fail\n");
-        printf     ("sys_listen: s fail\n");
+        printk     ("sys_listen: s fail\n");
         goto fail;
     }
 
@@ -2180,7 +2180,7 @@ int sys_listen(int sockfd, int backlog)
     // ...
 
     //debug_print ("sys_listen: [TODO] continue...\n");
-    //printf      ("sys_listen: [TODO] continue...\n");
+    //printk      ("sys_listen: [TODO] continue...\n");
 
     // ...
 
@@ -2189,7 +2189,7 @@ int sys_listen(int sockfd, int backlog)
 // ==============================================
 fail:
     debug_print("sys_listen: [FAIL]\n");
-    printf     ("sys_listen: [FAIL]\n");
+    printk     ("sys_listen: [FAIL]\n");
     //refresh_screen();
     //while(1){}
     return (int) -1;
@@ -2215,26 +2215,26 @@ int sys_socket_shutdown(int socket, int how)
     int IsSocketObject = -1;
 
     debug_print ("sys_socket_shutdown: [TODO]\n");
-    //printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
+    //printk      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
     //    socket, how );
 
 // Invalid fd.
     if ( socket < 0 || socket >= OPEN_MAX ){
         debug_print ("sys_socket_shutdown: [FAIL] fd\n");
-        printf      ("sys_socket_shutdown: [FAIL] fd\n");
+        printk      ("sys_socket_shutdown: [FAIL] fd\n");
         return (int) (-EBADF);
     }
 
 // Process
     pid_t current_process = (pid_t) get_current_process();
     if (current_process < 0  || current_process >= PROCESS_COUNT_MAX){
-        printf      ("sys_socket_shutdown: p fail\n");
+        printk      ("sys_socket_shutdown: p fail\n");
         goto fail;        
     }
     p = (struct process_d *) processList[current_process];
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         debug_print ("sys_socket_shutdown: p fail\n");
-        printf      ("sys_socket_shutdown: p fail\n");
+        printk      ("sys_socket_shutdown: p fail\n");
         goto fail;
     }
 
@@ -2245,7 +2245,7 @@ int sys_socket_shutdown(int socket, int how)
     f = (file *) p->Objects[socket];
     if ((void *) f == NULL){
         debug_print("sys_socket_shutdown: f fail\n");
-        printf     ("sys_socket_shutdown: f fail\n");
+        printk     ("sys_socket_shutdown: f fail\n");
         goto fail;
     }
 
@@ -2253,7 +2253,7 @@ int sys_socket_shutdown(int socket, int how)
     IsSocketObject = is_socket((file *) f);
     if (IsSocketObject != 1){
         debug_print("sys_socket_shutdown: f is not a socket\n");
-        printf     ("sys_socket_shutdown: f is not a socket\n");
+        printk     ("sys_socket_shutdown: f is not a socket\n");
         goto fail;
     }
 
@@ -2264,7 +2264,7 @@ int sys_socket_shutdown(int socket, int how)
     s = (struct socket_d *) f->socket;
     if ((void *) s == NULL){
         debug_print ("sys_socket_shutdown: s fail\n");
-        printf      ("sys_socket_shutdown: s fail\n");
+        printk      ("sys_socket_shutdown: s fail\n");
         goto fail;
     // permanece conectado, mas usaremos outro da fila.
     } else {
@@ -2276,10 +2276,9 @@ int sys_socket_shutdown(int socket, int how)
 
 fail:
     debug_print("sys_socket_shutdown: [FAIL]\n");
-    printf     ("sys_socket_shutdown: [FAIL]\n");
+    printk     ("sys_socket_shutdown: [FAIL]\n");
     return (int) -1;
 }
-
 
 //
 // End

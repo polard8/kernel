@@ -131,7 +131,7 @@ fsLoadFile (
 
     // #debug:
     debug_print ("fsLoadFile:\n");
-    //printf      ("fsLoadFile:\n");
+    //printk    ("fsLoadFile:\n");
 
 // Fat address and dir address.
 // Vectors of 'short'
@@ -242,17 +242,17 @@ fsLoadFile (
 
 // file name
     if ((void *) file_name == NULL){
-        printf ("fsLoadFile: file_name\n");
+        printk ("fsLoadFile: file_name\n");
         goto fail;
     }
     if (*file_name == 0){
-        printf ("fsLoadFile: *file_name\n");
+        printk ("fsLoadFile: *file_name\n");
         goto fail;
     }
 
 //#debug
 //vamos mostrar a string.
-    //printf ("fsLoadFile: file_name={%s}\n", file_name);
+    //printk ("fsLoadFile: file_name={%s}\n", file_name);
 
 // name size.
 // Se o tamanho da string falhar, vamos ajustar.
@@ -261,10 +261,10 @@ fsLoadFile (
     //    goto fail;
     if (FileNameSize > 11)
     {
-         printf ("fsLoadFile: Name size %d\n", FileNameSize ); 
-         //FileNameSize = 11;
-         //return 1; //fail
-         goto fail;
+        printk ("fsLoadFile: Name size %d\n", FileNameSize ); 
+        //FileNameSize = 11;
+        //return 1; //fail
+        goto fail;
     }
 
 // File size
@@ -294,7 +294,7 @@ fsLoadFile (
     if (FileSize == 0)
     {
         debug_print("fsLoadFile: [FIXME] FileSize\n");
-        printf     ("fsLoadFile: [FIXME] FileSize %d\n", FileSize);
+        printk     ("fsLoadFile: [FIXME] FileSize %d\n", FileSize);
         //goto fail;
     }
 
@@ -302,7 +302,7 @@ fsLoadFile (
     if (FileSize >= BufferSizeInBytes)
     {
         debug_print("fsLoadFile: [FIXME] Buffer Overflow\n");
-             printf("fsLoadFile: [FIXME] FileSize %d BufferSizeInBytes %d\n",
+             printk("fsLoadFile: [FIXME] FileSize %d BufferSizeInBytes %d\n",
                  FileSize, BufferSizeInBytes );
         goto fail;
     }
@@ -359,7 +359,7 @@ fsLoadFile (
 // O arquivo não foi encontrado.
 //__notFound:
     debug_print("fsLoadFile: File not found\n");
-    printf     ("fsLoadFile 1: %s not found\n", file_name );  
+    printk     ("fsLoadFile 1: %s not found\n", file_name );  
     goto fail;
 
 // Found
@@ -367,7 +367,7 @@ fsLoadFile (
 __found:
 
     // #debug
-    // printf ("file FOUND!\n");
+    // printk ("file FOUND!\n");
     // refresh_screen();
     // while(1){}
 
@@ -389,7 +389,7 @@ __found:
     if ( cluster <= 0 || cluster > 0xFFF0 )
     {
         debug_print("fsLoadFile: Cluster limits\n");
-        printf     ("fsLoadFile: Cluster limits %x\n", cluster );
+        printk     ("fsLoadFile: Cluster limits %x\n", cluster );
         goto fail;
     }
 
@@ -516,7 +516,7 @@ __loop_next_entry:
     //if ( cluster <= 0 || cluster > 0xFFF8 )
     if ( cluster <= 0 || cluster > 0xFFF0 )
     {
-        printf("nreads={%d} cluster{%x}\n",nreads,cluster);
+        printk("nreads={%d} cluster{%x}\n",nreads,cluster);
         panic("fsLoadFile: fat[] vector limits.\n");
     }
 
@@ -569,7 +569,7 @@ __loop_next_entry:
 
 fail:
     debug_print("fsLoadFile: [FAIL]\n");
-    printf     ("fsLoadFile: [FAIL] file={%s}\n", file_name );
+    printk     ("fsLoadFile: [FAIL] file={%s}\n", file_name );
     refresh_screen();
     return (unsigned long) 1;
 }
@@ -623,14 +623,14 @@ fsLoadProgramFromGRAMADO (
     unsigned long Status=1; // fail
 
     // #debug
-    //printf ("fsLoadProgramFromGRAMADO:\n");
+    //printk ("fsLoadProgramFromGRAMADO:\n");
 
     if ((void*) buffer == NULL){
-        printf("fsLoadProgramFromGRAMADO: buffer\n");
+        printk("fsLoadProgramFromGRAMADO: buffer\n");
         goto fail;
     }
     if (buffer_size_in_bytes == 0){
-        printf("fsLoadProgramFromGRAMADO: buffer_size_in_bytes\n");
+        printk("fsLoadProgramFromGRAMADO: buffer_size_in_bytes\n");
         goto fail;
     }
 
@@ -639,11 +639,11 @@ fsLoadProgramFromGRAMADO (
 //
 
     if (sdGRAMADO.initialized != TRUE){
-        printf("fsLoadProgramFromGRAMADO: sdGRAMADO.initialized\n");
+        printk("fsLoadProgramFromGRAMADO: sdGRAMADO.initialized\n");
         goto fail;
     }
     if (sdGRAMADO.address == 0){
-        printf("fsLoadProgramFromGRAMADO: sdGRAMADO.address\n");
+        printk("fsLoadProgramFromGRAMADO: sdGRAMADO.address\n");
         goto fail;
     }
 // The memory address for our target directory.
@@ -701,14 +701,14 @@ fsLoadProgramFromPROGRAMS (
     unsigned long Status=1; // fail
 
     // #debug
-    //printf ("fsLoadProgramFromPROGRAMS:\n");
+    //printk ("fsLoadProgramFromPROGRAMS:\n");
 
     if ((void*) buffer == NULL){
-        printf("fsLoadProgramFromPROGRAMS: buffer\n");
+        printk("fsLoadProgramFromPROGRAMS: buffer\n");
         goto fail;
     }
     if (buffer_size_in_bytes == 0){
-        printf("fsLoadProgramFromPROGRAMS: buffer_size_in_bytes\n");
+        printk("fsLoadProgramFromPROGRAMS: buffer_size_in_bytes\n");
         goto fail;
     }
 
@@ -717,11 +717,11 @@ fsLoadProgramFromPROGRAMS (
 //
 
     if (sdPROGRAMS.initialized != TRUE){
-        printf("fsLoadProgramFromPROGRAMS: sdPROGRAMS.initialized\n");
+        printk("fsLoadProgramFromPROGRAMS: sdPROGRAMS.initialized\n");
         goto fail;
     }
     if (sdPROGRAMS.address == 0){
-        printf("fsLoadProgramFromPROGRAMS: sdPROGRAMS.address\n");
+        printk("fsLoadProgramFromPROGRAMS: sdPROGRAMS.address\n");
         goto fail;
     }
 // The memory address for our target directory.
@@ -861,7 +861,7 @@ fs_load_path (
     }
 
 // #debug
-    //printf ("fs_load_path: path with %d levels\n",n_levels);
+    //printk ("fs_load_path: path with %d levels\n",n_levels);
 
 // Local pointer.
     p = path;
@@ -890,7 +890,7 @@ fs_load_path (
 
     for (l=0; l<n_levels; l++)
     {
-        printf ("[LEVEL %d]\n",l);
+        printk ("[LEVEL %d]\n",l);
 
         // The level needs to start with '/', even the first one.
         if ( p[0] != '/' ){
@@ -914,7 +914,7 @@ fs_load_path (
 
             name_buffer[i] = (char) *p;
 
-            printf ("%c", (char) *p);
+            printk ("%c", (char) *p);
 
             //
             // Load a FILE.
@@ -1019,8 +1019,8 @@ fs_load_path (
                 // Finalize the string.
                 name_buffer[11] = 0;
                      
-                printf("\n");
-                printf("fs_load_path: This is the name {%s}\n",name_buffer); 
+                printk("\n");
+                printk("fs_load_path: This is the name {%s}\n",name_buffer); 
 
                 //
                 // Load file
@@ -1054,13 +1054,13 @@ fs_load_path (
                 // ok.
                 if (Ret == 0)
                 {
-                    printf("Level %d loaded!\n\n",l);
+                    printk("Level %d loaded!\n\n",l);
 
                     // #importante
                     // Esse nível tinha ponto, então deveria ser o último.
                     if ( l != (n_levels-1) )
                     {
-                        printf ("fs_load_path: Directory name with '.'\n");
+                        printk ("fs_load_path: Directory name with '.'\n");
                         panic ("It needs to be the last level.\n");
                     }
 
@@ -1120,8 +1120,8 @@ fs_load_path (
                 // Finalize the string.
                 name_buffer[11] = 0;
                 
-                printf("\n");
-                printf("fs_load_path: This is the name {%s}\n",name_buffer);
+                printk("\n");
+                printk("fs_load_path: This is the name {%s}\n",name_buffer);
 
                 //
                 // Load directory.
@@ -1166,7 +1166,7 @@ fs_load_path (
                 // ok.
                 if (Ret == 0)
                 {
-                    printf("Level %d loaded!\n\n",l);
+                    printk("Level %d loaded!\n\n",l);
                     // O endereço onde carregamos o arquivo desse nível
                     // será o endereço onde vamos procurar o arquivo do próximo nível.
                     __src_buffer = __dst_buffer;
@@ -1183,7 +1183,7 @@ fs_load_path (
 
 fail:
     debug_print("fs_load_path: Fail\n");
-    printf     ("fs_load_path: Fail\n");
+    printk     ("fs_load_path: Fail\n");
     refresh_screen();
     return (-1);
 }
@@ -1240,7 +1240,7 @@ int fsLoadFileFromCurrentTargetDir(void)
     }
 
     //#debug
-    //printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
+    //printk ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
     //    current_target_dir.name, current_target_dir.current_dir_address );
 
 //++
@@ -1259,7 +1259,7 @@ int fsLoadFileFromCurrentTargetDir(void)
 //--
 
     //#debug
-    //printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) new_dir_addr=(%x) #debug \n",
+    //printk ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) new_dir_addr=(%x) #debug \n",
     //   current_target_dir.name, current_target_dir.current_dir_address );
 
     // debug_print ("fsLoadFileFromCurrentTargetDir: done\n");
@@ -1295,7 +1295,7 @@ __try_to_load_program_from_special_folder(
     new_filename = filename;
 
     // #debug
-    //printf ("__try_to_load_program_from_special_folder:\n");
+    //printk ("__try_to_load_program_from_special_folder:\n");
 
 // Invalid file name.
     if ((void*) new_filename == NULL)
@@ -1391,7 +1391,7 @@ fs_load_image(
          path[1] == '/' )
     {
         debug_print ("fs_load_image: [FIXME] Can't execute from cwd\n");
-        printf      ("fs_load_image: [FIXME] Can't execute from cwd\n");
+        printk      ("fs_load_image: [FIXME] Can't execute from cwd\n");
         goto fail;
     }
 
@@ -1441,7 +1441,7 @@ __search:
         goto __found; 
     }
     debug_print ("fs_load_image: [FAIL] File not found!\n");
-    printf      ("fs_load_image: [FAIL] File not found!\n");
+    printk      ("fs_load_image: [FAIL] File not found!\n");
     goto fail;
 
 // The file was found into the directory.
@@ -1450,10 +1450,10 @@ __found:
 // ============================
 
 // [3]
-// #debug.
+// #debug
 
     debug_print ("fs_load_image: [3] Loading the image.\n");
-         //printf ("fs_load_image: [3] Loading the image.\n");
+       //printk ("fs_load_image: [3] Loading the image.\n");
 
 // Loading from rootdir?
 // >> Load file:
@@ -1473,7 +1473,7 @@ __found:
 // Num ambiente 'mp' precisaremos de um lock aqui.
 
     //#debug
-    //printf ("do_clone_execute_process: %s\n",filename);
+    //printk ("do_clone_execute_process: %s\n",filename);
 
     //unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (unsigned long) (512 * 4096);
 

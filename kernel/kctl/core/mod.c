@@ -2,6 +2,7 @@
 // mod.c
 // see: mod.h
 // see: kernel.h
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -27,7 +28,7 @@ int mod_initialize_first_module(void)
 
     m = (struct kernel_module_d *) kmalloc( sizeof(struct kernel_module_d) );
     if ((void*) m == NULL){
-        printf ("mod_initialize_first_module: m\n");
+        printk ("mod_initialize_first_module: m\n");
         return FALSE;
     }
     memset( m, 0, sizeof(struct kernel_module_d) );
@@ -40,7 +41,7 @@ int mod_initialize_first_module(void)
     m->name[s] = 0;   // finalize
 
 //#debug
-    //printf ("String: {%s}\n",m->name);
+    //printk ("String: {%s}\n",m->name);
     //refresh_screen();
     //while(1){}
 
@@ -98,7 +99,7 @@ void test_mod0(void)
     unsigned long fn_table_base=0;
     unsigned long mod_sci=0;
 
-    printf ("test_mod0:\n");
+    printk ("test_mod0:\n");
 
     if ((void*) kernel_mod0 == NULL)
         return;
@@ -118,15 +119,15 @@ void test_mod0(void)
             (unsigned long) kernel_mod0->entry_point(
                 0xFF,
                 1000,1234,0,0);
-        printf ("RETURN: %d\n",return_value);
+        printk ("RETURN: %d\n",return_value);
 
         // --------------------
-        // Reason 1001: Testin printf function.
+        // Reason 1001: Testin printk function.
         return_value = 
             (unsigned long) kernel_mod0->entry_point(
                 0xFF,
                 1001,1234,0,0);    
-        printf ("RETURN: %d\n",return_value);
+        printk ("RETURN: %d\n",return_value);
 
         // --------------------
         // Reason 1002:
@@ -137,7 +138,7 @@ void test_mod0(void)
             (unsigned long) kernel_mod0->entry_point(
                 0xFF,
                 1002, 1234, fn_table_base, fn_table_base );    
-        printf ("RETURN: %d\n",return_value);
+        printk ("RETURN: %d\n",return_value);
 
         // --------------------
         // Reason 1003:
@@ -148,10 +149,10 @@ void test_mod0(void)
             (unsigned long) kernel_mod0->entry_point(
                 0xFF,
                 1003, 1234, mod_sci, mod_sci );    
-        printf ("RETURN: %d\n",return_value);
+        printk ("RETURN: %d\n",return_value);
     }
 
-    printf ("test_mod0: Done :)\n");
+    printk ("test_mod0: Done :)\n");
 }
 
 void xp_putchar_in_fgconsole(unsigned long _char)
@@ -189,7 +190,7 @@ void *ring0_module_sci(
     unsigned long arg3, 
     unsigned long arg4 )
 {
-    printf("ring0_module_sci:\n");
+    printk("ring0_module_sci:\n");
 
 // #todo:
 // Populate the switch with some good services for modules.
@@ -202,7 +203,7 @@ void *ring0_module_sci(
 
 void xp_die(void)
 {
-    printf("xp_die:\n");
+    printk("xp_die:\n");
     keDie();
 }
 

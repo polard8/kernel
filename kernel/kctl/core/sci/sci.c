@@ -2,11 +2,11 @@
 // sci.c - (Transfiguration)
 // (System Call Interface).
 // System Service Dispatcher.
-//
 // Handlers for the system interrupts.
 // #todo: 
 // There is another point:
 // The 'event delivery' and 'return' support.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -248,7 +248,7 @@ void *sci0 (
 
     // #debug
     //debug_print("sc0:\n");
-    //printf("sc0:\n");
+    //printk("sc0:\n");
 
     //?? #deprecated?
     g_profiler_ints_gde_services++;
@@ -727,20 +727,19 @@ void *sci0 (
     }
 
 // 111
-// See: msg.c
 // Get the next system message.
-// IN: buffer for message elements.
+// IN: User buffer for message elements.
+// See: msg.c
     if (number == SCI_SYS_GET_MESSAGE){
         return (void *) sys_get_message( (unsigned long) &message_address[0] );
     }
 
-// msg.c
+// 112
 // Post message to tid.
 // Asynchronous.
 // IN: tid, message buffer address.
+// See: msg.c
     if (number == 112){
-        //if (arg2<0)
-            //return NULL;
         return (void *) sys_post_message_to_tid( 
                             (int) arg2, 
                             (unsigned long) arg3 );
@@ -945,7 +944,7 @@ void *sci0 (
         if (is_superuser() == TRUE)
         {
             debug_print("sci0: [SCI_PWD] Yes, I'm the super user\n");
-            printf     ("sci0: [SCI_PWD] Yes, I'm the super user\n");
+            printk     ("sci0: [SCI_PWD] Yes, I'm the super user\n");
         }
         sys_pwd();
         return NULL;
@@ -1130,13 +1129,10 @@ void *sci0 (
 // =====================================
 // (250 ~ 255) - Info support.
 
-// Get system metrics.
 // 250
+// Get system metrics.
 // IN: index
-    if (number == SCI_SYS_GET_SYSTEM_METRICS)
-    {
-        //if (arg2<0)
-            //return NULL;
+    if (number == SCI_SYS_GET_SYSTEM_METRICS){
        return (void *) sys_get_system_metrics((int) arg2);
     }
 
@@ -1200,16 +1196,15 @@ void *sci0 (
     //    return (void *) pty_link_by_pid ( (int) arg2, (int) arg3 );
     //}
 
-
 // Channel is a file descriptor in the file list 
 // of the current process.
 // IN: fd, buf, count.
     if (number == 272)
     {
-           return (void *) tty_read ( 
-                               (unsigned int) arg2,    // channel 
-                               (char *)       arg3,    // buf
-                               (int)          arg4 );  // nr
+        return (void *) tty_read ( 
+                            (unsigned int) arg2,    // channel 
+                            (char *)       arg3,    // buf
+                            (int)          arg4 );  // nr
     }
 
 // Channel is a file descriptor in the file list 
@@ -1222,8 +1217,6 @@ void *sci0 (
                             (char *)       arg3,    // buf
                             (int)          arg4 );  // nr
     }
-
-
 
 // Get current virtual console.
     if (number == 277){
@@ -1266,7 +1259,7 @@ void *sci0 (
 // ou qualquer outro.
 // see: 
     if (number == 350){
-        printf("sci0: 350\n"); 
+        printk("sci0: 350\n"); 
         return (void *) sys_initialize_component((int) arg2);
     }
 
@@ -1395,7 +1388,6 @@ void *sci0 (
         }
         return NULL; //fail
     }    
-
 
 
 // 600 - dup
@@ -1595,13 +1587,12 @@ void *sci0 (
     }
 
 // is the socket full?
-// See: sys.c
 // IN: fd
 // OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
-    if ( number == 913 ){
+// See: sys.c
+    if (number == 913){
         return (void *) sys_sleep_if_socket_is_empty(arg2);
     }
-
 
 // get screen window.
 // #todo. checar validade
@@ -1618,7 +1609,7 @@ void *sci0 (
 // A interrupção não conseguirá retornar para a mesma thread.
 // Chamará o scheduler por conta própria.
 // IN: reason, reason
-    if ( number == 970 )
+    if (number == 970)
     {
         // #suspended
         /*
@@ -1721,21 +1712,20 @@ void *sci0 (
 
 // 7008 - show socket info for a process.
 // IN: pid
-    if ( number == 7008 ){
+    if (number == 7008){
         show_socket_for_a_process((int) arg2);
         return NULL;
     }
 
 // 7009 - libc: shutdown() IN: fd, how
-    if ( number == 7009 ){
+    if (number == 7009){
         sys_socket_shutdown( (int) arg2, (int) arg3 );
         return NULL;
     }
 
-
 // 8000 - ioctl() implementation.
-// See: fs.c
 // IN: fd, request, arg
+// See: fs.c
     if (number == SCI_SYS_IOCTL){
         return (void *) sys_ioctl ( 
                             (int) arg2, 
@@ -2073,7 +2063,7 @@ void *sci2 (
     {
         debug_print("sci2: [SCI_COPY_PROCESS] clone and execute\n");
         // #debug
-        //printf("sci2: copy_process called by pid{%d}\n",current_process);
+        //printk("sci2: copy_process called by pid{%d}\n",current_process);
         return (void *) copy_process( 
                             (const char *) arg2, 
                             (pid_t) current_process, 
@@ -2145,7 +2135,7 @@ void *sci2 (
     if (number == SCI_SYS_IOCTL)
     {
         debug_print("sci2: [8000] ioctl\n");
-        //printf("sci2: [8000] ioctl\n");
+        //printk("sci2: [8000] ioctl\n");
         return (void *) sys_ioctl ( 
                             (int) arg2, 
                             (unsigned long) arg3, 
@@ -2369,17 +2359,10 @@ void *sci2 (
     if (number == 22003)
     {
         switch (arg2){
-            case 1:
-                network_send_arp_request();
-                break;
-            case 2:
-                network_test_udp();
-                break;
-            case 3:
-                network_initialize_dhcp();
-                break;
-            case 4:
-                break;
+        case 1:  network_send_arp_request();  break;
+        case 2:  network_test_udp();          break;
+        case 3:  network_initialize_dhcp();   break;
+        // case 4: break;
         };
         return NULL;
     }
@@ -2448,7 +2431,7 @@ void *sci2 (
  
         //arg4: desired ms
         if (arg4<1 || arg4>1000){
-            printf("sci2: [44000] Invalid ms\n");
+            printk("sci2: [44000] Invalid ms\n");
             panic ("sci2: [44000] Invalid ms\n");
         }
          //setup_callback( (unsigned long) r3_handler, 16 );

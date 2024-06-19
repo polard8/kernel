@@ -79,7 +79,7 @@ search_in_dir (
     stringSize = (size_t) strlen(file_name);
 
     //#debug
-    //printf ("Name size = {%d}\n",stringSize);
+    //printk ("Name size = {%d}\n",stringSize);
 
 // check
 // #bugbug
@@ -87,9 +87,9 @@ search_in_dir (
 // the whole commant line to this routine.
 // We need only the filename.
     if (stringSize > 11){
-        printf ("search_in_dir: [ERROR] Wrong name size. {%d} \n", 
+        printk ("search_in_dir: [ERROR] Wrong name size. {%d} \n", 
             stringSize);
-        printf("filename: %s\n",file_name);
+        printk ("filename: %s\n",file_name);
         goto fail;
     }
 
@@ -101,7 +101,7 @@ search_in_dir (
         //    strcat(Name_Desired," ");
         //    stringSize++;
         //}
-        //printf ("Name_Desired={%s}\n",Name_Desired);
+        //printk ("Name_Desired={%s}\n",Name_Desired);
             
             //#debug
         //refresh_screen();
@@ -136,7 +136,7 @@ search_in_dir (
 /*
 // hack hack
     if (stringSize != 11){
-        printf ("search_in_dir: [ERROR] Wrong name size. {%d} \n", 
+        printk ("search_in_dir: [ERROR] Wrong name size. {%d} \n", 
         stringSize);
         goto fail;
     }
@@ -145,18 +145,18 @@ search_in_dir (
 // File name.
 
     if ((void*) file_name == NULL){
-        printf ("search_in_dir: [ERROR] file_name\n");
+        printk ("search_in_dir: [ERROR] file_name\n");
         goto fail;
     }
     if (*file_name == 0){
-        printf ("search_in_dir: [ERROR] *file_name\n");
+        printk ("search_in_dir: [ERROR] *file_name\n");
         goto fail;
     }
 // #bugbug
 // #todo
 // Can't search for a filename that starts with a '/'.
     if (*file_name == '/'){
-        printf ("search_in_dir: Invalid char in file name\n");
+        printk ("search_in_dir: Invalid char in file name\n");
         goto fail;
     }
 
@@ -164,7 +164,7 @@ search_in_dir (
 // Endereço de memória onde o diretório está.
     
     if (dir_address == 0){
-        printf ("search_in_dir: Invalid dir address\n");
+        printk ("search_in_dir: Invalid dir address\n");
         goto fail;
     }
 
@@ -207,7 +207,7 @@ search_in_dir (
             {
                 // #debug
                 debug_print("search_in_dir: Found\n");
-                // printf ("search_in_dir: Found\n");
+                // printk ("search_in_dir: Found\n");
 
                 // *index_return = j;
                 
@@ -222,7 +222,7 @@ search_in_dir (
 
 fail:
     debug_print("search_in_dir: Not found\n");
-    printf     ("search_in_dir: Not found %s\n",Name_Desired);
+    printk     ("search_in_dir: Not found %s\n",Name_Desired);
     // return FALSE;
     return (int) -1;
 }

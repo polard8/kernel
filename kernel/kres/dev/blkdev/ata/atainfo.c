@@ -8,7 +8,7 @@
 
 void ata_show_ata_controller_info(void)
 {
-    printf("\n");
+    printk("\n");
 
     if (g_ata_driver_initialized != TRUE)
         return;
@@ -17,17 +17,17 @@ void ata_show_ata_controller_info(void)
     switch (AtaController.controller_type)
     {
         case ATA_IDE_CONTROLLER:
-            printf("IDE controller\n");
+            printk("IDE controller\n");
             break;
         case ATA_RAID_CONTROLLER:
-            printf("RAID controller\n");
+            printk("RAID controller\n");
             break;
         case ATA_AHCI_CONTROLLER:
-            printf("AHCI controller\n");
+            printk("AHCI controller\n");
             break;
         case ATA_UNKNOWN_CONTROLLER:
         default:
-            printf("Unknown controller type\n");
+            printk("Unknown controller type\n");
             break;
     };
 }
@@ -39,26 +39,26 @@ void ata_show_ide_info(void)
 {
     int i=0;
 
-    printf("\n");
-    printf("\n");
-    printf ("ata_show_ide_info: ide ports\n");
+    //printk("\n");
+    printk("\n");
+    printk ("ata_show_ide_info: ide ports\n");
 
     for ( i=0; i<4; i++ )
     {
-        printf("\n");
-        printf ("id=%d \n", ide_ports[i].id );
-        printf ("channel=%d dev_num=%d \n", 
+        printk("\n");
+        printk ("id=%d \n", ide_ports[i].id );
+        printk ("channel=%d dev_num=%d \n", 
             ide_ports[i].channel, 
             ide_ports[i].dev_num );
         //printk ("used=%d magic=%d \n", 
         //    ide_ports[i].used, 
         //    ide_ports[i].magic );
-        printf ("type=%d      \n", ide_ports[i].type );
-        printf ("base_port=%x \n", ide_ports[i].base_port );
-        printf ("name=%s      \n", ide_ports[i].name );
+        printk ("type=%d      \n", ide_ports[i].type );
+        printk ("base_port=%x \n", ide_ports[i].base_port );
+        printk ("name=%s      \n", ide_ports[i].name );
 
 // #todo: This is what we need.
-        printf ("Size in sectors = %d \n", 
+        printk ("Size in sectors = %d \n", 
             ide_ports[i].size_in_sectors );
     };
 
@@ -67,7 +67,7 @@ void ata_show_ide_info(void)
 //
 
 // primary secondary  ... master slave
-    // printf ( " channel=%d dev=%d \n", ata_controller.channel, ata_controller.dev_num );
+    // printk ( " channel=%d dev=%d \n", ata_controller.channel, ata_controller.dev_num );
 
 /*
 	// Estrutura 'ata'
@@ -76,17 +76,17 @@ void ata_show_ide_info(void)
 
 	//if( ata != NULL )
 	//{
-		printf("ata:\n");
- 	    printf("type={%d}\n", (int) ata_controller.chip_control_type);
-	    printf("channel={%d}\n", (int) ata_controller.channel);
-	    printf("devType={%d}\n", (int) ata_controller.dev_type);
-	    printf("devNum={%d}\n", (int) ata_controller.dev_num);
-	    printf("accessType={%d}\n", (int) ata_controller.access_type);
-	    printf("cmdReadMode={%d}\n", (int) ata_controller.cmd_read_modo);
-	    printf("cmdBlockBaseAddress={%d}\n", (int) ata_controller.cmd_block_base_address);
-	    printf("controlBlockBaseAddress={%d}\n", (int) ata_controller.ctrl_block_base_address);
-		printf("busMasterBaseAddress={%d}\n", (int) ata_controller.bus_master_base_address);
-		printf("ahciBaseAddress={%d}\n", (int) ata_controller.ahci_base_address);
+		printk("ata:\n");
+ 	    printk("type={%d}\n", (int) ata_controller.chip_control_type);
+	    printk("channel={%d}\n", (int) ata_controller.channel);
+	    printk("devType={%d}\n", (int) ata_controller.dev_type);
+	    printk("devNum={%d}\n", (int) ata_controller.dev_num);
+	    printk("accessType={%d}\n", (int) ata_controller.access_type);
+	    printk("cmdReadMode={%d}\n", (int) ata_controller.cmd_read_modo);
+	    printk("cmdBlockBaseAddress={%d}\n", (int) ata_controller.cmd_block_base_address);
+	    printk("controlBlockBaseAddress={%d}\n", (int) ata_controller.ctrl_block_base_address);
+		printk("busMasterBaseAddress={%d}\n", (int) ata_controller.bus_master_base_address);
+		printk("ahciBaseAddress={%d}\n", (int) ata_controller.ahci_base_address);
 	//};
 */
 }
@@ -99,39 +99,39 @@ void ata_show_device_list_info(void)
     unsigned long mb28=0;
     unsigned long mb48=0;
 
-    printf("\n");
-    //printf("ata_show_device_list_info:\n");
-    printf("Printing information about all the\n");
-    printf("ata devices in the list\n");
+    printk("\n");
+    //printk("ata_show_device_list_info:\n");
+    printk("Printing information about all the\n");
+    printk("ata devices in the list\n");
 
 // The head of the list
     sd = (struct ata_device_d *) ready_queue_dev;
     
     while ( (void *) sd != NULL ){
 
-    printf("\n");
+    printk("\n");
     if(sd->boottime_device == TRUE){
-        printf("\n");
-        printf("The boot device is the port %d\n",sd->dev_nport);
+        printk("\n");
+        printk("The boot device is the port %d\n",sd->dev_nport);
     }
 
-    printf("\n");
+    printk("\n");
 
     // --------------------
     // The size in bytes.
-    printf("Size in bytes: PORT %d: lba28{%d} lba48{%d}\n",
+    printk("Size in bytes: PORT %d: lba28{%d} lba48{%d}\n",
         sd->dev_nport, 
         sd->dev_total_num_sector,
         sd->dev_total_num_sector_lba48 );
 
     //#debug
-    //printf("PORT %d: LBA28 v1{%d} v2{%d} \n",
+    //printk("PORT %d: LBA28 v1{%d} v2{%d} \n",
         //sd->dev_nport, 
         //sd->lba28_value1,
         //sd->lba28_value2 );
 
     //#debug
-    //printf("PORT %d: LBA48 v1{%d} v2{%d} v3{%d} v4{%d}\n",
+    //printk("PORT %d: LBA48 v1{%d} v2{%d} v3{%d} v4{%d}\n",
         //sd->dev_nport, 
         //sd->lba48_value1,
         //sd->lba48_value2,
@@ -143,7 +143,7 @@ void ata_show_device_list_info(void)
 
     // --------------------
     // The size in mega bytes.
-    printf("Size in MB: LBA28 {%d MB} LBA48{%d MB}\n",
+    printk("Size in MB: LBA28 {%d MB} LBA48{%d MB}\n",
         mb28, mb48 );
 
     sd = (struct ata_device_d *) sd->next;
@@ -161,12 +161,12 @@ void ata_show_ata_info_for_boot_disk(void)
     disk = (struct disk_d *) ____boot____disk;
     if ( (void*) disk == NULL )
     {
-        printf("disk\n");
+        printk("disk\n");
         return;
     }
     if (disk->magic != 1234)
     {
-        printf("disk validation\n");
+        printk("disk validation\n");
         return;
     }
 
@@ -175,18 +175,18 @@ void ata_show_ata_info_for_boot_disk(void)
     ata_device = (struct ata_device_d *) disk->ata_device;
     if ( (void*) ata_device == NULL )
     {
-        printf("ata_device\n");
+        printk("ata_device\n");
         return;
     }
     if (ata_device->magic != 1234)
     {
-        printf("ata_device validation\n");
+        printk("ata_device validation\n");
         return;
     }
 
 // --------------------------------
     // Show the number of blocks.
-    printf("Number of blocks: %d\n",
+    printk("Number of blocks: %d\n",
         ata_device->dev_total_num_sector );
 
 // done

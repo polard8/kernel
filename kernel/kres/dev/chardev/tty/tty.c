@@ -1,5 +1,6 @@
 
 // tty.c
+// Created by Fred Nora.
 
 #include <kernel.h>  
 
@@ -10,7 +11,6 @@
 // tty_write_byte()
 
 static int new_tty_index=0;
-
 
 /*
 // #todo
@@ -75,15 +75,15 @@ __tty_read (
     b = buffer;
 
     // #debug
-    printf("__tty_read:\n");
+    printk("__tty_read:\n");
 
 // tty structure.
     if ((void *) tty == NULL){
-        printf ("__tty_read: tty\n");
+        printk ("__tty_read: tty\n");
         goto fail;
     }
     if ( tty->used != TRUE || tty->magic != 1234 ){
-        printf ("__tty_read: tty validation\n");
+        printk ("__tty_read: tty validation\n");
         goto fail;
     }
 // buffer
@@ -92,7 +92,7 @@ __tty_read (
     }
 // nr
     if (nr <= 0){
-        printf ("__tty_read: nr\n");
+        printk ("__tty_read: nr\n");
         goto fail;
     }
     //if ( tty->stopped == TRUE )
@@ -127,7 +127,7 @@ __tty_read (
         // Isso acontece também quando a fila esta vazia.
         if ( tty->raw_queue.head == tty->raw_queue.tail )
         {
-            printf("__tty_read: tty->raw_queue.head == tty->raw_queue.tail\n");
+            printk("__tty_read: tty->raw_queue.head == tty->raw_queue.tail\n");
             //return 0;
             return (int) i;  // Quantos bytes conseguimos ler.
         }
@@ -135,7 +135,7 @@ __tty_read (
         // Acabou a fila.
         if ( tty->raw_queue.tail > TTY_BUF_SIZE )
         {
-            printf("__tty_read: tty->raw_queue.tail > TTY_BUF_SIZE\n");
+            printk("__tty_read: tty->raw_queue.tail > TTY_BUF_SIZE\n");
             //return 0;
             return (int) i;  // Quantos bytes conseguimos ler.
         }
@@ -154,7 +154,7 @@ __tty_read (
 
 // Quantidade de bytes no buffer local.
     if (i <= 0){
-        printf("__tty_read: i <= 0\n");
+        printk("__tty_read: i <= 0\n");
         return 0;  // 0 byes lidos.
     }
 
@@ -171,8 +171,8 @@ __tty_read (
         i );                 // n bytes lidos
 
     // #debug
-    printf("__tty_read: [DONE] %d bytes read\n",i);
-    printf("TAIL %d\n",tty->raw_queue.tail);
+    printk("__tty_read: [DONE] %d bytes read\n",i);
+    printk("TAIL %d\n",tty->raw_queue.tail);
 
 // Retornamos a quantidade de bytes 
 //  que conseguimos ler da buffer raw da tty.
@@ -210,7 +210,7 @@ __tty_write (
     b = buffer;
 
     // #debug
-    printf("__tty_write:\n");
+    printk("__tty_write:\n");
 
 // tty
     if ((void *) tty == NULL){
@@ -218,7 +218,7 @@ __tty_write (
         goto fail;
     }
     if ( tty->used != TRUE || tty->magic != 1234 ){
-        printf("__tty_write: tty validation\n");
+        printk("__tty_write: tty validation\n");
         goto fail;
     }
 // buffer (From)
@@ -227,7 +227,7 @@ __tty_write (
     }
 // nr
     if (nr <= 0){
-        printf("__tty_write: nr\n");
+        printk("__tty_write: nr\n");
         goto fail;
     }
 
@@ -320,16 +320,15 @@ __tty_write (
             // Copy from master to slave.
             nbytes_copied = (int) tty_copy_raw_buffer(tty,tty_slave);
             // #debug
-            printf("%d bytes copied to slave\n",nbytes_copied);
+            printk("%d bytes copied to slave\n",nbytes_copied);
         }
     }
  
-
 done:
     
     //#debug
-    printf("__tty_write: [DONE] %d bytes written\n",i);
-    printf("HEAD %d\n",tty->raw_queue.head);
+    printk("__tty_write: [DONE] %d bytes written\n",i);
+    printk("HEAD %d\n",tty->raw_queue.head);
 
 // Quantidade de bytes que gravamos na tty.
     if (i <= 0){
@@ -1086,7 +1085,7 @@ tty_ioctl (
 
 //#debug
     //if (request == TIOCCONS)
-        //printf("request == TIOCCONS\n");
+        //printk("request == TIOCCONS\n");
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
@@ -1150,7 +1149,7 @@ tty_ioctl (
         other_tty = NULL;
     }
     if (other_tty->magic == 1234){
-        //printf("is_linked\n");
+        //printk("is_linked\n");
         is_linked = TRUE;
     }
     // Not a pty. Cant connect.
@@ -1238,7 +1237,7 @@ tty_ioctl (
 //    entao o output vai para o console virtual em foreground.
 
     case TIOCCONS:
-        printf("tty_ioctl: TIOCCONS (Redirecting output)\n");
+        printk("tty_ioctl: TIOCCONS (Redirecting output)\n");
         refresh_screen();
         // Se a tty eh um console.
         if (tty->type == TTY_TYPE_CONSOLE) 
@@ -1246,7 +1245,7 @@ tty_ioctl (
             if ( is_superuser() != TRUE )
             {
                 // #debug
-                printf("Not a superuser\n");
+                printk("Not a superuser\n");
                 return (int) -EPERM;
             }
             redirect = NULL;
@@ -1263,7 +1262,7 @@ tty_ioctl (
             }
             if (is_linked != TRUE){
                 redirect = NULL;
-                printf("Not linked\n");
+                printk("Not linked\n");
                 return -1;
             }
         } else if (tty->subtype == TTY_SUBTYPE_PTY_SLAVE){

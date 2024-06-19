@@ -2,15 +2,12 @@
 // queue.c
 // This routines are suspended.
 
-
 // #bugbug
 // Esse módulo não está bom. 
 // precisa ser repensado e refeito.
 // Possivelmente temos problemas de overflow.
 
-
 #include <kernel.h>  
-
 
 // init_queue:
 //     Inicializa uma estrutura de fila.
@@ -710,14 +707,12 @@ void ScanReadyQueue(struct queue_d *q)
 
     struct thread_d *t;
 
-
-
-	if((void*)q == NULL){
-	    printf("ScanReadyQueue:\n");
+	if ((void*)q == NULL){
+	    printk("ScanReadyQueue:\n");
 	    return;
 	}
 		
-	//printf("head={%d} tail={%d}\n", q->readyHead, q->readyTail);
+	//printk("head={%d} tail={%d}\n", q->readyHead, q->readyTail);
 
     while ( i < q->readyMax)
     {
@@ -847,11 +842,9 @@ done:
     return;
 }
 
-
 // show_queue_information:
 //      Mostra informações sobre a queue.
 //      #todo: put this in a info file.
-
 void show_queue_information(struct queue_d *q)
 {
     panic("show_queue_information: deprecated");
@@ -860,18 +853,18 @@ void show_queue_information(struct queue_d *q)
 
     if ((void*) q == NULL)
     {
-        printf("show_queue_information error: Struct\n");
+        printk("show_queue_information error: Struct\n");
         return;
     }
 
-    printf("Ready queue Information:\n");	
-    printf("Head={%d} Tail={%d}\n", q->readyHead, q->readyTail);
+    printk("Ready queue Information:\n");	
+    printk("Head={%d} Tail={%d}\n", q->readyHead, q->readyTail);
 
     while (i < q->readyMax)
     {
         q = (void *) q->readyList[i];
         if ( (void *) q != NULL ){
-            printf("Index={%d} Struct={%x}\n", i, (void*) q );
+            printk("Index={%d} Struct={%x}\n", i, (void*) q );
         } 
         
         ++i;

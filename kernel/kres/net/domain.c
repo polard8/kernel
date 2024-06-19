@@ -39,11 +39,11 @@ struct domain_d *domain_create_domain(const char *name)
 
 // Name
     if ((void*) name == NULL){
-        printf("domain_create_domain: Invalid name\n");
+        printk("domain_create_domain: Invalid name\n");
         goto fail;
     }
     if (*name == 0){
-        printf("domain_create_domain: *name\n");
+        printk("domain_create_domain: *name\n");
         goto fail;
     }
     d->domain_name = (char *) name;

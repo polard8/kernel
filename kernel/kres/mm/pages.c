@@ -3,12 +3,9 @@
 
 #include <kernel.h>
 
-
 // global
 // The virtual address of the kernel pml4 table.
 unsigned long gKernelPML4Address=0;
-
-
 
 // ==================================================
 // This is not global variable.
@@ -203,16 +200,14 @@ void *CreateAndIntallPageTable (
     unsigned long *PageDirectoryPointerTable = (unsigned long *) pdpt_va;
     unsigned long *PML4                      = (unsigned long *) pml4_va;
 
-
-
 //
 // #debug
 //
-    //printf("\n");
-    //printf (" pt va   : %x\n",PageTable);
-    //printf (" pd va   : %x\n",PageDirectory);
-    //printf (" pdpt va : %x\n",PageDirectoryPointerTable);
-    //printf (" pml4 va : %x\n",PML4);
+    //printk("\n");
+    //printk (" pt va   : %x\n",PageTable);
+    //printk (" pd va   : %x\n",PageDirectory);
+    //printk (" pdpt va : %x\n",PageDirectoryPointerTable);
+    //printk (" pml4 va : %x\n",PML4);
     //refresh_screen();
     //while(1){}
 
@@ -236,14 +231,12 @@ void *CreateAndIntallPageTable (
 //
 // #debug
 //
-    //printf("\n");
-    //printf (" pt pa   : %x\n",__ptPA);
-    //printf (" pd pa   : %x\n",__pdPA);
-    //printf (" pdpt pa : %x\n",__pdptPA);
+    //printk("\n");
+    //printk (" pt pa   : %x\n",__ptPA);
+    //printk (" pd pa   : %x\n",__pdPA);
+    //printk (" pdpt pa : %x\n",__pdptPA);
     //refresh_screen();
     //while(1){}
-
- 
  
     if ( __ptPA == 0 ){
         panic ("CreateAndIntallPageTable: __ptPA\n");
@@ -687,8 +680,8 @@ __virtual_to_physical (
     //debug_print ("__virtual_to_physical: [TESTING] \n");
 
     //#debug
-    //printf("virtual_address = %x \n",virtual_address);
-    //printf("pml4_va = %x \n",pml4_va);
+    //printk("virtual_address = %x \n",virtual_address);
+    //printk("pml4_va = %x \n",pml4_va);
     //refresh_screen();
     //while(1){}
 
@@ -707,7 +700,7 @@ __virtual_to_physical (
     unsigned long tmp=0;
     unsigned long address=0;
 
-    //printf ("a=%d b=%d d=%d t=%d o=%d \n",a,b,d,t,o);
+    //printk ("a=%d b=%d d=%d t=%d o=%d \n",a,b,d,t,o);
     //refresh_screen();
     //while(1){}
 
@@ -721,13 +714,12 @@ __virtual_to_physical (
     if ( a >= 512 || b >= 512 || d >= 512 || t >= 512 || 
          o >= 4096  )
     {
-        printf("__virtual_to_physical: entry limits\n");
-        printf("a=%d\n",a);
-        printf("b=%d\n",b);
-        printf("d=%d\n",d); //directory
-        printf("t=%d\n",t); //page table
-        printf("o=%d\n",o); //offset 4096 bytes limit
-        
+        printk("__virtual_to_physical: entry limits\n");
+        printk("a=%d\n",a);
+        printk("b=%d\n",b);
+        printk("d=%d\n",d); //directory
+        printk("t=%d\n",t); //page table
+        printk("o=%d\n",o); //offset 4096 bytes limit
         refresh_screen();
         while (1){
         };
@@ -739,7 +731,7 @@ __virtual_to_physical (
 
     // #hackhack
     if (a != 0){
-        printf ("__virtual_to_physical: [TODO] a != 0 \n");
+        printk ("__virtual_to_physical: [TODO] a != 0 \n");
         refresh_screen();
         while (1){
         };
@@ -748,7 +740,7 @@ __virtual_to_physical (
 
     // #hackhack
     if (b != 0){
-        printf ("__virtual_to_physical: [TODO] b != 0 \n");
+        printk ("__virtual_to_physical: [TODO] b != 0 \n");
         refresh_screen();
         while (1){
         };
@@ -765,7 +757,7 @@ __virtual_to_physical (
     //debug_print ("virtual_to_physical2: [pml4]\n");
     unsigned long *pml4VA = (unsigned long *) pml4_va;
 
-    //printf (">> pml4VA[a] %x\n", pml4VA[a]);
+    //printk (">> pml4VA[a] %x\n", pml4VA[a]);
     //refresh_screen();
 
     // Temos o pdpt junto com suas flags.
@@ -776,7 +768,7 @@ __virtual_to_physical (
     //debug_print ("virtual_to_physical2: [ptpt]\n");
     unsigned long *ptpt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
-    //printf (">> ptpt[d] %x\n", ptpt[b]);
+    //printk (">> ptpt[d] %x\n", ptpt[b]);
     //refresh_screen();
 
     // Temos o pd junto com suas flags.
@@ -787,7 +779,7 @@ __virtual_to_physical (
     //debug_print ("virtual_to_physical2: [dir]\n");
     unsigned long *dir = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
-    //printf ("dir[d] %x\n", dir[d]);
+    //printk ("dir[d] %x\n", dir[d]);
     //refresh_screen();
     
     // Temos o endereço da pt junto com as flags.
@@ -847,11 +839,11 @@ void pages_calc_mem(void)
     unsigned long *pg_dir;
     unsigned long *pg_tbl;
 
-    printf ("\n\n");
+    printk ("\n\n");
 
     //for(i=0 ; i<PAGING_PAGES ; i++)
     //    if (!mem_map[i]) free++;
-    //printf("%d pages free (of %d)\n\r",free,PAGING_PAGES);
+    //printk("%d pages free (of %d)\n\r",free,PAGING_PAGES);
 
 
     for (a=0; a<512; a++)
@@ -875,7 +867,7 @@ void pages_calc_mem(void)
                             {
                                 if (pg_tbl[j] & 1){ k++; }
                             };
-                            printf ("%d|%d:  dir[%d]  uses  %d  pages\n",a,b,i,k);
+                            printk ("%d|%d:  dir[%d]  uses  %d  pages\n",a,b,i,k);
                         }
                     };
                 }
@@ -2146,7 +2138,7 @@ int mmInitializePaging(void)
     //debug_print("mmInitializePaging: [DANGER] Load cr3\n");
 
 // pae
-    //printf ("SetUpPaging: __enable_pae\n");
+    //printk ("SetUpPaging: __enable_pae\n");
 
     //isso ja foi feito no bl.
     //__enable_pae();
@@ -2154,7 +2146,7 @@ int mmInitializePaging(void)
     //while(1){}
 
 // Load it in cr3.
-    //printf ("SetUpPaging: load_pml4_table\n");
+    //printk ("SetUpPaging: load_pml4_table\n");
 
 // #importante
 // O kernel já está em long mode,
@@ -2229,7 +2221,7 @@ int mmInitializePaging(void)
 
 
     // ==============================================
-    //printf ("SetUpPaging: cpuSetMSR\n");
+    //printk ("SetUpPaging: cpuSetMSR\n");
     
     // #todo
     // long mode exige uma configuração usando msr.
@@ -2261,61 +2253,57 @@ void pages_print_info(int system_type)
     switch (system_type){
 
     case stSmallSystem:
-            printf("Origin PA:            %xH \n", SMALL_origin_pa );
-            printf("Base kernel start PA: %xH \n", SMALL_kernel_base_pa );
-            printf("User area start PA:   %xH \n", SMALL_user_pa );
-            printf("cga memory PA:        %xH \n", SMALL_cga_pa );
-            printf("frontbuffer PA:       %xH \n", SMALL_frontbuffer_pa );
-            printf("backbuffer PA:        %xH \n", SMALL_backbuffer_pa );
-            printf("paged memory pool PA: %xH \n", SMALL_pagedpool_pa );
-            printf("heap pool PA:         %xH \n", SMALL_heappool_pa );
-            printf("extraheap1 PA:        %xH \n", SMALL_extraheap1_pa );
-            printf("extraheap2 PA:        %xH \n", SMALL_extraheap2_pa );
-            printf("extraheap3 PA:        %xH \n", SMALL_extraheap3_pa );
+            printk("Origin PA:            %xH \n", SMALL_origin_pa );
+            printk("Base kernel start PA: %xH \n", SMALL_kernel_base_pa );
+            printk("User area start PA:   %xH \n", SMALL_user_pa );
+            printk("cga memory PA:        %xH \n", SMALL_cga_pa );
+            printk("frontbuffer PA:       %xH \n", SMALL_frontbuffer_pa );
+            printk("backbuffer PA:        %xH \n", SMALL_backbuffer_pa );
+            printk("paged memory pool PA: %xH \n", SMALL_pagedpool_pa );
+            printk("heap pool PA:         %xH \n", SMALL_heappool_pa );
+            printk("extraheap1 PA:        %xH \n", SMALL_extraheap1_pa );
+            printk("extraheap2 PA:        %xH \n", SMALL_extraheap2_pa );
+            printk("extraheap3 PA:        %xH \n", SMALL_extraheap3_pa );
         break;
     case stMediumSystem:
-            printf("Origin PA:            %xH \n", MEDIUM_origin_pa );
-            printf("Base kernel start PA: %xH \n", MEDIUM_kernel_base_pa );
-            printf("User area start PA:   %xH \n", MEDIUM_user_pa );
-            printf("cga memory PA:        %xH \n", MEDIUM_cga_pa );
-            printf("frontbuffer PA:       %xH \n", MEDIUM_frontbuffer_pa );
-            printf("backbuffer PA:        %xH \n", MEDIUM_backbuffer_pa );
-            printf("paged memory pool PA: %xH \n", MEDIUM_pagedpool_pa );
-            printf("heap pool PA:         %xH \n", MEDIUM_heappool_pa );
-            printf("extraheap1 PA:        %xH \n", MEDIUM_extraheap1_pa );
-            printf("extraheap2 PA:        %xH \n", MEDIUM_extraheap2_pa );
-            printf("extraheap3 PA:        %xH \n", MEDIUM_extraheap3_pa );
+            printk("Origin PA:            %xH \n", MEDIUM_origin_pa );
+            printk("Base kernel start PA: %xH \n", MEDIUM_kernel_base_pa );
+            printk("User area start PA:   %xH \n", MEDIUM_user_pa );
+            printk("cga memory PA:        %xH \n", MEDIUM_cga_pa );
+            printk("frontbuffer PA:       %xH \n", MEDIUM_frontbuffer_pa );
+            printk("backbuffer PA:        %xH \n", MEDIUM_backbuffer_pa );
+            printk("paged memory pool PA: %xH \n", MEDIUM_pagedpool_pa );
+            printk("heap pool PA:         %xH \n", MEDIUM_heappool_pa );
+            printk("extraheap1 PA:        %xH \n", MEDIUM_extraheap1_pa );
+            printk("extraheap2 PA:        %xH \n", MEDIUM_extraheap2_pa );
+            printk("extraheap3 PA:        %xH \n", MEDIUM_extraheap3_pa );
         break;
     case stLargeSystem:
-            printf("Origin PA:            %xH \n", LARGE_origin_pa );
-            printf("Base kernel start PA: %xH \n", LARGE_kernel_base_pa );
-            printf("User area start PA:   %xH \n", LARGE_user_pa );
-            printf("cga memory PA:        %xH \n", LARGE_cga_pa );
-            printf("frontbuffer PA:       %xH \n", LARGE_frontbuffer_pa );
-            printf("backbuffer PA:        %xH \n", LARGE_backbuffer_pa );
-            printf("paged memory pool PA: %xH \n", LARGE_pagedpool_pa );
-            printf("heap pool PA:         %xH \n", LARGE_heappool_pa );
-            printf("extraheap1 PA:        %xH \n", LARGE_extraheap1_pa );
-            printf("extraheap2 PA:        %xH \n", LARGE_extraheap2_pa );
-            printf("extraheap3 PA:        %xH \n", LARGE_extraheap3_pa );
+            printk("Origin PA:            %xH \n", LARGE_origin_pa );
+            printk("Base kernel start PA: %xH \n", LARGE_kernel_base_pa );
+            printk("User area start PA:   %xH \n", LARGE_user_pa );
+            printk("cga memory PA:        %xH \n", LARGE_cga_pa );
+            printk("frontbuffer PA:       %xH \n", LARGE_frontbuffer_pa );
+            printk("backbuffer PA:        %xH \n", LARGE_backbuffer_pa );
+            printk("paged memory pool PA: %xH \n", LARGE_pagedpool_pa );
+            printk("heap pool PA:         %xH \n", LARGE_heappool_pa );
+            printk("extraheap1 PA:        %xH \n", LARGE_extraheap1_pa );
+            printk("extraheap2 PA:        %xH \n", LARGE_extraheap2_pa );
+            printk("extraheap3 PA:        %xH \n", LARGE_extraheap3_pa );
         break;
     default:
         break;
     };
 }
 
-
 void pages_print_video_info(void)
 {
 // Video info
-    printf("\n\n");
-    printf ("Frontbuffer PA: {%x} | Frontbuffer VA: {%x}\n", 
-        SMALL_frontbuffer_pa, 
-        g_frontbuffer_va );
-
-    printf ("Backbuffer PA: {%x} | Backbuffer VA: {%x}\n", 
-        SMALL_backbuffer_pa, 
-        g_backbuffer_va );
+    printk("\n\n");
+    printk ("Frontbuffer PA: {%x} | Frontbuffer VA: {%x}\n", 
+        SMALL_frontbuffer_pa, g_frontbuffer_va );
+    printk ("Backbuffer PA: {%x} | Backbuffer VA: {%x}\n", 
+        SMALL_backbuffer_pa, g_backbuffer_va );
 }
 
 //

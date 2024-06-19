@@ -282,7 +282,7 @@ tss_init (
     tss->rsp0 = (unsigned long) stack_address;  // va?? 
 
     //#debug
-    //printf ("Stack %x\n", stack_address);
+    //printk ("Stack %x\n", stack_address);
     //refresh_screen();
     //while(1){}
 }
@@ -578,7 +578,7 @@ static void __get_cpu_intel_parameters(void)
     buffer[3] = edx;  //reserved
     buffer[4] = 0; 
     processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
-    //printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
+    //printk("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
 
 //========================================
 // EAX=80000001h: Extended Processor Info and Feature Bits
@@ -598,8 +598,8 @@ static void __get_cpu_intel_parameters(void)
     processor->BrandName[1] = ebx;
     processor->BrandName[2] = ecx;
     processor->BrandName[3] = edx;
-    //printf("CPU={%s", &buffer[0]);
-    //printf("%s",&buffer[0]);
+    //printk("CPU={%s", &buffer[0]);
+    //printk("%s",&buffer[0]);
 
 /*name part 2*/
     cpuid ( 0x80000003, eax, ebx, ecx, edx);
@@ -613,7 +613,7 @@ static void __get_cpu_intel_parameters(void)
     processor->BrandName[5] = ebx;
     processor->BrandName[6] = ecx;
     processor->BrandName[7] = edx;
-    //printf("%s",&buffer[0]);
+    //printk("%s",&buffer[0]);
 
 /*name part 3*/
     cpuid ( 0x80000004, eax, ebx, ecx, edx);
@@ -627,7 +627,7 @@ static void __get_cpu_intel_parameters(void)
     processor->BrandName[9]  = ebx;
     processor->BrandName[10] = ecx;
     processor->BrandName[11] = edx;
-    //printf("%s}\n",&buffer[0]);
+    //printk("%s}\n",&buffer[0]);
 
 //========================================
 // EAX=80000005h: L1 Cache and TLB Identifiers
@@ -639,7 +639,7 @@ static void __get_cpu_intel_parameters(void)
     if (processor->MaxFeatureId < 6)
     {
         debug_print("__get_cpu_intel_parameters: Cache Extended Feature not supported\n");
-        //printf("Cache Extended Feature not supported\n");
+        //printk("Cache Extended Feature not supported\n");
         //goto done;
         return;  // Why?
     }
@@ -674,8 +674,8 @@ static void __get_cpu_intel_parameters(void)
     processor->L2Cachesize = 
         (unsigned long)((ecx >> 16) & 0xFFFF);
 
-    //printf("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);
-    //printf("L2Cachesize={%d KB} \n",(unsigned long) processor->L2Cachesize);
+    //printk("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);
+    //printk("L2Cachesize={%d KB} \n",(unsigned long) processor->L2Cachesize);
 
 //========================================
 // EAX=80000007h: Advanced Power Management Information
@@ -704,8 +704,8 @@ static void __get_cpu_intel_parameters(void)
     processor->Virtual_Address_Size = 
         (unsigned long) ((eax >> 8) & 0x00FF);
 
-    //printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
-    //printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
+    //printk("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
+    //printk("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
 
     //...
 }
@@ -737,29 +737,29 @@ int x64_init_fpu_support(void)
 // + Initialize fpu support.
 
 // Structure validation
-    if ( (void*) processor == NULL ){
-        printf("x64_init_fpu_support: processor\n");
+    if ((void*) processor == NULL){
+        printk("x64_init_fpu_support: processor\n");
         return -1;
     }
 // has SSE
     if (processor->hasSSE != TRUE){
-        printf("x64_init_fpu_support: hasSSE\n");
+        printk("x64_init_fpu_support: hasSSE\n");
         return -1;
     }
 // has SSE2
     if (processor->hasSSE2 != TRUE){
-        printf("x64_init_fpu_support: hasSSE2\n");
+        printk("x64_init_fpu_support: hasSSE2\n");
         return -1;
     }
 // has SSE3
     if (processor->hasSSE3 != TRUE){
-        printf("x64_init_fpu_support: hasSSE3\n");
+        printk("x64_init_fpu_support: hasSSE3\n");
         return -1;
     }
 // has x87fpu
 // Check the FPU bit in CPUID.
     if (processor->hasX87FPU != TRUE){
-        printf("x64_init_fpu_support: hasX87FPU\n");
+        printk("x64_init_fpu_support: hasX87FPU\n");
         return -1;
     }
 

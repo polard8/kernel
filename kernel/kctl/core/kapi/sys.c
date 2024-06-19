@@ -118,7 +118,7 @@ void *sys_create_process (
 //
 
     debug_print("sys_create_process: [TODO]\n");
-    printf     ("sys_create_process: [TODO]\n");
+    printk     ("sys_create_process: [TODO]\n");
     //return NULL;
 
     // ==============
@@ -198,12 +198,12 @@ void *sys_create_process (
                      ProcessPersonality );
 
     if ((void*) new == NULL){
-        printf("sys_create_process: new\n");
+        printk("sys_create_process: new\n");
         goto fail;
     }
     
     // #debug
-    printf("sys_create_process: done :)\n");
+    printk("sys_create_process: done :)\n");
 
 // Switch back
     x64_load_pml4_table(old_pml4);
@@ -212,7 +212,7 @@ void *sys_create_process (
     return (void*) new;
 
 fail:
-    printf("sys_create_process: fail\n");
+    printk("sys_create_process: fail\n");
 // Switch back
     x64_load_pml4_table(old_pml4);
     return NULL;

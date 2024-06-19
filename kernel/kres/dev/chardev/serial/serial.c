@@ -1,6 +1,7 @@
 
 // serial.c
 // This is the serial port driver, embedded into the kernel base.
+// Created by Fred Nora.
 // credits: 
 // https://wiki.osdev.org/Serial_Ports
 

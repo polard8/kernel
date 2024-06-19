@@ -233,14 +233,14 @@ void DeviceInterface_PS2Keyboard(void)
     // ACKNOWLEDGE
     case 0xFA:
         //#test
-        //printf ("DeviceInterface_PS2Keyboard: ack\n");
+        //printk ("DeviceInterface_PS2Keyboard: ack\n");
         goto done;
         break;
     
     // RESEND
     case 0xFE:
         //#test
-        //printf ("DeviceInterface_PS2Keyboard: resend\n");
+        //printk ("DeviceInterface_PS2Keyboard: resend\n");
         goto done;
         break;
 
@@ -481,7 +481,7 @@ void i8042_keyboard_expect_ack (void)
     if (ack_value != 0xFA)
     {
         //#debug
-        //printf ("expect_ack: not ack\n");
+        //printk ("expect_ack: not ack\n");
         return;
         //return -1;
     }

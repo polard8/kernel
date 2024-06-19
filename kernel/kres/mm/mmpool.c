@@ -41,7 +41,7 @@ static void *__pageObject(void)
             if (New == NULL)
             {
                 debug_print ("__pageObject:\n");
-                printf      ("__pageObject:\n");
+                printk      ("__pageObject:\n");
 
                 // #todo: free() ??
                 goto fail;
@@ -142,7 +142,7 @@ void *newPage(void)
     New->ref_count = 1;
 
     // #debug
-    //printf ("newPage: base=%x id=%d \n",base,New->id);
+    //printk ("newPage: base=%x id=%d \n",base,New->id);
     //while(1){}
 
 //
@@ -415,7 +415,7 @@ void *allocPages(int size)
             }
             memset ( p, 0, sizeof(struct page_d) );
 
-            //printf("#");
+            //printk("#");
             
             p->id = __slot;
             p->used  = TRUE;
@@ -480,7 +480,7 @@ void *allocPages(int size)
 fail:
     // #debug
     debug_print("allocPages: fail\n");
-    //printf   ("allocPages: fail\n");
+    //printk   ("allocPages: fail\n");
     panic      ("allocPages: fail\n");
     return NULL;
 }

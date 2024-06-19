@@ -23,7 +23,7 @@ int __gethostname(char *buffer)
 // see: host.h
     if ((void *) HostInfo == NULL)
     {
-        printf("__gethostname: HostInfo\n");
+        printk("__gethostname: HostInfo\n");
         refresh_screen();
         goto fail;
     }
@@ -62,7 +62,7 @@ int __sethostname(const char *new_hostname)
 // Estrutura HostInfo em host.h 
 // (network)
     if ((void *) HostInfo == NULL){
-        printf("__sethostname: HostInfo\n");
+        printk("__sethostname: HostInfo\n");
         goto fail;
     }
     HostInfo->hostName_len = (size_t) StringLen;

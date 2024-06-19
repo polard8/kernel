@@ -338,7 +338,7 @@ no:
 void network_test_NIC(void)
 {
     // #debug
-    //printf("testNIC:\n");
+    //printk("testNIC:\n");
 
     //network_send_arp_request();
     //network_test_udp();
@@ -348,7 +348,7 @@ void network_test_NIC(void)
     e1000_show_info();
 
     // #debug
-    //printf("testNIC: done\n");
+    //printk("testNIC: done\n");
 }
 
 void 
@@ -405,19 +405,19 @@ network_on_receiving (
     if (NetworkInitialization.initialized != TRUE)
     {
         //#debug
-        //printf("Packet: Network is OFF\n");
+        //printk("Packet: Network is OFF\n");
         goto fail;
     }
 
 // Frame validation
 
     if ((void*) frame == NULL){
-        //printf("network_on_receiving: frame\n");
+        //printk("network_on_receiving: frame\n");
         goto fail;
     }
     // 1~8192
     if ( frame_size <= 0 || frame_size > E1000_DEFAULT_BUFFER_SIZE ){
-        //printf("network_on_receiving: frame_size\n");
+        //printk("network_on_receiving: frame_size\n");
         goto fail;
     }
 
@@ -442,8 +442,8 @@ network_on_receiving (
     //return;
     
     // #debug
-    //printf("\n");
-    //printf("Ethernet Header\n");
+    //printk("\n");
+    //printk("Ethernet Header\n");
 
 // Ethernet header
     if ((void*) eth == NULL){
@@ -456,15 +456,15 @@ network_on_receiving (
 // Protocol type.
 
 /*
-    printf ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
+    printk ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
         eth->dst[0], eth->dst[1], eth->dst[2], 
         eth->dst[3], eth->dst[4], eth->dst[5] );
 
-    printf ("   |-Source Address      : %x-%x-%x-%x-%x-%x \n", 
+    printk ("   |-Source Address      : %x-%x-%x-%x-%x-%x \n", 
         eth->src[0], eth->src[1], eth->src[2], 
         eth->src[3], eth->src[4], eth->src[5] );
 
-    printf ("   |-Ethertype           : %x \n",
+    printk ("   |-Ethertype           : %x \n",
         (unsigned short) eth->type);
 */
 
@@ -499,7 +499,7 @@ network_on_receiving (
     // ...
 
     default:
-        // printf ("Default type\n");
+        // printk ("Default type\n");
         goto fail;
         break;
     };
@@ -543,7 +543,7 @@ network_push_packet(
     void *dst_buffer;
     int tail=0;
 
-    printf ("--------------------- >>>> PUSH\n");
+    printk ("--------------------- >>>> PUSH\n");
 
 // Check args
     if ((void*) src_buffer == NULL){
@@ -574,7 +574,7 @@ network_push_packet(
 // #todo
 // MTU: maximim transmition unit.
 // For ethernet is 1500 bytes.
-    //printf ("network_buffer_in: buffer_len %d\n",len);
+    //printk ("network_buffer_in: buffer_len %d\n",len);
     //refresh_screen();
 
 // Fail
@@ -596,7 +596,7 @@ network_push_packet(
         // #todo: Podemos criar um contador de vezes que isso acontece.
         // Isso acontece frequentemente.
         // panic ("network_buffer_in: [TEST] Not responding ...\n");
-        // printf ("network_buffer_in: [FIXME] Can't write. This buffer is full.\n");
+        // printk ("network_buffer_in: [FIXME] Can't write. This buffer is full.\n");
         // refresh_screen();
     }
 
@@ -614,7 +614,7 @@ network_push_packet(
 // Avisamos que esse buffer está cheio.
     NETWORK_BUFFER.is_full[tail] = TRUE;
 
-    //printf("network_buffer_in: ok\n");
+    //printk("network_buffer_in: ok\n");
     //refresh_screen();
     //return 0;  //ok
     return (int) len;
@@ -641,7 +641,7 @@ network_pop_packet (
 // queue filled by the NIC devices.
 // It doesn't open any device to get data.
 
-    //printf (" ---------- >>>> POP\n");
+    //printk (" ---------- >>>> POP\n");
 
     int head=0;
     void *src_buffer;
@@ -682,7 +682,7 @@ network_pop_packet (
 // #todo
 // MTU: maximim transmition unit.
 // For ethernet is 1500 bytes.
-    //printf ("network_buffer_in: buffer_len %d\n",len);
+    //printk ("network_buffer_in: buffer_len %d\n",len);
     //refresh_screen();
 
     if (head<0 || head >= 32)
@@ -710,7 +710,7 @@ network_pop_packet (
         NETWORK_BUFFER.is_full[head] = FALSE;
     }
 
-    //printf("network_buffer_in: ok\n");
+    //printk("network_buffer_in: ok\n");
     //refresh_screen();
     //return 0;  //ok
     return (int) len;
@@ -816,7 +816,7 @@ int networkInit(void)
     struct network_info_d *ni;
     ni = (void*) kmalloc( sizeof(struct network_info_d) );
     if ((void*) ni == NULL){
-        printf("on ni\n");
+        printk("on ni\n");
         goto fail;
     }
     // Clear the structure
@@ -875,7 +875,7 @@ int networkInit(void)
         tmp_buffer_address = (void*) mmAllocPage();
         if ((void *)tmp_buffer_address == NULL)
         {
-            printf("on tmp_buffer_address\n");
+            printk("on tmp_buffer_address\n");
             goto fail;
         }
         NETWORK_BUFFER.buffers[i] = (unsigned long) tmp_buffer_address;
@@ -895,7 +895,7 @@ int networkInit(void)
     HostInfo = 
         (struct host_info_d *) kmalloc( sizeof(struct host_info_d) ); 
     if ((void *) HostInfo == NULL){
-        printf("on HostInfo\n");
+        printk("on HostInfo\n");
         goto fail;
     }
 
@@ -911,7 +911,7 @@ int networkInit(void)
     HostInfo->hostName_len = (size_t) strlen("gramado");
     if ( HostInfo->hostName_len >= HOST_NAME_MAX )
     {
-        printf("on hostname\n");
+        printk("on hostname\n");
         goto fail;
     }
 
@@ -942,7 +942,7 @@ int networkInit(void)
     LocalHostHTTPSocket = (struct socket_d *) create_socket_object();
     if ((void *) LocalHostHTTPSocket == NULL)
     {
-        printf("on LocalHostHTTPSocket\n");
+        printk("on LocalHostHTTPSocket\n");
         goto fail;
     }
     CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
@@ -973,7 +973,7 @@ int networkInit(void)
     my_domain = (void *) domain_create_domain(UTS_DOMAINNAME);
     if ((void*) my_domain == NULL)
     {
-        printf("on my_domain\n");
+        printk("on my_domain\n");
         goto fail;
     }
 

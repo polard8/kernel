@@ -30,7 +30,7 @@ static int __debug_check_inicialization (void)
 // Check phase
     if (Initialization.current_phase != 3){
        Status = FALSE;
-       printf("debug.c: Initialization phase = {%d}\n",
+       printk("debug.c: Initialization phase = {%d}\n",
            Initialization.current_phase );
        goto fail;
     }
@@ -41,23 +41,23 @@ static int __debug_check_inicialization (void)
 
     int cp_status = TRUE;
     if (Initialization.mm_phase0 != TRUE){
-        printf("debug.c: mm_phase0 failed\n");
+        printk("debug.c: mm_phase0 failed\n");
         cp_status = FALSE;
     }
     if (Initialization.mm_phase1 != TRUE){
-        printf("debug.c: mm_phase1 failed\n");
+        printk("debug.c: mm_phase1 failed\n");
         cp_status = FALSE;
     }
     if (Initialization.ke_phase0 != TRUE){
-        printf("debug.c: ke_phase0 failed\n");
+        printk("debug.c: ke_phase0 failed\n");
         cp_status = FALSE;
     }
     if (Initialization.ke_phase1 != TRUE){
-        printf("debug.c: ke_phase1 failed\n");
+        printk("debug.c: ke_phase1 failed\n");
         cp_status = FALSE;
     }
     if (Initialization.ke_phase2 != TRUE){
-        printf("debug.c: ke_phase2 failed\n");
+        printk("debug.c: ke_phase2 failed\n");
         cp_status = FALSE;
     }
 
@@ -235,7 +235,7 @@ int debug(void)
 
 //...
 
-    // printf ("debug: Done\n");
+    // printk ("debug: Done\n");
 
     return 0; 
 }
@@ -245,7 +245,7 @@ int debug(void)
 //     @todo: isso pode ir para o arquivo debug.c.
 void debug_breakpoint(void)
 {
-    printf("debug_breakpoint:\n");
+    printk("debug_breakpoint:\n");
 // This is gonna show the message if it is possible and hang.
     keDie();
 }

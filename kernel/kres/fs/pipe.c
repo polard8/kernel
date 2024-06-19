@@ -303,12 +303,12 @@ int sys_pipe( int *pipefd, int flags )
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
         //debug_print("sys_pipe: Process\n");
-        //todo printf
+        //todo printk
         goto fail;
     }
     if ( Process->used != TRUE || Process->magic != 1234 ){
         //debug_print("sys_pipe: validation\n");
-        //todo printf
+        //todo printk
         goto fail;
     }
 
@@ -352,7 +352,7 @@ int sys_pipe( int *pipefd, int flags )
     if ( slot1 == -1 || slot2 == -1 )
     {
         debug_print("sys_pipe: slots alocation fail\n");
-        // todo: printf
+        // todo: printk
         return (int) (-1);
     }
 
@@ -466,7 +466,7 @@ int sys_pipe( int *pipefd, int flags )
     pipefd[1] = slot2; 
 
     //#debug
-    //printf ("sys_pipe: %d %d\n",slot1,slot2);
+    //printk ("sys_pipe: %d %d\n",slot1,slot2);
     //refresh_screen();
 
 // OK

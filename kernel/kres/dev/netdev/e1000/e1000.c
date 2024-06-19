@@ -63,11 +63,11 @@ static void __e1000_linkup(struct intel_nic_info_d *d);
 
 void e1000_show_info(void)
 {
-    printf("e1000 NIC info:\n");
+    printk("e1000 NIC info:\n");
     if ((void*) currentNIC == NULL){
-        printf ("currentNIC fail\n");
+        printk ("currentNIC fail\n");
     }
-    printf("Counters: TX={%d} RX={%d}\n",
+    printk("Counters: TX={%d} RX={%d}\n",
         e1000_tx_counter, e1000_rx_counter );
 }
 
@@ -115,7 +115,7 @@ __E1000ReadEEPROM (
 	// We have the EEPROM?
  
 	//#debug
-	//printf("E1000ReadEEPROM:\n");
+	//printk("E1000ReadEEPROM:\n");
 
     // Yes :)
     if (d->has_eeprom == TRUE){
@@ -178,7 +178,7 @@ __E1000AllocCont (
     }
     memset ( va, 0, amount );
     //#debug
-    //printf("va=%x\n",va);
+    //printk("va=%x\n",va);
 
 // ============
 // pa
@@ -193,7 +193,7 @@ __E1000AllocCont (
         panic ("__E1000AllocCont: [FAIL] pa\n");
     }
     //#debug
-    //printf("pa=%x\n",pa);
+    //printk("pa=%x\n",pa);
 
     return (unsigned long) pa;
 }
@@ -238,7 +238,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
         panic("__initialize_tx_support: d\n");
     }
 
-    //printf("[1]:\n");
+    //printk("[1]:\n");
 
 // And alloc the phys/virt address of the transmit buffer
 // tx_descs_phys conterá o endereço físico e
@@ -249,7 +249,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
     //unsigned long tx_address = 
     //    (unsigned long) &d->legacy_tx_descs; //#wrong
     //unsigned long tx_address=0; //#bugbug not used  //va
-    //printf("tx_address=%x\n",tx_address);
+    //printk("tx_address=%x\n",tx_address);
  
 // Vamos alocar memória e pagarmos seu endereço físico.
 // Retorna um endereço virtual em tx_address e 
@@ -267,7 +267,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
         panic ("__e1000_reset_controller: [FAIL] d->tx_descs_phys\n");
     }
 
-    //printf("[2]:\n");
+    //printk("[2]:\n");
 
 // tx
 // tmp physical address.
@@ -327,7 +327,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
 /*
 // #debug
     for ( i=0; i<8; i++ ){
-        printf ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
+        printk ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
             d->legacy_tx_descs[i].addr,
             d->legacy_tx_descs[i].addr2, 
             d->tx_buffers_virt[i] );
@@ -361,7 +361,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
 
 /*
 // #debug
-    printf ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
+    printk ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
         d->tx_descs_phys,
         (d->tx_descs_phys >> 32), 
         d->legacy_tx_descs );
@@ -495,11 +495,11 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
 	
 	//iow32(d, TCTL, TCTL_EN);
 	
-	//printf("nic_i8254x_reset: Done\n");
+	//printk("nic_i8254x_reset: Done\n");
 	//refresh_screen();	
 	
 	//endereço físico  dos rings;
-	//printf("tx_ring_pa=%x rx_ring_pa=%x \n", 
+	//printk("tx_ring_pa=%x rx_ring_pa=%x \n", 
 	//    d->rx_descs_phys, 
 	//	d->tx_descs_phys );
 
@@ -571,7 +571,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
 // Vamos imprimir os endereços edereços físicos dos buffers 
 // e os edereços virtuais dos descritores.
     for ( i=0; i < 32; i++ ){
-        printf ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
+        printk ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
             d->legacy_rx_descs[i].addr,
             d->legacy_rx_descs[i].addr2, 
             d->rx_buffers_virt[i] );
@@ -600,7 +600,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
 
 /*
 // #debug
-    printf ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
+    printk ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
         d->rx_descs_phys,
         (d->rx_descs_phys >> 32), 
         d->legacy_rx_descs );
@@ -631,7 +631,7 @@ static int __e1000_reset_controller(struct intel_nic_info_d *d)
 
     // #debug
     //debug_print ("__e1000_reset_controller:\n");
-    //printf      ("__e1000_reset_controller:\n");
+    //printk      ("__e1000_reset_controller:\n");
 
 // structure
     if ((void*) d == NULL){
@@ -689,10 +689,10 @@ static void __e1000_setup_irq(int irq_line)
     uint8_t idt_num = (uint8_t) (irq + 32);
 
 //#debug OK (irq=9) 
-    printf("__e1000_setup_irq: irq={%d}\n", irq);
-    printf("__e1000_setup_irq: idt_num={%d}\n", idt_num);
-    printf("__e1000_setup_irq: handler={%x}\n", handler);
-	//printf ("PCIRegisterIRQHandler: pin={%d}\n",currentNIC->pci->irq_pin);//shared INTA#
+    printk("__e1000_setup_irq: irq={%d}\n", irq);
+    printk("__e1000_setup_irq: idt_num={%d}\n", idt_num);
+    printk("__e1000_setup_irq: handler={%x}\n", handler);
+	//printk ("PCIRegisterIRQHandler: pin={%d}\n",currentNIC->pci->irq_pin);//shared INTA#
 	//refresh_screen();
 	//while(1){}
 	//#debug interrupção=41 
@@ -720,9 +720,9 @@ static void __e1000_setup_irq(int irq_line)
 //na verdade o assembly esta usando outro endereço
     nic_idt_entry_new_address = (unsigned long) handler; 
 
-    printf("__e1000_setup_irq: interrupt={%d}\n", 
+    printk("__e1000_setup_irq: interrupt={%d}\n", 
         nic_idt_entry_new_number );
-    printf("__e1000_setup_irq: handler={%x}\n", 
+    printk("__e1000_setup_irq: handler={%x}\n", 
         nic_idt_entry_new_address );
 
 // Call assembly.
@@ -777,9 +777,9 @@ e1000_init_nic (
 
     // #debug
     PROGRESS("e1000_init_nic:\n");
-    printf     ("e1000_init_nic:\n");
-    //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
-    //printf("82540EM Gigabit Ethernet Controller found\n");
+    printk     ("e1000_init_nic:\n");
+    //printk("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
+    //printk("82540EM Gigabit Ethernet Controller found\n");
 
     e1000_initialized = FALSE;
     e1000_tx_counter=0;
@@ -802,7 +802,7 @@ e1000_init_nic (
         panic      ("e1000_init_nic: Expected 82540EM\n");
     }
     // #debug
-    printf("Vendor=%x | Device=%x \n", Vendor, Device );
+    printk("Vendor=%x | Device=%x \n", Vendor, Device );
 
 // pci_device structure.
 // pci device struct
@@ -1016,7 +1016,7 @@ e1000_init_nic (
         (unsigned char) pciGetInterruptLine(bus,dev);
 
     //#debug
-    //printf("Done irqline %d\n",irq_line);   
+    //printk("Done irqline %d\n",irq_line);   
     //refresh_screen();
 
 // irq
@@ -1028,7 +1028,7 @@ e1000_init_nic (
     e1000_initialized = TRUE;
 
     //#debug
-    //printf ("e1000_init_nic: Test #breakpoint\n");
+    //printk ("e1000_init_nic: Test #breakpoint\n");
     //refresh_screen();
     //while(1){ asm("hlt"); }
 
@@ -1049,11 +1049,11 @@ e1000_send(
 // Device structure
     d = (struct intel_nic_info_d *) dev;
     if ((void*) d == NULL){
-        printf("e1000_send: d\n");
+        printk("e1000_send: d\n");
         goto fail;
     }
     if (d->magic != 1234){
-        printf("e1000_send: d validation\n");
+        printk("e1000_send: d validation\n");
         goto fail;
     }
 
@@ -1116,7 +1116,7 @@ fail:
 // update the counters.
 static void __e1000_on_transmit(void)
 {
-    // printf ("__e1000_on_transmit: Transmit completed\n");
+    // printk ("__e1000_on_transmit: Transmit completed\n");
     e1000_tx_counter++;
     networkUpdateCounter(1);
 }
@@ -1163,7 +1163,7 @@ static void __e1000_on_receive(void)
         }
 
         //#debug
-        //printf ("BUFFER ID: gotten from %d\n", old);
+        //printk ("BUFFER ID: gotten from %d\n", old);
 
         // Get the frame base address.
         // frame addres and frame lenght.
@@ -1194,7 +1194,7 @@ static void __e1000_on_receive(void)
         //if (____network_late_flag == TRUE)
         //{
              //network_buffer_in ( (void *) buffer, (int) len );
-             //printf("DeviceInterface_e1000: [DEBUG] iret\n");
+             //printk("DeviceInterface_e1000: [DEBUG] iret\n");
              //refresh_screen();
         //}  
 
@@ -1281,14 +1281,14 @@ static void DeviceInterface_e1000(void)
     // 0x02
     // INTERRUPT_TXQE
     } else if (InterruptCause & 0x02){
-        printf("DeviceInterface_e1000: Transmit queue empty!\n");
+        printk("DeviceInterface_e1000: Transmit queue empty!\n");
         goto done;
 
     // 0x04 - Linkup
     // INTERRUPT_LSC
     // Start link.
     } else if (InterruptCause & 0x04){
-        printf("DeviceInterface_e1000: Start link\n");
+        printk("DeviceInterface_e1000: Start link\n");
         __e1000_linkup(currentNIC);
         goto done;
 
@@ -1300,17 +1300,17 @@ static void DeviceInterface_e1000(void)
 
     // INTERRUPT_RXDMT0
     } else if (InterruptCause & 0x10){
-        printf("DeviceInterface_e1000: Good threshold!\n");
+        printk("DeviceInterface_e1000: Good threshold!\n");
         goto done;
 
     // ??
     // INTERRUPT_SRPD
     } else if (InterruptCause & 0x8000){
-        printf ("DeviceInterface_e1000: status = 0x8000\n");
+        printk ("DeviceInterface_e1000: status = 0x8000\n");
         goto done;
 
     } else {
-        printf("DeviceInterface_e1000: Unknown interrupt cause {%x}\n",
+        printk("DeviceInterface_e1000: Unknown interrupt cause {%x}\n",
             InterruptCause);
         goto fail;
     };

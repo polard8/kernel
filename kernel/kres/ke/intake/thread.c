@@ -629,13 +629,12 @@ void SelectForExecution(struct thread_d *Thread)
     // queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
 }
 
-
 void thread_show_profiler_info (void)
 {
     struct thread_d *thread;
     register int i=0;
 
-    printf ("\n");
+    printk ("\n");
 
     for (i=0; i<THREAD_COUNT_MAX; i++)
     {
@@ -644,7 +643,7 @@ void thread_show_profiler_info (void)
         {
             if (thread->used == TRUE && thread->magic == 1234)
             {
-                printf ("tid=%d totalp=%d last_ticks=%d ( %d percent ) name={%s} \n", 
+                printk ("tid=%d totalp=%d last_ticks=%d ( %d percent ) name={%s} \n", 
                     thread->tid,
                     profiler_ticks_limit,
                     thread->profiler_last_ticks,
@@ -673,7 +672,7 @@ void show_thread_information (void)
     struct thread_d  *Idle;
     struct thread_d  *Current;
 
-    printf ("show_thread_information:\n");
+    printk ("show_thread_information:\n");
 
 // =================================
 // Idle thread
@@ -681,7 +680,7 @@ void show_thread_information (void)
     if ((void *) Idle != NULL)
     {
         if (Idle->magic == 1234){
-            printf ("Idle->tid = %d\n", Idle->tid );
+            printk ("Idle->tid = %d\n", Idle->tid );
         }
     }
 
@@ -691,8 +690,8 @@ void show_thread_information (void)
     if ((void *) Current != NULL)
     {
         if (Current->magic == 1234){
-            printf ("Current->tid   = %d\n", Current->tid );
-            printf ("current_thread = %d\n", current_thread );
+            printk ("Current->tid   = %d\n", Current->tid );
+            printk ("current_thread = %d\n", current_thread );
         }
     }
 
@@ -700,7 +699,7 @@ void show_thread_information (void)
 // see: threadi.c
     show_slots(); 
 
-    printf("Done\n");
+    printk("Done\n");
     refresh_screen();
 }
 
@@ -861,7 +860,7 @@ struct thread_d *create_thread (
 
 // #debug
     debug_print ("create_thread: #todo\n");
-    //printf ("create_thread: #todo\n");
+    //printk ("create_thread: #todo\n");
 
 //======================================
 // check parameters.
@@ -913,7 +912,7 @@ struct thread_d *create_thread (
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
         debug_print ("create_thread: current_thread fail\n");
-        printf      ("create_thread: current_thread fail\n");
+        printk      ("create_thread: current_thread fail\n");
         goto fail;
     }
 
@@ -1246,7 +1245,7 @@ try_next_slot:
 
     // #debug
     //debug_print ("create_thread: Done\n");
-    //printf ("create_thread: Done\n");
+    //printk ("create_thread: Done\n");
 
 // Warning !!! 
 // ( NÃO COLOCAR PARA EXECUÇÃO, 
@@ -1296,11 +1295,11 @@ void exit_thread (tid_t tid)
 
     Thread = (void *) threadList[tid];
     if ((void *) Thread == NULL){
-        printf ("exit_thread: Thread doesn't exist\n");
+        printk ("exit_thread: Thread doesn't exist\n");
         goto fail;
     }
     if (Thread->magic != 1234){
-            printf ("exit_thread: Thread validation \n");
+            printk ("exit_thread: Thread validation \n");
             goto fail;
     }
 

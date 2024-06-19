@@ -3,7 +3,7 @@
 // Low level routines for ata devices.
 // Wrappers: 
 // ataReadSector, ataWriteSector, pio_rw_sector.
-
+// Created by Fred Nora.
 
 #include <kernel.h>  
 
@@ -507,7 +507,7 @@ again:
 fail:
     return (int) (-1);
 failTimeOut:
-    printf ("pio_rw_sector: [FAIL] Timeout\n");
+    printk ("pio_rw_sector: [FAIL] Timeout\n");
     return (int) (-3);
 }
 

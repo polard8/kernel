@@ -3,7 +3,6 @@
 
 #include <kernel.h> 
 
-
 int copy_process_in_progress=FALSE;
 unsigned long __copy_process_counter=0;
 
@@ -72,21 +71,20 @@ pid_t copy_process(
     _pd = 0;
     _pt = 0;
 
-
     copy_process_in_progress=TRUE;
 
 // Copiar a tabela pml4 do kernel.
     _pml4 = (void *) CloneKernelPML4();
-    if ( (void*) _pml4 == NULL ){
+    if ((void*) _pml4 == NULL){
         panic("copy_process: _pml4\n");
     }
 
-    //printf ("_pml4: %x\n",_pml4);
+    //printk ("_pml4: %x\n",_pml4);
     //refresh_screen();
     //while(1){}
 
     //#debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -119,12 +117,12 @@ pid_t copy_process(
 
     // #debug
     debug_print ("copy_process: This is a work in progress \n");
-         //printf ("copy_process: This is a work in progress \n");
+         //printk ("copy_process: This is a work in progress \n");
 
 // pega
     pid_t current_process = (pid_t) get_current_process();
 
-    //printf (":)\n");
+    //printk (":)\n");
     //refresh_screen();
     //return -1;
 
@@ -139,17 +137,17 @@ pid_t copy_process(
 
 // parent pid.
     if (parent_pid < 0 || parent_pid >= PROCESS_COUNT_MAX){
-        printf("copy_process: parent_pid\n");
+        printk("copy_process: parent_pid\n");
         goto fail;
     }
 // parent process pointer.
     parent_process = (struct process_d *) processList[parent_pid];
     if ((void *) parent_process == NULL){
-        printf("copy_process: parent_process\n");
+        printk("copy_process: parent_process\n");
         goto fail;
     }
     if (parent_process->used != TRUE || parent_process->magic != 1234){
-        printf("copy_process: parent_process validation\n");
+        printk("copy_process: parent_process validation\n");
         goto fail;
     }
 
@@ -180,17 +178,17 @@ pid_t copy_process(
 
 // pml4
     if ((void*) parent_process->pml4_VA == NULL){
-        printf("copy_process: [FAIL] parent_process->pml4_VA\n");
+        printk("copy_process: [FAIL] parent_process->pml4_VA\n");
         goto fail;
     }
 // pdpt
     if ((void*) parent_process->pdpt0_VA == NULL){
-        printf("copy_process: [FAIL] parent_process->pdpt0_VA\n");
+        printk("copy_process: [FAIL] parent_process->pdpt0_VA\n");
         goto fail;
     }
 // pd
     if ((void*) parent_process->pd0_VA == NULL){
-        printf("copy_process: [FAIL] parent_process->pd0_VA\n");
+        printk("copy_process: [FAIL] parent_process->pd0_VA\n");
         goto fail;
     }
 
@@ -200,7 +198,7 @@ pid_t copy_process(
     // old_image_pa = (unsigned long) virtual_to_physical ( parent_process->Image, gKernelPageDirectoryAddress ); 
 
     //#debug
-    //printf(">>> check current process: %d %d \n", current_process, parent_process->pid );
+    //printk(">>> check current process: %d %d \n", current_process, parent_process->pid );
 
     // ...
 
@@ -297,7 +295,7 @@ do_clone:
     // Switch
     //x64_load_pml4_table( kernel_mm_data.pml4_pa );
 
-    //printf (":)\n");
+    //printk (":)\n");
     //refresh_screen();
     //return -1;
 
@@ -310,12 +308,12 @@ do_clone:
 
     if ((void *) child_process == NULL){
         debug_print("copy_process: child_process\n");
-        printf     ("copy_process: child_process\n");
+        printk     ("copy_process: child_process\n");
         goto fail;
     }
     if (child_process->magic != 1234){
         debug_print("copy_process: child_process validation\n");
-        printf     ("copy_process: child_process validation\n");
+        printk     ("copy_process: child_process validation\n");
         goto fail;
     }
 
@@ -343,7 +341,7 @@ do_clone:
 // Breakpoint
 
     //#debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -373,8 +371,8 @@ do_clone:
 // Breakpoint
 
     // #debug
-    //printf ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
-    //printf ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
+    //printk ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
+    //printk ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
     //refresh_screen();
     //while(1){}
 
@@ -442,7 +440,7 @@ do_clone:
 
     // #debug
     debug_print("copy_process: [1] Copying process image and stack.\n");
-    //printf   ("copy_process: [1] Copying process image and stack.\n");
+    //printk   ("copy_process: [1] Copying process image and stack.\n");
 
 // Allocating memory for the image and for the stack.
     Status = (int) alloc_memory_for_image_and_stack(parent_process);
@@ -453,7 +451,7 @@ do_clone:
 // Breakpoint
 
     //#debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -466,7 +464,7 @@ do_clone:
 
     //#debug
     debug_print("copy_process: [2] Copying process structure\n");
-    //printf ("copy_process: [2] Copying process structure\n");
+    //printk ("copy_process: [2] Copying process structure\n");
 
 // Cloning the process structure.
 // #todo: It depends on the childs personality.
@@ -478,19 +476,19 @@ do_clone:
 // Breakpoint
 
     //#debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
     // #debug
     // ok
-    //printf ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
-    //printf ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
+    //printk ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
+    //printk ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
     //refresh_screen();
     //while(1){}
 
     // #debug
-    //printf ("Stack : %x \n",__rsp);
+    //printk ("Stack : %x \n",__rsp);
     //refresh_screen();
     //while(1){}
 
@@ -523,7 +521,7 @@ do_clone:
 // Breakpoint
 
     // #debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -545,8 +543,8 @@ do_clone:
 
     // #debug
     // ok
-    //printf ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
-    //printf ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
+    //printk ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
+    //printk ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
     //refresh_screen();
     //while(1){}
 
@@ -558,8 +556,8 @@ do_clone:
     child_thread->pml4_PA = (unsigned long) child_process->pml4_PA;
 
     // #debug
-    //printf ("child_thread->pml4_VA: %x\n",child_thread->pml4_VA);
-    //printf ("child_thread->pml4_PA: %x\n",child_thread->pml4_PA);
+    //printk ("child_thread->pml4_VA: %x\n",child_thread->pml4_VA);
+    //printk ("child_thread->pml4_PA: %x\n",child_thread->pml4_PA);
     //refresh_screen();
     //while(1){}
 
@@ -614,14 +612,14 @@ do_clone:
     if (Status != 0)
     {
         debug_print("copy_process: [FAIL] Couldn't load the file\n");
-        printf     ("copy_process: [FAIL] Couldn't load the file %s\n", 
+        printk     ("copy_process: [FAIL] Couldn't load the file %s\n", 
             filename );
         goto fail;
     }
 
     //#debug
     //ok
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -636,7 +634,7 @@ do_clone:
 
 // #debug
     debug_print("copy_process: [5] Check signature\n");
-    //printf ("copy_process: [5] Check signature\n");
+    //printk ("copy_process: [5] Check signature\n");
 
 // #bugbug
 // O processo init deve ter suas proprias tabelas de paginas.
@@ -646,13 +644,13 @@ do_clone:
     Status = (int) fsCheckELFFile(image_va);
     if (Status < 0){
         debug_print("copy_process: ELF header\n");
-        printf     ("copy_process: ELF header\n");
+        printk     ("copy_process: ELF header\n");
         goto fail;
     }
 
     //#debug
     //ok
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -685,14 +683,14 @@ do_clone:
 // Breakpoint
 //
 
-    //printf (":)\n");
+    //printk (":)\n");
     //refresh_screen();
     //return -1;
 
     //debug_print ("copy_process:  This is a work in progress\n");
-    //     printf ("copy_process:  This is a work in progress\n");
+    //     printk ("copy_process:  This is a work in progress\n");
     debug_print("copy_process: Calling CreateAndIntallPageTable\n");
-    //printf   ("copy_process: Calling CreateAndIntallPageTable :)\n");
+    //printk   ("copy_process: Calling CreateAndIntallPageTable :)\n");
     //panic    ("copy_process: [Breakpoint] CreateAndIntallPageTable\n");
 
 //
@@ -713,7 +711,7 @@ do_clone:
 // PT   - Page Table    
 
     //#debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -823,7 +821,7 @@ do_clone:
         panic("copy_process: child_process->pdpt0_PA==0\n");
 
     //#debug
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -862,12 +860,12 @@ do_clone:
 
     //#debug
     // ok
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
     // #debug
-    //printf ("New page table : %x \n", _pt);
+    //printk ("New page table : %x \n", _pt);
     //refresh_screen();
     //while(1){}
 
@@ -895,7 +893,7 @@ do_clone:
 
     //#debug
     //ok
-    //printf (" :) \n");
+    //printk (" :) \n");
     //refresh_screen();
     //return 0;
 
@@ -918,7 +916,7 @@ do_clone:
 // #debug
     debug_print("copy_process: [5] Done\n");
     //debug_print ("----------------------\n");
-    //printf ("copy_process: [5] Done\n");
+    //printk ("copy_process: [5] Done\n");
 
 
 // #todo
@@ -930,26 +928,26 @@ do_clone:
 // Debug
 //
 
-    //printf ("\n");
-    //printf ("--[ Debug ]---------------------------------\n");
+    //printk ("\n");
+    //printk ("--[ Debug ]---------------------------------\n");
 
-    //printf ("\n");
-    //printf ("Original thread::\n");
+    //printk ("\n");
+    //printk ("Original thread::\n");
     // ok: Esses são iguais, como deveria ser.
-    //printf ("pml4_VA:%x  | pml4_PA:%x  \n", parent_thread->pml4_VA,  parent_thread->pml4_PA);
+    //printk ("pml4_VA:%x  | pml4_PA:%x  \n", parent_thread->pml4_VA,  parent_thread->pml4_PA);
     // ok: Esses são iguais, como deveria ser.
-    //printf ("pdpt0_VA:%x | pdpt0_PA:%x \n", parent_thread->pdpt0_VA, parent_thread->pdpt0_PA);
+    //printk ("pdpt0_VA:%x | pdpt0_PA:%x \n", parent_thread->pdpt0_VA, parent_thread->pdpt0_PA);
     // ok: Esses são iguais, como deveria ser.
-    //printf ("pd0_VA:%x   | pd0_PA:%x   \n", parent_thread->pd0_VA,   parent_thread->pd0_PA);
+    //printk ("pd0_VA:%x   | pd0_PA:%x   \n", parent_thread->pd0_VA,   parent_thread->pd0_PA);
 
-    //printf ("\n");
-    //printf ("Clone thread::\n");
+    //printk ("\n");
+    //printk ("Clone thread::\n");
     // ok: Esses são iguais, como deveria ser.
-    //printf ("pml4_VA:%x  | pml4_PA:%x  \n",child_thread->pml4_VA,  child_thread->pml4_PA);
+    //printk ("pml4_VA:%x  | pml4_PA:%x  \n",child_thread->pml4_VA,  child_thread->pml4_PA);
     // ok: Esses são iguais, como deveria ser.
-    //printf ("pdpt0_VA:%x | pdpt0_PA:%x \n",child_thread->pdpt0_VA, child_thread->pdpt0_PA);
+    //printk ("pdpt0_VA:%x | pdpt0_PA:%x \n",child_thread->pdpt0_VA, child_thread->pdpt0_PA);
     // ok: Esses são iguais, como deveria ser.
-    //printf ("pd0_VA:%x   | pd0_PA:%x   \n",child_thread->pd0_VA,   child_thread->pd0_PA);
+    //printk ("pd0_VA:%x   | pd0_PA:%x   \n",child_thread->pd0_VA,   child_thread->pd0_PA);
 
     //show_slot (parent_thread->tid);
     //show_reg  (parent_thread->tid);
@@ -957,12 +955,12 @@ do_clone:
     //show_slot (child_thread->tid);
     //show_reg  (child_thread->tid);
 
-    //printf ("\n");
+    //printk ("\n");
     //current_process = (pid_t) child_pid;
     //show_currentprocess_info();
 
-    //printf ("--------------------------\n");
-    //printf ("\n");
+    //printk ("--------------------------\n");
+    //printk ("\n");
 
     // #debug
     //refresh_screen();
@@ -1025,8 +1023,8 @@ fail:
 // #debug
     debug_print ("copy_process: [X] Fail\n");
     //debug_print ("----------------------\n");
-    printf      ("copy_process: [X] Fail\n");
-    //printf      ("----------------------\n");
+    printk      ("copy_process: [X] Fail\n");
+    //printk      ("----------------------\n");
     refresh_screen();
 
     // Nem chegamos a pegar o valor.

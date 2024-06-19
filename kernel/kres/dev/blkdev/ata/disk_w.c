@@ -1,5 +1,6 @@
 
 // disk_w.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -92,7 +93,7 @@ void write_lba( unsigned long address, unsigned long lba )
     switch (g_currentvolume_fatbits){
 
     case 32:
-        printf ("write_lba: [ERROR] FAT32 not supported\n");
+        printk ("write_lba: [ERROR] FAT32 not supported\n");
         goto fail;
         break;
 
@@ -103,12 +104,12 @@ void write_lba( unsigned long address, unsigned long lba )
         break;
 
     case 12:
-        printf ("write_lba: [ERROR] FAT12 not supported\n");
+        printk ("write_lba: [ERROR] FAT12 not supported\n");
         goto fail;
         break;
 
     default:
-        printf ("write_lba: [ERROR] g_currentvolume_fatbits NOT SUPPORTED\n");
+        printk ("write_lba: [ERROR] g_currentvolume_fatbits NOT SUPPORTED\n");
         goto fail;
         break;
     };
@@ -171,7 +172,7 @@ fs_save_fat (
 // #bugbug: 
 // Debug provisório.
     debug_print ("fs_save_fat:\n");
-    printf      ("Saving fat\n");
+    printk      ("Saving fat\n");
     refresh_screen();
 
 // Filters
@@ -199,7 +200,7 @@ fs_save_fat (
 // #bugbug: 
 // Debug provisório.
     debug_print ("fs_save_fat: Done\n");
-    printf      ("fs_save_fat: Done\n"); 
+    printk      ("fs_save_fat: Done\n"); 
     refresh_screen ();
 
     return 0;
@@ -220,7 +221,7 @@ fs_save_rootdir (
 // #bugbug: 
 // Debug
     debug_print ("fs_save_rootdir:\n");
-    printf      ("Saving rootdir\n");
+    printk      ("Saving rootdir\n");
     refresh_screen();
 
 // Filters
@@ -249,7 +250,7 @@ fs_save_rootdir (
 // #bugbug: 
 // Debug provisório.
     debug_print ("fs_save_rootdir: Done\n");
-    printf      ("fs_save_rootdir: Done\n"); 
+    printk      ("fs_save_rootdir: Done\n"); 
     refresh_screen ();
 
     return 0;

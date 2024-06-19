@@ -53,11 +53,11 @@ ws_ioctl (
 
 void ws_show_info(void)
 {
-    printf("name %s\n",WindowServer_name);
-    printf("initialized     %d\n", WindowServer_initialized);
-    printf("type            %d\n", WindowServer_type);
-    printf("pid             %d\n", WindowServer_pid);
-    printf("virtual console %d\n", WindowServer_virtual_console);
+    printk("name %s\n",WindowServer_name);
+    printk("initialized     %d\n", WindowServer_initialized);
+    printk("type            %d\n", WindowServer_type);
+    printk("pid             %d\n", WindowServer_pid);
+    printk("virtual console %d\n", WindowServer_virtual_console);
     refresh_screen();
 }
 

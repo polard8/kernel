@@ -3,18 +3,14 @@
 
 #include <kernel.h> 
 
-
 int ioInit(void)
 {
     int Status = 0;
 
     debug_print ("ioInit: [TODO]\n");
-
     // ...
-
     return (int) Status;
 }
-
 
 //==========================================
 // This is called by ioctl() in ring3.
@@ -76,16 +72,15 @@ io_ioctl (
     int ObjectType = -1;
 
     debug_print ("io_ioctl: [TODO]\n");
-    //printf ("io_ioctl: [TODO]\n");
+    //printk ("io_ioctl: [TODO]\n");
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
 // Get file pointer.
-
     f = (file *) get_file_from_fd(fd);
-    if ( (void *) f == NULL ){
+    if ((void *) f == NULL){
         debug_print("io_ioctl: [FAIL] f\n");
         return -1;
     }

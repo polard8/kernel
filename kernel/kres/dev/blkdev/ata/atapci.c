@@ -74,7 +74,7 @@ uint32_t diskPCIScanDevice(int class)
     uint32_t data = -1;
 
     // #debug
-    //printf ("diskPCIScanDevice:\n");
+    //printk ("diskPCIScanDevice:\n");
     //refresh_screen ();
 
 // Probe
@@ -94,7 +94,7 @@ uint32_t diskPCIScanDevice(int class)
                 if ( ( data >> 24 & 0xff ) == class )
                 {
                     // #debug
-                    // printf ("Detected PCI device: %s\n", 
+                    // printk ("Detected PCI device: %s\n", 
                     //     pci_classes[class] );
                     // Done
                     return (uint32_t) ( fun + (dev*8) + (bus*32) );
@@ -104,7 +104,7 @@ uint32_t diskPCIScanDevice(int class)
     };
 
 // Fail
-    printf("diskPCIScanDevice: PCI device NOT detected\n");
+    printk("diskPCIScanDevice: PCI device NOT detected\n");
 
 // #bugbug 
 // Usando -1 para unsigned int. 
@@ -135,11 +135,11 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
 // Check parameters.
     if ((void *) D == NULL){
-        printf("atapciConfigurationSpace: D\n");
+        printk("atapciConfigurationSpace: D\n");
         goto fail;
     }
     if ( D->used != TRUE || D->magic != 1234 ){
-        printf ("atapciSetupMassStorageController: D validation\n");
+        printk ("atapciSetupMassStorageController: D validation\n");
         goto fail;
     }
 
@@ -151,14 +151,14 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     //D->Device = data >> 16 &0xffff;
 
 //#ifdef KERNEL_VERBOSE
-//    printf ("Disk info: [ Vendor ID: %x,Device ID: %x ]\n", 
+//    printk ("Disk info: [ Vendor ID: %x,Device ID: %x ]\n", 
 //        D->Vendor, D->Device );
 //#endif
 
 
 /*
     if ( D->Vendor == 0x1106 && D->Device == 0x0591 ){
-        kprintf ("VIA disk found\n");
+        printk ("VIA disk found\n");
     } else if (D->Vendor == 0x1106 && D->Device == 0x0591){
         // ...
     };
@@ -230,7 +230,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
 
 //#ifdef KERNEL_VERBOSE 
-        //kprintf ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+        // printk ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
         //    ata_sub_class_code_register_strings[AtaController.controller_type],
         //    ata_pci.progif,
         //    ata_pci.revisionId );
@@ -252,7 +252,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
         // #type: (ATA RAID).
         AtaController.controller_type = (uint8_t) ATA_RAID_CONTROLLER;
-        printf ("atapciSetupMassStorageController: ATA RAID not supported\n");
+        printk ("atapciSetupMassStorageController: ATA RAID not supported\n");
         goto fail;
 
 //
@@ -301,12 +301,11 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
         diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data & ~0x400);
 
 //#ifdef KERNEL_VERBOSE
-        // kprintf ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+        // printk ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
         //     ata_sub_class_code_register_strings[ata_port.controller_type], 
         //     ata_pci.progif,
         //     ata_pci.revisionId );
 //#endif
-
 
 // ====
 // No type
@@ -319,7 +318,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     }else{
         // #type: Unknown controller.
         AtaController.controller_type = (uint8_t) ATA_UNKNOWN_CONTROLLER;
-        printf("atapciSetupMassStorageController: Mass Storage Device NOT supported\n");
+        printk("atapciSetupMassStorageController: Mass Storage Device NOT supported\n");
         goto fail;
     };
 
@@ -354,8 +353,8 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
 // #debug
 //#ifdef KERNEL_VERBOSE
-//    printf ("[ Command %x Status %x ]\n", D->Command, D->Status );
-//    printf ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
+//    printk ("[ Command %x Status %x ]\n", D->Command, D->Status );
+//    printk ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
 //        D->irq_line, D->irq_pin );
 //#endif
 
@@ -365,7 +364,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 //
     data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 0x48 );
 //#debug
-    //printf("[ Synchronous DMA Control Register %x ]\n", data );
+    //printk("[ Synchronous DMA Control Register %x ]\n", data );
 
 //done:
     //ata_port.used = TRUE;

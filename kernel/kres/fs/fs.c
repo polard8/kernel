@@ -65,34 +65,34 @@ int file_read_buffer( file *f, char *buffer, int len )
 
 // Check file
     if ((void *) f == NULL){
-        printf ("file_read_buffer: f\n");
+        printk ("file_read_buffer: f\n");
         goto fail;
     }
     if ( f->used != TRUE || f->magic != 1234 ){
-        printf ("file_read_buffer: f validation\n");
+        printk ("file_read_buffer: f validation\n");
         goto fail;
     }
 // Check buffer
     if ((void *) p == NULL){
-        printf ("file_read_buffer: p\n");
+        printk ("file_read_buffer: p\n");
         goto fail;
     }
 // nada para ler.
     if (Count <= 0){
-         printf ("file_read_buffer: Count <= 0\n");
-         goto fail;
+        printk ("file_read_buffer: Count <= 0\n");
+        goto fail;
     }
 // Chech len
 // #bugbug: Isso é provisório
 // A quantidade que desejamos ler é menor que o tamanho do buffer.
 // Estamos lendo do início do arquivo?
     if (Count > f->_lbfsize){
-        printf ("file_read_buffer: Count > f->_lbfsize\n");
+        printk ("file_read_buffer: Count > f->_lbfsize\n");
         goto fail;
     }
 
     //if ( Count > f->_fsize ){
-        //printf ("file_read_buffer: Count > f->_fsize\n");
+        //printk ("file_read_buffer: Count > f->_fsize\n");
     //    Count = f->_fsize;
     //    goto fail;
     //}
@@ -103,7 +103,7 @@ int file_read_buffer( file *f, char *buffer, int len )
     {
         if( f->_lbfsize != PROMPT_SIZE)
         {
-           printf ("file_read_buffer: [FAIL] Wrong size for stdin _lbfsize\n");
+           printk ("file_read_buffer: [FAIL] Wrong size for stdin _lbfsize\n");
            goto fail;
         }
     }
@@ -147,27 +147,27 @@ int file_read_buffer( file *f, char *buffer, int len )
     {
         // Se o buffer tem tamanho 0.
         if (f->_lbfsize <= 0){
-            printf ("file_read_buffer: _lbfsize is 0\n");
+            printk ("file_read_buffer: _lbfsize is 0\n");
             goto fail;
         }
 
         // Se o tamanho do buffer for maior que o padrão.
         // #todo: O buffer pdoerá ser maior que isso no futuro.
         //if ( f->_lbfsize > BUFSIZ ){
-        //    printf ("file_read_buffer: _lbfsize\n");
+        //    printk ("file_read_buffer: _lbfsize\n");
         //    goto fail;
         //}
 
         // #test: Limite provisorio
         if (f->_lbfsize > (8*1024)){
-            printf ("file_read_buffer: _lbfsize bigger than 8KB\n");
+            printk ("file_read_buffer: _lbfsize bigger than 8KB\n");
             goto fail;
         }
 
         // Não podemos ler antes do início do arquivo.
         if ( f->_r < 0 ){
             f->_r = 0;
-            printf ("file_read_buffer: f->_r = 0\n");
+            printk ("file_read_buffer: f->_r = 0\n");
             goto fail;
         }
 
@@ -175,7 +175,7 @@ int file_read_buffer( file *f, char *buffer, int len )
         if ( f->_r > f->_lbfsize )
         {
             //#debug: provisorio
-            printf ("file_read_buffer: f->_r > f->_lbfsize\n");
+            printk ("file_read_buffer: f->_r > f->_lbfsize\n");
             goto fail;
             //debug_print("file_read_buffer: f->_r > f->_lbfsize\n");
             //f->_r = f->_lbfsize;
@@ -191,7 +191,7 @@ int file_read_buffer( file *f, char *buffer, int len )
         if ( f->_r > f->_w )
         {
             // EOF
-            printf ("file_read_buffer: f->_r > f->_w\n");
+            printk ("file_read_buffer: f->_r > f->_w\n");
             //goto fail;
             //debug_print("file_read_buffer: f->_r > f->_w\n");
             f->_r = f->_w;
@@ -208,11 +208,10 @@ int file_read_buffer( file *f, char *buffer, int len )
         // # Isso ja foi feito logo acima.
         if (Count > f->_lbfsize)
         {
-
-            //printf ("file_read_buffer: Count > f->_lbfsize\n");
+            //printk ("file_read_buffer: Count > f->_lbfsize\n");
             //goto fail;
 
-            //printf ("file_read_buffer: [FAIL] local_len limits\n");
+            //printk ("file_read_buffer: [FAIL] local_len limits\n");
             //goto fail;
         
             //#test #bugbug
@@ -230,7 +229,7 @@ int file_read_buffer( file *f, char *buffer, int len )
         // no buffer.
         //if (Count > f->_cnt)
         //{
-            //printf ("file_read_buffer: local_len > f->_cnt\n");
+            //printk ("file_read_buffer: local_len > f->_cnt\n");
             //goto fail;
             //Count = f->_cnt;
         //}
@@ -242,7 +241,7 @@ int file_read_buffer( file *f, char *buffer, int len )
         // pois o ponteiro de escrita e o de leitura sao iguais,
         if (delta == 0){
             // 0 bytes lidos
-            //printf ("delta=0\n");
+            //printk ("delta=0\n");
             return 0;
         }
  
@@ -267,9 +266,9 @@ int file_read_buffer( file *f, char *buffer, int len )
 
         //#debug
         if (Count <= 0){
-            printf ("file_read_buffer: Count <= 0 SECOND\n");
+            printk ("file_read_buffer: Count <= 0 SECOND\n");
             goto fail;
-            //printf("local_len\n");
+            //printk("local_len\n");
             //refresh_screen();
             //return -1;
         }
@@ -325,8 +324,8 @@ file_write_buffer (
     // debug_print ("file_write_buffer:\n");
 
 // File validation.
-    if ((void *) f == NULL ){
-        printf ("file_write_buffer: f\n");
+    if ((void *) f == NULL){
+        printk ("file_write_buffer: f\n");
         goto fail;
     }
     // #todo: Check used and magic.
@@ -334,13 +333,13 @@ file_write_buffer (
         //return -1;
 
     if ((void *) p == NULL){
-        printf ("file_write_buffer: p\n");
+        printk ("file_write_buffer: p\n");
         goto fail;
     }
 
 // Tentando escrever mais do que cabe no arquivo.
     if (len >= BUFSIZ){
-        printf ("file_write_buffer: len > BUFSIZ\n");
+        printk ("file_write_buffer: len > BUFSIZ\n");
         goto fail;
     }
 
@@ -384,7 +383,7 @@ file_write_buffer (
 
         // se o tamanho do buffer for maior que o padrao.
         if (f->_lbfsize > BUFSIZ){
-            printf ("file_write_buffer: _lbfsize\n");
+            printk ("file_write_buffer: _lbfsize\n");
             goto fail;
         }
     
@@ -402,7 +401,7 @@ file_write_buffer (
         {
             //#bugbug
             debug_print("file_write_buffer: f->_w >= BUFSIZ\n");
-            printf     ("file_write_buffer: f->_w >= BUFSIZ\n");
+            printk     ("file_write_buffer: f->_w >= BUFSIZ\n");
             f->_w = BUFSIZ;
             f->_cnt = 0;
             return EOF;
@@ -428,7 +427,7 @@ file_write_buffer (
         // Inicio do arquivo
         if (f->_cnt > f->_lbfsize)
         {
-            printf ("file_write_buffer: _cnt\n");
+            printk ("file_write_buffer: _cnt\n");
             f->_cnt = f->_lbfsize;
             f->_p = f->_base;
             f->_w = 0;
@@ -493,9 +492,9 @@ file_write_buffer (
         return (int) len;
     }
 
-// Unknown type.
+// Unknown type
 fail:
-    //printf ("file_write_buffer: fail\n");
+    //printk ("file_write_buffer: fail\n");
     //refresh_screen();
     return EOF;
 }
@@ -612,13 +611,13 @@ sys_read (
     if ((void *) fp == NULL)
     {
         debug_print("sys_read: fp not open\n");
-        printf     ("sys_read: fp not open\n");
+        printk     ("sys_read: fp not open\n");
         goto fail; 
     }
 
     if (fp->sync.can_read != TRUE){
         debug_print("sys_read: [PERMISSION] Can NOT read the file\n");
-        printf     ("sys_read: [PERMISSION] Can NOT read the file\n");
+        printk     ("sys_read: [PERMISSION] Can NOT read the file\n");
         goto fail; 
     }
 
@@ -785,10 +784,10 @@ RegularFile:
          //if( fp->_file == 5)
          //{
          //    if ( (fp->_flags & __SRD) == 0 )
-         //        printf("cant read\n");
+         //        printk("cant read\n");
          //    if ( fp->_flags & __SRD )
-         //        printf("can read\n");
-         //    printf("sys_read-OUTPUT 5: %s \n",fp->_base);
+         //        printk("can read\n");
+         //    printk("sys_read-OUTPUT 5: %s \n",fp->_base);
          //    refresh_screen();
          //}
 
@@ -806,7 +805,7 @@ RegularFile:
             //fp->_flags |= __SWR;  //pode escrever.
             //scheduler();
             
-            //printf("sys_read: fp->_flags & __SRD \n");
+            //printk("sys_read: fp->_flags & __SRD \n");
             //refresh_screen();
             
             goto fail;
@@ -919,7 +918,7 @@ fail:
 // #bugbug: 
 // Isso pode degradar o desempenho.
 
-    // printf ("sys_read: [FAIL] something is wrong!\n");
+    // printk ("sys_read: [FAIL] something is wrong!\n");
     //refresh_screen();  
     //bloqueando, autorizando a escrita e reescalonando.
     //do_thread_waiting (current_thread);
@@ -1063,13 +1062,13 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
     if ((void *) fp == NULL)
     {
         debug_print("sys_write: fp not open\n");
-        printf     ("sys_write: fp not open #hang\n");
-        //printf      ("fd{%d} pid{%d}\n",fd,current_process);
-        //printf("entry0: %x\n", __P->Objects[0]);
-        //printf("entry1: %x\n", __P->Objects[1]);
-        //printf("entry2: %x\n", __P->Objects[2]);
-        //printf("entry3: %x\n", __P->Objects[3]);
-        //printf("entry4: %x\n", __P->Objects[4]);
+        printk     ("sys_write: fp not open #hang\n");
+        //printk      ("fd{%d} pid{%d}\n",fd,current_process);
+        //printk("entry0: %x\n", __P->Objects[0]);
+        //printk("entry1: %x\n", __P->Objects[1]);
+        //printk("entry2: %x\n", __P->Objects[2]);
+        //printk("entry3: %x\n", __P->Objects[3]);
+        //printk("entry4: %x\n", __P->Objects[4]);
         //refresh_screen();
         //while(1){}
         goto fail;
@@ -1077,7 +1076,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 
     if (fp->sync.can_write != TRUE){
         debug_print("sys_write: [PERMISSION] Can NOT write the file\n");
-        printf     ("sys_write: [PERMISSION] Can NOT write the file\n");
+        printk     ("sys_write: [PERMISSION] Can NOT write the file\n");
         goto fail; 
     }
 
@@ -1145,7 +1144,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 //
 
     if ( fp->____object == ObjectTypeNIC ){
-       printf("sys_write: Writing on NIC device ... #todo\n");
+       printk("sys_write: Writing on NIC device ... #todo\n");
        //network_on_sending(ubuf,count);
        return 0;
    }
@@ -1372,7 +1371,7 @@ RegularFile:
 fail:
     // #debug
     // debug_print ("sys_write: [FAIL] Something is wrong!\n");
-    // printf      ("sys_write: [FAIL] something is wrong!\n");
+    // printk      ("sys_write: [FAIL] something is wrong!\n");
 fail2:
 
     //invalidate_screen();
@@ -1466,7 +1465,7 @@ sys_open (
             // Put it into the list inside the
             // current process structure
             // and return the fd.
-            printf("sys_open: #todo isDevice!\n");
+            printk("sys_open: #todo isDevice!\n");
             //refresh_screen();
             return -1;
         }
@@ -1781,7 +1780,7 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
     int status=-1;
 
     debug_print ("sys_ioctl: [FIXME] \n");
-    //printf("sys_ioctl: [FIXME] \n");
+    //printk("sys_ioctl: [FIXME] \n");
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
@@ -1838,12 +1837,12 @@ file *get_file_from_fd(int fd)
     fp = (file *) p->Objects[fd];
     if ( (void*) fp == NULL ){
         //#debug
-        //printf("fd{%d} pid{%d}\n",fd,current_pid);
-        //printf("entry0: %x\n", p->Objects[0]);
-        //printf("entry1: %x\n", p->Objects[1]);
-        //printf("entry2: %x\n", p->Objects[2]);
-        //printf("entry3: %x\n", p->Objects[3]);
-        //printf("entry4: %x\n", p->Objects[4]);
+        //printk("fd{%d} pid{%d}\n",fd,current_pid);
+        //printk("entry0: %x\n", p->Objects[0]);
+        //printk("entry1: %x\n", p->Objects[1]);
+        //printk("entry2: %x\n", p->Objects[2]);
+        //printk("entry3: %x\n", p->Objects[3]);
+        //printk("entry4: %x\n", p->Objects[4]);
         goto fail;
     }
 
@@ -2015,7 +2014,7 @@ void sys_set_file_sync(int fd, int request, int data)
     case 216:
 
         //#debug
-        //printf("216:\n"); 
+        //printk("216:\n"); 
         //refresh_screen();
 
         object->sync.action = 0;
@@ -2034,7 +2033,7 @@ void sys_set_file_sync(int fd, int request, int data)
     case 217:
 
         //#debug
-        //printf("217:\n"); 
+        //printk("217:\n"); 
         //refresh_screen();
 
         object->sync.action = 0;
@@ -2207,7 +2206,7 @@ int sys_open_device_by_number(int device_index)
 __OK:
 
     if ( __slot < 0 || __slot >= 32 ){
-        printf ("sys_open_device_by_number: __slot fail\n");
+        printk ("sys_open_device_by_number: __slot fail\n");
         //refresh_screen();
         return (int) (-1);
     }
@@ -3216,7 +3215,7 @@ void fsInitializeWorkingDiretoryString (void)
 			
             default:
 		        //fail.
-		        //printf("fsInitializeWorkingDiretoryString: default volume #todo\n");
+		        //printk("fsInitializeWorkingDiretoryString: default volume #todo\n");
 		        //die();
                 current_volume_string = (char *) volume_string; 
                 break;
@@ -3478,7 +3477,7 @@ fsListFiles (
         goto fail;
     }
 
-    printf ("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
+    printk ("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
         disk_id, volume_id, directory_id );
 
 // Show!
@@ -3498,7 +3497,7 @@ fsListFiles (
     goto done;
 
 fail:
-    printf ("fail\n");
+    printk ("fail\n");
 done:
     //refresh_screen ();
     return;
@@ -4079,14 +4078,14 @@ void fs_pathname_backup ( pid_t pid, int n )
     register int i=0;
 
 // CWD
-    if ( CWD.initialized != TRUE ){
-        printf ("fs_pathname_backup: [FAIL] CWD not initialized\n"); 
+    if (CWD.initialized != TRUE){
+        printk ("fs_pathname_backup: [FAIL] CWD not initialized\n"); 
         return;
     } 
 
 // pid
     if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
-        printf ("fs_pathname_backup: [FAIL] pid\n"); 
+        printk ("fs_pathname_backup: [FAIL] pid\n"); 
         return;
     }
 
@@ -4145,7 +4144,7 @@ int fs_print_process_cwd(pid_t pid)
     struct process_d *p;
 
     //debug_print ("fs_print_process_cwd:\n");
-    printf      ("fs_print_process_cwd:\n");
+    printk      ("fs_print_process_cwd:\n");
 
 // pid
     if (pid<0 || pid>=PROCESS_COUNT_MAX){
@@ -4170,7 +4169,7 @@ int fs_print_process_cwd(pid_t pid)
         if ( (void *) p->cwd_string != NULL )
         {
             //p->cwd_string[31] = 0;
-            printf ("> PID=%d p->cwd_string {%s} \n", 
+            printk ("> PID=%d p->cwd_string {%s} \n", 
                 p->pid, p->cwd_string);
         }
 
@@ -4180,7 +4179,7 @@ int fs_print_process_cwd(pid_t pid)
         if ( (void *) current_target_dir.name != NULL )
         {
             //current_target_dir.name[31] = 0;
-            printf ("> PID=%d current_target_dir.name {%s} \n", 
+            printk ("> PID=%d current_target_dir.name {%s} \n", 
                 p->pid, current_target_dir.name);
         }
 
@@ -4205,7 +4204,7 @@ void fs_show_file_info (file *f)
     {
         if ( (void*) f->_tmpfname != NULL )
         {
-            printf ("Name={%s}\n",f->_tmpfname);
+            printk ("Name={%s}\n",f->_tmpfname);
             //refresh_screen();
         }
     }
@@ -4216,7 +4215,7 @@ void fs_show_file_table(void)
     file *f;
     register int i=0;
 
-    printf ("\nfile_table:\n");
+    printk ("\nfile_table:\n");
     
     for (i=0; i<32; i++)
     {
@@ -4240,7 +4239,7 @@ void fs_show_inode_info (struct inode_d *i)
     {
         if ( (void*)i->path != NULL )
         {
-            printf ("Name={%s}\n",i->path);
+            printk ("Name={%s}\n",i->path);
         }
     }  
 }
@@ -4250,7 +4249,7 @@ void fs_show_inode_table(void)
     struct inode_d *inode;
     register int i=0;
 
-    printf ("\n inode_table: \n");
+    printk ("inode_table: \n");
     
     for (i=0; i<32; ++i)
     {
@@ -4270,34 +4269,34 @@ void fs_show_inode_table(void)
 
 void fs_show_root_fs_info(void)
 {
-    //printf ("\n");
-    printf ("fs_show_root_fs_info:\n");
+    //printk ("\n");
+    printk ("fs_show_root_fs_info:\n");
 
 // root fs structure.
 
     if ( (void *) root == NULL ){
-        printf ("No root structure\n");
+        printk ("No root structure\n");
         goto fail;
     
     }else{
 
         if ( root->used != 1 || root->magic != 1234 ){
-             printf ("Validation fail\n");
-             goto fail;
+            printk ("Validation fail\n");
+            goto fail;
         }
 
-        printf ("name = %s \n",       root->name );
-        printf ("Object type %d \n",  root->objectType );
-        printf ("Object class %d \n", root->objectClass );
-        printf ("type = %d \n",       root->type );
-        printf ("Dir entries %d \n",  root->dir_entries );
-        printf ("Entry size %d \n",   root->entry_size );
+        printk ("name = %s \n",       root->name );
+        printk ("Object type %d \n",  root->objectType );
+        printk ("Object class %d \n", root->objectClass );
+        printk ("type = %d \n",       root->type );
+        printk ("Dir entries %d \n",  root->dir_entries );
+        printk ("Entry size %d \n",   root->entry_size );
         // ...
         goto done;
     }; 
 
 fail:
-    printf("fail\n");
+    printk("fail\n");
 done:
     //refresh_screen();
     return;
@@ -4381,7 +4380,7 @@ fsSaveFile (
 
     // #debug:
     debug_print ("fsSaveFile:\n");
-    //printf      ("fsSaveFile:\n");
+    //printk      ("fsSaveFile:\n");
 
 // Updating fat address and dir address.
 
@@ -4411,12 +4410,12 @@ fsSaveFile (
 
     if ((void *) file_name == NULL){
         debug_print("fsSaveFile: [ERROR] file_name\n");
-        printf     ("fsSaveFile: [ERROR] file_name\n"); 
+        printk     ("fsSaveFile: [ERROR] file_name\n"); 
         goto fail;
     }
     if (*file_name == 0){
         debug_print("fsSaveFile: [ERROR] *file_name\n");
-        printf     ("fsSaveFile: [ERROR] *file_name\n"); 
+        printk     ("fsSaveFile: [ERROR] *file_name\n"); 
         goto fail;
     }
 
@@ -4424,13 +4423,13 @@ fsSaveFile (
 // Esse endereço eh valido?
 
 /*
-    printf ("name address = %x \n", &file_name );
-    printf ("name    = %s \n", file_name ); 
-    printf ("size    = %d \n", file_size );       // Size in sectors.
-    printf ("nbytes  = %d \n", size_in_bytes );
-    printf ("address = %x \n", file_address );
-    printf ("flag    = %x \n", flag );
-    printf ("entries = %d \n", dir_entries );
+    printk ("name address = %x \n", &file_name );
+    printk ("name    = %s \n", file_name ); 
+    printk ("size    = %d \n", file_size );       // Size in sectors.
+    printk ("nbytes  = %d \n", size_in_bytes );
+    printk ("address = %x \n", file_address );
+    printk ("flag    = %x \n", flag );
+    printk ("entries = %d \n", dir_entries );
  */
 
 // How name direntries this directory have?
@@ -4451,7 +4450,7 @@ fsSaveFile (
     if (file_size > 16)
     {
         debug_print("fsSaveFile: [FIXME] Size in sectors\n");
-        printf     ("fsSaveFile: [FIXME] Size in sectors = %d \n", 
+        printk     ("fsSaveFile: [FIXME] Size in sectors = %d \n", 
             file_size ); 
         goto fail;
     }
@@ -4513,7 +4512,7 @@ fsSaveFile (
 
 out_of_range:  
 
-    printf ("fsSaveFile: No free cluster \n");
+    printk ("fsSaveFile: No free cluster \n");
     goto fail;
 
     // #debug
@@ -4530,7 +4529,7 @@ out_of_range:
 save_file:
 
     //#debug
-    //printf("fsSaveFile: save_file: \n"); 
+    //printk("fsSaveFile: save_file: \n"); 
     //refresh_screen();
 
 // Início da lista.
@@ -4548,7 +4547,7 @@ save_file:
     first = fat16ClustersToSave[i];
 
     // #debug
-    // printf("first={%x}\n",first);
+    // printk("first={%x}\n",first);
 
 // Create directory entry
 // Name/ext 8.3
@@ -4574,12 +4573,11 @@ save_file:
     }
 
     /*
-    printf ("flag=%x \n",flag);
-    printf ("%c\n",DirEntry[8]);
-    printf ("%c\n",DirEntry[9]);
-    printf ("%c\n",DirEntry[10]);
+    printk ("flag=%x \n",flag);
+    printk ("%c\n",DirEntry[8]);
+    printk ("%c\n",DirEntry[9]);
+    printk ("%c\n",DirEntry[10]);
     */
-
 
 // Attribute byte.
 // 0x01: read only
@@ -4668,10 +4666,9 @@ save_file:
                   dir_entries );
 
     if ( FreeIndex == -1 ){
-        printf ("fsSaveFile: [FAIL] No empty entry\n");
+        printk ("fsSaveFile: [FAIL] No empty entry\n");
         goto fail;
     }
-
 
 //
 // Write entry into the directory buffer.
@@ -4698,7 +4695,7 @@ save_file:
 //resetIDE:
 
     //#debug
-    //printf("fsSaveFile: reset and while\n"); 
+    //printk("fsSaveFile: reset and while\n"); 
     //refresh_screen();
 
     //reset_ide0 ();
@@ -4741,7 +4738,7 @@ save_file:
         next = fat16ClustersToSave[i];
 
         // #debug
-        printf ("fsSaveFile: [DEBUG] next={%x}\n", next);
+        printk ("fsSaveFile: [DEBUG] next={%x}\n", next);
 
         // O next é o marcador de fim de lista.
         if (next == 0xFFF8){
@@ -4763,7 +4760,7 @@ save_file:
             fat[next] = fat16ClustersToSave[i+1];
  
             //#debug 
-            //printf("write_lba\n");
+            //printk("write_lba\n");
             //refresh_screen();
             
             // Wait and write!
@@ -4793,7 +4790,7 @@ save_file:
         // Limite provisorio.
         if (i > 16){
             debug_print ("fsSaveFile: [FIXME] write sectors limit\n");
-            printf      ("fsSaveFile: [FIXME] write sectors limit\n");
+            printk      ("fsSaveFile: [FIXME] write sectors limit\n");
             goto fail;
         }
 
@@ -4836,14 +4833,14 @@ do_save_dir_and_fat:
 
     // #debug
     //debug_print ("fsSaveFile: done\n");
-    //printf      ("fsSaveFile: done\n");
+    //printk      ("fsSaveFile: done\n");
     //refresh_screen();
 
     return 0;
 
 fail:
     debug_print("fsSaveFile: Fail\n");
-    printf     ("fsSaveFile: Fail\n");
+    printk     ("fsSaveFile: Fail\n");
     //refresh_screen ();
     return (int) 1;  // Why 1?
     //return -1;
@@ -4934,11 +4931,11 @@ do_read_file_from_disk (
     if (*file_name == '@')
     {
         if (sdGRAMADO.initialized != TRUE){
-            printf("do_read_file_from_disk: sdGRAMADO.initialized\n");
+            printk("do_read_file_from_disk: sdGRAMADO.initialized\n");
             goto fail;
         }
         if (sdGRAMADO.address == 0){
-            printf("do_read_file_from_disk: sdGRAMADO.address\n");
+            printk("do_read_file_from_disk: sdGRAMADO.address\n");
             goto fail;
         }
         TargetDirAddress = sdGRAMADO.address;
@@ -4960,11 +4957,11 @@ do_read_file_from_disk (
     if (*file_name == '#')
     {
         if (sdPROGRAMS.initialized != TRUE){
-            printf("do_read_file_from_disk: sdPROGRAMS.initialized\n");
+            printk("do_read_file_from_disk: sdPROGRAMS.initialized\n");
             goto fail;
         }
         if (sdPROGRAMS.address == 0){
-            printf("do_read_file_from_disk: sdPROGRAMS.address\n");
+            printk("do_read_file_from_disk: sdPROGRAMS.address\n");
             goto fail;
         }
         TargetDirAddress = sdPROGRAMS.address;
@@ -4987,7 +4984,7 @@ do_read_file_from_disk (
 
 // #debug
 
-    //printf ("do_read_file_from_disk: FILE={%s}\n",
+    //printk ("do_read_file_from_disk: FILE={%s}\n",
     //    file_name);
     //refresh_screen();
 
@@ -5016,7 +5013,7 @@ do_read_file_from_disk (
     if (Status != TRUE)
     {
          //#debug
-        printf ("do_read_file_from_disk: [FIXME] File not found!\n");
+        printk ("do_read_file_from_disk: [FIXME] File not found!\n");
         //refresh_screen();
 
         // Create a new one.
@@ -5030,7 +5027,7 @@ do_read_file_from_disk (
             buff = (void*) kmalloc(BUFSIZ);
             if ((void*) buff == NULL)
             {
-                printf("do_read_file_from_disk: buff\n");
+                printk("do_read_file_from_disk: buff\n");
                 goto fail;
             }
             memset(buff,0,BUFSIZ);
@@ -5058,8 +5055,8 @@ do_read_file_from_disk (
               }
          }
 
-         printf("do_read_file_from_disk: [FIXME] Can't create new file\n");
-         goto fail;
+        printk("do_read_file_from_disk: [FIXME] Can't create new file\n");
+        goto fail;
     }
 
 __go:
@@ -5067,37 +5064,37 @@ __go:
 // Process
     p = (struct process_d *) get_current_process_pointer();
     if ( (void *) p == NULL ){
-        printf("do_read_file_from_disk: p\n");
+        printk("do_read_file_from_disk: p\n");
         goto fail;
     }
     if ( p->used != TRUE || p->magic != 1234 ){
-        printf("do_read_file_from_disk: p validation\n");
+        printk("do_read_file_from_disk: p validation\n");
         goto fail;
     }
 
 // Procurando um slot livre.
     for (__slot=0; __slot<32; __slot++)
     {
-         if ( p->Objects[__slot] == 0 ){ goto __OK; }
+        if ( p->Objects[__slot] == 0 ){ goto __OK; }
     };
 
 // fail
     //panic ("do_read_file_from_disk: No slots!\n");
-    printf("do_read_file_from_disk: No slots!\n");
+    printk("do_read_file_from_disk: No slots!\n");
     goto fail;
 
 // Slot found.
 __OK:
 
     if ( __slot < 0 || __slot >= 32 ){
-        printf ("do_read_file_from_disk: Slot fail\n");
+        printk ("do_read_file_from_disk: Slot fail\n");
         goto fail;
     }
 
 // File struct
     fp = (file *) kmalloc( sizeof(file) );
     if ((void *) fp == NULL){
-        printf ("do_read_file_from_disk: fp\n");
+        printk ("do_read_file_from_disk: fp\n");
         goto fail;
     }
     memset( fp, 0, sizeof(file) );
@@ -5171,7 +5168,7 @@ __OK:
 
     fp->_base = (char *) kmalloc(BUFSIZ);
     if ((void *) fp->_base == NULL){
-        printf ("do_read_file_from_disk: fp->_base\n");
+        printk ("do_read_file_from_disk: fp->_base\n");
         goto fail;
     }
     memset(fp->_base, 0, BUFSIZ);
@@ -5180,7 +5177,7 @@ __OK:
     fp->_lbfsize = BUFSIZ;
 
 // #debug
-    //printf ("FILE_AGAIN={%s}\n",file_name);
+    //printk ("FILE_AGAIN={%s}\n",file_name);
     //refresh_screen();
 
 // File size.
@@ -5193,7 +5190,7 @@ __OK:
                       (unsigned long) TargetDirAddress );
 
     if (FileSize <= 0){
-        printf ("do_read_file_from_disk: FileSize\n");
+        printk ("do_read_file_from_disk: FileSize\n");
         goto fail;
     }
 // Structure field for file size.
@@ -5214,8 +5211,8 @@ __OK:
     if (FileSize >= fp->_lbfsize)
     {
         // #debug
-        printf("do_read_file_from_disk: [todo] File size out of limits\n");
-        //printf("Size {%d}\n",FileSize);
+        printk("do_read_file_from_disk: [todo] File size out of limits\n");
+        //printk("Size {%d}\n",FileSize);
         //goto fail;
 
         // #bugbug: Provisório.
@@ -5223,8 +5220,8 @@ __OK:
         //if (FileSize > 1024*1024)
         if (FileSize > 8*1024)  //8KB
         {
-            printf ("do_read_file_from_disk: File size out of limits\n");
-            printf ("%d bytes \n",FileSize);
+            printk ("do_read_file_from_disk: File size out of limits\n");
+            printk ("%d bytes \n",FileSize);
             //refresh_screen();
             return (-1);
         }
@@ -5239,7 +5236,7 @@ __OK:
             //return -1;
         fp->_base = (char *) kmalloc(buflen);
         if ((void *) fp->_base == NULL){
-            printf ("do_read_file_from_disk: Couldn't create a new buffer\n");
+            printk ("do_read_file_from_disk: Couldn't create a new buffer\n");
             //refresh_screen();
             return -1;             
         }
@@ -5255,7 +5252,7 @@ __OK:
 // Limits - 1MB
     //if (FileSize > 1024*1024)
     //{
-    //    printf ("do_read_file_from_disk: File size out of limits\n");
+    //    printk ("do_read_file_from_disk: File size out of limits\n");
     //    refresh_screen();
     //    return -1;
     //}
@@ -5264,7 +5261,7 @@ __OK:
 // Checando base novamente.
 
     if ( (void *) fp->_base == NULL ){
-        printf("do_read_file_from_disk: fp->_base (again)\n");
+        printk("do_read_file_from_disk: fp->_base (again)\n");
         goto fail;
     }
 
@@ -5296,7 +5293,7 @@ __OK:
     //if ( FileSize >= BUFSIZ )
     if (fp->_fsize >= fp->_lbfsize)
     {
-        printf ("do_read_file_from_disk: the file is larger than the buffer\n");
+        printk ("do_read_file_from_disk: the file is larger than the buffer\n");
         //refresh_screen();
         fp->_r = fp->_lbfsize;
         fp->_w = fp->_lbfsize;
@@ -5309,7 +5306,7 @@ __OK:
 
 // Load.
 // Load the file into the memory.
-    //printf("Load ....\n");
+    //printk("Load ....\n");
     Status = 
         (int) fsLoadFile ( 
                   VOLUME1_FAT_ADDRESS, 
@@ -5320,10 +5317,10 @@ __OK:
                   fp->_lbfsize );
 
     if (Status != 0){
-        printf ("do_read_file_from_disk: fsLoadFile fail\n");
+        printk ("do_read_file_from_disk: fsLoadFile fail\n");
         goto fail;
     }
-    //printf("Loaded ....\n");
+    //printk("Loaded ....\n");
 
 // #bugbug
 // Agora é a hora de atualizarmos as tabelas ....
@@ -5422,9 +5419,9 @@ __OK:
     p->Objects[__slot] = (unsigned long) fp;
 
     //#debug
-    //printf ("process name: %s\n",p->__processname);
-    //printf ("fd %d\n",fp->_file);
-    //printf("do_read_file_from_disk-OUTPUT: %s \n",fp->_base);
+    //printk ("process name: %s\n",p->__processname);
+    //printk ("fd %d\n",fp->_file);
+    //printk("do_read_file_from_disk-OUTPUT: %s \n",fp->_base);
     //refresh_screen();
 
 done:
@@ -5589,7 +5586,7 @@ int sys_create_empty_file(char *file_name)
     int NumberOfSectors = 1;
 
     debug_print ("sys_create_empty_file:\n");
-    printf("sys_create_empty_file:\n");
+    printk      ("sys_create_empty_file:\n");
 
     if ((void*) file_name == NULL){
         return (int) (-EINVAL);
@@ -5608,7 +5605,7 @@ int sys_create_empty_file(char *file_name)
 
 // 0x20 = file.
 // See: write.c
-    //printf ("0x20 \n");
+    //printk ("0x20 \n");
     __ret = 
         (int) fsSaveFile ( 
                   VOLUME1_FAT_ADDRESS, 
@@ -5647,7 +5644,7 @@ int sys_create_empty_directory(char *dir_name)
     int number_of_sectors = 1;
 
     debug_print ("sys_create_empty_directory:\n");
-    printf("sys_create_empty_directory:\n");
+    printk      ("sys_create_empty_directory:\n");
     
     if ((void*) dir_name == NULL){
         return (int) (-EINVAL);
@@ -5662,7 +5659,7 @@ int sys_create_empty_directory(char *dir_name)
 
 // See: write.c
 // 0x10 = directory. 
-    //printf ("0x10 \n");
+    //printk ("0x10 \n");
     __ret = 
         (int) fsSaveFile ( 
                   VOLUME1_FAT_ADDRESS, 

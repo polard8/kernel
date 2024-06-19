@@ -635,14 +635,16 @@ regularfile_ioctl (
 
 int kstdio_initialize(void);
 
-//
-// == printk ===============================================
-//
 
+// printf
+// No more printf() in ring0.
 //https://en.wikipedia.org/wiki/Printk
-#define printf  kinguio_printf
 #define printk  kinguio_printf
+
+// sprintf
 #define sprintf  mysprintf
+// #todo:
+//#define sprintfk  mysprintf
 
 // crt/
 #define crt_printf  kinguio_printf
@@ -652,6 +654,7 @@ int kstdio_initialize(void);
 #define crt_ftell  k_ftell
 #define crt_fclose  k_fclose
 // ...
+
 
 #endif    
 

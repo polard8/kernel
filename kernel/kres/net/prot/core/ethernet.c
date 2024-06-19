@@ -14,7 +14,7 @@ ethernet_send(
 // #todo
 // NIC Intel device structure.
     if ((void *) dev == NULL){
-        printf("ethernet_send: dev\n");
+        printk("ethernet_send: dev\n");
         goto fail;
     }
 

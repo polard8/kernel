@@ -1,7 +1,6 @@
 
 // callback.c
 
-
 #include <kernel.h>
 
 //--------------------------------------
@@ -16,7 +15,6 @@
 // para o assembly entender o que esta acontecendo.
 // see: psTaskSwitch
 
-
 // Exported to asm.
 unsigned long asmflagDoCallbackAfterCR3=0;
 unsigned long ring3_callback_address=0;
@@ -27,7 +25,6 @@ unsigned long _callback_address=0;
 unsigned long _callback_address_saved=0;
 
 struct ws_callback_info_d  ws_callback_info;
-
 
 // initialize for the first time 
 // during the kernel initialization.
