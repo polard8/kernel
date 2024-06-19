@@ -1,4 +1,5 @@
 
+// mmain.c
 // Generic kernel side component for
 // the ring3 main subsystem.
 // The main file for the ring 0 kernel module.
@@ -6,6 +7,7 @@
 // #warning: 
 // Do not use 'interrupts'. Do done make syscalls.
 // Call the kernel symbols directly.
+// Created by Fred Nora.
 
 #include "kernel.h"
 
@@ -35,10 +37,9 @@ mmain (
 
     //#debug
     //if (sc_id == 0xFF)
-        //printf ("[0xFF]: Called by kernel\n");
+        //printk ("[0xFF]: Called by kernel\n");
 
-
-// Invalid reason.
+// Invalid reason
     if (reason < 0){
         goto fail;
     }
@@ -51,13 +52,13 @@ mmain (
             Status = (int) newm0_initialize();
             if (Status == TRUE)
             {
-                printf("Initialization OK\n");
+                printk("Initialization OK\n");
                 return 1234;
             }
             return (unsigned long) 0;
             break;
 
-        // Testing printf function.
+        // Testing printk function.
         case 1001:
             Status = (int) newm0_1001();
             if (Status == TRUE){
@@ -69,7 +70,7 @@ mmain (
         // The function table exported by the base kernel.
         case 1002:
             fn_table = (unsigned long *) param4;
-            printf("fn_table {%x}\n", fn_table);
+            printk("fn_table {%x}\n", fn_table);
             return (unsigned long) 0;
             //while(1){}
             break;
@@ -77,16 +78,16 @@ mmain (
         // The syscall entrypoint exported by the kernel.
         // This way we can call routines inside the kernel.
         case 1003:
-            printf("mod_sci: {%x}\n", param4);
+            printk("mod_sci: {%x}\n", param4);
             sci_entry = param4;
             
             // Calling the kernel service.
             // see: kal.c
             // ok, it is working!
             //ReturnValue = (unsigned long) ke_sci(0,0,0,0);
-            //printf("mmain.c: ReturnValue={%d} \n", ReturnValue);
+            //printk("mmain.c: ReturnValue={%d} \n", ReturnValue);
             
-            //printf("mmain.c: #breakpoint :)\n");
+            //printk("mmain.c: #breakpoint :)\n");
             //while (1){};
             return (unsigned long) 0;
             break;
@@ -121,7 +122,7 @@ mmain (
                 newm0_initialize();
             }
             if (ModuleInitialization.initialized == TRUE){
-                printf("Parameters: %d | %d | %d | %d\n",
+                printk("Parameters: %d | %d | %d | %d\n",
                     param1, param2, param3, param4 );
                 return (unsigned long) 1234;
             }

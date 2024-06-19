@@ -1,4 +1,7 @@
 
+// display.c
+// Created by Fred Nora.
+
 #include <kernel.h>
 
 struct display_info_d  DisplayInfo;
@@ -25,7 +28,7 @@ display_initialization_phase1(
 
     if (ModuleInitialization.initialized == TRUE)
     {
-        //printf("Parameters: %d | %d | %d | %d\n",
+        //printk("Parameters: %d | %d | %d | %d\n",
             // param1, param2, param3, param4 );
     }
 
@@ -45,7 +48,7 @@ display_initialization_phase1(
     DisplayInfo.initialized = FALSE;
 
     //#debug
-    //printf ("frontbuffer={%x} | backbuffer={%x}\n",
+    //printk ("frontbuffer={%x} | backbuffer={%x}\n",
         //DisplayInfo.frontbuffer_address,
         //DisplayInfo.backbuffer_address );
     //while(1){ asm ("hlt"); }
@@ -69,7 +72,7 @@ display_initialization_phase2(
             
     if (ModuleInitialization.initialized == TRUE)
     {
-        //printf("Parameters: %d | %d | %d | %d\n",
+        //printk("Parameters: %d | %d | %d | %d\n",
             //param1, param2, param3, param4 );
     }
 
@@ -92,7 +95,7 @@ display_initialization_phase2(
 
     /*
     // #debug
-    printf ("w={%d} | h={%d} | bpp={%d}\n",
+    printk ("w={%d} | h={%d} | bpp={%d}\n",
         DisplayInfo.width, 
         DisplayInfo.height, 
         DisplayInfo.bpp );

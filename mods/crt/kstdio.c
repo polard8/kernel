@@ -1,4 +1,7 @@
 
+// kstdio.c
+// Created by Fred Nora.
+
 #include <kernel.h>
 
 // kernel sysboltable address.
@@ -15,11 +18,9 @@ int PUTCHAR_FGCONSOLE=4;  //(1arg)
 // read messages
 // ...
 
-
 struct module_initialization_d  ModuleInitialization;
 
-
-// printf support.
+// printk support.
 static void __kstdio_puts(const char* str);
 static char *_vsputs_r(char *dest, char *src);
 
@@ -86,14 +87,14 @@ int newm0_1001(void)
     //do_int3();
     //caller1( kfunctions[PUTCHAR_FGCONSOLE], 'x');
 
-// #testing printf
+// #testing printk
     long value = 1234;
-    //printf("mod0.bin: Testing printf | value={%d} :)\n",
+    //printk("mod0.bin: Testing printk | value={%d} :)\n",
         //value);
 
 // #testing reboot.
 // ok, it's working.
-    //printf("mod0.bin: Testing reboot via ports\n");
+    //printk("mod0.bin: Testing reboot via ports\n");
     //do_reboot();
 
 // Done
@@ -351,13 +352,7 @@ kinguio_vsprintf(
 }
 
 
-
-
-
-
-
-
-// printf implementation.
+// printk implementation.
 // Credits:
 // Nelson Cole. Kinguio/Sirius OS.
 int kinguio_printf(const char *fmt, ...)
@@ -401,9 +396,4 @@ int mysprintf(char *buf, const char *fmt, ...)
 
     return (int) i;
 }
-
-
-
-
-
 

@@ -1,4 +1,7 @@
 
+// hal.c
+// Created by Fred Nora.
+
 #include <kernel.h>
 
 void do_hlt(void)
@@ -15,7 +18,7 @@ void do_reboot(void)
 {
     unsigned char good=0;
 
-    printf ("newm0: do_reboot\n");
+    printk ("newm0: do_reboot\n");
 
 // Wait
     good = 0x02;
@@ -23,11 +26,11 @@ void do_reboot(void)
         good = in8(0x64);
     };
 
-    printf ("newm0: Go!\n");
+    printk ("newm0: Go!\n");
     out8(0x64, 0xFE);
 
 //fail:
-    printf ("newm0: Fail\n");
+    printk ("newm0: Fail\n");
     while (1){
         asm (" cli ");
         do_hlt();

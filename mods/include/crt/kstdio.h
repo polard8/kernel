@@ -4,7 +4,6 @@
 #ifndef __CRT_KSTDIO_H
 #define __CRT_KSTDIO_H    1
 
-
 struct module_initialization_d
 {
     int initialized;
@@ -13,13 +12,8 @@ struct module_initialization_d
 extern struct module_initialization_d  ModuleInitialization;
 
 void newm0_print_string (char *s);
-
 int newm0_1001(void);
-
 int newm0_initialize(void);
-
-
-
 
 char *kinguio_itoa (int val, char *str);
 
@@ -43,10 +37,8 @@ int mysprintf(char *buf, const char *fmt, ...);
 
 // --------------------
 // Aliases
-#define printf   kinguio_printf
 #define printk   kinguio_printf
 #define sprintf  mysprintf
-
 
 #endif   
 
