@@ -54,11 +54,12 @@ typedef enum {
 #define FOREGROUND_PROCESS  2
 
 
-
 // Image. 
 // (Base da imagem de um processo de usuário).
 // virtual address
 #define UPROCESS_IMAGE_BASE  0x200000 
+/* 0x00200000 = image base */
+/* 0x00201000 = The entry point */
 
 
 //Process Limit. (User process) 

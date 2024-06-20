@@ -3,9 +3,8 @@
 // Physical memory overview.
 // Global declaration of static physical address used by the kernel.
 
-#ifndef ____GPA_H
-#define ____GPA_H  1
-
+#ifndef __MM_GPA_H
+#define __MM_GPA_H  1
 
 //
 // == 0 KB ==================================================

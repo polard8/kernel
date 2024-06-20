@@ -1,6 +1,7 @@
 
-// mmsize.h
-// memory size support.
+// mm/mmsize.h
+// Memory size support.
+// Created by Fred Nora.
 
 #ifndef __MM_MMSIZE_H
 #define __MM_MMSIZE_H    1
@@ -20,41 +21,37 @@ struct last_mb_footer_d
 extern struct last_mb_footer_d  last_mb_footer;
 */
 
-
 // Size support.
 #define KB  (1024)
 #define MB  (1024 * 1024)
 #define GB  (1024 * 1024 * 1024)
 
+//
+// System size
+//
 
+// --------------
+// System size in MB.
 #define __SMALL   ( 256 -1)
 #define __MEDIUM  ( 512 -1)
 #define __LARGE   (1024 -1)
-
-// --------------
-// Tamanho dado em bytes.
+// System size in bytes.
 #define SMALLSYSTEM_SIZE  ( __SMALL  *1024*1024)
 #define MEDIUMSYSTEM_SIZE ( __MEDIUM *1024*1024)
 #define LARGESYSTEM_SIZE  ( __LARGE  *1024*1024)
-
-// Tamanho do sistema, dado em KB.
+// System size in KB.
 #define SMALLSYSTEM_SIZE_KB  (__SMALL  * 1024)
 #define MEDIUMSYSTEM_SIZE_KB (__MEDIUM * 1024)
 #define LARGESYSTEM_SIZE_KB  (__LARGE  * 1024)
-
-// #todo
-// Tamanho do sistema, dado em MB.
+// System size in MB.
 #define SMALLSYSTEM_SIZE_MB  (__SMALL)
 #define MEDIUMSYSTEM_SIZE_MB (__MEDIUM)
 #define LARGESYSTEM_SIZE_MB  (__LARGE)
-
-// Tamanho so sitema, dado em quantidade de páginas de 4KB.
+// System size in 4KB pages.
 #define SMALLSYSTEM_SIZE_PAGES  ( (__SMALL  *1024*1024) / 4096 )
 #define MEDIUMSYSTEM_SIZE_PAGES ( (__MEDIUM *1024*1024) / 4096 )
 #define LARGESYSTEM_SIZE_PAGES  ( (__LARGE  *1024*1024) / 4096 )
 // --------------
-
-
 
 //
 // Memory size support.
@@ -81,7 +78,6 @@ extern unsigned long memorysizeUsed;
 extern unsigned long memorysizeFree;
 
 
-
 //
 // System memory type.
 //
@@ -99,16 +95,16 @@ typedef enum {
 extern int g_mm_system_type;
 
 
+//
+// Memory size
+//
 
 struct memory_size_info_d
 {
-
 // If this structure was initialized or not.
 // Initialized by mmsize_initialize() in mmsize.c
     int initialized;
-
     // ...
-
 };
 // see: mmsize.c
 extern struct memory_size_info_d MemorySizeInfo;

@@ -1,5 +1,7 @@
 
-// mm.h
+// mm/mm.h
+// Memory manager
+// Created by Fred Nora.
 
 #ifndef __MM_MM_H
 #define __MM_MM_H    1

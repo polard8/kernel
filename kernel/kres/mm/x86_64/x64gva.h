@@ -3,9 +3,8 @@
 // Virtual memory overview.
 // Global virtual addresses.
 
-#ifndef ____GVA_H
-#define ____GVA_H    1
-
+#ifndef __MM_GVA_H
+#define __MM_GVA_H    1
 
 // #todo
 // Tem um monte de endereços usados no início da 

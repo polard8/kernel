@@ -1,22 +1,16 @@
+// mm/mmblock.h
+// Blocks
+// Created by Fred Nora.
 
-// mmblock.h
-
-#ifndef __MMBLOCK_H
-#define __MMBLOCK_H    1
-
+#ifndef __MM_MMBLOCK_H
+#define __MM_MMBLOCK_H    1
 
 // Number of indexes into the list.
 // see: mmblockList[i]
 #define MMBLOCK_COUNT_MAX  (2*4096)
 
 
-/*
- * mmblock_d:
- *     Estrutura para memory blocks.
- *     Temos v�rios blocos de mem�ria espalhados em lugares diferentes 
- * dentro de um heap.
- *     Essa estrutura � usada pelo kernel para controlar as �reas de mem�ria
- * alocadas din�micamente dentro do heap do kernel.
+ /*
  * @todo: 
  * Os blocos precisam de alguma organiza��o. 
  * Por enquanto, o total � 256 heaps de tamanhos diferentes.
@@ -37,6 +31,15 @@
 // alocadas dinamicamente dentro do heap do processo kernel. 
 // >>> Don't change this structure.
 // It has a fixed size.
+
+/*
+ * mmblock_d:
+ * This strcture is used to represent blocks of memory only 
+ * inside the Kernel's heap.
+ * We also have another structure used to represent blocks of 
+ * physical memory called aspace_d.
+ * The blocks of memory inside the heap are allocated dinamicaly.
+ */
 
 struct mmblock_d 
 {
