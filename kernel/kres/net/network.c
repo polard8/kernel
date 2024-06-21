@@ -53,7 +53,7 @@ static void __initialize_ws_info(pid_t pid)
 
 // Maybe we can just emit an error message and return.
     if (WindowServerInfo.initialized == TRUE){
-        panic("__initialize_ws_info: The ws is already running\n");
+        panic("__initialize_ws_info: Another display server is on\n");
     }
     WindowServerInfo.initialized = FALSE;
 
