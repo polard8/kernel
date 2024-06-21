@@ -4,6 +4,7 @@
 // It handles the device-independent part of the console infrastructure.
 // + We receive bytes from the ps2 keyboard driver.
 // + We print bytes into the screen.
+// Created by Fred Nora.
 
 // #todo
 // If this code is device independent, 
@@ -530,7 +531,7 @@ console_init_virtual_console(
     // Nao sei se essas estruturas estao prontas para isso nesse momento
     // ou se esses ponteiros sao nulos.
     CONSOLE_TTYS[ConsoleIndex].user_session = NULL;  // Current user session;
-    CONSOLE_TTYS[ConsoleIndex].zh = NULL;  // Current zing hook
+    CONSOLE_TTYS[ConsoleIndex].cgroup = NULL;        // Current cgroup
 
     // file pointer
     // this file handles this tty object

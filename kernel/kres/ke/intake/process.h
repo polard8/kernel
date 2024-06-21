@@ -1,5 +1,5 @@
-
 // process.h
+// Created by Fred Nora.
 
 #ifndef __PS_PROCESS_H
 #define __PS_PROCESS_H    1
@@ -746,10 +746,9 @@ struct process_d
 // == Security ============================
 //
 
-// User session,  zh.
-
-    struct usession_d  *usession;  //user session
-    struct zing_hook_d *zh;        //zh.        
+// User session, cgroup.
+    struct usession_d  *usession;  // user session
+    struct cgroup_d *cg;           // cgroup.        
 
 // ============================================
 
@@ -954,10 +953,10 @@ void close_all_processes(void);
 // ===
 
 // Worker for create_process.
-void ps_initialize_process_common_elements( struct process_d *p );
+void ps_initialize_process_common_elements(struct process_d *p);
     
 struct process_d *create_process ( 
-    struct zing_hook_d *zh,
+    struct cgroup_d *cg,
     unsigned long base_address, 
     unsigned long priority, 
     ppid_t ppid, 

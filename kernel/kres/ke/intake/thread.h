@@ -1,5 +1,5 @@
-
 // thread.h
+// Created by Fred Nora.
 
 #ifndef __PS_THREAD_H
 #define __PS_THREAD_H    1
@@ -641,8 +641,9 @@ struct thread_d
 // Isso é usado para gerência de memória e 
 // para privilégios de acesso.
 
+// usersession and cgroup
     struct usession_d *usession;  // user session.
-    struct zing_hook_d *zh;   // zh.
+    struct cgroup_d *cg;          // cgroup.
 
 // Callback:
 // The main procedure for a ring 3 application.
@@ -852,7 +853,7 @@ unlink_two_threads(
 struct thread_d *copy_thread_struct(struct thread_d *thread);
 
 struct thread_d *create_thread ( 
-    struct zing_hook_d  *zh,
+    struct cgroup_d  *cg,
     unsigned long init_rip, 
     unsigned long init_stack, 
     pid_t pid, 

@@ -1,5 +1,6 @@
 
 // thread.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -836,7 +837,7 @@ int thread_profiler(int service)
 // The second one will setup all the machine dependent elements.
 
 struct thread_d *create_thread ( 
-    struct zing_hook_d  *zh,
+    struct cgroup_d  *cg,
     unsigned long init_rip, 
     unsigned long init_stack, 
     pid_t pid, 
@@ -844,9 +845,6 @@ struct thread_d *create_thread (
     unsigned int cpl )
 {
 // Create a thread.
-// #todo:
-// Explain what is a 'zing hook'.
-// Change this name. Maybe this is the old 'desktop' structure.
 
     struct process_d *Process;
     struct thread_d  *Thread;
@@ -865,8 +863,9 @@ struct thread_d *create_thread (
 //======================================
 // check parameters.
 
-    if ((void*) zh == NULL){
-        debug_print ("create_thread: zh\n");
+    // cgroup
+    if ((void*) cg == NULL){
+        debug_print ("create_thread: cg\n");
     }
 
 // #bugbug
@@ -1358,7 +1357,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     //char new_name[32];
 
 // IN: 
-//  zh, window,
+// cgroup, window,
 // initial eip, initial stack, 
 // pid, thread name.
 
@@ -1692,7 +1691,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     clone->owner_process = father->owner_process; 
 
 	//Thread->window_station
-	//Thread->zh
+	//Thread->cg  // cgroup
 	//Thread->control_menu_procedure
 	//Thread->wait4pid =
 

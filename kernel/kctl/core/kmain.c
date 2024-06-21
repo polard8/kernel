@@ -330,7 +330,7 @@ void init_globals(void)
 
 // Security layers.
     current_usersession = (int) 0;
-    current_zh = (int) 0;
+    current_cgroup = (int) 0;
 
 // Process
     foreground_process = (pid_t) 0;

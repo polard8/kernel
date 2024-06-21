@@ -1,5 +1,6 @@
 
 // process.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -509,10 +510,9 @@ copy_process_struct(
     Process2->rflags_iopl = Process1->rflags_iopl;
 
 // Security: 
-// usersession and zh.
-
+// usersession and cgroup.
     Process2->usession = Process1->usession;
-    Process2->zh  = Process1->zh;
+    Process2->cg = Process1->cg;
 
 // Absolute pathname and relative pathname. 
 
@@ -1020,7 +1020,7 @@ void ps_initialize_process_common_elements(struct process_d *p)
 
 // Create process
 struct process_d *create_process ( 
-    struct zing_hook_d *zh,
+    struct cgroup_d *cg,
     unsigned long base_address, 
     unsigned long priority, 
     ppid_t ppid, 
@@ -1045,8 +1045,9 @@ struct process_d *create_process (
 //=================================
 // check parameters
 
-    if( (void*) zh == NULL ){
-        //debug_print ("create_process: zh\n");
+    // cgroup
+    if ((void*) cg == NULL){
+        //debug_print ("create_process: cg\n");
     }
 
 // #todo
@@ -1463,7 +1464,7 @@ struct process_d *create_process (
     //Process->event
 
 // #importante
-// user session and zh.
+// user session and cgroup.
 // #bugbug: 
 // Nao temos informaçao sobre a user session, 
 // devemos pegar a estrutura de current user session. 
@@ -1472,7 +1473,7 @@ struct process_d *create_process (
 
 // Security
     Process->usession = CurrentUserSession;  // Current.
-    Process->zh  = zh;             // Passado via argumento.
+    Process->cg = (struct cgroup_d *) cg;    // Passado via argumento.
 // Navigation
     Process->prev = NULL; 
     Process->next = NULL; 

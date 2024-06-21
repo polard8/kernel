@@ -2,6 +2,7 @@
 // ws.h
 // Window system support.
 // Colors and color scheme.
+// Created by Fred Nora.
 
 #ifndef __DISPLAY_WS_H
 #define __DISPLAY_WS_H    1
@@ -36,8 +37,6 @@ extern int guiStatus;
 extern int logonStatus;              //Logon status.
 extern int logoffStatus;             //Logoff status.
 extern int userenvironmentStatus;    //User environment status.
-// Contagens de ambientes;
-extern int zh_count;
 
 // draw char support
 extern int gcharWidth;
@@ -62,6 +61,8 @@ extern unsigned long g_mousepointer_y;
 // == window server ==================================================
 //
 
+// #todo:
+// Change this term to display server.
 // types of window server.
 typedef enum {
     WindowServerTypeNull,
@@ -69,13 +70,20 @@ typedef enum {
     WindowServerTypeRing0Process,
     WindowServerTypeRing3Process
     // ...
+    // #todo
+    //DisplayServerTypeNull,
+    //DisplayServerTypeEmbedded,       // Embedded inside the base kernel.
+    //DisplayServerTypeRing0Process,
+    //DisplayServerTypeRing3Process
+    // ...
 } window_server_t;
+//} display_server_t;
 
 // The window server struct.
 // Here we will find all the info we need about the window server
 // that the system is using in the moment. Things like, name, pid ... 
 // The system is able to run only one window server.
-// We can select one window server per zing hook.
+// We can select one window server per cgroup.
 // The window server is a ring3 process.
 // The system also have an embedded window server inside the base kernel.
 // Maybe we will create different kinds of window server in the future,
@@ -112,7 +120,7 @@ typedef enum {
     // the pid of the kernel process.
     
     pid_t WindowServer_pid; 
-    //struct zing_hook_d *zh;  // The zh associated with the ws. (display server)
+    //struct cgroup_d *cgroup;  // The cgroup associated with the ws. (display server)
 
     // Limiting the nale to 64.
     char WindowServer_name[64];

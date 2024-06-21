@@ -1,5 +1,5 @@
-
 // tty.h
+// Created by Fred Nora.
 
 #ifndef ____TTY_H
 #define ____TTY_H  1
@@ -203,11 +203,10 @@ struct tty_d
 // What is the user logged in this terminal?
 // see: user.h
     struct user_info_d *user_info;
-// Security: user session, zh.
     struct usession_d  *user_session;
-    struct zing_hook_d   *zh;
+// cgroup
+    struct cgroup_d  *cgroup;
 // ===================================================
-
 
 //
 // == Storage ========

@@ -9,6 +9,7 @@
 // pois vamos dar suporte ao conceito de 'surfaces',
 // que serao areas de memoria compartilhadas entre o painter-client side 
 // e o compositor, server-side. 
+// Created by Fred Nora.
 
 #ifndef __DISPLAY_WS2_H
 #define __DISPLAY_WS2_H    1
@@ -188,10 +189,10 @@ struct gui_d
 
 // Security
     struct usession_d  *user_session;
-    struct zing_hook_d   *zing_hook;
+// #todo: cgroup spport
+    // struct cgroup_d  *cgroup;
 };
 extern struct gui_d  *gui; 
-
 
 //
 // == prototypes ================

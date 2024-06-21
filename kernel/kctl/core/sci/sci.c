@@ -1,4 +1,3 @@
-
 // sci.c - (Transfiguration)
 // (System Call Interface).
 // System Service Dispatcher.
@@ -240,7 +239,8 @@ void *sci0 (
 
     unsigned long *message_address = (unsigned long *) arg2;
 
-    struct zing_hook_d *__zh;
+// Pointer for cgroup
+    struct cgroup_d *cg;
 
     unsigned long *a2 = (unsigned long*) arg2;
     unsigned long *a3 = (unsigned long*) arg3;
@@ -627,7 +627,7 @@ void *sci0 (
     {
         debug_print("sci0: [FIXME] SCI_SYS_CREATE_PROCESS\n");
         return (void *) sys_create_process ( 
-                            NULL,             // zing hook
+                            NULL,             // cgroup
                             0,                // Reserved
                             arg3,             // priority
                             current_process,  // ppid
@@ -898,9 +898,9 @@ void *sci0 (
 
 // 158 - free
 
-// 159 - get current zing hook id
+// 159 - get current cgroup id
     if (number == SCI_GETCURRENTDESKTOP){
-        return (void *) current_zh; 
+        return (void *) current_cgroup; 
     }
 
 // ----------------
@@ -1300,19 +1300,19 @@ void *sci0 (
         return NULL;
     }
 
-// 512 - Get display server PID for a given zing hook.
-// IN: zing hook structure pointer.
+// 512 - Get display server PID for a given cgroup
+// IN: cgroup structure pointer.
 // OUT: pid
     if (number == SCI_GET_WS_PID)
     {
         debug_print("sci0: SCI_GET_WS_PID\n");
-        __zh = (struct zing_hook_d *) arg2;
-        if ( (void *) __zh != NULL )
+        cg = (struct cgroup_d *) arg2;
+        if ( (void *) cg != NULL )
         {
-            if ( __zh->used  == TRUE && 
-                 __zh->magic == 1234 )
+            if ( cg->used  == TRUE && 
+                 cg->magic == 1234 )
             {
-                return (void *) __zh->__display_server_pid; 
+                return (void *) cg->__display_server_pid; 
             }
         }
         // It means pid=0.
@@ -1321,22 +1321,22 @@ void *sci0 (
 
 // 513
 // Register the ring3 display server.
-// Set display PID for a given zing hook structure.
+// Set display PID for a given cgroup structure.
 // Register a display server.
 // gramado_ports[11] = ws_pid
 // Called by the ring 3 display server.
-// arg2 = zing hook structure pointer.
-// arg3 = The display erver PID.
+// >> arg2 = cgroup structure pointer.
+// >> arg3 = The display erver PID.
     int display_server_ok=FALSE;
     if (number == SCI_SET_WS_PID)
     {
         debug_print("sci0: SCI_SET_WS_PID\n");
         
-        // IN: zing hook, caller pid.
+        // IN: cgroup, caller pid.
         // see: network.c
         display_server_ok = 
             (int) network_register_ring3_display_server(
-                (struct zing_hook_d *) arg2, (pid_t) arg3);
+                (struct cgroup_d *) arg2, (pid_t) arg3);
         
         if (display_server_ok == TRUE){
             return (void*) TRUE;
@@ -1346,13 +1346,13 @@ void *sci0 (
 
 
 // #deprecated
-// 514 - get wm PID for a given zing hook
+// 514 - get wm PID for a given cgroup
     if ( number == SCI_GET_WM_PID ){
         panic("sci0: SCI_GET_WM_PID\n");
         return NULL;
     }
 // #deprecated
-// 515 - set wm PID for a given zing hook
+// 515 - set wm PID for a given cgroup
     if (number == SCI_SET_WM_PID){
         panic("sci0: SCI_SET_WM_PID\n");
         return NULL;
@@ -1361,24 +1361,22 @@ void *sci0 (
 // #bugbug
 // This is a ring0 pointer.
 // A ring3 process can't handle this thing.
-// Get current zing hook
+// Get current cgroup. (ring0 pointer hahaha)
     if (number == 519){
-        return (void *) CurrentZingHook;
+        return (void *) CurrentCG;
     }
 
-// 521 - set ns PID for a given zing hook.
+// 521 - set ns PID for a given cgroup
 // network server
 // Register a network server.
     if (number == 521)
     {
-        __zh = (struct zing_hook_d *) arg2;
-        if ( (void *) __zh != NULL )
+        cg = (struct cgroup_d *) arg2;
+        if ((void *) cg != NULL)
         {
-            if ( __zh->used == TRUE && 
-                 __zh->magic == 1234 )
+            if ( cg->used == TRUE && cg->magic == 1234 )
             {
-                __zh->__network_server_pid = (pid_t) arg3;
-
+                cg->__network_server_pid = (pid_t) arg3;
                 socket_set_gramado_port(
                     GRAMADO_PORT_NS,
                     (pid_t) current_process );
@@ -1388,7 +1386,6 @@ void *sci0 (
         }
         return NULL; //fail
     }    
-
 
 // 600 - dup
     if (number == 600){

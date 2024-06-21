@@ -1,9 +1,8 @@
-
 // console.h
+// Created by Fred Nora.
 
 #ifndef  __CONSOLE_H
 #define __CONSOLE_H    1
-
 
 //
 // Modes
@@ -92,9 +91,9 @@ struct virtual_console_login_d
     int mode;
     
     struct user_info_d *user_info;
-    
     struct usession_d *usession;
-    struct zing_hook_d  *zh;
+
+    struct cgroup_d  *cgroup;
 };
 
 //

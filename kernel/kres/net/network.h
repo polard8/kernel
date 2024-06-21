@@ -1,5 +1,5 @@
-
 // network.h
+// Created by Fred Nora.
 
 #ifndef __NET_NETWORK_H
 #define __NET_NETWORK_H    1
@@ -137,11 +137,11 @@ struct network_initialization_d
 // == Prototypes ====================
 //
 
+// Register display servver into a given valid cgroup.
 int 
 network_register_ring3_display_server(
-    struct zing_hook_d *zh,
+    struct cgroup_d *cg,
     pid_t caller_pid );
-
 
 void 
 network_fill_mac(

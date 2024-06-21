@@ -1,5 +1,6 @@
 
 // heap.h
+// Created by Fred Nora.
 
 #ifndef  __HEAP_H
 #define  __HEAP_H    1
@@ -60,19 +61,20 @@ struct heap_d
 	//unsigned long freeBlocks[32];
 	//unsigned long Blocks[64];
 
-// Um heap pertence à um zh.
-    struct zing_hook_d *zh;
 // Um heap pertence à um processo.
     struct process_d *process;
 // Um heap pode pertencer à um thread.
     struct thread_d *thread;
+
+// The heap belongs to a cgroup;
+    struct cgroup_d *cgroup;
 
 // Compartilhamento de heap:
 // ========================
 // + As threads de um mesmo processo podem compartilhar o mesmo heap
 //   pois estão na mesma área de memória.
 // + #todo: 
-//   O desafio é fazer os processes que estão no mesmo zh
+//   O desafio é fazer os processes que estão no mesmo cgroup
 //   compartilharem o mesmo heap, porque eles deveriam estar
 //   na mesma área de memória para isso. 
 

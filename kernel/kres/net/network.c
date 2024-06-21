@@ -1,4 +1,3 @@
-
 // network.c
 // Network layer. (IP)
 // Transport layer. (TCP/UDP/...)
@@ -164,9 +163,10 @@ static void __maximize_ws_priority(pid_t pid)
     t->quantum = QUANTUM_MAX;
 }
 
+// Register display servver into a given valid cgroup.
 int 
 network_register_ring3_display_server(
-    struct zing_hook_d *zh,
+    struct cgroup_d *cg,
     pid_t caller_pid )
 {
 // 513 - SYS_SET_WS_PID
@@ -174,16 +174,16 @@ network_register_ring3_display_server(
 
     struct process_d *p;
     struct thread_d *t;
-
     pid_t current_process = (pid_t) get_current_process();
 
-// parameter:
-    if ((void*) zh == NULL)
+// parameters
+
+    // cgroup
+    if ((void*) cg == NULL)
         goto fail;
-    if (zh->magic != 1234)
+    if (cg->magic != 1234)
         goto fail;
 
-// parameter:
 // Invalid caller.
     if (caller_pid != current_process){
         panic("network_register_ring3_display_server: caller_pid\n");
@@ -203,9 +203,14 @@ network_register_ring3_display_server(
     if (p->magic != 1234)
         panic("network_register_ring3_display_server: p magic\n");
 
+//
+// Save
+//
+
+// Saving the display server PID into the cgroup structure.
 
 // Register_ws_process(current_process);
-    zh->__display_server_pid = (pid_t) current_process;
+    cg->__display_server_pid = (pid_t) current_process;
 
 // #todo
 // Maybe this method belongs to the sys_bind() routine.

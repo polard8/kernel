@@ -1,5 +1,6 @@
-
 // sys.c
+// Created by Fred Nora.
+
 // see: syscalls.h
 // Kernel-mode callable interfaces.
 // These are the wrappers for the real low-level 
@@ -100,7 +101,7 @@ unsigned long sys_get_system_metrics(int n)
 // Only ring3 for now.
 // OUT: ?
 void *sys_create_process ( 
-    struct zing_hook_d  *zh,
+    struct cgroup_d *cg,
     unsigned long res1,          //nothing
     unsigned long priority, 
     int ppid, 
@@ -186,7 +187,7 @@ void *sys_create_process (
 
     new = 
         (void *) create_process ( 
-                     NULL,  //zh
+                     NULL,  // cg #todo: cgroup came from parameters.
                      (unsigned long) CONTROLTHREAD_BASE, 
                      PRIORITY_NORMAL_THRESHOLD, 
                      (int) current_pid, 
@@ -228,7 +229,7 @@ fail:
 // Enviar os argumentos via buffer.
 
 void *sys_create_thread ( 
-    struct zing_hook_d  *zh,
+    struct cgroup_d *cg,
     unsigned long init_rip, 
     unsigned long priority, 
     int ppid, 
@@ -236,13 +237,12 @@ void *sys_create_thread (
 {
     struct thread_d  *Thread;
 
-
     debug_print ("sys_create_thread:\n");
 
 // #todo:
 // Filtros, para ponteiros NULL.
     
-    if ( init_rip == 0 ){
+    if (init_rip == 0){
         debug_print ("sys_create_thread: [FAIL] init_rip\n");
         return NULL;
     }
@@ -267,7 +267,7 @@ void *sys_create_thread (
     
     Thread = 
         (struct thread_d *) create_thread ( 
-                                zh,  
+                                cg,           // cgroup  
                                 init_rip, 
                                 priority, 
                                 ppid, 

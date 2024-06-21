@@ -1,7 +1,7 @@
 
 // user.h
-
 // userinfo >> user session
+// Created by Fred Nora.
 
 #ifndef ____USER_H
 #define ____USER_H    1
@@ -39,6 +39,10 @@ struct usession_d
 // This session has a terminal or console?
     //int tty;
 
+// #test #todo
+// This usersession belongs to an cgroup.
+    //struct cgroup_d *cgroup;
+
 // =========================================================
     unsigned long BeginTime;
     unsigned long EndTime;
@@ -47,74 +51,74 @@ struct usession_d
 };
 // #todo
 // Use external reference here.
-struct usession_d *usession0;
-struct usession_d *CurrentUserSession;
+extern struct usession_d *usession0;
+extern struct usession_d *CurrentUserSession;
+extern int current_usersession;
 // List
 // Counters.
 #define USER_SESSION_COUNT_MAX  16
-unsigned long usessionList[USER_SESSION_COUNT_MAX];
+extern unsigned long usessionList[USER_SESSION_COUNT_MAX];
 
 //==============================================================
 
-struct zing_hook_d
+// cgroup
+// cgroup is all about resources management.
+struct cgroup_d
 {
-// Register some components of the zing layer.
+// Register some components of the cgroups.
 // + display server.
 // + network server.
+// ...
 
-    object_type_t   objectType;
+    object_type_t  objectType;
     object_class_t  objectClass;
-
-    int id;
     int used;
     int magic;
-    uid_t uid;
+
+    // cgroup ID.
+    int id;
+
 // usando o mesmo esquema do usuário.
     char __name[64];
     int name_lenght;
+
+    uid_t uid;
 
 // Main PIDs
     pid_t __display_server_pid;   // display server
     pid_t __network_server_pid;   // network server
 
 // Navigation
-    struct zing_hook_d *next;
+    struct cgroup_d *next;
 };
-extern struct zing_hook_d  *CurrentZingHook;
-// List
-// Zing hook list.
-#define ZH_COUNT_MAX    16
-unsigned long zinghookList[ZH_COUNT_MAX];
+// See: gramk/user/user.c
+extern struct cgroup_d  *CurrentCG;
+extern int current_cgroup; 
+extern int cg_counter;
+// List of cgroups.
+#define CGROUP_COUNT_MAX    16
+extern unsigned long cgroupList[CGROUP_COUNT_MAX];
 
 //
 // == prototypes ===========================
 //
-// Initialization
-void init_zh_list(void);
-void init_zh(void);
 
-void set_current_zh(struct zing_hook_d *zh);
-struct zing_hook_d *get_current_zh(void);
+// Initialize the first cgroup.
+int init_first_cgroup(void);
 
-int get_current_zh_id(void);
+void set_current_cgroup(struct cgroup_d *cg);
+struct cgroup_d *get_current_cgroup(void);
 
-int RegisterZingHook (struct zing_hook_d *d);
+int get_current_cg_id(void);
 
-void *CreateZingHook(void);
+int RegisterCG(struct cgroup_d *cg);
+struct cgroup_d *CreateCG(void);
 
 // --------------------------------------------
 
 int init_logon_manager (void);
 int init_logoff (int mode);
-int register_logoff_process ( pid_t pid );
-
-//
-// == Security ==========================================
-//
-
-extern int current_usersession;
-extern int current_zh; 
-
+int register_logoff_process(pid_t pid);
 
 /*
  Um usuário só pode rodar o servidor de recursos gráficos se ele estiver no modo terminal.
@@ -174,12 +178,14 @@ struct user_info_d
     int initialized;
 
 // Security
-// User session and zh.    
 
+    // user session
     struct usession_d *usession;
     int usessionId;
-    struct zing_hook_d *zh;
-    int zh_id;
+
+    // cgroup
+    struct cgroup_d *cg;
+    int cg_id;
 
     //??
     char *path;             // '/root/user/(name)'

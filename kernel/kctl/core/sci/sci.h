@@ -2,6 +2,7 @@
 // sci.h
 // Here is where the numbers are defines.
 // The other files contain just aliases.
+// Created by Fred Nora.
 
 // Maybe the SCI_ prefix can be followed by 
 // the symbol of the function called by the syscall number.
@@ -269,7 +270,7 @@
 // Security ?
 #define SCI_GETCURRENTUSERSESSION    157 // user session
 // 158 - free
-#define SCI_GETCURRENTDESKTOP        159 // zh?
+#define SCI_GETCURRENTDESKTOP        159 // cgroup ?
 
 // ------------
 
@@ -441,47 +442,47 @@
 // ws and wm.
 
 // 512 - SCI_GET_WS_PID
-// 512 - Get ws PID for a given zh.
-// Pega o wm de um dado zh.
+// 512 - Get ws PID for a given cgroup.
+// Pega o wm de um dado cgroup.
 #define  SCI_GET_WS_PID  512
 
 // 513 - SCI_SET_WS_PID
 // 513
 // Register the ring3 display server.
-// Set ws PID for a given zh
+// Set ws PID for a given cgroup
 // Register a display server.
 // gramado_ports[11] = ws_pid
 // Called by the window server.
-// arg2 = zh structure pointer.
+// arg2 = cgroup structure pointer.
 // arg3 = The window server PID.
 // #todo: 
 // We need a helper function for this.
 #define SCI_SET_WS_PID  513
 
 // 514 - SCI_GET_WM_PID
-// 514 - get wm PID for a given zh
-// IN: zh
+// 514 - get wm PID for a given cgroup
+// IN: cgroup
 #define SCI_GET_WM_PID  514
 
 // 515 - SCI_SET_WM_PID
-// 515 - set wm PID for a given zh
+// 515 - set wm PID for a given cgroup
 // Register a ring3 wm.
-// IN: zh, pid
+// IN: cgroup, pid
 #define SCI_SET_WM_PID  515
 
 // Ingo for ws and wm.
 #define SCI_SHOW_X_SERVER_INFO  516  // show x server info
 #define SCI_SHOW_WM_INFO        517  // show wm info
 
-// 519 - CurrentZingHook
+// 519 - CurrentCG
 // #bugbug
 // This is a ring0 pointer.
 // A ring3 process can't handle this thing.
-// Get current zh
+// Get current cgroup
 
 // 521
 // network server
-// 521 - set ns PID for a given zh
+// 521 - set ns PID for a given cgroup
 // Register a network server.
 // gramado_ports[11] = ws_pid
 

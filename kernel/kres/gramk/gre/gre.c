@@ -32,9 +32,6 @@ int logonStatus=0;            //Logon status.
 int logoffStatus=0;           //Logoff status.
 int userenvironmentStatus=0;  //User environment status.
 
-// Contagens de ambientes;
-int zh_count=0;
-
 // draw char support
 int gcharWidth=8;
 int gcharHeight=8;

@@ -3,102 +3,118 @@
 
 #include <kernel.h>
 
-struct zing_hook_d  *CurrentZingHook;
+//
+// User session
+//
 
+// See: user.h
+struct usession_d *CurrentUserSession;
+struct usession_d *usession0;
+// See: user.h
+unsigned long usessionList[USER_SESSION_COUNT_MAX];
 int current_usersession=0;
-int current_zh=0;
+
+//
+// cgroup
+//
+
+// See: user.h
+struct cgroup_d  *CurrentCG;
+//struct cgroup_d  *cgroup0;
+// See: user.h
+unsigned long cgroupList[CGROUP_COUNT_MAX];
+int current_cgroup=0;
+int cg_counter=0;
 
 //============================
 
-// init_zh_list:
-// Inicializa o array de ponteiros de zh.
-void init_zh_list(void)
+static void __init_cg_list(void);
+
+//============================
+
+// init_cg_list:
+// Inicializa o array de ponteiros de cgroup.
+static void __init_cg_list(void)
 {
     register int i=0;
-    while (i<ZH_COUNT_MAX){
-        zinghookList[i] = 0;
+    while (i<CGROUP_COUNT_MAX){
+        cgroupList[i] = 0;
         i++; 
     };
 }
 
-/*
- * init_zh:
- *     Inicializa o zh 0.
- *     int ?
- */
-void init_zh(void)
+// Initialize the first cgroup.
+int init_first_cgroup(void)
 {
     register int i=0;
 
-    debug_print ("init_zh:\n");
-    //printk("init_zh: Initializing..\n");
+    debug_print("init_first_cgroup:\n");
+    //printk("init_first_cgroup: Initializing\n");
 
-    zh_count = 0;
+    cg_counter = 0;
 // List
-    init_zh_list();
+    __init_cg_list();
 
 //
 // Struct
 //
 
-    struct zing_hook_d  *zh;
-
-// Creating the zh. 
-    zh = (void *) kmalloc( sizeof(struct zing_hook_d) );
-    if ((void *) zh == NULL){
-        panic("init_zh: zh\n");
+// Create the current cgroup structure.
+    struct cgroup_d  *cg;
+    cg = (void *) kmalloc( sizeof(struct cgroup_d) );
+    if ((void *) cg == NULL){
+        panic("init_first_cgroup: cg\n");
     }
-    zh->id = 0;
-    zh->used = TRUE;
-    zh->magic = 1234;
-
+    cg->id = 0;
+    cg->used = TRUE;
+    cg->magic = 1234;
     //todo: object
-
-    zh_count = 1;
-
-    zh->__display_server_pid = (pid_t) -1;
-    zh->__network_server_pid = (pid_t) -1;
-
+    cg_counter = 1;
+    cg->__display_server_pid = (pid_t) -1;
+    cg->__network_server_pid = (pid_t) -1;
 // Registrando na lista
-    zinghookList[0] = (unsigned long) zh;
+    cgroupList[0] = (unsigned long) cg;
 
-    set_current_zh(zh);  
+    set_current_cgroup(cg);
+    return 0;
 }
 
-void set_current_zh(struct zing_hook_d *zh)
+void set_current_cgroup(struct cgroup_d *cg)
 {
-    if ((void *) zh == NULL){ 
+    if ((void *) cg == NULL){ 
         return; 
     }
-    current_zh = (int) zh->id;
-    CurrentZingHook = zh;
+    current_cgroup = (int) cg->id;
+    CurrentCG = (struct cgroup_d *) cg;
 }
 
-struct zing_hook_d *get_current_zh(void)
+struct cgroup_d *get_current_cgroup(void)
 {
+    //#todo
+    //return (struct cgroup_d *) CurrentCG;
+
 // Check limits.
-    if ( current_zh < 0 || current_zh >= ZH_COUNT_MAX )
+    if ( current_cgroup < 0 || current_cgroup >= CGROUP_COUNT_MAX )
     {
         return NULL;
     }
-    return (struct zing_hook_d *) zinghookList[current_zh];
+    return (struct cgroup_d *) cgroupList[current_cgroup];
 }
 
-int get_current_zh_id(void)
+int get_current_cg_id(void)
 {
-    return (int) current_zh;
+    return (int) current_cgroup;
 }
 
-/*
- * RegisterZingHook:
- *     Registrando um zh numa lista de zh. 
- */
-int RegisterZingHook(struct zing_hook_d *d)
+// Register cgroup given a valid pointer.
+int RegisterCG(struct cgroup_d *cg)
 {
     int Offset=0;
 
-    if ((void *) d == NULL){
-        debug_print("RegisterZingHook: d\n");
+    if ((void *) cg == NULL)
+    {
+        debug_print("RegisterCG: cg\n");
+        // #todo: return -1;
         return (int) 1;  
     }
 
@@ -106,58 +122,54 @@ int RegisterZingHook(struct zing_hook_d *d)
 // Pode aparacer um loop infinito aqui.
 // #todo: usar for.
 
-    while (Offset < ZH_COUNT_MAX)
+    while (Offset < CGROUP_COUNT_MAX)
     {
-        if ( (void *) zinghookList[Offset] == NULL )
+        if ( (void *) cgroupList[Offset] == NULL )
         {
-            zinghookList[Offset] = (unsigned long) d;
-            d->id = Offset;
+            cgroupList[Offset] = (unsigned long) cg;
+            cg->id = Offset;
             return 0;
         }
        Offset++;
     };
 
 // Fail
+// #todo: return -1;
     return (int) 1;
 }
 
-/*
- * CreateZingHook:
- *     Cria um zh em uma window station.
- */
-void *CreateZingHook (void)
+// Create a new cgroup object.
+struct cgroup_d *CreateCG(void)
 {
-    struct zing_hook_d *Current;
-    struct zing_hook_d *Empty;
-    int i=0;
+    struct cgroup_d *New;
+    struct cgroup_d *Empty;
+    register int i=0;
     //... 
 
 // #todo: 
-// O usuário precisa de permissão pra criar zh.
-    Current = (void *) kmalloc( sizeof(struct zing_hook_d) );
-    if ( (void *) Current == NULL ){
-        panic ("CreateZingHook: Current\n");
+// O usuário precisa de permissão pra criar cgroup.
+    New = (void *) kmalloc( sizeof(struct cgroup_d) );
+    if ((void *) New == NULL){
+        panic ("CreateCG: New\n");
     } else {
-
-        memset( Current, 0, sizeof(struct zing_hook_d) );
+        memset( New, 0, sizeof(struct cgroup_d) );
         //continua...
     };
 
-    while (i < ZH_COUNT_MAX)
+    while (i < CGROUP_COUNT_MAX)
     {
-        Empty = (void *) zinghookList[i];
+        Empty = (void *) cgroupList[i];
         if ((void *) Empty == NULL)
         {
-            zinghookList[i] = (unsigned long) Current;
-            Current->id = i;
-            return (void *) Current;
+            cgroupList[i] = (unsigned long) New;
+            New->id = i;
+            return (void *) New;
         }
         i++;
     };
 
     return NULL;
 }
-
 
 
 //==================================
@@ -344,11 +356,11 @@ struct user_info_d *CreateUser(char *name, int type)
             //if ( New->userName_len >= ???? ){}
     }
  
-//Session.
-//zh.
+// user session
+// cgroup
 
     New->usessionId = current_usersession;
-    New->zh_id  = current_zh;
+    New->cg_id  = current_cgroup;
     
 // Inicializando a lista de objetos permitidos.
 // Proibindo tudo.
@@ -454,9 +466,9 @@ int User_initialize(void)
 
     current_user = 0;
 
-// User session,  zh, 
-    current_usersession  = 0;
-    current_zh      = 0;
+// User session and cgroup;
+    current_usersession = 0;
+    current_cgroup = 0;
 
 // Initialize user info structure
     printk ("User_initialize: init_user_info\n");
@@ -466,14 +478,14 @@ int User_initialize(void)
 // Security
 //
 
-// Initialize User Session, and zh.
+// Initialize User Session, and cgroup.
 // user section
     //printk ("User_initialize: initializing user session\n");
     //init_user_session();
 
-    // zh
-    printk ("User_initialize: initializing zh\n");   
-    init_zh();
+// Initializing the first cgroup
+    printk ("User_initialize: initializing first cgroup\n");   
+    init_first_cgroup();
 
     //debug_print("User_initialize: done\n");
     return 0;

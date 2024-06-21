@@ -1,5 +1,7 @@
 
 // syscalls.h
+// Created by Fred Nora.
+
 // See: sci.c.
 
 // #todo
@@ -57,7 +59,7 @@ unsigned long sys_get_system_metrics(int n);
 
 /* sys.c */
 void *sys_create_process ( 
-    struct zing_hook_d  *zh,
+    struct cgroup_d *cg,
     unsigned long res1,          //nothing
     unsigned long priority, 
     int ppid, 
@@ -66,7 +68,7 @@ void *sys_create_process (
 
 /* sys.c */
 void *sys_create_thread ( 
-    struct zing_hook_d  *zh,
+    struct cgroup_d *cg,
     unsigned long init_rip, 
     unsigned long priority, 
     int ppid, 
