@@ -1,0 +1,25 @@
+ Main directories in the base kernel.
+
+(1) include/
+  Headers used by the base kernel.
+
+(2) kctl/
+  Control routines. 
+  These are the routines responsable to control 
+  the kernel resources.
+
+(3) kres/
+  The kernel resources.
+    dev/   - i/o system.
+    fs/    - File system support.
+    gramk/ - Ring 0 routines to support the user interactions,
+             just like keybord, mouse and display.
+    ke/    - hal, processes and threads.
+    mm/    - Memory management.
+    net/   - Network support.
+
+(4) lib/
+  Libraries used by the base kernel.
+  Ring 0 only.
+
+  

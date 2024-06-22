@@ -1,3 +1,7 @@
+[en]
+...
+
+[pt-br]
 A sequencia de inicializaçao do kernel:
 Uma coisa que ninguem fala e' que depois de construida a 
 rotina de inicializaçao do kernel, fica bem dificil reorganizar a rotina ... 

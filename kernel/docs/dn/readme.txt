@@ -21,7 +21,7 @@
 
     The init process:
     The image for the control thread of the init process
-    is called INIT.BIN. It is found in prestier/init/init.    
+    is called INIT.BIN. It is found in init/.    
     
     
     

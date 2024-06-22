@@ -1,0 +1,30 @@
+
+ This note describe a special moment in the kernel where 
+the kernel is trying to handle the threads during the taskswitching.
+See the folder: kres/ke/intake/ for more.
+
+ There are two major components in this module: The dispacher and the scheduler.
+
+The dispacher:
+ The dispatcher is resposable for save and restore the processor context,
+make the taskswitch using the scheduler as a worker and finally dispach the 
+next thread and spawn it. It also can spawn a thread for the forst time.
+
+The scheduler:
+  The scheduler is responsable for create and recreate the queues of threads and 
+select the next thread that is gonna be picked by the taskswitcher.
+
+ The intake module is also responsable for the creation of processes and threads. 
+It can create this objects from the scratch or clone it using the caller as a reference.
+ The method for cloning the process at the moment is very close to the routine 
+necessary to fork a process. A little bit of work and we will have the implementation 
+of the unix-like fork() function.
+
+ This kernel uses two objects, the process object and the thread object. Each one 
+ has its own structure and one process can have multiple threads.
+ Remember, they are not using the same structure!
+
+ At the initialization the kernel creates the init process and its control thread, 
+and after that the kernel jumps to the control thread in ring 3.
+ The init processes is responsable to activate some functionalities necessary 
+to have fully working taskswitching mecanism.

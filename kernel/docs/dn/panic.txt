@@ -1,5 +1,4 @@
 
-
 	Only the main routines in init.c will emit a panic() or x_panic().
 	All the subroutins in the subfolder will return TRUE or FALSE.
 

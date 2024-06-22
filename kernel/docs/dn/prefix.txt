@@ -1,7 +1,6 @@
 
 	Prefixes used by symbols inside the base kernel:
 
-
 // =================================
 
 Top layer:
