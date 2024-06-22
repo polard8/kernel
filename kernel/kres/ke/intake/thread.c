@@ -1,6 +1,5 @@
-
 // thread.c
-// Created by Fred Nora.
+// Created by Fred Nora. 
 
 #include <kernel.h>
 
@@ -534,8 +533,13 @@ int init_threads(void)
     return 0;
 }
 
-// GetCurrentTID
-//      Pega o id da thread atual.
+// Set the current TID.
+void SetCurrentTID(tid_t tid)
+{
+    current_thread = (tid_t) tid;
+}
+
+// Get the current TID.
 tid_t GetCurrentTID(void)
 {
     return (tid_t) current_thread;

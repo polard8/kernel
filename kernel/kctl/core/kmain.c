@@ -195,6 +195,13 @@ static void preinit_Globals(int arch_type)
     SchedulerInfo.policy = SCHED_POLICY_RR;
     SchedulerInfo.flags  = (unsigned long) 0;
 
+    InitProcess = NULL;
+    InitThread = NULL;
+
+    // Invalidate.
+    set_current_process(-1);
+    SetCurrentTID(-1);
+
 // Initializing the global spinlock.
     __spinlock_ipc = TRUE;
 
@@ -618,6 +625,9 @@ void I_kmain(int arch_type)
 // Product type.
 // see: heauty/product.h
     g_product_type = PRODUCT_TYPE;
+    // Status Flag and Edition flag.
+    gSystemStatus = 1;
+    gSystemEdition = 0;
 
     __failing_kernel_subsystem = KERNEL_SUBSYSTEM_INVALID;
 
@@ -672,10 +682,8 @@ void I_kmain(int arch_type)
 // + Initialize memory sizes.
     PROGRESS(":: Initialize mm, phase 0\n");
     Status = (int) mmInitialize(0);
-    if (Status != TRUE)
-    {
-        __failing_kernel_subsystem = 
-            KERNEL_SUBSYSTEM_MM;
+    if (Status != TRUE){
+        __failing_kernel_subsystem = KERNEL_SUBSYSTEM_MM;
         if (Initialization.is_serial_log_initialized == TRUE){
             debug_print("I_kmain: mmInitialize phase 0 fail\n");
         }
@@ -689,10 +697,8 @@ void I_kmain(int arch_type)
 //   Mapping all the static system areas.
     PROGRESS(":: Initialize mm, phase 1\n");
     Status = (int) mmInitialize(1);
-    if (Status != TRUE)
-    {
-        __failing_kernel_subsystem = 
-            KERNEL_SUBSYSTEM_MM;
+    if (Status != TRUE){
+        __failing_kernel_subsystem = KERNEL_SUBSYSTEM_MM;
         if (Initialization.is_serial_log_initialized == TRUE){
             debug_print("I_kmain: mmInitialize phase 1 fail\n");
         }
@@ -718,8 +724,7 @@ void I_kmain(int arch_type)
 // + Initialize bootloader display device.
     PROGRESS(":: Initialize ke, phase 0\n");
     Status = (int) keInitialize(0);
-    if (Status != TRUE)
-    {
+    if (Status != TRUE){
         __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
         goto fail;
     }
@@ -747,10 +752,8 @@ void I_kmain(int arch_type)
 // + PS2 early initialization.
     PROGRESS(":: Initialize ke, phase 1\n");
     Status = (int) keInitialize(1);
-    if (Status != TRUE)
-    {
-        __failing_kernel_subsystem = 
-            KERNEL_SUBSYSTEM_KE;
+    if (Status != TRUE){
+        __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
         goto fail;
     }
     Initialization.ke_phase1 = TRUE;
@@ -760,10 +763,8 @@ void I_kmain(int arch_type)
 // + Load BMP icons.
     PROGRESS(":: Initialize ke, phase 2\n");
     Status = (int) keInitialize(2);
-    if (Status != TRUE)
-    {
-        __failing_kernel_subsystem = 
-            KERNEL_SUBSYSTEM_KE;
+    if (Status != TRUE){
+        __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
         goto fail;
     }
     Initialization.ke_phase2 = TRUE;

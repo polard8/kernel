@@ -848,6 +848,9 @@ int keInitialize(int phase)
 
     int Status=FALSE;
 
+    // Phase 0: 
+    // Architecture independent.
+    // >> Debug and display support.
     if (phase == 0){
 
         //PROGRESS("keInitialize: phase 0\n");
@@ -877,10 +880,21 @@ int keInitialize(int phase)
 
         goto InitializeEnd;
 
+    // Phase 1: 
+    // It depends on the architecture. 
+    // >> Process and thread support.
     } else if (phase == 1) {
+
+        // Starting with some architecture independent stuff.
+
+        // Threads counter
+        UPProcessorBlock.threads_counter = 0;
+
+        // Architecture dependent stuff.
 
         //PROGRESS("keInitialize: phase 1\n");
         // Initialize the current architecture.
+        // Change name to I_arch_initialize();
         // See: ke/x86_64/x64init.c
         Status = (int) I_x64_initialize();
         if (Status != TRUE){
@@ -889,6 +903,9 @@ int keInitialize(int phase)
 
         goto InitializeEnd;
 
+    // Phase 2: 
+    // Architecture independent. 
+    // >> Device drivers and 3d graphics support.
     } else if (phase == 2){
 
         // ================================

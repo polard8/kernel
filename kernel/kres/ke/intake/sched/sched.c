@@ -2,6 +2,7 @@
 // sched.c
 // Core scheduler code and related routines.
 // ...
+// Created by Fred Nora.
 
 #include <kernel.h>
 

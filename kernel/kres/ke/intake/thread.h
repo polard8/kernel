@@ -803,6 +803,7 @@ void *FindReadyThread (void);
 int GetThreadState (struct thread_d *thread);
 int GetThreadType (struct thread_d *thread);
 
+void SetCurrentTID(tid_t tid);
 tid_t GetCurrentTID(void);
 
 void *GetThreadByTID(tid_t tid);

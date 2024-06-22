@@ -1360,9 +1360,9 @@ int I_x64_initialize(void)
 // We already did that before in kmain().
     Initialization.current_phase = 0;
 
-// The first ring3 process.
-// Ainda não configuramos qual será o primeiro processo
-// a rodar em user mode.
+    // The first ring3 process.
+    // Ainda não configuramos qual será o primeiro processo
+    // a rodar em user mode.
     InitialProcessInitialized = FALSE;
 
 // Obs: 
@@ -1397,18 +1397,12 @@ int I_x64_initialize(void)
         return FALSE;
     }
 
-// Threads counter
-    UPProcessorBlock.threads_counter = 0;
 
 // ================================
 // sse support.
     //PROGRESS("::(2)(?)\n"); 
     //debug_print ("I_x64_initialize: [TODO] SSE support\n");
     // x86_sse_init();
-
-// Status Flag and Edition flag.
-    gSystemStatus = 1;
-    gSystemEdition = 0;
 
 // ===================================
 // I_init

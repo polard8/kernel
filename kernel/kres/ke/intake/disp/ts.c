@@ -2,6 +2,7 @@
 // ts.c
 // Task switching.
 // Actually it's thread scwitching.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
