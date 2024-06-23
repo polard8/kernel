@@ -39,8 +39,11 @@
 
 // ----------------------
 
-static void InitializeGlobals(void);
-static void ShutdownApplication(int socket_fd);
+static int __client_fd = -1;
+
+static void __initialize_globals(void);
+static void appShutdown(int socket_fd);
+static int appInitialization(void);
 
 // ----------------------
 
@@ -63,7 +66,7 @@ struct sockaddr_in addr = {
 */
 
 
-static void InitializeGlobals(void)
+static void __initialize_globals(void)
 {
     register int i=0;
 
@@ -73,18 +76,16 @@ static void InitializeGlobals(void)
     };
 }
 
-static void ShutdownApplication(int socket_fd)
+static void appShutdown(int socket_fd)
 {
-    debug_print("net.bin: ShutdownApplication\n"); 
-    printf     ("net.bin: ShutdownApplication\n");
+    debug_print("net.bin: appShutdown\n"); 
+    printf     ("net.bin: appShutdown\n");
 // Close the given socket.
     close(socket_fd);
 }
 
-// ========
-// main:
 
-int main(int argc, char *argv[])
+static int appInitialization(void)
 {
 
 //========================
@@ -98,16 +99,14 @@ int main(int argc, char *argv[])
     addrlen = sizeof(server_address);
 //========================
 
-    int client_fd = -1;
-
     debug_print ("net.bin: Initializing ...\n");
-    InitializeGlobals();
+    __initialize_globals();
 
 // Socket
-    client_fd = (int) socket( AF_INET, SOCK_STREAM, 0 );
-    if (client_fd < 0){
+    __client_fd = (int) socket( AF_INET, SOCK_STREAM, 0 );
+    if (__client_fd < 0){
        //gws_debug_print ("gnst: Couldn't create socket\n");
-       printf ("net.bin: [FAIL] Couldn't create socket\n");
+       printf ("net.bin: on socket()\n");
        exit(1);
     }
 
@@ -116,16 +115,16 @@ int main(int argc, char *argv[])
 // Então o servidor escreverá em nosso arquivo.
 
     while (1){
-        if (connect (client_fd, (void *) &server_address, addrlen ) < 0)
+        if (connect (__client_fd, (void *) &server_address, addrlen ) < 0)
         { 
             //gws_debug_print ("gnst: Connection Failed\n");
             printf ("net.bin: Connection Failed \n"); 
-            //close(client_fd);
+            //close(__client_fd);
             //exit(1);
         }else{ break; }; 
     };
 
-    if (client_fd<0){
+    if (__client_fd<0){
         printf("net.bin: fd fail\n");
         exit(1);
     }
@@ -135,9 +134,10 @@ int main(int argc, char *argv[])
 // Send request and wait for response.
 // Ok. Its working :)
 
+    printf("\n");
     printf("NET.BIN: Sending hello!\n");
 
-    int hello_status = (int) gns_hello(client_fd);
+    int hello_status = (int) gns_hello(__client_fd);
     if (hello_status <= 0){
         printf("net.bin: Service failed\n");
     }
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
         // ------------------
         // Send request and wait for response.
         // Ok. Its working :)
-        //service_status = (int) gns_hello(client_fd);
+        //service_status = (int) gns_hello(__client_fd);
         //if (service_status <= 0){
         //    printf("net.bin: Service failed\n");
         //}
@@ -176,9 +176,16 @@ int main(int argc, char *argv[])
         gns_yield();
     };
 
-// Not reached.
-
-    ShutdownApplication(client_fd);
+// Not reached
+    appShutdown(__client_fd);
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    int Status=-1;
+
+    Status = appInitialization();
+    return (int) Status;
 }
 

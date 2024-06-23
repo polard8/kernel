@@ -1,5 +1,5 @@
 
- This note describe a special moment in the kernel where 
+ This note describes a special moment in the kernel where 
 the kernel is trying to handle the threads during the taskswitching.
 See the folder: kres/ke/intake/ for more.
 

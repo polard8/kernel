@@ -1,6 +1,8 @@
 // main.c
 // netd.bin
 // Gramado Network Server
+// 2020 - Created by Fred Nora.
+
 // This is the main server whe Gramado is acting like
 // a server. When the 'product' is the 'Gramado Server'.
 // And a client can use this service to connect
@@ -15,7 +17,6 @@
 // Gramado Tokens.
 // Podemos gerar estatísticas sobre o uso da rede
 // e descrições sobre os componentes.
-// 2020 - Created by Fred Nora.
 
 /*
  Network server costuma ser um termo genérico que identifica
@@ -67,14 +68,19 @@ static int NoReply = FALSE;
 // == Prototypes =========================
 //
 
-static int ServerInitialization(void);
-static int ServerShutdown(void);
+
+//
+// Sevices
+//
+
+static void serviceHello(void);
+static int serviceInitializeNetwork(void);
+
+//
+// Initialization
+//
 
 static void __initialize_globals(void);
-
-static void dispatch(int fd);
-static int serviceInitializeNetwork(void);
-static void serviceHello(void);
 
 // dialog
 static int 
@@ -83,6 +89,11 @@ gnsProcedure (
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
+
+static void dispatch(int fd);
+
+static int ServerShutdown(void);
+static int ServerInitialization(void);
 
 static void 
 gns_send_error_response (int fd, int code, char *error_message);
@@ -101,9 +112,109 @@ gns_send_error_response (int fd, int code, char *error_message)
     debug_print("netd: [TODO] gns_send_error_response\n");
 }
 
+//char *
+//eth_broadcast_addr = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+//char *
+//eth_null_addr = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+/*
+void gnssrv_print_mac (char *string);
+void gnssrv_print_mac (char *string)
+{
+    char *ptr = (char *) string;
+    printf("MAC { %x:%x:%x:%x:%x:%x } \n", 
+        ptr[0], 
+        ptr[1], 
+        ptr[2], 
+        ptr[3], 
+        ptr[4],
+        ptr[5] );
+}
+*/
+
+/*
+int gnssrv_maccmp(char *a, char *b);
+int gnssrv_maccmp(char *a, char *b)
+{
+    char *__a = a;
+    char *__b = b;
+    int i=0;
+
+    for ( i=0; i<6; i++ )
+    {
+        if (__a[i] != __b[i]){ return (int) 1; }
+    };
+
+    return 0;
+}
+*/
+
+/*
+void
+gnssrv_print_ip_addr(uint32_t ip);
+void
+gnssrv_print_ip_addr(uint32_t ip)
+{
+    char *__ip = (char *) &ip;
+    print ("%d.%d.%d.%d \n", 
+        (uint8_t) __ip[0], 
+        (uint8_t) __ip[1], 
+        (uint8_t) __ip[2], 
+        (uint8_t) __ip[3]);
+}
+*/
+
+/*
+void
+gnssrv_print_le_ip_addr(uint32_t ip);
+void
+gnssrv_print_le_ip_addr(uint32_t ip)
+{
+    char *__ip = (char *) &ip;
+    print ("%d.%d.%d.%d \n", 
+        (uint8_t) __ip[3], 
+        (uint8_t) __ip[2], 
+        (uint8_t) __ip[1], 
+        (uint8_t) __ip[0]);
+}
+*/
+
+
+/*
+uint16_t
+ip_calculate_checksum(void *ip);
+uint16_t
+ip_calculate_checksum(void *ip)
+{
+    uint16_t *buffer = (uint16_t *) ip;
+    uint32_t sum = 0;
+    int i;
+    int len = 20; //FIXME: get it from ip_ihl 
+
+    for (i = 0; i < len / sizeof(uint16_t); i ++)
+        sum += (buffer[i]);
+
+    while (sum > 0xffff) {
+        uint16_t val = (sum & 0xffff0000) >> 16;
+        sum &= 0x0000ffff;
+        sum += val;
+    }
+
+    sum = ~sum;
+
+    return (sum);
+}
+*/
+
+static void gnssrv_yield(void)
+{
+    gramado_system_call(265,0,0,0); 
+    //  sc82 (265,0,0,0);
+}
+
 static void serviceHello(void)
 {
-    printf("\n");
+    //printf("\n");
     printf("netd: [1000] Hello from Gramado Network Server!\n");
     next_response[0] = 0;  //wid
     next_response[1] = SERVER_PACKET_TYPE_REPLY; // The response is a reply. 
@@ -113,143 +224,33 @@ static void serviceHello(void)
     rtl_yield();
 }
 
-// internal.
-// Messages sended via socket.
-// obs: read and write use the buffer '__buffer'
-// in the top of this file.
-// Called by main.
-
-static void dispatch(int fd)
+static int serviceInitializeNetwork(void)
 {
-    unsigned long *message_buffer = 
-        (unsigned long *) &__buffer[0];
-    int n_reads = 0;     // For requests.
-    int n_writes = 0;    // For responses.
+    // Ring0 routine to initialize network infrastructure.
+    // #remember: At this moment we are in the user app memory space.
+    gramado_system_call(968,0,0,0);
+    return 0;
+}
 
-// Fail. Cleaning
-    if (fd<0){
-        debug_print("netd: dispatch fd\n");
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        gnssrv_yield(); 
-        return;
-    }
+static void __initialize_globals(void)
+{
+    register int i=0;
 
-// Check if we have a new request.
-    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-// Not a request.
-    if (value != ACTION_REQUEST){
-        gnssrv_yield();
-        return;
-    }
+// Global flag for the loop.
+    running = FALSE;
+    ____saved_server_fd = -1;
+    ____saved_current_client_fd = -1;
 
-// =====================
-// Read the request.
-    n_reads = (int) read( fd, __buffer, sizeof(__buffer) );
-    if (n_reads <= 0)
-    {
-        debug_print("netd: dispatch n_reads\n");
-        // No reply
-        rtl_set_file_sync( 
-            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
-        // Cleaning
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        gnssrv_yield(); 
-        return; 
-    }
-
-// Nesse momento já lemos alguma coisa.
-
-// Invalid message code.
-    if (message_buffer[1] == 0)
-    { 
-        debug_print("netd: dispatch Unknown message\n");
-        // No reply
-        rtl_set_file_sync( 
-            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
-        // Cleaning
-        message_buffer[0] = 0;
-        message_buffer[1] = 0;
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        gnssrv_yield();
-        return;
-    }
-
-// OK:
-// Valid message
-// Call the service!
-
-    gnsProcedure ( 
-        (void *)        message_buffer[0], 
-        (int)           message_buffer[1], 
-        (unsigned long) message_buffer[2], 
-        (unsigned long) message_buffer[3] );
-
-// #todo
-// Se o request foi um request de evento,
-// significa que o cliente deseja receber o próximo evento da 
-// lista de eventos.
-// podemos passar mensagens recebidas pelo gws para o cliente.
-
-    if (NoReply == TRUE){
-        rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
-        return;
-    }
-
-// ==============================================
-
-//
-// Send reply!
-//
-
-
-// Insert message string int to the response buffer.
-    char *m = (char *) (__buffer + 128);
-    sprintf( m, "GRAMADO 501 Not Implemented!");
-    //sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
-    //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
-
-// Standard message fields.
-// Primeiros longs do buffer.
-// #bugbug: Invalid values for next_response[i];
-    message_buffer[0] = next_response[0];         // Window ID.
-    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
-    message_buffer[2] = next_response[2];         // Return value (long1)
-    message_buffer[3] = next_response[3];         // Return value (long2)
-
-// #todo:
-// Talvez aqui possamos usar alguma função chamada post_message().
-
-// Sending the reply.
-    n_writes = (int) write( fd, __buffer, sizeof(__buffer) );
-    if (n_writes<=0)
-    {
-        debug_print("netd: dispatch Response fail\n");
-        // No response. It fails.
-        rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
-        return;
-    }
-
-// Cleaning
-    message_buffer[0] = 0;
-    message_buffer[1] = 0;
-    message_buffer[2] = 0;
-    message_buffer[3] = 0;
-
-// Cleaning the buffer for the response.
-    register int c=0;
-    for (c=0; c<32; c++){
-        next_response[c] = 0;
+// Clear the buffer for the messages.
+// see: globals.c
+    for (i=0; i<GNS_BUFFER_SIZE; i++){
+        __buffer[i] = 0;
     };
-
-// Set response.
-    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+// Clear the tmp buffer for next response metadata.
+// see: globals.c
+    for (i=0; i<32; i++){
+        next_response[i] = 0;
+    };
 }
 
 static int 
@@ -368,140 +369,146 @@ gnsProcedure (
     return 0;
 }
 
-//char *
-//eth_broadcast_addr = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-//char *
-//eth_null_addr = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-/*
-void gnssrv_print_mac (char *string);
-void gnssrv_print_mac (char *string)
+// dispatch:
+// Messages sended via socket.
+// obs: read and write use the buffer '__buffer'
+// in the top of this file.
+// Called by main.
+static void dispatch(int fd)
 {
-    char *ptr = (char *) string;
-    printf("MAC { %x:%x:%x:%x:%x:%x } \n", 
-        ptr[0], 
-        ptr[1], 
-        ptr[2], 
-        ptr[3], 
-        ptr[4],
-        ptr[5] );
-}
-*/
+    unsigned long *message_buffer = 
+        (unsigned long *) &__buffer[0];
+    int n_reads = 0;     // For requests.
+    int n_writes = 0;    // For responses.
 
-/*
-int gnssrv_maccmp(char *a, char *b);
-int gnssrv_maccmp(char *a, char *b)
-{
-    char *__a = a;
-    char *__b = b;
-    int i=0;
-
-    for ( i=0; i<6; i++ )
-    {
-        if (__a[i] != __b[i]){ return (int) 1; }
-    };
-
-    return 0;
-}
-*/
-
-/*
-void
-gnssrv_print_ip_addr(uint32_t ip);
-void
-gnssrv_print_ip_addr(uint32_t ip)
-{
-    char *__ip = (char *) &ip;
-    print ("%d.%d.%d.%d \n", 
-        (uint8_t) __ip[0], 
-        (uint8_t) __ip[1], 
-        (uint8_t) __ip[2], 
-        (uint8_t) __ip[3]);
-}
-*/
-
-/*
-void
-gnssrv_print_le_ip_addr(uint32_t ip);
-void
-gnssrv_print_le_ip_addr(uint32_t ip)
-{
-    char *__ip = (char *) &ip;
-    print ("%d.%d.%d.%d \n", 
-        (uint8_t) __ip[3], 
-        (uint8_t) __ip[2], 
-        (uint8_t) __ip[1], 
-        (uint8_t) __ip[0]);
-}
-*/
-
-
-/*
-uint16_t
-ip_calculate_checksum(void *ip);
-uint16_t
-ip_calculate_checksum(void *ip)
-{
-    uint16_t *buffer = (uint16_t *) ip;
-    uint32_t sum = 0;
-    int i;
-    int len = 20; //FIXME: get it from ip_ihl 
-
-    for (i = 0; i < len / sizeof(uint16_t); i ++)
-        sum += (buffer[i]);
-
-    while (sum > 0xffff) {
-        uint16_t val = (sum & 0xffff0000) >> 16;
-        sum &= 0x0000ffff;
-        sum += val;
+// Fail. Cleaning
+    if (fd<0){
+        debug_print("netd: dispatch fd\n");
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        gnssrv_yield(); 
+        return;
     }
 
-    sum = ~sum;
+// Check if we have a new request.
+    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+// Not a request.
+    if (value != ACTION_REQUEST){
+        gnssrv_yield();
+        return;
+    }
 
-    return (sum);
-}
-*/
+// =====================
+// Read the request.
+    n_reads = (int) read( fd, __buffer, sizeof(__buffer) );
+    if (n_reads <= 0)
+    {
+        debug_print("netd: dispatch n_reads\n");
+        // No reply
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        gnssrv_yield(); 
+        return; 
+    }
 
-static void gnssrv_yield(void)
-{
-    gramado_system_call(265,0,0,0); 
-    //  sc82 (265,0,0,0);
-}
+// Nesse momento já lemos alguma coisa.
 
-static int serviceInitializeNetwork(void)
-{
-    // Ring0 routine to initialize network infrastructure.
-    // #remember: At this moment we are in the user app memory space.
-    gramado_system_call(968,0,0,0);
-    return 0;
-}
+// Invalid message code.
+    if (message_buffer[1] == 0)
+    { 
+        debug_print("netd: dispatch Unknown message\n");
+        // No reply
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        // Cleaning
+        message_buffer[0] = 0;
+        message_buffer[1] = 0;
+        message_buffer[2] = 0;
+        message_buffer[3] = 0;
+        gnssrv_yield();
+        return;
+    }
 
-static void __initialize_globals(void)
-{
-    register int i=0;
+// OK:
+// Valid message
+// Call the service!
 
-// Global flag for the loop.
-    running = FALSE;
+    gnsProcedure ( 
+        (void *)        message_buffer[0], 
+        (int)           message_buffer[1], 
+        (unsigned long) message_buffer[2], 
+        (unsigned long) message_buffer[3] );
 
-    ____saved_server_fd = -1;
-    ____saved_current_client_fd = -1;
+// #todo
+// Se o request foi um request de evento,
+// significa que o cliente deseja receber o próximo evento da 
+// lista de eventos.
+// podemos passar mensagens recebidas pelo gws para o cliente.
 
-// Clear the buffer for the messages.
-// see: globals.c
-    for (i=0; i<GNS_BUFFER_SIZE; i++){
-        __buffer[i] = 0;
+    if (NoReply == TRUE){
+        rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        return;
+    }
+
+// ==============================================
+
+//
+// Send reply!
+//
+
+// Insert message string int to the response buffer.
+    char *m = (char *) (__buffer + 128);
+    sprintf( m, "GRAMADO 501 Not Implemented!");
+    //sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
+    //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
+
+// Standard message fields.
+// Primeiros longs do buffer.
+// #bugbug: Invalid values for next_response[i];
+    message_buffer[0] = next_response[0];         // Window ID.
+    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
+    message_buffer[2] = next_response[2];         // Return value (long1)
+    message_buffer[3] = next_response[3];         // Return value (long2)
+
+// #todo:
+// Talvez aqui possamos usar alguma função chamada post_message().
+
+// Sending the reply.
+    n_writes = (int) write( fd, __buffer, sizeof(__buffer) );
+    if (n_writes<=0)
+    {
+        debug_print("netd: dispatch Response fail\n");
+        // No response. It fails.
+        rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        return;
+    }
+
+// Cleaning
+    message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[2] = 0;
+    message_buffer[3] = 0;
+
+// Cleaning the buffer for the response.
+    register int c=0;
+    for (c=0; c<32; c++){
+        next_response[c] = 0;
     };
 
-// Clear the tmp buffer for next response metadata.
-// see: globals.c
-    for (i=0; i<32; i++){
-        next_response[i] = 0;
-    };
+// Set response.
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
 }
 
+// #todo
 static int ServerShutdown(void)
 {
-    //#todo
     printf("netd: [todo] ServerShutdown\n");
 }
 
@@ -529,6 +536,7 @@ static int ServerInitialization(void)
     //unsigned long h=0;
 
 // debug
+    printf("\n");
     printf("NETD.BIN: Initializing\n");
 
 // Initialize global variables.
@@ -643,9 +651,8 @@ fail:
 // Main:
 int main (int argc, char **argv)
 {
-    int Status=-1;
+    int Status = -1;
     register int i=0;
-
 // #test: Flags
     int f1= FALSE;
     int f2= FALSE;
