@@ -305,26 +305,32 @@ clean-all: clean
 # ==================
 # (1) boot/
 # Clear boot images
+#	-rm -rf boot/arm/bin/*.BIN
 	-rm -rf boot/x86/bin/*.BIN
 
 # ==================
 # (2) kernel/
-# Clear newos kernel image
-	-rm -rf kernel/KERNEL.BIN
+# Clear kernel image
 	-rm kernel/*.o
 	-rm kernel/*.BIN
+	-rm -rf kernel/KERNEL.BIN
 
 # ==================
 # (3) mods/
 # Clear the ring0 module images
-	-rm -rf mods/HVMOD0.BIN
+	-rm -rf mods/*.o
+	-rm -rf mods/*.BIN
 
 # ==================
+# (4) userland/
 # Clear INIT.BIN, HVNETD.BIN and HVNET.BIN.
-	-rm userland/init/*.o
-	-rm userland/hvnetd/client/*.o
-	-rm userland/hvnetd/server/*.o
 	-rm userland/bin/*.BIN
+	-rm userland/init/*.o
+	-rm userland/init/*.BIN 
+	-rm userland/netd/client/*.o
+	-rm userland/netd/client/*.BIN
+	-rm userland/netd/server/*.o
+	-rm userland/netd/server/*.BIN 
 
 # ==================
 # Clear the disk cache

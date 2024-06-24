@@ -138,26 +138,29 @@ cluster     dw  0x0000
 ; ---------------------------
 ; The image name.
 
-; legacy boot
+
+; Option 1:
+; This is the legacy boot manager.
 ; It loads the legacy version of the boot manager,
 ; with the 32bit-assembly shell.
-;ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+;
+; ImageName db  "BM      BIN", 0x0D, 0x0A, 0x00
 
 
-; #test #caution
-; Something is affecting the window server,
-; if we enter in the graphics mode without entering
-; the shell first. There are two routines 
-; to initialize the gui mode. Only one is good.
+; Option 2:
 ; It loads a faster version of the boot manager,
-; with no 32bit-assembly shell.
-; boot manager with dialog.
-ImageName     db "BM2     BIN", 0x0D, 0x0A, 0x00
+; with NO 32bit-assembly shell.
+; This boot manager with UI dialog window.
+; In one option we the system is initialized and 
+; in the second we go to the shell. Probably it is
+; the old 32bit shell.
+;
+ImageName db  "BM2     BIN", 0x0D, 0x0A, 0x00
 
 
 ; Message:
 ; 'R' = Root fail.
-msgFailure    db "R", 0x00 
+msgFailure db  "R", 0x00 
 ;...
 ;=================================
 ; End of the data area.
@@ -245,8 +248,7 @@ ReadSectors:
     cmp bx, 0x0000
     jne .NextSector
 
-    ; Trocando de segmento.
-
+    ; Switching the segment.
     push ax
     mov  ax, es
     add  ax, 0x1000
@@ -271,10 +273,8 @@ FAILURE:
     int 0x16        ; Await keypress
     int 0x19        ; Warm boot computer
 
-; -----------------------------------------
-; -----------------------------------------
-; GRAMADOINIT:  REAL START
-; Real Start!
+; =============================================
+; GRAMADOINIT:  (Real start)
 ; Start here 0x07C0:0.
 ; Stack here 0:6000h.
 ; Root dir in 0x07C0:0x0200.

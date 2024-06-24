@@ -116,6 +116,8 @@ os_call_vectors:
 ROOTDIRSTART EQU  (bootmanagerOEM_ID)
 ROOTDIRSIZE  EQU  (bootmanagerOEM_ID+4)
 
+; ...
+
 ; ========
 ; bm_main:
 ; The real entry point.
@@ -145,12 +147,12 @@ bm_main:
 ; will be 'up' - incrementing address in RAM
     cld
 
+; Data segments in 0x0000.
     mov ax, 0x0000
     mov ds, ax
     mov es, ax
 
 ; Save disk number.
-
     mov byte [bootmanagerDriveNumber], dl
     mov byte [META$FILE.DISK_NUMBER], dl
     mov byte [DISKINFO16_disk_number], dl
@@ -184,7 +186,6 @@ bm_main:
     ;xor ax, ax
     ;mov ah,  0xFF
     ;int 0x16
-
 
 ; #test
 ; Set the keyboard repeat rate to the max
@@ -305,12 +306,14 @@ restart_loop:
 ; usaremos a opçao de boot default.
 ; Load the BL.BIN image.
     cmp ax, 1 
-    jne near load_stuff  ;app_selector
+; >> GUI::
+    jne near load_stuff
 
 ; Caso contrario usaremos a opção CLI.
 ; 1 = Starts system GUI.
 ; 0 = Starts the Boot Manager CLI.
     mov byte [finish_saved_boot_option], 0
+; >> CLI::
     jmp load_stuff
 
     jmp restart_loop
@@ -321,8 +324,12 @@ restart_loop:
 ;
 ; Load stuff --------------------------
 ;
+
 load_stuff:
 ; Load the BL.BIN image.
+; This routine starts the system based on a flag,
+; that will tell us if we start the system using the graphics mode
+; or we start the 32bit embedded shell here in the bm.
 
     call Window.ClearScreen
     
@@ -335,13 +342,15 @@ load_stuff:
     mov ax, word bootmanager_ImageName2
     call test_load_bl_image
 
-; Trampoline.
-; see: finish.inc
+; Trampoline:
+; see: features/finish.inc
     push WORD 0
     push WORD AFTER_DATA 
     retf
 
-;---------------------------------------------------------
+; ================================================
+; DATA
+; ================================================
 ; Data for the above code...
 
     os_init_msg     db 'Gramado Boot Manager', 0

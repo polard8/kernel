@@ -17,53 +17,50 @@ finish_saved_boot_option db 0
 
 AFTER_DATA:
 
-; Segments at '0'.
-
+; Data segments at 0x0000.
     mov ax, 0 
     mov ds, ax
     mov es, ax 
 
 ; Message: Boot Manager Splash.
 ; See: s2header.inc
-
     mov si, msg_bm_splash
     call DisplayMessage
 
     ; Debug.
     ; jmp $
 
-;; Checar se a assinatura PE est� na mem�ria, se estiver, pularemos e
-;; a etapa de carregamento do arquivo.
+;; PE signature for BL.BIN image.
+;; Check if we have the PE signature at the beginning of the file.
 ;; #todo
-;; Rever essa assinatudo, pois tudo no sistema agora usa ELF.
+;; We need to rething this because everything alse in the system 
+;; is using the ELF header.
 
 xxx_checkSig:
 
     mov ax, 0x2000
     mov gs, ax 
 
-; Testando o 4C
+; Probe for '4C'. The first byte.
     xor bx, bx
     mov al, byte [gs:bx]    ; 0x2000:0 
-    cmp al, byte 0x4C         ;'L' primeiro byte
+    cmp al, byte 0x4C       ;'L' primeiro byte
     jne .sigNotFound
 
-; Testando o 01
+; Probe for '01'. The second byte.
     mov bx, 1
-    mov al, byte [gs:bx]    ; 0x2000:1 
-    cmp al, byte 0x01         ; Segundo byte
+    mov al, byte [gs:bx]  ; 0x2000:1 
+    cmp al, byte 0x01     ; Segundo byte
     jne .sigNotFound
 
-; Se os dois char n�o est�o ausentes, 
-; significa que o arquivo eta no lugar.
+; ========
+; Found:
+; If we found both bytes, so the file was found.
     jmp .sigFound
 
 ; ========
 ; Not Found
-; A assinatura n�o foi encontrada,
-; o arqui n�o est� na mem�ria.
-; message: 
-; O arquivo n�o esta presente na mem�ria.
+; File not found. Final message and hang.
 .sigNotFound:
     mov si, stage2_msg_pe_sigNotFound
     call DisplayMessage
@@ -92,16 +89,24 @@ xxx_turnoffFDCMotor:
 xxx_setupPS2Mouse:
     mov ax, 0c201h
     int 15h
+
+; Set up the registers.
+; + Data segments in 0x0000.
+; + Stack segment in 0x0000.
+; + Stack pointer in 0x6000.
 xxx_setupRegisters:
     cli
+    ; Segments
     mov ax, 0 
     mov ds, ax
     mov es, ax
     ;mov fs, ax 
-    ;mov gs, ax 
+    ;mov gs, ax
+    ; Stack 
     xor ax, ax
     mov ss, ax
     mov sp, 0x6000
+    ; Zeros
     xor dx, dx
     xor cx, cx
     xor bx, bx
@@ -119,15 +124,11 @@ xxx_setupA20:
     call DisplayMessage
     popa
 
-; xxx_Config
-; Configurando o modo de inicializaçao do Boot Manager:
 ; ======================================
-; Seleciona um modo de inicializa�ao para o Boot Manager.
-; A op��o est� salva no metafile do Boot Mananger.
-; Op��es:
-;     +1 ~ Shell do boot manager.
-;     +2 ~ GUI
-; Configura o metafile. META$FILE.INIT_MODE = al
+; Selecting the initialization mode for the boot manager.
+;  +1 = Embedded shell.
+;  +2 = GUI.
+; Savinf al into META$FILE.INIT_MODE.
 
 xxx_Config:
 
@@ -136,7 +137,6 @@ xxx_Config:
 .setupBootMode:
     mov si, msg_selecting_videomode
     call DisplayMessage
-
     ; #debug
     ; JMP $
 
@@ -178,7 +178,7 @@ xxx_Config:
 .xxxxCLI:
     mov al, byte BOOTMODE_SHELL
     call set_boot_mode
-    JMP s2modesActivateMode  ; pm.inc
+    JMP s2modesActivateMode  ; s2modes.inc
     jmp $
 
 ;;

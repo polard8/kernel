@@ -133,7 +133,23 @@ clean:
 	rm -rf *.o   
 	@echo "~clean"
 clean-all:
+
 	rm -rf *.o   
 	rm -rf *.BIN   
+
+	rm -rf kctl/*.o   
+	rm -rf kres/*.o   
+	rm -rf lib/*.o   
+
+	rm -rf kctl/arch/*.o   
+	rm -rf kctl/core/*.o   
+
+	rm -rf kres/dev/*.o   
+	rm -rf kres/fs/*.o   
+	rm -rf kres/gramk/*.o   
+	rm -rf kres/ke/*.o   
+	rm -rf kres/mm/*.o   
+	rm -rf kres/net/*.o   
+
 	@echo "~clean-all"
 

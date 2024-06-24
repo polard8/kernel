@@ -215,6 +215,8 @@ mGui:
     call set_boot_mode
 
 ; Setup registers.
+; + Data segments in 0x0000.
+; + Stack in 0:0x6000.
 
     cli
     mov ax, 0 
@@ -395,6 +397,7 @@ s2modespm32:
 ; == \o/ ============================
 ;
 
+;; ==============================================
 ; Strings:
 
 s2modes_initmessageinGM: 
