@@ -324,7 +324,7 @@
 #include "../kres/ke/ke.h"
 
 // ==================================
-#include "../kctl/core/user.h"
+#include "../kres/gramk/user/user.h"
 
 // ==================================
 // ke/

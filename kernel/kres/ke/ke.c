@@ -954,7 +954,9 @@ int keInitialize(int phase)
         // see: gramk/gre/gre.c
         gre_initialize();
         // Desktop stuff.
-        init_logon_manager();
+        // Ring0 components for the display server.
+        // see: user.c
+        gramkInitialize();
         // ws registration support.
         ws_init();
         // ws callback support.

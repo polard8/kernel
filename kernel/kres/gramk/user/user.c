@@ -30,6 +30,11 @@ int cg_counter=0;
 
 static void __init_cg_list(void);
 
+// Logon/logoff support.
+static int init_logon_manager (void);
+static int init_logoff (int mode);
+static int register_logoff_process(pid_t pid);
+
 //============================
 
 // init_cg_list:
@@ -491,19 +496,50 @@ int User_initialize(void)
     return 0;
 }
 
-int init_logon_manager (void)
+static int init_logon_manager (void)
 {
-// #todo
-// #bugbug
+    return 0;
+}
 
-    debug_print("init_logon_manager: [TODO FIXME]\n");
+static int init_logoff (int mode)
+{
+    return 0;
+}
 
+// See: gpid.h
+static int register_logoff_process (pid_t pid)
+{
+    if (pid<0 || pid >= PROCESS_COUNT_MAX ){
+        debug_print("register_logoff_process: pid fail\n");
+        return -1;
+    }
+// ??
+// Global variable.
+    if (__gpidLogoff != 0){
+        debug_print("register_logoff_process:\n");
+        return -1;
+    }
+
+    __gpidLogoff = (pid_t) pid;
+
+    return 0;
+}
+
+// Ring0 components for the display server.
+int gramkInitialize(void)
+{
+// Called by keInitialize() in ke.c
+
+    debug_print("gramkInitialize: [TODO FIXME]\n");
+
+//-------------------------------
+// The 'gui' structure
 // #bugbug
 // Is it the first time? Or not?
 
     gui = (void *) kmalloc( sizeof(struct gui_d) );
     if ((void *) gui == NULL){
-        panic("init_logon_manager: [FAIL] gui\n");
+        panic("gramkInitialize: [FAIL] gui\n");
     }
 
 //
@@ -515,14 +551,13 @@ int init_logon_manager (void)
 // o kernel usa a tty0.
 
     // Limpa a lista
-    printk ("init_logon_manager: Initializing tty module\n");
+    printk ("gramkInitialize: Initializing tty module\n");
     //tty_init_module();
 
     // Limpa a lista de terminais virtuais tamb�m.
-    printk ("init_logon_manager: Initializing vt module\n");
+    printk ("gramkInitialize: Initializing vt module\n");
     //vt_init_module();
 
-// See: userenv.c
     User_initialize();
 
 // See: ws.h
@@ -543,40 +578,10 @@ int init_logon_manager (void)
 
     // ...
 
-    return 0;
-}
-
-//-------------
-
-int init_logoff (int mode)
-{
-    return 0;
-}
-
-// See: gpid.h
-int register_logoff_process (pid_t pid)
-{
-    if (pid<0 || pid >= PROCESS_COUNT_MAX ){
-        debug_print("register_logoff_process: pid fail\n");
-        return -1;
-    }
-// ??
-// Global variable.
-    if (__gpidLogoff != 0){
-        debug_print("register_logoff_process:\n");
-        return -1;
-    }
-
-    __gpidLogoff = (pid_t) pid;
+    init_logon_manager();
+    //init_logoff(...);
+    //register_logoff_process(...);
 
     return 0;
 }
-
-
-
-
-
-
-
-
 

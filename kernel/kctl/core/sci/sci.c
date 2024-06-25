@@ -217,8 +217,8 @@ void *sci0 (
 
     pid_t current_process = (pid_t) get_current_pid();
 
-// #test
 // ---------------------------------
+// Thread
     if ( current_thread<0 || 
          current_thread >= THREAD_COUNT_MAX )
     { 
@@ -239,12 +239,13 @@ void *sci0 (
 
     unsigned long *message_address = (unsigned long *) arg2;
 
-// Pointer for cgroup
-    struct cgroup_d *cg;
-
     unsigned long *a2 = (unsigned long*) arg2;
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
+
+
+// Pointer for cgroup
+    struct cgroup_d *cg;
 
     // #debug
     //debug_print("sc0:\n");
@@ -1300,17 +1301,16 @@ void *sci0 (
         return NULL;
     }
 
-// 512 - Get display server PID for a given cgroup
-// IN: cgroup structure pointer.
+// 512 - Get display server PID for a given cgroup ring0 pointer.
+// IN: arg2 = cgroup structure pointer.
 // OUT: pid
     if (number == SCI_GET_WS_PID)
     {
         debug_print("sci0: SCI_GET_WS_PID\n");
         cg = (struct cgroup_d *) arg2;
-        if ( (void *) cg != NULL )
+        if ((void *) cg != NULL)
         {
-            if ( cg->used  == TRUE && 
-                 cg->magic == 1234 )
+            if ( cg->used  == TRUE && cg->magic == 1234 )
             {
                 return (void *) cg->__display_server_pid; 
             }

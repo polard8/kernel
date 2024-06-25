@@ -13,8 +13,8 @@
  */ 
 struct usession_d
 {
-    object_type_t   objectType;
-    object_class_t  objectClass;
+    object_type_t objectType;
+    object_class_t objectClass;
     struct object_d  *object;
 // SID - Session ID.
     int id;
@@ -116,9 +116,11 @@ struct cgroup_d *CreateCG(void);
 
 // --------------------------------------------
 
-int init_logon_manager (void);
-int init_logoff (int mode);
-int register_logoff_process(pid_t pid);
+// Ring0 components for the display server.
+int gramkInitialize (void);
+
+// --------------------------------------------
+
 
 /*
  Um usuário só pode rodar o servidor de recursos gráficos se ele estiver no modo terminal.
