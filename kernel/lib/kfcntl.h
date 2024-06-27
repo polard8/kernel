@@ -1,6 +1,6 @@
 
-
-// fcntl.h
+// kfcntl.h
+// Created by Fred Nora.
 
 #ifndef ____FCNTL_H
 #define ____FCNTL_H    1
@@ -58,22 +58,17 @@
 
 /* Struct used for locking.  POSIX Table 6-8. */
 
-struct flock {
-
+struct flock 
+{
     short l_type;    // type: F_RDLCK, F_WRLCK, or F_UNLCK 
     short l_whence;  // flag for starting offset 
     off_t l_start;   // relative offset in bytes 
     off_t l_len;     // size; if 0, then until EOF 
     pid_t l_pid;     // process id of the locks' owner 
-
 };
-
 
 #endif  //____FCNTL_H
 
-
 //
-// End.
+// End
 //
-
-

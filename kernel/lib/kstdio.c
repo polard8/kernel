@@ -656,7 +656,7 @@ int print ( char **out, int *varg )
 
 
 /*
- * printk:
+ * printk_old:
  *     @field 2
  *     The printk function.
  *     Assuming sizeof(void *) == sizeof(int).

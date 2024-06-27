@@ -1,10 +1,8 @@
-/*
- * iso646.h
- */
+// kiso646.h
+// Created by Fred Nora.
 
 #ifndef ISO646_H
 #define ISO646_H    1
-
 
 /*
 	<iso646.h> -- macros for use in place of certain tokens that are
@@ -70,9 +68,5 @@
 #define xor     ^
 #define xor_eq  ^=    
 
-
-#endif    
-
-
-
+#endif
 

@@ -1,4 +1,6 @@
 // kunistd.h
+// Standard unix routines.
+// Created by Fred Nora.
 
 #ifndef __KUNISTD_H
 #define __KUNISTD_H    1
@@ -8,7 +10,7 @@
 #define STDERR_FILENO  2  // Standard error file descriptor
 
 // Process IDentifier. (posix)
-typedef int    pid_t;
+typedef int  pid_t;
 
 //
 // prototypes ======================

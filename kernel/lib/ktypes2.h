@@ -70,17 +70,13 @@ typedef  short      pid_t;    //process id
 #endif
 */
 
-
-
 // old ... 
 // #bugbug: Como no bsd encontramos valores de 32bit
 // vamos mudar isso.
 //typedef	u_short	mode_t;			/* permissions */
-typedef ulong    mode_t;
+typedef ulong  mode_t;
 
-typedef u_long    fixpt_t;    /* fixed point number */
-
-
+typedef u_long  fixpt_t;    /* fixed point number */
 
 #ifndef _POSIX_SOURCE
 typedef  struct _uquad  { u_long val[2]; } u_quad;
@@ -91,8 +87,6 @@ typedef  long   *qaddr_t;    /* should be typedef quad * qaddr_t; */
 #define	minor(x)      ((int)((x)&0xff))                /* minor number */
 #define	makedev(x,y)  ((dev_t)(((x)<<8) | (y)))        /* create dev_t */
 #endif
-
-
 
 /*
 #include <machine/ansi.h>
@@ -138,8 +132,6 @@ typedef long  time_t;    // time in sec since 1 Jan 1970 0000 GMT.
 typedef long  clock_t;    // unit for system accounting.
 #endif
 
-
-
 /* 
  Process IDentifier 
  posix.  
@@ -159,8 +151,6 @@ typedef int  pid_t;
 #define __GID_T 
 typedef int  gid_t;
 #endif
-
-
 
 #ifndef _POSIX_SOURCE
 #define NBBY  8    /* number of bits in a byte */
@@ -211,12 +201,7 @@ struct	uio;
 #endif
 */
 
-
 #endif /* !_POSIX_SOURCE */
 
-
 #endif    //____TYPES2_H
-
-
-
 

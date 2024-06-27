@@ -1,6 +1,7 @@
 
 // kstring.h
 // Ring 0, string operations.
+// Created by Fred Nora.
 
 #ifndef __KSTRING_H
 #define __KSTRING_H    1
@@ -28,12 +29,10 @@ void *memset ( void *ptr, int value, int size );
 size_t strcspn(const char *str, const char *reject);
 size_t strspn (const char *str, const char *accept);
 
-
 unsigned long 
 string_compute_checksum ( 
     unsigned char *buffer, 
     unsigned long lenght );
-
 
 //
 // == strtok ============
@@ -60,10 +59,7 @@ char *strdup(const char *str);
 
 #endif    
 
-
 //
-// End.
+// End
 //
-
-
 

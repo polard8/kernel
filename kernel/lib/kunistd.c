@@ -1,5 +1,5 @@
-
 // kunistd.c
+// Created by Fred Nora.
 
 #include <kernel.h>    
 
@@ -31,10 +31,11 @@ int __gethostname(char *buffer)
     strcpy ( 
         hostname_buffer, 
         (const char *) HostInfo->__hostname );
+
 // Get the size.
     size = (int) HostInfo->hostName_len;
-
     return (int) size;
+
 fail:
     return (int) -1;
 }
@@ -152,13 +153,14 @@ off_t sys_lseek(int fd, off_t offset, int whence)
 // See: kstdio.c
     k_fseek( (file *) f, (long) offset, (int) whence );
 
-    if (f->_p < f->_base){
+    if (f->_p < f->_base)
+    {
+        // #debug
         panic("sys_lseek: #fixme f->_p < f->_base\n");
     }
 
-    off_t FinalResult = 
-        (off_t) (f->_p - f->_base);
-
+// Final result.
+    off_t FinalResult = (off_t) (f->_p - f->_base);
     return (off_t) FinalResult;
 
 fail:

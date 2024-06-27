@@ -1,5 +1,5 @@
-
-// signal.h
+// ksignal.h
+// Created by Fred Nora.
 
 #ifndef  __SIGNAL_H
 #define  __SIGNAL_H    1

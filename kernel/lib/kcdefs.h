@@ -34,11 +34,10 @@
  *	cdefs.h,v 1.4 1993/05/26 14:52:56 cgd Exp
  */
 
+// kcdefs.h
 
 #ifndef ____CDEFS_H
 #define ____CDEFS_H    1
-
-
 
 
 #ifndef	_SYS_CDEFS_H_
@@ -102,9 +101,5 @@
 
 #endif /* !_SYS_CDEFS_H_ */
 
-
 #endif  //____CDEFS_H
-
-
-
 

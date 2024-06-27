@@ -1933,7 +1933,7 @@ done:
 
     // ShellFlag == TRUE
 
-    // :: keystrokes qhen we are in ring0 shell mode.
+    // :: keystrokes when we are in ring0 shell mode.
     // queue:: (combinations)
     Status = 
         (int) __ProcessInput(

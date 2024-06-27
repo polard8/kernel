@@ -1,18 +1,15 @@
-/*
- * File: kstddef.h 
- * Descrição:
- *     Definições padrão da linguagem C, versão C99.
- */
+// kstddef.h 
+// Standard definitions for libc.
+// Created by Fred Nora.
 
 #ifndef ____STDDEF_H
 #define ____STDDEF_H    1
 
 enum {
-	false  = 0,
-	true   = 1
+    false  = 0,
+    true   = 1
 };
 
- 
 /* 
     @todo:
 Macros:
@@ -26,20 +23,12 @@ Variables:
 */
 
 
-/*
- * NULL HANDLE. 
- * Observação: 
- *     Essa definição também existe em types.h.
- */ 
-#define NULL ((void *)0)
+// Defining NULL handle.
+#define NULL  ((void *)0)
 
+// Signed integral type of the result of subtracting two pointers.
+typedef int  ptrdiff_t;
 
-/*
- * Signed integral type of the result of subtracting two pointers.
- */
-typedef int ptrdiff_t;
-
-  
 /*
  * Integral type whose range of values can represent distinct 
  * wide-character codes for all members of the largest character set 
@@ -49,29 +38,18 @@ typedef int ptrdiff_t;
  * Set has a code value equal to its value when used as 
  * the lone character in an integer character constant.
  */ 
-typedef int wchar_t;
+typedef int  wchar_t;
 
-
-/* 
- * which is the unsigned integer type of the result of the sizeof operator;   
- */
+// which is the unsigned integer type of the result of the sizeof operator;   
 //typedef unsigned int size_t;
-typedef int size_t;
+typedef int  size_t;
 
-
-/*
- * offset_of - "deslocamento dentro de uma estrutura"
- */
-
+// offset_of - "deslocamento dentro de uma estrutura"
 //linux like. 
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
- 
+#define offsetof(TYPE, MEMBER)  ((size_t) &((TYPE *)0)->MEMBER)
+
 //#define offsetof(st, m) ((size_t)&(((st *)0)->m))
 //#define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
 
 #endif    //____STDDEF_H
-
-
-
-
 

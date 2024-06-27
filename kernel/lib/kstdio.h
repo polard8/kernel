@@ -1,5 +1,7 @@
 
 // kstdio.h
+// Standard io support for libc in ring0.
+// Created by Fred Nora.
 
 #ifndef __KSTDIO_H
 #define __KSTDIO_H    1
@@ -330,7 +332,6 @@ struct file_d
     int socket_buffer_full;
     struct socket_d  *socket;
 
-
 //
 // Buffer
 //
@@ -592,7 +593,7 @@ int printk_old( const char *format, ... );
 
 // ===================================
 
-int kputs ( const char *str );
+int kputs (const char *str);
 
 // #suspensa
 // Essa implementação foi feita para 32bit e não funciona
@@ -612,14 +613,14 @@ int kinguio_printf(const char *fmt, ...);
 
 int k_ungetc ( int c, file *f );
 long k_ftell (file *f);
-int k_fileno ( file *f );
+int k_fileno (file *f);
 int k_fgetc (file *f);
-int k_feof ( file *f );
-int k_ferror ( file *f );
+int k_feof (file *f);
+int k_ferror (file *f);
 int k_fseek ( file *f, long offset, int whence );
 int k_fputc ( int ch, file *f );
 int k_fscanf (file *f, const char *format, ... );
-void k_rewind ( file *f );
+void k_rewind (file *f);
 int k_fclose (file *f);
 int k_fputs ( const char *str, file *f );
 void k_setbuf (file *f, char *buf);
@@ -648,16 +649,13 @@ int kstdio_initialize(void);
 
 // ??
 // crt/
-#define crt_printf  kinguio_printf
+#define crt_printf   kinguio_printf
 #define crt_sprintf  mysprintf
-#define crt_fseek  k_fseek
-#define crt_rewind  k_rewind
-#define crt_ftell  k_ftell
-#define crt_fclose  k_fclose
+#define crt_fseek    k_fseek
+#define crt_rewind   k_rewind
+#define crt_ftell    k_ftell
+#define crt_fclose   k_fclose
 // ...
 
-
 #endif    
-
-
 

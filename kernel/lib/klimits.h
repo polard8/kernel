@@ -1,9 +1,7 @@
-/*
- * File: limits.h 
- *     It defines some limits in the libc.
- *     ring 0.
- *     2005 - Created by Fred Nora.
- */
+// klimits.h 
+// It defines some limits in the libc.
+// ring 0.
+// 2005 - Created by Fred Nora.
 
 #ifndef ____LIMITS_H
 #define ____LIMITS_H    1
@@ -21,7 +19,6 @@
 //
 // CHAR
 //
-
 
 // Minimum and maximum values a 'signed char' can hold.  
 #define SCHAR_MIN  0x80  // (-128)
@@ -53,7 +50,6 @@
 // signed int
 #define ____INT_MAX  SINT_MAX
 
-
 //
 // long
 //
@@ -64,8 +60,4 @@
 #define ULONG_MAX  0xffffffffffffffff
 
 #endif    
-
-
-
-
 

@@ -1,5 +1,6 @@
 
 // kstdlib.h
+// Created by Fred Nora.
 
 #ifndef  __KSTDLIB_H
 #define __KSTDLIB_H    1
@@ -11,7 +12,6 @@
 
 // Números pseudo-aleatórios   
 #define RAND_MAX  32767    //0x7FFF
-
 
 //
 // prototypes ===========================
@@ -30,5 +30,4 @@ int k_atoi(const char *str);
 int abs(int j);
 
 #endif    
-
 

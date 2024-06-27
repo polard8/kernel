@@ -1,6 +1,7 @@
 
-// termios.h
+// ktermios.h
 // ring0, kernel base.
+// Created by Fred Nora.
 
 // #todo
 // kernel side termios support.
@@ -65,7 +66,6 @@ Macro: int NCCS
 #define VSTART       9	/* cc_c[VSTART] = START char (^S) */
 #define VSTOP       10	/* cc_c[VSTOP] = STOP char (^Q) */
 #define VERASEWORD  14	/* cc_c[VERASEWORD] = ERASEWORD char (^W) */
-
 
 // ================================================
 

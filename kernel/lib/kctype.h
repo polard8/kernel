@@ -1,8 +1,7 @@
-
 // kctype.h
 // 2018 - Created by Fred Nora.
 //      - Linux-stuff
-// see: kctype.v
+// see: kctype.c
 
 #ifndef ____CTYPE_H
 #define ____CTYPE_H    1
@@ -40,7 +39,6 @@ inline unsigned char __tolower(unsigned char c);
 inline unsigned char __toupper(unsigned char c);
 inline char _tolower(const char c);
 inline int isodigit(const char c);
-
 
 // partes: 
 // básico, intermediário e definitivo.
@@ -183,6 +181,4 @@ inline int isodigit(const char c);
 */
 
 #endif    
-
-
 
