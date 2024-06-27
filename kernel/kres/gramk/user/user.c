@@ -560,6 +560,10 @@ int gramkInitialize(void)
 
     User_initialize();
 
+    // Enable both input targets for now.
+    // stdin and thread's queue,
+    gramkSetInputTargets(TRUE,TRUE);
+
 // See: ws.h
 // hostname:Displaynumber.Screennumber
 // gramado:0.0

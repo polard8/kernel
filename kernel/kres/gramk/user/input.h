@@ -5,6 +5,26 @@
 #define __DISPLAY_GRINPUT_H    1
 
 
+// -----------------------------------
+// Input targets:
+// We can sent input to some targets:
+// + stdin file.
+// + Message queue of the foreground thread.
+// Let's select the valid targets.
+struct input_targets_d
+{
+// The structure initialization.
+    int initialized;
+
+// The input goes to stdin
+    int target_stdin;
+// The input goes to the thread's queue.
+    int target_thread_queue;
+};
+// see: input.c
+extern struct input_targets_d  InputTargets;
+
+
 // Basic block of data to handle input events.
 // Used PS2 keyboard and PS2 mouse for now.
 // See: grinput.c
@@ -25,6 +45,12 @@ struct input_event_d
     // ...
 };
 
+//==========================================================
+
+
+int gramkSetInputTargets(int stdin_target, int queue_target);
+
+
 //
 // Input events:
 //
@@ -35,12 +61,6 @@ wmKeyEvent(
     unsigned char raw_byte,
     int prefix );
 int wmTimerEvent(int signature);
-
-int 
-keProcessInput ( 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
 
 
 #endif    
