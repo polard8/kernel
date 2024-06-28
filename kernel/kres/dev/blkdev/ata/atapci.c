@@ -1,5 +1,8 @@
-
 // atapci.c
+// History:
+// + Original version Created by Nelson Cole, Sirius OS, BSD license.
+// + Document created by Fred Nora.
+// + Changed many times by Fred Nora.
 
 #include <kernel.h>
 
@@ -17,7 +20,6 @@
 struct pci_device_d *PCIDeviceATA;
 // struct pci_device_d *PCIDeviceATA2;
 // ...
-
 
 // ---------------------------------------------
 
@@ -68,7 +70,6 @@ uint32_t diskPCIScanDevice(int class)
     int bus=0;
     int dev=0;
     int fun=0;
-
 // #bugbug 
 // Usando -1 para unsigned int. 
     uint32_t data = -1;
@@ -150,11 +151,9 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     //D->Vendor = data &0xffff;
     //D->Device = data >> 16 &0xffff;
 
-//#ifdef KERNEL_VERBOSE
-//    printk ("Disk info: [ Vendor ID: %x,Device ID: %x ]\n", 
-//        D->Vendor, D->Device );
-//#endif
-
+    // #debug
+    // printk ("Disk info: [ Vendor ID: %x,Device ID: %x ]\n", 
+    //     D->Vendor, D->Device );
 
 /*
     if ( D->Vendor == 0x1106 && D->Device == 0x0591 ){
@@ -228,14 +227,11 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
         data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x48 );
         diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 0x48, data | 0xf);
 
-
-//#ifdef KERNEL_VERBOSE 
+        // #debug
         // printk ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
         //    ata_sub_class_code_register_strings[AtaController.controller_type],
         //    ata_pci.progif,
         //    ata_pci.revisionId );
-//#endif
-
 
 //
 // == #RAID ========
@@ -300,12 +296,11 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
         data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 4 );
         diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data & ~0x400);
 
-//#ifdef KERNEL_VERBOSE
+        // #debug
         // printk ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
         //     ata_sub_class_code_register_strings[ata_port.controller_type], 
         //     ata_pci.progif,
         //     ata_pci.revisionId );
-//#endif
 
 // ====
 // No type
@@ -351,13 +346,10 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     D->Command = (data & 0xffff); 
     D->Status  = (data >> 16) & 0xffff;
 
-// #debug
-//#ifdef KERNEL_VERBOSE
-//    printk ("[ Command %x Status %x ]\n", D->Command, D->Status );
-//    printk ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
-//        D->irq_line, D->irq_pin );
-//#endif
-
+    // #debug
+    // printk ("[ Command %x Status %x ]\n", D->Command, D->Status );
+    // printk ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
+    //     D->irq_line, D->irq_pin );
 
 //
 // == DMA ====================

@@ -1,4 +1,3 @@
-
 // console.c
 // This is the virtual console driver, embedded into the kernel base.
 // It handles the device-independent part of the console infrastructure.

@@ -1,7 +1,7 @@
-
 // fat/fat16.c
 // FAT16 file system support.
 // ring 0.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -14,7 +14,6 @@ int g_fat_cache_loaded=FALSE;
 
 struct fat_d  *bootvolume_fat;
 struct system_fat_d sfMainFAT;
-
 
 //
 // == Cluster list ===============================
@@ -350,13 +349,11 @@ fsGetFileSize (
 // ## ROOT ##
 //
 
+//Carrega o diretório raiz na memória.
 //loadRoot:
 
-//Carrega o diretório raiz na memória.
-
-//#ifdef KERNEL_VERBOSE
-    //printk ("fsRootDirGetFileSize: Loading root..\n"); 
-//#endif
+    // #debug
+    // printk ("fsGetFileSize: Loading root..\n"); 
 
 // #bugbug
 // pega o tamanho de um arquivo que está no diretório raiz.
@@ -523,7 +520,7 @@ found:
 	//while(1){ asm("hlt"); }
 
     // #debug
-    // printk ("fsRootDirGetFileSize: FileSize=%d \n" , FileSize );
+    // printk ("fsGetFileSize: FileSize=%d \n" , FileSize );
     // refresh_screen ();
 
     return (unsigned long) ( FileSize & 0x00000000FFFFFFFF );

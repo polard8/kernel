@@ -1,10 +1,11 @@
-
 // config.h
 // Config for the Gramado kernel only. Not the whole system.
+// Created by Fred Nora.
 
 #ifndef ____KERNEL_CONFIG_H
 #define ____KERNEL_CONFIG_H    1
 
+// ------------------------------------------------------
 // Target machine
 #define __TARGET_MACHINE_BAREMETAL     0
 #define __TARGET_MACHINE_QEMU          1
@@ -16,7 +17,7 @@
 // ------------------------------------------------------
 // Device flags:
 #define USE_SERIALDEBUG    0
-#define USE_E1000          0 
+#define USE_E1000          0
 // ...
 
 // ------------------------------------------------------
@@ -140,54 +141,13 @@ sixth..     ide5, usually PCI, probed
 // #define DEFAULT_RUNLEVEL  0
 #define DEFAULT_RUNLEVEL  5
 
-/* configuração de compilação */
-
-// Algumas adaptações precisam ser feitas 
-// para que as ferramentas de compilação 
-// sejam usadas corretamente.
-
-// gcc version:
-// gcc 8 on manjaro
-
-// #importante:
-// O kernel tem três possíveis processos usados na inicialização.
-// #obs: cada um deles tem sua própria estrutura de processo e suas 
-// próprias threads, mas até o momento todos os três estão usando 
-// o diretório de páginas do processo kernel.  
-// Com essas flags podemos habilitar qual dos três processos 
-// irão rodar na inicialização.
-// Se a configuração não indicar nenhum processo então o kernel deve 
-// falhar na inicialização, por enquanto. 
-
-//=====================================================
-//    ######## Creation flags ########
-//
-
-//Cria o processo shell e sua thread de controle.
-#define ENTRY_CREATE_SHELL   
-//Cria o processo taskman e sua thread de controle.
-#define ENTRY_CREATE_TASKMAN 
-//Cria uma thread para o processo kernel, que irá rodar em ring0.
-#define ENTRY_CREATE_KERNELTHREAD_RING0
-
-//==========================================
-// modes
-
-//Se usaremos os processos do x server ou apenas o init.
-#define ENTRY_GRAMADO_CORE  
-
-//====================================================
-//    ######## more ... ########
-//
-
-//Essa flag aciona a rotina que vai checar o máximo de 
-//configurações e inicializações válidas.
-
-#define ENTRY_DEBUG_CHECK_VALIDATIONS  1
-
 
 // ------------------------------------------------------
 // Setup verbose preferences.
+
+//
+// ==== VERBOSE ====
+//
 
 //
 // Set up what kind of debug message we wanna see.
@@ -203,24 +163,10 @@ sixth..     ide5, usually PCI, probed
 // uma espinha dorsal, um esqueleto.
 #define KERNEL_VERBOSE  1
 
-// Esse é usado para trabalhar a rotina de 
-// entrypoint da arquitetura alvo.
-#define ENTRY_VERBOSE  1
 
-// Esses quatro são as camadas principais.
-#define HAL_VERBOSE     1
-#define PS_VERBOSE      1
-#define EXECVE_VERBOSE  1
-#define GWS_VERBOSE     1
-
-// Permite que várias mensagens secundárias 
-// sejam enviadas para a porta serial.
-// #define SERIAL_DEBUG_VERBOSE  1
-
-//
+// ==================================================
 // ## breack points ##
 // Set up what what is the breakpoint.
-//
 
 // Seriam inicializações parciais programadas. 
 

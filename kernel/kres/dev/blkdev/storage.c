@@ -1,4 +1,3 @@
-
 // storage.c
 // Created by Fred Nora.
 
@@ -577,14 +576,8 @@ storage_write_sector(
     return (int) res; 
 }
 
-
-
-
-
-/*
- * disk_init:
- *     Initialize the disk manager.
- */
+// disk_init:
+// Initialize the disk manager.
 // #bugbug
 // #fixme
 // The boot disk was not include in the diskList[]
@@ -596,23 +589,17 @@ int disk_init (void)
 {
     struct disk_d *d;
     unsigned char BootDisk=0;
-    int i=0;
+    register int i=0;
 
-//#ifdef KERNEL_VERBOSE
-    //printk ("disk_init: Initializing..\n");
-//#endif
+    // #debug
+    // printk ("disk_init: Initializing..\n");
 
-//
-//  storage structure
-//
-
-    if( (void *) storage == NULL ){
-        panic ("disk_init: storage\n");
+// Check the storage structure.
+    if ((void *) storage == NULL){
+        panic("disk_init: storage\n");
     }
-
 // Clean the disk list.
-    for ( i=0; i<DISK_COUNT_MAX; i++ )
-    {
+    for ( i=0; i<DISK_COUNT_MAX; i++ ){
         diskList[i] = 0;
     };
 
@@ -629,17 +616,19 @@ int disk_init (void)
         panic("disk_init: d\n");
     }
     memset ( d, 0, sizeof(struct disk_d) );
-
     d->used = (int) TRUE;
     d->magic = (int) 1234;
 
+// ID
 // This is the boot disk.
 // So, it will be the number '0'.
-
     d->id = 0;
     current_disk = d->id;
-    diskList[ current_disk ] = (unsigned long) d;   //#test
+// Saving
+// #bugbug? Is it too early for that?
+    diskList[ current_disk ] = (unsigned long) d;
 
+// Type
     d->diskType = DISK_TYPE_NULL;
 
 // Get the number of the boot disk.
@@ -675,14 +664,18 @@ int disk_init (void)
     d->next = NULL;
 
 // #bugbug
-// Is this structure initialized ?
-
-    if ( (void*) storage != NULL ){
+// Is this structure initialized?
+    if ((void*) storage != NULL){
         storage->system_disk = (struct disk_d *) d;
     }
 
 // global.
     ____boot____disk =  (struct disk_d *) d;
+
+// #todo
+// Maybe this is the right moment to save the pointer
+// into the list.
+    //diskList[ current_disk ] = (unsigned long) d;
 
    //more?
 

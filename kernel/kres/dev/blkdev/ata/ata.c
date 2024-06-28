@@ -1,10 +1,12 @@
-
 // ata.c
 // This is the ata controller driver, embedded into the kernel base.
 // ata handshake.
 // write command and read status.
-// Document created by Fred Nora.
-// Original version Created by Nelson Cole, Sirius OS, BSD license.
+// History:
+// + Original version Created by Nelson Cole, Sirius OS, BSD license.
+// + Document created by Fred Nora.
+// + Changed many times by Fred Nora.
+
 // A lot of changes by Fred Nora.
 // Suporte à controladora IDE.
 
@@ -1314,9 +1316,9 @@ static int ata_initialize_ide_device(char port)
     case 1:  dev_nport.dev1 = 0x82;  break;
     case 2:  dev_nport.dev2 = 0x83;  break;
     case 3:  dev_nport.dev3 = 0x84;  break;
+    // #bugbug
+    // Return?
     default:
-        // #bugbug
-        // Porque não retornamos daqui mesmo?
         debug_print("ata_initialize_ide_device: [ERROR] default port number\n");
         break;
     };
@@ -1324,11 +1326,9 @@ static int ata_initialize_ide_device(char port)
 // Linked list.
     new_dev->next = NULL;
 
-//#ifdef KERNEL_VERBOSE
-    // #todo
+    // #debug
     // printk("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
     // refresh_screen ();
-//#endif
 
 // =========================================
 
@@ -1526,10 +1526,9 @@ static int __ata_initialize(int ataflag)
 // Messages
 //
 
-//#ifdef KERNEL_VERBOSE
-    //printk ("ata_initialize:\n");
-    //printk ("Initializing IDE/AHCI support ...\n");
-//#endif
+
+    // #debug
+    // printk ("Initializing IDE/AHCI support ...\n");
 
 // #test
 // Sondando na lista de dispositivos encontrados 
