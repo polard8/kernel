@@ -1,4 +1,5 @@
 // schedi.c
+// Workers for the scheduler.
 // Created by Fred Nora.
 
 #include <kernel.h>  
@@ -29,7 +30,6 @@ void do_credits_by_tid(tid_t tid)
         do_credits(thread);
     }
 }
-
 
 /*
  * psScheduler:
@@ -80,8 +80,7 @@ tid_t psScheduler(void)
 // Ela será a current_thread.
     if (UPProcessorBlock.threads_counter == 1)
     {
-        currentq = 
-            (struct thread_d *) UPProcessorBlock.IdleThread;
+        currentq = (struct thread_d *) UPProcessorBlock.IdleThread;
         current_thread = (tid_t) currentq->tid;
         debug_print("psScheduler: Idle $\n");
         // Return tid.
@@ -103,7 +102,7 @@ void do_thread_initialized(tid_t tid)
     }
 // Structure
     t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -127,7 +126,7 @@ void do_thread_standby(tid_t tid)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -151,7 +150,7 @@ void do_thread_running(tid_t tid)
 
     t = (void *) threadList[tid];
 // Valid?
-    if ( (void *) t != NULL ){
+    if ((void *) t != NULL){
         if ( t->used == TRUE && t->magic == 1234 ){
             t->state = RUNNING;
         }
@@ -169,7 +168,7 @@ void do_thread_ready(tid_t tid)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -246,7 +245,7 @@ void do_thread_blocked(tid_t tid)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -282,7 +281,7 @@ void do_thread_zombie(tid_t tid)
 
 // structure
     t = (void *) threadList[tid]; 
-    if ( (void*) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -315,13 +314,13 @@ void do_thread_dead(tid_t tid)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
         return;
     }
-    if(t->magic != 1234){
+    if (t->magic != 1234){
         return;
     }
 
@@ -339,7 +338,6 @@ void drop_quantum(struct thread_d *thread)
     thread->quantum = QUANTUM_MIN;
 }
 
-
 /*
  * do_waitpid:
  *     espera por qualquer um do processo filho.
@@ -355,11 +353,13 @@ void drop_quantum(struct thread_d *thread)
 //rever essa função, há muito o que fazer nela 
 //ela precisa retornar valores padronizados e configurar 
 //o status recebido
-
 int do_waitpid (pid_t pid, int *status, int options)
 {
     struct process_d *p;
     pid_t current_process = (pid_t) get_current_process();
+
+// #todo
+// Check parameters
 
     //#debug
     //printk ( "do_waitpid: current_process=%d pid=%d \n", 
@@ -369,10 +369,14 @@ int do_waitpid (pid_t pid, int *status, int options)
     // tem que bloquear o processo atual até que um dos seus 
     // processos filhos seja fechado.
 
+    //if (pid < 0)
+        //goto fail;
+
+
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
         printk ("do_waitpid: Current process struct fail\n");
-        return -1;
+        goto fail;
     }else{
 
         if ( p->used != 1 || p->magic != 1234 ){
@@ -418,6 +422,7 @@ int do_waitpid (pid_t pid, int *status, int options)
     //printk ("do_waitpid: done. \n");
     //refresh_screen();
 
+fail:
     return (int) (-1);
 }
 
@@ -507,10 +512,9 @@ void wait_for_a_reason ( int tid, int reason )
 
     t = (struct thread_d *) threadList[tid];
 
-    if ( (void *) t == NULL ){
+    if ((void *) t == NULL){
         debug_print ("wait_for_a_reason: t\n");
         return;
-
     } else {
 
         if ( t->used != 1 || t->magic != 1234 ){
@@ -690,7 +694,7 @@ void wakeup_thread(int tid)
 
 // structure
     t = (void *) threadList[tid]; 
-    if ( (void *) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if (t->used != TRUE){
@@ -788,6 +792,7 @@ void sleep_until (tid_t tid, unsigned long ms)
     do_thread_waiting(tid, ms);
 }
 
+// sleep:
 // Yield
 // Set a flag that this thread will be preempted.
 // Desiste do tempo de processamento.
@@ -863,7 +868,7 @@ void sys_broken_vessels(tid_t tid)
 
 // structure
     t = (void *) threadList[tid];
-    if ( (void *) t == NULL ){
+    if ((void *) t == NULL){
         return;
     }
     if ( t->used != TRUE || t->magic != 1234 ){
@@ -982,59 +987,4 @@ fail:
 //
 // End
 //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

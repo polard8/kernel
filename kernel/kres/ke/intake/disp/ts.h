@@ -1,7 +1,8 @@
 
 // ts.h 
-// header para rotinas de operação de troca de contexto de threads e processos.
 // task switching
+// header para rotinas de operação de troca de contexto de threads e processos.
+// Created by Fred Nora.
 
 
 #ifndef __TS_H
