@@ -124,9 +124,12 @@ struct network_initialization_d
 // 1 - initialized
     int initialized;
 
+    int locked;
+
 // Are we online?
 // Do we already have an valid IP?
     int is_online;
+
 
 // ...
 
@@ -194,6 +197,10 @@ int network_pop_packet( void *u_buffer, int len );
 
 void networkSetStatus(int status);
 int networkGetStatus(void);
+
+void networkLock (void);
+void networkUnlock (void);
+int networkIsLocked (void);
 
 void networkSetOnlineStatus(int status);
 int networkGetOnlineStatus(void);

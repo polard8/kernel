@@ -1,4 +1,3 @@
-
 // e1000.h
 // see: e1000.c
 // Credits: Chicago OS, Italo Matias.
@@ -6,6 +5,10 @@
 
 #ifndef ____E1000_H
 #define ____E1000_H    1
+
+
+extern int e1000_irq_count;
+
 
 // Interrupt Masks
 // The handler uses this.
@@ -218,8 +221,6 @@ extern struct intel_nic_info_d  *currentNIC;
 // O valor máximo precisa ser definido. 
 //extern unsigned long nicList[8]; 
 
-extern int e1000_interrupt_flag;
-extern int e1000_irq_count;
 
 
 //

@@ -1,4 +1,3 @@
-
 // pci.c
 // Created by Fred Nora.
 
@@ -26,7 +25,6 @@ int pciListOffset=0;
 //...
 
 static void __is_pci_supported(void);
-
 
 /*
 // #todo:
@@ -791,8 +789,6 @@ pciHandleDevice (
         if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) )
         {
             //debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found\n");
-            // Locked: Alguma rotina em ring3 desbloqueia depois.
-            e1000_interrupt_flag = FALSE;
 
             // Se a configuração decidiu usar o E1000.
             // see: kernel/config.h

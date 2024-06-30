@@ -8,9 +8,9 @@ import socket
 # Send to Gramado on virtualbox.
 #UDP_IP = "192.168.1.255"
 
-UDP_IP = "192.168.1.3"
+UDP_IP = "192.168.1.6"
 UDP_PORT = 11888
-MESSAGE = b"Hello Broadcast, from python script, on Linux.\0"
+MESSAGE = b"Hello from python script on Linux.\0"
 
 print("UDP target IP:   %s" % UDP_IP)
 print("UDP target port: %s" % UDP_PORT)

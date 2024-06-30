@@ -2341,12 +2341,18 @@ void *sci2 (
 // We can put all the network services in a single dialog function.
 // Just like a procedure. networkProcesure(....);
 
-// 22001 - Set network status.
-// Enable or disable.
-    if (number == 22001){
-        networkSetStatus((int) arg2);
+// 22001 
+// Lock or unlock the network.
+
+    if (number == 22001)
+    {
+        if (arg2 == TRUE)
+            networkUnlock();
+        if (arg2 == FALSE)
+            networkLock();
         return NULL;
     }
+
 // 22002 - Get network status.
     if (number == 22002){
         return (void*) networkGetStatus();

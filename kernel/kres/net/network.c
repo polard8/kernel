@@ -415,6 +415,10 @@ network_on_receiving (
         goto fail;
     }
 
+// If the network is locked
+    if (NetworkInitialization.locked == TRUE)
+        goto fail;
+
 // Frame validation
 
     if ((void*) frame == NULL){
@@ -525,6 +529,10 @@ network_on_sending (
     if (NetworkInitialization.initialized != TRUE){
         return -1;
     }
+
+// If the network is locked
+    if (NetworkInitialization.locked == TRUE)
+        return -1;
 
 //fail:
     return -1;
@@ -737,6 +745,20 @@ int networkGetStatus (void)
 {
     return (int) NetworkInitialization.initialized;
 }
+
+void networkLock (void)
+{
+    NetworkInitialization.locked = (int) TRUE;
+}
+void networkUnlock (void)
+{
+    NetworkInitialization.locked = (int) FALSE;
+}
+int networkIsLocked (void)
+{
+    return (int) NetworkInitialization.locked;
+}
+
 
 void networkSetOnlineStatus(int status)
 {
@@ -964,7 +986,15 @@ int networkInit(void)
 // see: 
 // network_on_receiving() and network_on_sending();
 
-    //networkSetStatus(TRUE);
+    networkSetStatus(TRUE);
+
+//
+// Lock
+//
+
+// The ring3 application will unlock it.
+    NetworkInitialization.locked = TRUE;
+
 
 // =====================================
 // domain

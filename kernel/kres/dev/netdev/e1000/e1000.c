@@ -1,4 +1,3 @@
-
 // e1000.c
 // e1000 Intel nic driver.
 // Credits: Chicago OS, Italo Matias.
@@ -11,7 +10,6 @@ static int e1000_initialized = FALSE;
 // see: nicintel.h
 struct intel_nic_info_d  *currentNIC;
 
-int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
 unsigned long gE1000InputTime=0;
 
@@ -220,12 +218,19 @@ static void __e1000_enable_interrupt(struct intel_nic_info_d *nic_info)
 static void __e1000_linkup(struct intel_nic_info_d *d)
 {
     uint32_t val=0;
+
     if ((void*)d == NULL){
         panic("__e1000_linkup: d\n");
     }
+
+    printk("__e1000_linkup:\n");
+
 // CTRL - Device Control Register
     val = (uint32_t) __E1000ReadCommand(d,0);
     __E1000WriteCommand (d, 0, (val | 0x40));
+
+// #debug
+    printk("__e1000_linkup: Done\n");
 }
 
 static void __initialize_tx_support(struct intel_nic_info_d *d)
@@ -1023,8 +1028,8 @@ e1000_init_nic (
     __e1000_setup_irq(irq_line);
 // Reset the controller.
     __e1000_reset_controller(currentNIC);
+
 // Flags
-    e1000_interrupt_flag = TRUE;
     e1000_initialized = TRUE;
 
     //#debug
@@ -1347,8 +1352,10 @@ irq_E1000(void)
     if (e1000_initialized != TRUE){
         return;
     }
+
 // Time in ticks.
     gE1000InputTime = (unsigned long) get_systime_totalticks();
+
 // Call the handler.
     DeviceInterface_e1000();
 }

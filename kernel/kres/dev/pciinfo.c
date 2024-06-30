@@ -1,4 +1,3 @@
-
 // pciinfo.c
 // Created by Fred Nora.
 
