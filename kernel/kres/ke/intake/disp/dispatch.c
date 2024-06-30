@@ -30,11 +30,11 @@ void IncrementDispatcherCount(int type)
         return;
     }
 
-    if ((void *) DispatchCountBlock == NULL){
+    if ( (void *) DispatchCountBlock == NULL ){
         panic ("IncrementDispatcherCount:\n");
     }
     
-    if (DispatchCountBlock->magic != 1234){
+    if (DispatchCountBlock->magic!=1234){
         panic ("IncrementDispatcherCount: validation\n");
     }
 
@@ -110,7 +110,7 @@ void dispatcher(int type)
 // ...
 
     //#hack
-    if (type != DISPATCHER_CURRENT){
+    if ( type != DISPATCHER_CURRENT ){
         type = DISPATCHER_CURRENT;
     }
 
@@ -174,7 +174,8 @@ dispatch_current:
         TargetThread->quantum = QUANTUM_MIN;
     }
 
-    UPProcessorBlock.CurrentThread = (struct thread_d *) TargetThread;
+    UPProcessorBlock.CurrentThread = 
+        (struct thread_d *) TargetThread;
 
 //
 // ## RESTORE CONTEXT ##
@@ -207,4 +208,10 @@ void dispatch_signal(void)
 {
 }
 */
+
+
+
+
+
+
 

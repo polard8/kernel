@@ -19,4 +19,6 @@ QEMU="qemu-system-x86_64"
 	-drive file=$GRAMADO_DISK_IMAGE,format=raw,bus=0 \
 	-device ich9-intel-hda -device hda-duplex \
 	-serial stdio \
-#	-net nic,model=e1000 -net user
+	-netdev type=user,id=net1 -device e1000,netdev=net1
+
+

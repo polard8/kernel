@@ -184,18 +184,9 @@ static int __CompareStrings(void)
         goto exit_cmp;
     }
 
-//
-// Network
-// 
-
-// nic
+// test nic
     if ( kstrncmp(prompt,"test-nic",8) == 0 ){
         network_test_NIC();
-        goto exit_cmp;
-    }
-// arp
-    if ( kstrncmp(prompt,"arp",3) == 0 ){
-        arp_show_table();
         goto exit_cmp;
     }
     if ( kstrncmp(prompt,"test-arp",8) == 0 ){
@@ -206,7 +197,12 @@ static int __CompareStrings(void)
         network_send_arp_request2();
         goto exit_cmp;
     }
-// udp
+    // Print arp table.
+    if ( kstrncmp(prompt,"arp",3) == 0 )
+    {
+        arp_show_table();
+        goto exit_cmp;
+    }
     if ( kstrncmp(prompt,"test-udp",8) == 0 ){
         network_test_udp();
         goto exit_cmp;
@@ -215,16 +211,16 @@ static int __CompareStrings(void)
         network_test_udp2();
         goto exit_cmp;
     }
-// dhcp
-    if ( kstrncmp(prompt,"dhcp",4) == 0 ){
-        network_show_dhcp_info();
-        goto exit_cmp;
-    }
+
     if ( kstrncmp(prompt,"test-dhcp",9) == 0 ){
         network_initialize_dhcp();
         goto exit_cmp;
     }
 
+    if ( kstrncmp(prompt,"dhcp",4) == 0 ){
+        network_show_dhcp_info();
+        goto exit_cmp;
+    }
 
     if ( kstrncmp(prompt,"str",3) == 0 )
     {

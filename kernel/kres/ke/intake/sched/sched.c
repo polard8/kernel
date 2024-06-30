@@ -456,8 +456,10 @@ void scheduler_unlock (void){
     g_scheduler_status = (unsigned long) UNLOCKED;
 }
 
-// Get the scheduler status
-// Is the scheduler locked or not?
+/*
+ * scheduler_get_status:
+ *     Pega o status do scheduler, se ele está travado ou não.
+ */
 unsigned long scheduler_get_status (void)
 {
     return (unsigned long) g_scheduler_status;
@@ -478,21 +480,11 @@ unsigned long scheduler_get_status (void)
 int init_scheduler(unsigned long sched_flags)
 {
     register int i=0;
-    
-    // Based on the bit in the function parameter, let's register 
-    // the flags here for future use at the end of the routine.
-    //int fXXXX = FALSE;
-    //int fZZZZ = FALSE;
-    // ...
 
     debug_print("init_scheduler: [TODO]\n");
     // ...
 
-    // SchedulerInfo.initialized = FALSE;
-
     scheduler_lock();
-
-    // ...
 
 // -------------------------------
 // Scheduler policies

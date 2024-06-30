@@ -333,7 +333,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
     }
 
 // The party is over!
-    PROGRESS("-- iretq fail ----\n");
+    PROGRESS("-- iretq fail --------\n");
     panic("__spawn_thread_by_tid_imp: iretq fail\n");
 }
 

@@ -26,7 +26,7 @@ die(){
 	-m   $GRAMADO_RAM_SIZE \
 	-hda $GRAMADO_DISK_IMAGE \
 	-serial stdio \
-#	-netdev type=user,id=net1 -device e1000,netdev=net1
+	-netdev type=user,id=net1 -device e1000,netdev=net1
 
 # Exit the script.
 	die

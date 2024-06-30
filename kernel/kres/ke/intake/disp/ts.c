@@ -29,9 +29,9 @@ static void cry(unsigned long flags);
 
 static void __on_finished_executing(struct thread_d *t)
 {
-    if ((void *) t == NULL)
+    if ( (void*) t == NULL )
         panic("__on_finished_executing: t\n");
-    if (t->magic != 1234)
+    if (t->magic!=1234)
         panic("__on_finished_executing: t magic\n");
 
 // #bugbug
@@ -164,7 +164,7 @@ static void cry(unsigned long flags)
 }
 
 /*
- * __task_switch:
+ * task_switch:
  * + Switch the thread.
  * + Save and restore context.
  * + Select the next thread and dispatch.
@@ -195,7 +195,7 @@ static void __task_switch(void)
     }
 // structure
     CurrentThread = (void *) threadList[current_thread]; 
-    if ((void *) CurrentThread == NULL){
+    if ( (void *) CurrentThread == NULL ){
         panic ("ts: CurrentThread\n");
     }
     if ( CurrentThread->used != TRUE || CurrentThread->magic != 1234 ){
@@ -208,19 +208,18 @@ static void __task_switch(void)
 
 // pid
     owner_pid = (pid_t) CurrentThread->owner_pid;
+
     if ( owner_pid < 0 || owner_pid >= PROCESS_COUNT_MAX ){
         panic ("ts: owner_pid\n");
     }
-
 // structure
     CurrentProcess = (void *) processList[owner_pid];
-    if ((void *) CurrentProcess == NULL){
+    if ( (void *) CurrentProcess == NULL ){
         panic ("ts: CurrentProcess\n");
     }
     if ( CurrentProcess->used != TRUE || CurrentProcess->magic != 1234 ){
         panic ("ts: CurrentProcess validation\n");
     }
-
 // check pid
     if (CurrentProcess->pid != owner_pid){
         panic("ts: CurrentProcess->pid != owner_pid\n");

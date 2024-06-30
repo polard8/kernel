@@ -1,13 +1,12 @@
 
 // schedq.c
-// Scheduler queues.
-// Created by Fred Nora.
 
 #include <kernel.h>
 
 // List of heads.
 // Each priority has its own queue.
 unsigned long sched_queues[SCHEQ_COUNT_MAX];
+
 
 // The current list
 // Global queue.
@@ -70,4 +69,9 @@ struct thread_d *schedq_get_element(int index)
 fail:
     return NULL;
 }
+
+
+
+
+
 
