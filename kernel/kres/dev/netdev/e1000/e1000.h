@@ -7,6 +7,13 @@
 #ifndef ____E1000_H
 #define ____E1000_H    1
 
+
+/*
+#define E1000_DEV      0x100E  // Device ID for the e1000 Qemu, Bochs, and VirtualBox emmulated NICs
+#define E1000_I217     0x153A  // Device ID for Intel I217
+#define E1000_82577LM  0x10EA  // Device ID for Intel 82577LM
+*/
+
 // Interrupt Masks
 // The handler uses this.
 

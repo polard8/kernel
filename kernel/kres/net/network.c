@@ -340,6 +340,7 @@ no:
     return ToNetByteOrder16(final);
 }
 
+// test-nic:
 // Test, called by the kernel console.
 void network_test_NIC(void)
 {

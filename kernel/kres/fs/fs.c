@@ -4393,11 +4393,9 @@ fsSaveFile (
     }
 
 // VOLUME1_FAT_ADDRESS
-    unsigned short *fat = 
-        (unsigned short *) fat_address;
+    unsigned short *fat   = (unsigned short *) fat_address;
 // VOLUME1_ROOTDIR_ADDRESS
-    unsigned short *__dir = 
-        (unsigned short *) dir_address;
+    unsigned short *__dir = (unsigned short *) dir_address;
 
 // #debug
 // #todo
@@ -4552,22 +4550,22 @@ save_file:
 
 // Create directory entry
 // Name/ext 8.3
-    DirEntry[0]  = (char) file_name[0];
-    DirEntry[1]  = (char) file_name[1];
-    DirEntry[2]  = (char) file_name[2];
-    DirEntry[3]  = (char) file_name[3];
-    DirEntry[4]  = (char) file_name[4];
-    DirEntry[5]  = (char) file_name[5];
-    DirEntry[6]  = (char) file_name[6];
-    DirEntry[7]  = (char) file_name[7];
+    DirEntry[0] = (char) file_name[0];
+    DirEntry[1] = (char) file_name[1];
+    DirEntry[2] = (char) file_name[2];
+    DirEntry[3] = (char) file_name[3];
+    DirEntry[4] = (char) file_name[4];
+    DirEntry[5] = (char) file_name[5];
+    DirEntry[6] = (char) file_name[6];
+    DirEntry[7] = (char) file_name[7];
 // extension.
     // Use extension or files.
     DirEntry[8]  = (char) file_name[8];
     DirEntry[9]  = (char) file_name[9];
     DirEntry[10] = (char) file_name[10];
-    // No extension for directories. Using spaces. I guess. 
-    if (flag == 0x10)
-    {
+
+    // No extension for directories. Using spaces.  
+    if (flag == 0x10){
         DirEntry[8]  = (char) 0x20;
         DirEntry[9]  = (char) 0x20;
         DirEntry[10] = (char) 0x20;
@@ -4590,33 +4588,38 @@ save_file:
 // 0x40: Unused
 // 0x80: Unused
 
-    DirEntry[11] = (char) flag; 
+    DirEntry[11] = (char) flag;
+
+// #bugbug
+// These informations bellow are 
+// working when we create a new file,
+// but not when we create a new directory.
 
 // Reserved
-    DirEntry[12] = 0; 
+    DirEntry[12] =  (char) 0; 
 // Creation time. 14 15 16
-    DirEntry[13] = 0x08;  // Create Time (ms)
-    DirEntry[14] = 0x08;  // Create Time (Hrs/Mins/Secs)
-    DirEntry[15] = 0xb6;
+    DirEntry[13] = (char) 0x08;  // Create Time (ms)
+    DirEntry[14] = (char) 0x08;  // Create Time (Hrs/Mins/Secs)
+    DirEntry[15] = (char) 0xb6;
 // Creation date
-    DirEntry[16] = 0xb6;
-    DirEntry[17] = 0x4c;
+    DirEntry[16] = (char) 0xb6;
+    DirEntry[17] = (char) 0x4c;
 // Access date
-    DirEntry[18] = 0xb8;
-    DirEntry[19] = 0x4c;
+    DirEntry[18] = (char) 0xb8;
+    DirEntry[19] = (char) 0x4c;
 
 // First cluster. (16 bits)
 // Only used in FAT32 Systems
 // 0 para fat12 ou 16
-    DirEntry[20] = 0;  // File/Folder Start Cluster (High)
-    DirEntry[21] = 0;
+    DirEntry[20] = (char) 0;  // File/Folder Start Cluster (High)
+    DirEntry[21] = (char) 0;
 
 // Modifield time
-    DirEntry[22] = 0xa8;
-    DirEntry[23] = 0x49;
+    DirEntry[22] = (char) 0xa8;
+    DirEntry[23] = (char) 0x49;
 // Modifield date
-    DirEntry[24] = 0xb8;
-    DirEntry[25] = 0x4c;
+    DirEntry[24] = (char) 0xb8;
+    DirEntry[25] = (char) 0x4c;
 
 // First cluster. (Low word)
     DirEntry[26] = (char) (first);  // File/Folder Start Cluster (Low)
@@ -4631,16 +4634,16 @@ save_file:
     DirEntry[30] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[31] = (char) size_in_bytes;
+
+/*
 // Folders will have a File Size of 0x0000
-    if (flag == 0x10)
-    {
+    if (flag == 0x10){
         DirEntry[28] = (char) 0;
         DirEntry[29] = (char) 0;
         DirEntry[30] = (char) 0;
         DirEntry[31] = (char) 0;
     }
-
-
+*/
 
 // #importante:
 // Vamos encontrar uma entrada livre no diretório para
@@ -5640,9 +5643,14 @@ int sys_create_empty_directory(char *dir_name)
 
 // #bugbug: 
 // We need a buffer in another place.
+// #todo: Allocate space for a new file.
     char buffer[BUFSIZ];
-    int size_in_bytes = 512; 
-    int number_of_sectors = 1;
+    //char *buf;
+// How many bytes.
+    int FileSizeInBytes = 512;
+// How many sectors.
+// (FileSizeInBytes/512)
+    int NumberOfSectors = 1;
 
     debug_print ("sys_create_empty_directory:\n");
     printk      ("sys_create_empty_directory:\n");
@@ -5667,8 +5675,8 @@ int sys_create_empty_directory(char *dir_name)
                   VOLUME1_ROOTDIR_ADDRESS, 
                   FAT16_ROOT_ENTRIES,
                   (char *)         dir_name,
-                  (unsigned long)  number_of_sectors, 
-                  (unsigned long)  size_in_bytes, 
+                  (unsigned long)  NumberOfSectors, 
+                  (unsigned long)  FileSizeInBytes, 
                   (char *)         &buffer[0], 
                   (char)           0x10 ); 
 
