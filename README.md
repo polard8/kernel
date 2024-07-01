@@ -13,14 +13,19 @@ which It is the place where web applications are made,
 it includes front-end and back-end layers.
 ```
 
-## Here are some screenshots of Gramado Operating System.
+## This image shows the first process that runs after the kernel initialization.
+![Screenshot](https://raw.githubusercontent.com/igapo/screenshots/main/kernel-01.png)
 
-![Screenshot](https://raw.githubusercontent.com/igapo/screenshots/main/gramado-8.png)
-![Screenshot](https://raw.githubusercontent.com/igapo/screenshots/main/gramado-3.png)
+ You can install a desktop environment on top of the kernel. The default 
+desktop environment can be found in the gramado/kernel repository.
+
+## What is Gramado Kernel?
+
+Gramado Kernel is the main component of the Gramado Operating System.
 
 ## What is Gramado Operating System?
 
-GramadoOS is a graphical operating system for x86_64 computers.
+GramadoOS is a 64bit graphical operating system. It has a bootloader, a kernel and a desktop environment.
 
 ## What is the category it belongs to? 
 
