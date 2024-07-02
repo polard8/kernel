@@ -1,17 +1,10 @@
 # kernel - GramadoKernel
 
-```
-   The kernel for Gramado OS.
-```
+The kernel for Gramado OS.
 
-```
-Building an operating system is a good way to understand how systems work and
-the software stack needed to run your favorite application. But remember It's not
-the best way to make money easily. So if you want to earn money easily,
-go to the high demand area, which is probably the top layer of the stack,
-which It is the place where web applications are made,
-it includes front-end and back-end layers.
-```
+> [!IMPORTANT]
+> GramadoKernel is in a pre-alpha state, and only suitable for use by developers.
+>
 
 ## This image shows the first process that runs after the kernel initialization.
 ![Screenshot](https://raw.githubusercontent.com/igapo/screenshots/main/kernel-01.png)
@@ -86,6 +79,15 @@ not all the features needed by a commercial operating system.
 ## A description of the directories in the Gramado source code.
 
     The next few lines has a brief description of the subdirectories:
+
+```
+Building an operating system is a good way to understand how systems work and
+the software stack needed to run your favorite application. But remember It's not
+the best way to make money easily. So if you want to earn money easily,
+go to the high demand area, which is probably the top layer of the stack,
+which It is the place where web applications are made,
+it includes front-end and back-end layers.
+```
 
 ```
  ... #todo
