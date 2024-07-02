@@ -1,12 +1,10 @@
-/*
- * File: pipe.c
- *    Pipe support.
- *    A pipe uses the FILE structure.
- *    #todo: So this maybe we can link two pipes.
- *    This way the kernel can copy data when writing.
- * History:
- *     2019 -  Created by Fred Nora.
- */
+// fs/pipe.c
+// Pipe support.
+// 2019 -  Created by Fred Nora.
+
+// A pipe uses the FILE structure.
+// #todo: So this maybe we can link two pipes.
+// This way the kernel can copy data when writing.
 
 #include <kernel.h>
 

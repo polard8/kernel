@@ -1,5 +1,4 @@
-
-// fs.c
+// fs/fs.c
 // File system support.
 // Created by Fred Nora.
 
@@ -15,7 +14,7 @@ struct system_directory_d  sdROOT;      // '/'
 struct system_directory_d  sdGRAMADO;   // 'GRAMADO'
 struct system_directory_d  sdPROGRAMS;  // 'PROGRAMS'
 //struct system_directory_d  sdUSERS;     // 'USERS'
-
+// ...
 
 // Buffers for 8 directories. Each one with 512 entries.
 // 32*512 = 16384

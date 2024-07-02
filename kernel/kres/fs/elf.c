@@ -1,5 +1,7 @@
-
 // fs/elf.c
+// ELF images support.
+// Created by Fred Nora.
+
 // See:
 // fs/exec_elf.h
 

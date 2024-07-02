@@ -1,5 +1,6 @@
+// fs/search.c
+// Created by Fred Nora.
 
-// search.c
 // #todo
 // This routines belongs to fat16
 // we need to move it to fat/
@@ -12,7 +13,6 @@
 // O limite é um arquivo de 512KB.
 // see: fs.h
 unsigned short file_cluster_list[MAX_CLUSTERS]; 
-
 
 /*
  * search_in_dir:
