@@ -1528,9 +1528,8 @@ int sys_close(int fd)
 {
     file *object;
     struct process_d *p;
+    pid_t current_process = -1;
     int Done=FALSE;
-
-    pid_t current_process = (pid_t) get_current_process();
 
 // ??
 // Can we close this devices?
@@ -1552,7 +1551,7 @@ int sys_close(int fd)
     }
 
 // Process
-// #todo: There is a helper for that small routine.
+    current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         debug_print("sys_close: current_process\n");
         goto fail;
@@ -1680,6 +1679,7 @@ fail:
     return (int) (-1);
 }
 
+// sys_fcntl:
 // #todo: 
 // Rever esses argumentos.
 // SVr4, 4.3BSD, POSIX.1-2001. and more.
@@ -1690,6 +1690,7 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 {
     debug_print ("sys_fcntl: #todo\n");
 
+// Parameters
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
@@ -1705,55 +1706,55 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
     //duplicate file descriptor
     case F_DUPFD:
         debug_print ("sys_fcntl: [TODO] F_DUPFD\n");
-        return -1;
+        goto fail;
         break;
 
     //get file descriptor flags
     case F_GETFD:
         debug_print ("sys_fcntl: [TODO] F_GETFD\n");
-        return -1;
+        goto fail;
         break;
 
     //set file descriptor flags
     case F_SETFD:
-         debug_print ("sys_fcntl: [TODO] F_SETFD\n");
-         return -1;
-         break;
+        debug_print ("sys_fcntl: [TODO] F_SETFD\n");
+        goto fail;
+        break;
 
     //get file status flags
     case F_GETFL:
         debug_print ("sys_fcntl: [TODO] F_GETFL\n");
-        return -1;
+        goto fail;
         break;
 
     //set file status flags
     case F_SETFL:
         debug_print ("sys_fcntl: [TODO] F_SETFL\n");
-        return -1;
+        goto fail;
         break;
 
     //get record locking information
     case F_GETLK:
         debug_print ("sys_fcntl: [TODO] F_GETLK\n");
-        return -1;
+        goto fail;
         break;
 
     // set record locking information
     case F_SETLK:
         debug_print ("sys_fcntl: [TODO] F_SETLK\n");
-        return -1;
+        goto fail;
         break;
 
     //set record locking info; wait if blocked
     case F_SETLKW:
         debug_print ("sys_fcntl: [TODO] F_SETLKW\n");
-        return -1;
+        goto fail;
         break;
 
     //free a section of a regular file
     case F_FREESP:
         debug_print ("sys_fcntl: [TODO] F_FREESP\n");
-        return -1;
+        goto fail;
         break;
 
     // ...
@@ -1763,12 +1764,12 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
         break;
     };
 
+fail:
     debug_print ("sys_fcntl: FAIL\n");
-
     return (int) -1; //#todo
 }
 
-
+// sys_ioctl:
 // Called by sc82 in sci.c
 // Enquanto sys_ioctl eh chamada pelos applicativos,
 // io_ioctl eh chamada pelas rotinas dentro do kernel.
@@ -1799,7 +1800,7 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
     return (int) status;
 }
 
-
+// get_file_from_fd:
 // helper
 // dado o fd, pegamos o ponteiro 
 // para estrutura de arquivo na lista de
@@ -1807,14 +1808,16 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 // ## Talvez essa rotina ja foi implementada
 // em algum outro lugar.
 // Prototype in rtl/sci/sys.h
+
 file *get_file_from_fd(int fd)
 {
 // File pointer
     file *fp;
 // Current process
     struct process_d *p;
+    pid_t current_pid = -1;
 
-    pid_t current_pid = (pid_t) get_current_process();
+    current_pid = (pid_t) get_current_process();
     if ( current_pid < 0 || current_pid >= PROCESS_COUNT_MAX ){
         return NULL;
     }
@@ -1914,7 +1917,7 @@ int sys_create_new_sync(void)
 
     s = (struct kstdio_sync_d *) kmalloc( sizeof(struct kstdio_sync_d) );
     if ((void*) s == NULL){
-        return (int) -1;
+        goto fail;
     }
     memset(s, 0, sizeof(struct kstdio_sync_d));
 
@@ -1928,6 +1931,8 @@ int sys_create_new_sync(void)
         __saved_sync_id = (int) sync_count;
         return (int) sync_count;
     }
+
+fail:
     return (int) -1;
 }
 
@@ -1946,11 +1951,10 @@ int get_saved_sync(void)
 // It is used on socket communication.
 void sys_set_file_sync(int fd, int request, int data)
 {
-    struct process_d  *p;
     file *object;
-
-    pid_t current_process = (pid_t) get_current_process();
-    
+    struct process_d  *p;
+    pid_t current_process = -1;
+   
     //#bugbug
     // Pensaremos nessa possibilidade.
 
@@ -1969,12 +1973,11 @@ void sys_set_file_sync(int fd, int request, int data)
     }
 
 // == Process ================
-
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         debug_print("sys_set_file_sync: current_process\n");
         return;
     }
-
     p = (void *) processList[current_process];
     if ((void *) p == NULL){
         debug_print("sys_set_file_sync: p\n");
@@ -2061,10 +2064,9 @@ void sys_set_file_sync(int fd, int request, int data)
 // #todo: Explain the output values.
 int sys_get_file_sync(int fd, int request)
 {
-    struct process_d  *p;
     file *object;
-
-    pid_t current_process = (pid_t) get_current_process();
+    struct process_d  *p;
+    pid_t current_process = -1;
     
     //#bugbug
     // Pensaremos nessa possibilidade.
@@ -2083,20 +2085,19 @@ int sys_get_file_sync(int fd, int request)
     }
 
 // == Process ================
-
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         debug_print("sys_get_file_sync: current_process\n");
-        return (int) (-1);
+        goto fail;
     }
-
     p = (void *) processList[current_process];
     if ((void *) p == NULL){
         debug_print("sys_get_file_sync: p\n");
-        return (int) (-1);
+        goto fail;
     }
     if (p->magic != 1234){
         debug_print("sys_get_file_sync: p validation\n");
-        return (int) (-1);
+        goto fail;
     }
 
 // Object
@@ -2104,11 +2105,11 @@ int sys_get_file_sync(int fd, int request)
     object = (file *) p->Objects[fd];
     if ((void*) object == NULL){
         debug_print("sys_get_file_sync: [FAIL] object\n");
-        return (int) (-1);
+        goto fail;
     }
     if ( object->used != TRUE || object->magic != 1234 ){
         debug_print("sys_get_file_sync: validation\n");
-        return (int) (-1);
+        goto fail;
     }
 
     switch (request){
@@ -2120,8 +2121,8 @@ int sys_get_file_sync(int fd, int request)
         //break;
     // ...
     default:
-        debug_print("sys_get_file_sync: [FAIL] Default request\n");
-        return (int) (-1);
+        debug_print("sys_get_file_sync: Default request\n");
+        goto fail;
         break;
     };
 
@@ -2129,6 +2130,9 @@ int sys_get_file_sync(int fd, int request)
 
 // ?? Why '0'?
     return 0;
+
+fail:
+    return (int) -1;
 }
 
 // Get the device number in the dev_dir[] list
@@ -2150,8 +2154,9 @@ int sys_get_device_number_by_path(char *path)
 
 int sys_open_device_by_number(int device_index)
 {
-    struct process_d *p;
     file *fp;
+    struct process_d *p;
+    pid_t current_process = -1;
     register int __slot=0;
     int i = device_index;
 
@@ -2159,44 +2164,44 @@ int sys_open_device_by_number(int device_index)
         return (int) (-EINVAL);
     }
     if (dev_dir[i].magic != 1234){
-        return (int) -1;
+        goto fail;
     }
     if (dev_dir[i].initialized != TRUE){
-        return (int) -1;
+        goto fail;
     }
 
 // Get file pointer.
     fp = (file*) dev_dir[i].fp;
     if ((void*) fp == NULL){
-        return (int) -1;
+        goto fail;
     }
     if (fp->magic != 1234){
-        return (int) -1;
+        goto fail;
     }
 
 // Put the pointer into the list.
 
 // Process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
-        return -1;
+        goto fail;
     }
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
         debug_print ("sys_open_device_by_number: p\n");
-        return -1;
+        goto fail;
     }
     if ( p->used != TRUE || p->magic != 1234 ){
         debug_print ("sys_open_device_by_number: validation\n");
-        return -1;
+        goto fail;
     }
 
 // Probing for a free slot.
     for (__slot=0; __slot<32; __slot++)
     {
-         if ( p->Objects[__slot] == 0 ){
-             goto __OK;
-         }
+        if ( p->Objects[__slot] == 0 ){
+            goto __OK;
+        }
     };
 
 // fail
@@ -2205,10 +2210,11 @@ int sys_open_device_by_number(int device_index)
 // Slot found.
 __OK:
 
-    if ( __slot < 0 || __slot >= 32 ){
+    if ( __slot < 0 || __slot >= 32 )
+    {
         printk ("sys_open_device_by_number: __slot fail\n");
         //refresh_screen();
-        return (int) (-1);
+        goto fail;
     }
 
 // save
@@ -2216,8 +2222,11 @@ __OK:
 
 // Return fd.
     return (int) __slot;
+fail:
+    return (int) -1;
 }
 
+// sys_get_file_size:
 // 178
 // Only root dir.
 //#todo: 
@@ -2227,6 +2236,7 @@ unsigned long sys_get_file_size(char *path)
 {
     unsigned long FileSize=0;
 
+// Parameter
     if ((void*) path == NULL){
         debug_print("sys_get_file_size: path\n");
         return 0;
@@ -2252,45 +2262,46 @@ unsigned long sys_get_file_size(char *path)
 
 int sys_sleep_if_socket_is_empty(int fd)
 {
-    struct process_d *p;
     file *object;
+    struct process_d *p;
+    pid_t current_process = -1;
 
-    pid_t current_process = (pid_t) get_current_process();
-    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
-        debug_print("sys_sleep_if_socket_is_empty: current_process\n");
-        return (int) (-1);
-    }
-
+// Parameter
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
-// process
+// Process
+    current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        debug_print("sys_sleep_if_socket_is_empty: current_process\n");
+        goto fail;
+    }
     p = (void *) processList[current_process];
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         debug_print("sys_sleep_if_socket_is_empty: p\n");
-        return (int) (-1);
+        goto fail;
     }
     if (p->magic != 1234){
-        return (int) (-1);
+        goto fail;
     }
 
 // Object
 
     object = (file *) p->Objects[fd];
-    if ( (void *) object == NULL ){
+    if ((void *) object == NULL){
         debug_print("sys_sleep_if_socket_is_empty: object\n");
-        return (int) (-1);
+        goto fail;
     }
     if (object->used != TRUE || object->magic != 1234 ){
         debug_print("sys_sleep_if_socket_is_empty: object validation\n");
-        return -1;
+        goto fail;
     }
 
 // Is it a socket object?
-    if ( object->____object != ObjectTypeSocket ){
-        debug_print ("sys_sleep_if_socket_is_empty: [ERROR] only for sockets\n");
-        return -1;
+    if (object->____object != ObjectTypeSocket){
+        debug_print ("sys_sleep_if_socket_is_empty: Not a socket\n");
+        goto fail;
     }
 
     // TRUE or FALSE
@@ -2317,9 +2328,9 @@ int sys_sleep_if_socket_is_empty(int fd)
     }
 
 //#bugbug
-//Fail
-    debug_print ("sys_sleep_if_socket_is_empty: [FAIL] Unexpected error \n");
-    return -1;
+fail:
+    debug_print ("sys_sleep_if_socket_is_empty: Unexpected error\n");
+    return (int) -1;
 }
 
 // Get free slots in the file_table[].
@@ -2392,6 +2403,7 @@ void set_filesystem_type (int type)
     g_currentvolume_filesystem_type = (int) type;
 }
 
+// fs_count_path_levels:
 // Counting path levels.
 // Credits: Sirius OS.
 // return 'int'?
@@ -2401,8 +2413,13 @@ unsigned long fs_count_path_levels (unsigned char *path)
     register int i=0;
     int MaxChars = 2000;  //(80*25), 25 lines.
 
-    if ( (void*) path == NULL ){ return 0; }
-    if ( *path == 0 )          { return 0; }
+// Parameter
+    if ((void*) path == NULL){
+        return 0;
+    }
+    if (*path == 0){
+        return 0;
+    }
 
     for ( i=0; i < MaxChars; ++i )
     {
@@ -2422,13 +2439,10 @@ void *get_file (int Index)
 {
 //Limits.
 //#todo: max.
-
-    if (Index < 0)
-    {
+    if (Index < 0){
         // ?? todo: message
         return NULL;
     }
-
     return (void *) file_table[Index];
 }
 
@@ -2437,32 +2451,27 @@ void *get_file (int Index)
 // Na lista de arquivos do kernel.
 void set_file ( void *file, int Index )
 {
+// #todo:
+// Limite máximo da lista.
+
+// Parameters
+    if ((void *) file == NULL){
+        // ?? todo: message
+        return;
+    }
     if (Index < 0){
         // ?? todo: message
         return;
     }
 
-// #todo:
-// Limite máximo da lista.
-
-// Structure.
-
-    if ( (void *) file == NULL )
-    {
-        // ?? todo: message
-        return;
-    }
-
-// Include pointer in the list.
-
+// Include pointer into the list.
     file_table[Index] = (unsigned long) file;
 }
 
+// Clear the list
 int fs_initialize_dev_dir(void)
 {
     register int i=0;
-
-// Clear the list
     for (i=0; i<32; i++){
         dev_dir[i].used = FALSE;
         dev_dir[i].magic = FALSE;
@@ -2470,7 +2479,6 @@ int fs_initialize_dev_dir(void)
         dev_dir[i].path[0] = 0;
         dev_dir[i].fp = NULL;
     };
-
     return 0;
 }
 
@@ -2583,7 +2591,6 @@ static void __do_initialize_sdGRAMADO(void)
     sdGRAMADO.initialized = TRUE;
 }
 
-
 // ------------------
 // PROGRAMS
 // Load the directory PROGRAMS/ that belongs 
@@ -2645,7 +2652,6 @@ static void __do_initialize_sdPROGRAMS(void)
 // Set the flags as initialized.
     sdPROGRAMS.initialized = TRUE;
 }
-
 
 // >> So podemos chamar isso depois de termos
 // inicialiado o hardware de disco ...
@@ -2891,6 +2897,8 @@ int fsInit (void)
     return 0;
 }
 
+// #todo
+// Explain this unicorn.
 int init_directory_facilities(void)
 {
 
@@ -2928,7 +2936,6 @@ int init_directory_facilities(void)
 
     return 0;
 }
-
 
 // #todo
 // Change the return type to 'int' and
@@ -2981,7 +2988,7 @@ void fs_init_structures (void)
 // Save is in the 'storage' low level structure.
 
     if ((void*) storage == NULL){
-         panic("fs_init_structures: storage");
+        panic("fs_init_structures: storage");
     }
 
     storage->fs = (void*) root;
@@ -3067,6 +3074,8 @@ void fs_init_structures (void)
 // #todo: use int return.
 void file_close (file *_file)
 {
+// Not implemented yet!
+
     debug_print("file_close: todo\n");
 
     if ( (void*) _file == NULL ){
@@ -3074,9 +3083,10 @@ void file_close (file *_file)
     }
 }
 
-
 size_t file_get_len(file *_file)
 {
+// Not implemented yet!
+
     debug_print("file_get_len: todo\n");
 
     if ( (void*) _file == NULL ){
@@ -3086,10 +3096,10 @@ size_t file_get_len(file *_file)
     return (size_t) -1;
 }
 
-
 //OUT: inode structure.
 struct inode_d *file_inode (file *f)
 {
+
     if ( (void *)f==NULL ){
         return (struct inode_d *) 0;
         //return NULL;
@@ -3101,6 +3111,8 @@ struct inode_d *file_inode (file *f)
 //??
 int file_truncate (file *_file, size_t len)
 {
+// Not implemented yet!
+
     debug_print("file_truncate: todo\n");
 
     if ( (void*) _file == NULL ){
@@ -3113,6 +3125,7 @@ int file_truncate (file *_file, size_t len)
     return -1;
 }
 
+// fsCheckELFFile:
 // Check the signature in a elf header.
 // OUT:
 // 0 = OK. #todo: Isso poderia ser '1'.
@@ -3194,7 +3207,7 @@ void fsInitializeWorkingDiretoryString (void)
 
     v = (struct volume_d *) volumeList[current_volume];
 
-    if ( (void *) v == NULL ){
+    if ((void *) v == NULL){
         panic ("fsInitializeWorkingDiretoryString: v\n");
     }else{
         if ( v->used != TRUE || v->magic != 1234 ){
@@ -3229,7 +3242,6 @@ void fsInitializeWorkingDiretoryString (void)
         // path string na estrutura do volume.
         
         string_size = sizeof(current_volume_string);
-
         if (string_size >= 32){
             debug_print ("fsInitializeWorkingDiretoryString: [FIXME] string size\n"); 
             return;
@@ -3254,36 +3266,24 @@ void fsInitializeWorkingDiretoryString (void)
 // #bugbug
 // What is the limit for this string ? 32 bytes.
 // See: rtl/fs/path.h and globals.h
+
 // Separador
-
-    strcat ( 
-        CWD.path, 
-        FS_PATHNAME_SEPARATOR );
-
-//
-// Size
-//
-
-// #test
-
+    strcat ( CWD.path, FS_PATHNAME_SEPARATOR );
     CWD.path[31] = 0;
 
+// Size
     int size=0;
     size = strlen(CWD.path);
-
     if (size > 31){
         size = 31;
     }
-
     CWD.size = size;
 
 // More ?...
 
     //debug_print ("fsInitializeWorkingDiretoryString: done\n");
 
-// See: 
-// fs.h
-
+// See: fs.h
     CWD.initialized = TRUE;
 }
 
@@ -3318,8 +3318,7 @@ int fsInitTargetDir (unsigned long dir_address, char *dir_name)
         (unsigned long) dir_address;
 
 // Dir name
-    
-    if ( (void*) dir_name == NULL ){
+    if ((void*) dir_name == NULL){
         panic("fsInitTargetDir: dir_name\n");
     }
     if (*dir_name == 0){
@@ -3350,16 +3349,13 @@ int fsList(const char *dir_name)
     int Absolute = FALSE;
     register int i=0;
 
-    //debug_print ("fsList:\n");
-
 // Directory name
-
-    if ( (void *) dir_name == NULL ){
-        debug_print ("fsList: [FAIL] dir_name\n");
+    if ((void *) dir_name == NULL){
+        debug_print ("fsList: dir_name\n");
         goto fail;
     }
     if ( *dir_name == 0 ){
-        debug_print ("fsList: [FAIL] *dir_name\n");
+        debug_print ("fsList: *dir_name\n");
         goto fail;
     }
 
@@ -3430,8 +3426,7 @@ int fsList(const char *dir_name)
 
     // Well, the root dir has 512 entries.
     int n=256;
-    if ( current_target_dir.current_dir_address == 
-         VOLUME1_ROOTDIR_ADDRESS )
+    if ( current_target_dir.current_dir_address == VOLUME1_ROOTDIR_ADDRESS )
     {
         n=512;
     }
@@ -3447,7 +3442,7 @@ int fsList(const char *dir_name)
 fail:
     debug_print ("fsList: fail\n");
     //refresh_screen();
-    return -1;
+    return (int) -1;
 }
 
 /*
@@ -3510,19 +3505,15 @@ done:
  */ 
 // Used by the service 175, cd command.
 
-void fsUpdateWorkingDiretoryString ( char *string )
+void fsUpdateWorkingDiretoryString (char *string)
 {
     struct process_d  *p;
+    pid_t current_process = -1;
     char *tmp;
     register int i=0; 
     int string_size = 0;
 
     //debug_print ("fsUpdateWorkingDiretoryString:\n"); 
-
-    tmp = string;
-    string_size = sizeof(string);
-
-    pid_t current_process = (pid_t) get_current_process();
 
 // Initialized?
     if (CWD.initialized != TRUE)
@@ -3533,8 +3524,8 @@ void fsUpdateWorkingDiretoryString ( char *string )
         return;
     }
 
-// string
-    if ( (void *) string == NULL ){
+// Parameter
+    if ((void *) string == NULL){
         debug_print ("fsUpdateWorkingDiretoryString: string\n"); 
         return;  
     }
@@ -3542,20 +3533,22 @@ void fsUpdateWorkingDiretoryString ( char *string )
         debug_print ("fsUpdateWorkingDiretoryString: *string\n"); 
         return;  
     }
+    tmp = string;
+
+// String size.
+    string_size = sizeof(string);
     if (string_size <= 0){
-        debug_print ("fsUpdateWorkingDiretoryString: [FAIL] string_size\n"); 
+        debug_print ("fsUpdateWorkingDiretoryString: string_size\n"); 
         return;  
     }
 
-// Current process.
-
+// Current process
+    current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         panic ("fsUpdateWorkingDiretoryString: current_process\n");
     }
-
     p = (struct process_d *) processList[current_process];
-
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         panic ("fsUpdateWorkingDiretoryString: p\n");
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
@@ -3564,8 +3557,8 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
         // Atualiza a string do processo atual. 
         // Concatenando.
-        
-        if ( (void *) string != NULL )
+
+        if ((void *) string != NULL)
         {
             // #bugbug
             // We need to handle the string size limit.
@@ -3584,8 +3577,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
             // #importante
             // Respeitar o limite.
             
-            for ( i=0; i<32; i++ )
-            {
+            for ( i=0; i<32; i++ ){
                 CWD.path[i] = p->cwd_string[i];
             };
             CWD.path[31] = 0; //finaliza
@@ -3636,15 +3628,13 @@ void fs_fntos(char *name)
     // #todo
     int fAddNewExt = FALSE;
     
-
 // No extension
-// 
     ext[0] = 0;
     ext[1] = 0;
     ext[2] = 0;
     ext[3] = 0;
 
-// Invalid parameter
+// Parameter
     if ((void*) name == NULL){
         return;
     }
@@ -3980,30 +3970,35 @@ int fs_get_free_fd_from_pid (pid_t pid)
     register int __slot=0;
     struct process_d *p;
 
+// Parameter
     if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
-        debug_print ("fs_get_free_fd_from_pid: [FAIL] pid\n");
-        return -1;
+        debug_print ("fs_get_free_fd_from_pid: pid\n");
+        goto fail;
     }
 
+// Process
     p = (struct process_d *) processList[pid];
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         debug_print ("fs_get_free_fd_from_pid: p\n");
-        return -1;
+        goto fail;
     }
     if ( p->used != TRUE || p->magic != 1234 ){
         debug_print ("fs_get_free_fd_from_pid: p validation\n");
-        return -1;
+        goto fail;
     }
 
 // Pick a free one.
 // and return the index.
     for (__slot=0; __slot<32; __slot++)
     {
-         if ( p->Objects[__slot] == 0 ){ return (int) __slot; }
+        if ( p->Objects[__slot] == 0 )
+        {
+            return (int) __slot;
+        }
     };
 
-// fail
-    return -1;
+fail:
+    return (int) -1;
 }
 
 
@@ -4020,13 +4015,11 @@ int fs_initialize_process_cwd ( pid_t pid, char *string )
     struct process_d *p;
     register int i=0;
 
+// Parameters
     if (pid<0 || pid >= PROCESS_COUNT_MAX){
         debug_print ("fs_initialize_process_cwd: pid\n");
         return 1;
     }
-
-// string
-
     if ( (void *) string == NULL ){
         panic ("fs_initialize_process_cwd: string\n");
         //return 1;
@@ -4041,8 +4034,7 @@ int fs_initialize_process_cwd ( pid_t pid, char *string )
 // Vamos copiar a string para a estrutura do processo atual.
 
     p = (struct process_d *) processList[pid];
-
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         panic ("fs_initialize_process_cwd: p\n");
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
@@ -4050,14 +4042,15 @@ int fs_initialize_process_cwd ( pid_t pid, char *string )
         }
 
         // ?? fixed size.
-        for ( i=0; i<32; i++ ){ p->cwd_string[i] = string[i]; }
-        
+        for ( i=0; i<32; i++ )
+        {
+            p->cwd_string[i] = string[i];
+        }
         p->cwd_string[31] = 0; // finalizing 
     };
 
     return 0;
 }
-
 
 /* 
  * fs_pathname_backup:
@@ -4083,22 +4076,18 @@ void fs_pathname_backup ( pid_t pid, int n )
         return;
     } 
 
-// pid
+// Parameters
     if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
         printk ("fs_pathname_backup: [FAIL] pid\n"); 
         return;
     }
-
-// n
     if (n <= 0) {
         return;
     }
 
 // Process
-
     p = (struct process_d *) processList[pid];
-
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         panic ("fsUpdateWorkingDiretoryString: p\n");
     }else{
         if ( p->used != TRUE || p->magic != 1234 ){
@@ -4131,7 +4120,6 @@ void fs_pathname_backup ( pid_t pid, int n )
     };
 }
 
-
 /*
  * fs_print_process_cwd
  *     Cada processo tem seu proprio pwd.
@@ -4146,16 +4134,15 @@ int fs_print_process_cwd(pid_t pid)
     //debug_print ("fs_print_process_cwd:\n");
     printk      ("fs_print_process_cwd:\n");
 
-// pid
+// Parameter
     if (pid<0 || pid>=PROCESS_COUNT_MAX){
         debug_print ("fs_print_process_cwd: [FAIL] pid\n");
-        return -1;
+        goto fail;
     }
 
 // Process
     p = (struct process_d *) processList[pid];
-
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         panic ("fs_print_process_cwd: p\n");
     }else{
         if ( p->used != 1 || p->magic != 1234 ){
@@ -4166,10 +4153,10 @@ int fs_print_process_cwd(pid_t pid)
         // Is this element a pointer or a buffer ?
         // >>> This element is an array.
         
-        if ( (void *) p->cwd_string != NULL )
+        if ((void *) p->cwd_string != NULL)
         {
             //p->cwd_string[31] = 0;
-            printk ("> PID=%d p->cwd_string {%s} \n", 
+            printk ("> PID=%d p->cwd_string {%s}\n", 
                 p->pid, p->cwd_string);
         }
 
@@ -4179,7 +4166,7 @@ int fs_print_process_cwd(pid_t pid)
         if ( (void *) current_target_dir.name != NULL )
         {
             //current_target_dir.name[31] = 0;
-            printk ("> PID=%d current_target_dir.name {%s} \n", 
+            printk ("> PID=%d current_target_dir.name {%s}\n", 
                 p->pid, current_target_dir.name);
         }
 
@@ -4187,26 +4174,25 @@ int fs_print_process_cwd(pid_t pid)
         return 0;
     };
 
-// fail
+fail:
     debug_print ("fs_print_process_cwd: fail\n");   
-    return -1;
+    return (int) -1;
 }
-
 
 void fs_show_file_info (file *f)
 {
+
+// Parameter
     if ((void*)f==NULL){
         debug_print("fs_show_file_info: fail\n");
         return;
     }
+    if (f->used != TRUE)
+        return;
 
-    if (f->used == TRUE)
-    {
-        if ( (void*) f->_tmpfname != NULL )
-        {
-            printk ("Name={%s}\n",f->_tmpfname);
-            //refresh_screen();
-        }
+    if ((void*) f->_tmpfname != NULL){
+        printk ("Name={%s}\n",f->_tmpfname);
+        //refresh_screen();
     }
 }
 
@@ -4230,18 +4216,18 @@ void fs_show_file_table(void)
 
 void fs_show_inode_info (struct inode_d *i)
 {
-    if ( (void *) i == NULL ){
+
+// Parameter
+    if ((void *) i == NULL){
         debug_print("fs_show_inode_info: fail\n");
         return;
     }
+    if (i->used != TRUE)
+        return;
 
-    if (i->used == TRUE)
-    {
-        if ( (void*)i->path != NULL )
-        {
-            printk ("Name={%s}\n",i->path);
-        }
-    }  
+    if ((void*)i->path != NULL){
+        printk ("Name={%s}\n",i->path);
+    }
 }
 
 void fs_show_inode_table(void)
@@ -4250,20 +4236,17 @@ void fs_show_inode_table(void)
     register int i=0;
 
     printk ("inode_table: \n");
-    
     for (i=0; i<32; ++i)
     {
         inode = (struct inode_d *) inode_table[i];
-        
-        if ( (void*)inode != NULL )
+        if ((void *)inode != NULL)
         {
-            if( inode->used == 1 && inode->magic == 1234 )
+            if ( inode->used == 1 && inode->magic == 1234 )
             {
                 fs_show_inode_info(inode);
             }
         }
     };
-
     //refresh_screen();
 }
 
@@ -4274,7 +4257,7 @@ void fs_show_root_fs_info(void)
 
 // root fs structure.
 
-    if ( (void *) root == NULL ){
+    if ((void *) root == NULL){
         printk ("No root structure\n");
         goto fail;
     
@@ -4305,9 +4288,12 @@ done:
 // sys_pwd -  Service 170.
 void sys_pwd(void)
 {
-    pid_t current_process = (pid_t) get_current_process();
+    pid_t current_process = -1;
+
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
-        panic ("sys_pwd: [FAIL] current_process\n");
+        printk ("sys_pwd: [FAIL] current_process\n");
+        return;
     }
     fs_print_process_cwd (current_process);
 }
@@ -5430,7 +5416,7 @@ done:
     return (int) fp->_file;
 fail:
     //refresh_screen();
-    return -1;
+    return (int) -1;
 }
 
 // Wrapper
@@ -5449,7 +5435,6 @@ sys_read_file_from_disk (
         return (int) (-EINVAL);
     }
 
-
 //
 // Local copy
 //
@@ -5467,7 +5452,6 @@ sys_read_file_from_disk (
                     (int) flags, 
                     (mode_t) mode );
 }
-
 
 /*
  * do_write_file_to_disk:
@@ -5495,7 +5479,7 @@ do_write_file_to_disk (
 
     debug_print ("do_write_file_to_disk:\n");
 
-    if ( (void*) file_name == NULL ){
+    if ((void*) file_name == NULL){
         return (int) (-EINVAL);
     }
     if ( *file_name == 0 ){
@@ -5553,7 +5537,6 @@ sys_write_file_to_disk (
     // this way we're coping the 0x00 byte at the and of string
     // and some extra bytes.
     strncpy(pathname_local_copy,file_name,256);
-
 
     return (int) do_write_file_to_disk(
                      (char *) pathname_local_copy,
@@ -5617,18 +5600,17 @@ int sys_create_empty_file(char *file_name)
                   (char *)         &buffer[0], 
                   (char)           0x20 ); 
 
-    if (__ret<0)
-    {
+    if (__ret < 0){
         debug_print("sys_create_empty_file: fail\n");
-        return -1;
+        goto fail;
     }
 
 // #todo
 // the file structure.
-
     return (int) __ret;
+fail:
+    return (int) -1;
 }
-
 
 // ================================
 // Service 44
@@ -5671,15 +5653,16 @@ int sys_create_empty_directory(char *dir_name)
                   (char *)         &buffer[0], 
                   (char)           0x10 ); 
 
-    if (__ret<0){
+    if (__ret < 0){
         debug_print("sys_create_empty_directory: fail\n");
-        return -1;
+        goto fail;
     }
 
 // #todo
 // the file structure.
-
     return (int) __ret;
+fail:
+    return (int) -1;
 }
 
 void set_global_open_file ( void *file, int Index )
@@ -5719,11 +5702,7 @@ void *get_global_open_file (int Index)
     return (void *) file_table[Index];
 }
 
-
-/*
- *  sys_cd_command:
- * 
- */
+// sys_cd_command:
 // Service 175. cd command.
 // #todo
 // ou usamos o cwd do processo ou
@@ -5731,9 +5710,9 @@ void *get_global_open_file (int Index)
 
 void sys_cd_command (const char *string)
 {
-    //int i=0;
 
-    if ( (void*) string == NULL ){
+// Parameter
+    if ((void *) string == NULL){
         debug_print("sys_cd_command: string\n");
         return;
     }

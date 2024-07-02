@@ -71,11 +71,29 @@ search_in_dir (
 
     debug_print ("search_in_dir: $\n");
 
+// File name
+    if ((void*) file_name == NULL){
+        printk ("search_in_dir: file_name\n");
+        goto fail;
+    }
+    if (*file_name == 0){
+        printk ("search_in_dir: *file_name\n");
+        goto fail;
+    }
+
+// The address where the directory is.
+// #todo: Explain it better.
+    if (dir_address == 0){
+        printk ("search_in_dir: dir_address\n");
+        goto fail;
+    }
+
 //
 // Copy file name
 //
 
-// get the size
+// Get the size
+// #bugbug: Is it a valid pointer?
     stringSize = (size_t) strlen(file_name);
 
     //#debug
@@ -107,13 +125,12 @@ search_in_dir (
         //refresh_screen();
             //while(1){}
     
-        if (stringSize == 10)
-        { 
+        if (stringSize == 10){
             Name_Desired[10] = ' '; 
         }
         
         if (stringSize == 9)
-        { 
+        {
             Name_Desired[10] = ' '; 
             Name_Desired[9]  = ' '; 
         }
@@ -142,29 +159,13 @@ search_in_dir (
     }
 */
 
-// File name.
+// File name
 
-    if ((void*) file_name == NULL){
-        printk ("search_in_dir: [ERROR] file_name\n");
-        goto fail;
-    }
-    if (*file_name == 0){
-        printk ("search_in_dir: [ERROR] *file_name\n");
-        goto fail;
-    }
 // #bugbug
 // #todo
 // Can't search for a filename that starts with a '/'.
     if (*file_name == '/'){
         printk ("search_in_dir: Invalid char in file name\n");
-        goto fail;
-    }
-
-// Address Limits:
-// Endereço de memória onde o diretório está.
-    
-    if (dir_address == 0){
-        printk ("search_in_dir: Invalid dir address\n");
         goto fail;
     }
 
@@ -208,9 +209,7 @@ search_in_dir (
                 // #debug
                 debug_print("search_in_dir: Found\n");
                 // printk ("search_in_dir: Found\n");
-
                 // *index_return = j;
-                
                 return (int) TRUE; 
             }
             // Nothing
@@ -221,7 +220,7 @@ search_in_dir (
     };
 
 fail:
-    debug_print("search_in_dir: Not found\n");
+    //debug_print("search_in_dir: Not found\n");
     printk     ("search_in_dir: Not found %s\n",Name_Desired);
     // return FALSE;
     return (int) -1;
@@ -234,12 +233,12 @@ int search_in_root(const char *file_name)
     // unsigned long dir_va = (unsigned long) get_rootdir_va();
 
 // Pointer validation.
-    if ((void*) file_name == NULL){
-        debug_print("search_in_root: [ERROR] file_name\n");
+    if ((void *) file_name == NULL){
+        debug_print("search_in_root: file_name\n");
         goto fail;
     }
     if (*file_name == 0){
-        debug_print("search_in_root: [ERROR] *file_name\n");
+        debug_print("search_in_root: *file_name\n");
         goto fail;
     }
 // IN: filename, dir address
@@ -315,14 +314,12 @@ fail:
     return (unsigned short) 0;
 }
 
-
 /*
  * findEmptyDirectoryEntry:
  * Procura uma entrada vazia no diretório 
  * IN:
  *     Endereço do diretório e número máximo de entradas.
  */
-
 int 
 findEmptyDirectoryEntry ( 
     unsigned long dir_address, 
@@ -333,6 +330,7 @@ findEmptyDirectoryEntry (
     int EntrySizeInBytes = 32;
     unsigned char *dir = (unsigned char *) dir_address;
 
+// Parameters
     if (dir_address == 0){
         goto fail;
     }
@@ -354,14 +352,19 @@ fail:
     return (int) (-1);
 }
 
-// Wrapper.
+// Wrapper
+// Only in root dir.
 int fsSearchFileInRoot(const char *file_name)
 {
-// Only in root dir.
-    debug_print ("fsSearchFileInRoot:\n");
-    if ((void*) file_name == NULL)
-        return (int) -1;
+    //debug_print ("fsSearchFileInRoot:\n");
+    if ((void *) file_name == NULL){
+        goto fail;
+    }
+    //if (*file_name == 0)
+        //goto fail;
     return (int) search_in_root(file_name);
+fail:
+    return (int) -1;
 }
 
 /*
@@ -392,7 +395,7 @@ int search_path_in_the_inode_table(const char *path)
 
     debug_print("search_path_in_the_inode_table: [FIXME] Not tested yet\n");
 
-// path validation.
+// Parameters
     if ((void*) path == NULL){
         debug_print("search_path_in_the_inode_table: [ERROR] path\n");
         goto fail;
@@ -424,7 +427,7 @@ int search_path_in_the_inode_table(const char *path)
     };
 
 fail:
-    return -1;
+    return (int) -1;
 }
 
 //

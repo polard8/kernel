@@ -24,16 +24,15 @@ __try_to_load_program_from_special_folder(
 // Protectng some core areas.
 // OUT: 
 // TRUE = OK | FALSE = FAIL
-
-static int __check_address_validation(unsigned long address)
-{
 // #todo
 // We also can check against some well known ranges.
 
-    int Status=TRUE;  //ok
+static int __check_address_validation(unsigned long address)
+{
+    int Status = TRUE;
 
+// Parameter
 // fat, rootdir, base kernel, lfb, backbuffer ...
-
     if (address == VOLUME1_FAT_ADDRESS_VA)           { Status=FALSE; }
     if (address == VOLUME1_ROOTDIR_ADDRESS_VA)       { Status=FALSE; }
     if (address == KERNEL_IMAGE_BASE)                { Status=FALSE; }
@@ -534,8 +533,7 @@ __loop_next_entry:
 
 // #todo:
 // We found a bad cluster.
-    if (cluster == 0xFFF7)
-    {
+    if (cluster == 0xFFF7){
         panic("fsLoadFile: Bad cluster\n");
     }
 
@@ -881,8 +879,8 @@ fs_load_path (
     //unsigned long DirBufferSizeInBytes = (unsigned long) (4096);
 
     // Not absolute   
-    if ( p[0] != '/' ){
-        panic ("fs_load_path: Not absolute pathname \n");
+    if (p[0] != '/'){
+        panic ("fs_load_path: Not absolute pathname\n");
     }
 
 // loop: 
@@ -893,8 +891,8 @@ fs_load_path (
         printk ("[LEVEL %d]\n",l);
 
         // The level needs to start with '/', even the first one.
-        if ( p[0] != '/' ){
-            panic ("fs_load_path: All levels need to start with '/' \n");
+        if (p[0] != '/'){
+            panic ("fs_load_path: All levels need to start with '/'\n");
         }
 
         // Skip the '/'.
@@ -1029,8 +1027,7 @@ fs_load_path (
                 // Como esse é o último, 
                 // então vamos usar o endereço desejado pelo usuário.
                 __dst_buffer = (void *) __file_buffer;
-                if ((void *) __dst_buffer == NULL)
-                {
+                if ((void *) __dst_buffer == NULL){
                     panic ("fs_load_path: __dst_buffer\n");
                 }
 
@@ -1088,7 +1085,7 @@ fs_load_path (
             // estava errado e temos uma barra seguida da outra.
             if (*p == '/')
             {
-                if (i==0){
+                if (i == 0){
                     panic("fs_load_path: Invalid folder name\n");
                 }
 
@@ -1096,7 +1093,6 @@ fs_load_path (
                     panic("fs_load_path: The folder name is too long\n");
                 }
 
-                
                 // Encontramos o indicador de proximo nivel,
                 // o buffer ja tem chars que foram colocados um a um.
                 // Nao encontramos ponto nesse nivel.
@@ -1109,17 +1105,18 @@ fs_load_path (
                     // Adicionando espaços.
                     // O formato desejado eh: "DIRXDIRX   "
                     // Nome do diretorio sem extensao.
-                    while ( i < (8+3) )
+                    while (i < (8+3))
                     { 
                         //o primeiro espaço deve retirar a barra colocada antes
                         name_buffer[i] = ' ';  
                         i++; 
                     }
                 }
-                
+
                 // Finalize the string.
                 name_buffer[11] = 0;
-                
+
+                // #debug
                 printk("\n");
                 printk("fs_load_path: This is the name {%s}\n",name_buffer);
 
@@ -1147,8 +1144,7 @@ fs_load_path (
                 }
 
                 __dst_buffer = (void *) fs_buffers[l];
-                if ((void *) __dst_buffer == NULL)
-                {
+                if ((void *) __dst_buffer == NULL){
                     panic("fs_load_path: __dst_buffer\n");
                 }
 
@@ -1276,7 +1272,7 @@ fail:
     };
     current_target_dir.name[0] = '/';
     current_target_dir.name[1] = '\0';
-    return -1;
+    return (int) -1;
 }
 
 // ---------------
@@ -1299,9 +1295,9 @@ __try_to_load_program_from_special_folder(
 
 // Invalid file name.
     if ((void*) new_filename == NULL)
-        return -1;
+        goto fail;
     if (*new_filename == 0)
-        return -1;
+        goto fail;
 
 //
 // Skip first char and  load the image.
@@ -1339,9 +1335,10 @@ __try_to_load_program_from_special_folder(
     }
 
 fail:
-    return -1;
+    return (int) -1;
 }
 
+// fs_load_image:
 // helper.
 // Loading a image given the filename and its virtual address.
 // called by copy_process in clone.c right after a
@@ -1374,10 +1371,10 @@ fs_load_image(
 //
 
     if ((void*) filename == NULL){
-        panic ("fs_load_image: [ERROR] filename\n");
+        panic ("fs_load_image: filename\n");
     }
     if (*filename == 0){
-        panic ("fs_load_image: [ERROR] *filename\n");
+        panic ("fs_load_image: *filename\n");
     }
     path = filename;
     name = filename;
@@ -1496,7 +1493,10 @@ __found:
 // ok?
     return (int) Status;
 fail:
+    // #debug
+    // We still need this kind of break,
+    // cause the fs infrastructure is still immature.
     panic("fs_load_image: fail\n");
-    return -1;
+    return (int) -1;
 }
 

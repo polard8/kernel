@@ -7,27 +7,29 @@
 
 #include <kernel.h>
 
+// Worker
 int elfCheckSignature(unsigned long address)
 {
-// Worker
-
     unsigned char *buf = (unsigned char *) address;
 
+// Parameter
     if ((void *) buf == NULL){
-        printk ("elfCheckSignature: buf \n");
-        return (int) (-1);
+        printk ("elfCheckSignature: buf\n");
+        goto fail;
     }
 
-    // ELFMAG0
+// Check signature
+// ELFMAG0
     if ( buf[0] != 0x7F ||
          buf[1] != 0x45 || buf[2] != 0x4C || buf[3] != 0x46 )
     {
-        printk ("elfCheckSignature: Sig \n");
-        return (int) (-1);
+        printk ("elfCheckSignature: Sig\n");
+        goto fail;
     }
 
-    return 0;  //ok
+// ok
+    return 0;
+fail:
+    return (int) -1;
 }
-
-
 

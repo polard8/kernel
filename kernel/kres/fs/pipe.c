@@ -22,28 +22,26 @@ int sys_dup(int oldfd)
     file *f_old;
     file *f_new;
     struct process_d *Process;
+    pid_t current_process=-1;
     register int i=0;
     int slot = -1;
 
+// Parameters
     if ( oldfd < 0 || oldfd >= OPEN_MAX ){
         return (int) (-EINVAL);
     }
 
 // Process
-
-    pid_t current_process = (pid_t) get_current_process();
-
+    current_process = (pid_t) get_current_process();
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
-        debug_print("sys_dup: [FAIL]\n");
-        return -1;
-    }else{
-        if ( Process->used != TRUE || Process->magic != 1234 ){
-            debug_print("sys_dup: [FAIL]\n");
-            return -1;
-        }
-        //ok
-    };
+        //debug_print("sys_dup: [FAIL]\n");
+        goto fail;
+    }
+    if ( Process->used != TRUE || Process->magic != 1234 ){
+        //debug_print("sys_dup: [FAIL]\n");
+        goto fail;
+    }
 
 // Get an empty slot.
     for ( i=3; i< NUMBER_OF_FILES; i++ )
@@ -58,37 +56,35 @@ int sys_dup(int oldfd)
     };
 
     // fail
-    if ( slot == -1 )
+    if (slot == -1)
     {
         Process->Objects[i] = (unsigned long) 0;
-        
         // #todo
         // We need a message here.
-        return -1;
+        goto fail;
     }
 
-
-    // #todo: 
-    // Filtrar oldfd
+// #todo: 
+// Filtrar oldfd
 
 // Old
     f_old = (file *) Process->Objects[oldfd];
-    if ( (void *) f_old == NULL ){
+    if ((void *) f_old == NULL){
         Process->Objects[i] = (unsigned long) 0;
-        return -1;
+        goto fail;
     }
 
 // New
-    f_new = (void *) kmalloc(sizeof(file));
-    if ((void *) f_new == NULL)
-    {
+    f_new = (void *) kmalloc( sizeof(file) );
+    if ((void *) f_new == NULL){
         Process->Objects[i] = (unsigned long) 0;
         // #todo
         // We need a message here?
-        return -1;
+        goto fail;
     }
-    f_new->used = TRUE;
-    f_new->magic = 1234;
+// Early validation?
+    //f_new->used = TRUE;
+    //f_new->magic = 1234;
 
 // Herdando
 // So this way they are sharing the same ring0 buffer.
@@ -98,28 +94,27 @@ int sys_dup(int oldfd)
     f_new->_tmpfname  = f_old->_tmpfname;
     f_new->_lbfsize   = f_old->_lbfsize; 
     f_new->_cnt       = f_old->_cnt; 
-
+    f_new->used = TRUE;
+    f_new->magic = 1234;
     Process->Objects[slot] = (unsigned long) f_new;
-
     return (int) slot;
 
 // On success, these system calls return the new file descriptor.  
 // On error, -1 is returned, and errno is set appropriately.
-
 fail:
     //errno = ?;
-    return -1;
+    return (int) -1;
  }
 
 // #todo
 // Here is not the place for this function.
 // Move it to rtl.
-
 int sys_dup2(int oldfd, int newfd)
 {
     file *f_old;
     file *f_new;
     struct process_d *Process;
+    pid_t current_process = -1;
 
     if ( oldfd < 0 || oldfd >= OPEN_MAX )
         return (int) (-EINVAL);
@@ -128,46 +123,41 @@ int sys_dup2(int oldfd, int newfd)
         return (int) (-EINVAL);
 
 // Process
-
-    pid_t current_process = (pid_t) get_current_process();
-
+    current_process = (pid_t) get_current_process();
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
         //#todo: We need a message here.
-        return -1;
-    }else{
-        if ( Process->used != TRUE || Process->magic != 1234 )
-        {
-            return -1;
-        }
-		 //ok
-    };
-
-    int slot = newfd;
-
-    if ( slot == -1 ){
-        Process->Objects[slot] = (unsigned long) 0;
-        return -1;
+        goto fail;
+    }
+    if ( Process->used != TRUE || Process->magic != 1234 )
+    {
+        goto fail;
     }
 
-//#todo: filtrar oldfd
+    int slot = newfd;
+    if ( slot == -1 ){
+        Process->Objects[slot] = (unsigned long) 0;
+        goto fail;
+    }
 
+// #todo: 
+// filtrar oldfd
 
 // Old
     f_old = (file *) Process->Objects[oldfd];
-    if ( (void *) f_old == NULL ){
+    if ((void *) f_old == NULL){
         Process->Objects[slot] = (unsigned long) 0;
-        return -1;
+        goto fail;
     }
 
 // New
     f_new = (file *) Process->Objects[slot];
-    if ( (void *) f_new == NULL ){
+    if ((void *) f_new == NULL){
         Process->Objects[slot] = (unsigned long) 0;
-        return -1;
+        goto fail;
     }
-    f_new->used = TRUE;
-    f_new->magic = 1234;
+    //f_new->used = TRUE;
+    //f_new->magic = 1234;
 
 // Herdado
 // Sharing the same ring 0 buffer.
@@ -177,7 +167,8 @@ int sys_dup2(int oldfd, int newfd)
     f_new->_tmpfname  = f_old->_tmpfname;
     f_new->_lbfsize   = f_old->_lbfsize; 
     f_new->_cnt       = f_old->_cnt; 
-
+    f_new->used = TRUE;
+    f_new->magic = 1234;
     return (int) slot;
 
 // On success, these system calls return the new file descriptor.  
@@ -185,7 +176,7 @@ int sys_dup2(int oldfd, int newfd)
 
 fail:
 	//errno = ?;
-    return -1;
+    return (int) -1;
 }
 
 // #todo
@@ -194,11 +185,12 @@ fail:
 
 int sys_dup3(int oldfd, int newfd, int flags)
 {
-    //#todo: flags.
-
     file  *f_old;
     file  *f_new;
     struct process_d *Process;
+    pid_t current_process = -1;
+
+    //#todo: flags.
 
     if ( oldfd < 0 || oldfd >= OPEN_MAX )
         return (int) (-EINVAL);
@@ -207,22 +199,20 @@ int sys_dup3(int oldfd, int newfd, int flags)
         return (int) (-EINVAL);
 
 // Process
-
-    pid_t current_process = (pid_t) get_current_process();
-
+    current_process = (pid_t) get_current_process();
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
-        return -1;
+        goto fail;
     }
     if ( Process->used != TRUE || Process->magic != 1234 )
     {
-        return -1;
+        goto fail;
     }
 
     int slot = newfd;
     if ( slot == -1 ) {
         Process->Objects[slot] = (unsigned long) 0;
-        return -1;
+        goto fail;
     }
 
 // #todo: filtrar oldfd
@@ -231,17 +221,17 @@ int sys_dup3(int oldfd, int newfd, int flags)
     f_old = (file *) Process->Objects[oldfd];
     if ((void *) f_old == NULL){
         Process->Objects[slot] = (unsigned long) 0;
-        return -1;
+        goto fail;
     }
 
 // New
     f_new = (file *) Process->Objects[slot];
     if ((void *) f_new == NULL){
         Process->Objects[slot] = (unsigned long) 0;
-        return -1;
+        goto fail;
     }
-    f_new->used = TRUE;
-    f_new->magic = 1234;
+    //f_new->used = TRUE;
+    //f_new->magic = 1234;
 
 // Herdado
 // Shearing the same ring 0 buffer.
@@ -251,7 +241,8 @@ int sys_dup3(int oldfd, int newfd, int flags)
     f_new->_tmpfname  = f_old->_tmpfname;
     f_new->_lbfsize   = f_old->_lbfsize; 
     f_new->_cnt       = f_old->_cnt; 
-
+    f_new->used = TRUE;
+    f_new->magic = 1234;
     return (int) slot;
 
 // On success, these system calls return the new file descriptor.  
@@ -280,15 +271,13 @@ int sys_pipe( int *pipefd, int flags )
     file *f1;
     file *f2;
     struct process_d *Process;
+    pid_t current_process = -1;
     register int i=0;
     int slot1 = -1;
     int slot2 = -1;
 
     debug_print ("sys_pipe:\n");
-
-// Process
-    pid_t current_process = (pid_t) get_current_process();
-        
+       
     // Why ?    
     // Reject flags other than O_CLOEXEC.
     //if ((flags & O_CLOEXEC) != flags)
@@ -297,7 +286,7 @@ int sys_pipe( int *pipefd, int flags )
     // unsigned long fd_flags = (flags & O_CLOEXEC) ? FD_CLOEXEC : 0;
 
 // Process
-
+    current_process = (pid_t) get_current_process();
     Process = (void *) processList[current_process];
     if ((void *) Process == NULL){
         //debug_print("sys_pipe: Process\n");
@@ -351,7 +340,7 @@ int sys_pipe( int *pipefd, int flags )
     {
         debug_print("sys_pipe: slots alocation fail\n");
         // todo: printk
-        return (int) (-1);
+        goto fail;
     }
 
 // buffer
@@ -363,7 +352,7 @@ int sys_pipe( int *pipefd, int flags )
         Process->Objects[slot1] = (unsigned long) 0;
         Process->Objects[slot2] = (unsigned long) 0;
         debug_print("sys_pipe: buffer fail\n");
-        return (int) (-1);
+        goto fail;
     }
 
 // File structures
@@ -376,16 +365,18 @@ int sys_pipe( int *pipefd, int flags )
         Process->Objects[slot1] = (unsigned long) 0;
         Process->Objects[slot2] = (unsigned long) 0;
         debug_print("sys_pipe: structures fail\n");
-        return (int) (-1);
+        goto fail;
     }
 
-// As duas estruturas compartilham o mesmo buffer.        
+// Early validations?
 
     f1->used = TRUE;
     f1->magic = 1234;
 
     f2->used = TRUE;
     f2->magic = 1234;
+
+// As duas estruturas compartilham o mesmo buffer.        
 
 // File: object type.
     f1->____object = ObjectTypePipe;
@@ -481,6 +472,7 @@ int sys_read_pipe( int fd, char *ubuf, int count )
 {
     debug_print ("sys_read_pipe: TODO\n");
 
+// Parameters
     if (fd<0 || fd>=OPEN_MAX){
         return (int) (-EBADF);
     }
@@ -492,6 +484,7 @@ int sys_read_pipe( int fd, char *ubuf, int count )
 
 // #todo ...
 
+//fail:
     return (int) -1;
 }
 
@@ -500,6 +493,7 @@ int sys_write_pipe( int fd, char *ubuf, int count )
 {
     debug_print ("sys_write_pipe: TODO\n");
 
+// Parameters
     if (fd<0 || fd >= OPEN_MAX)
         return (int) (-EBADF);
 
@@ -544,7 +538,8 @@ pipe_ioctl (
         break;
     };
 
-    return -1;
+//fail:
+    return (int) -1;
 }
 
 //
