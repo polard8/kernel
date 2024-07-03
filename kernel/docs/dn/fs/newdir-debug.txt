@@ -1,0 +1,40 @@
+
+ Debuging NEWDIR/ created by Gramado OS.
+
+8.3 file name. The first 8 characters are the name and the last 3 are the extension.
+4E 45 57 44 49 52 20 20 
+20 20 20 
+
+Attributes of the file. The possible attributes are:
+10 
+
+Reserved for use by Windows NT.
+00 
+
+Creation time in hundredths of a second,
+08 
+
+The time that the file was created. Multiply Seconds by 2.
+08 B6 
+
+The date on which the file was created.
+B6 4C 
+
+Last accessed date. Same format as the creation date.
+B8 4C 
+
+The high 16 bits of this entry's first cluster number. For FAT 12 and FAT 16 this is always zero.
+00 00 
+
+Last modification time. Same format as the creation time.
+A8 49 
+
+Last modification date. Same format as the creation date.
+B8 4C 
+
+The low 16 bits of this entry's first cluster number. Use this number to find the first cluster for this entry.
+#bugbug: This way we're saving it on top of an already existent file.
+02 00 
+
+The size of the file in bytes.
+00 00 00 00

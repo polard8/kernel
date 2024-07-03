@@ -1,0 +1,95 @@
+
+  Examples of directory entries for fat16 fs.
+  ps: Linux created this entries.
+
+-------------------------
+USER/ directory
+
+8.3 file name. The first 8 characters are the name and the last 3 are the extension.
+55 53 45 52 53 20 20 20   
+20 20 20 
+
+Attributes of the file. The possible attributes are:
+10 
+
+Reserved for use by Windows NT.
+00 
+
+Creation time in hundredths of a second,
+7F 
+
+The time that the file was created. Multiply Seconds by 2.
+5B A7 
+
+The date on which the file was created.
+E2 58 
+
+Last accessed date. Same format as the creation date.
+E2 58 
+
+The high 16 bits of this entry's first cluster number. For FAT 12 and FAT 16 this is always zero.
+00 00 
+
+Last modification time. Same format as the creation time.
+5B A7 
+
+Last modification date. Same format as the creation date.
+E2 58 
+
+The low 16 bits of this entry's first cluster number. Use this number to find the first cluster for this entry.
+0C 1D 
+
+The size of the file in bytes.
+00 00 00 00
+
+
+-------------------------
+SYSLOG.TXT file
+
+8.3 file name. The first 8 characters are the name and the last 3 are the extension.
+53 59 53 4C 4F 47 20 20  
+54 58 54 
+
+Attributes of the file. The possible attributes are:
+20 
+
+Reserved for use by Windows NT.
+00 
+
+Creation time in hundredths of a second,
+79 
+
+The time that the file was created. Multiply Seconds by 2.
+5B A7 
+
+The date on which the file was created.
+E2 58 
+
+Last accessed date. Same format as the creation date.
+E2 58 
+
+The high 16 bits of this entry's first cluster number. For FAT 12 and FAT 16 this is always zero.
+00 00 
+
+Last modification time. Same format as the creation time.
+5B A7 
+
+Last modification date. Same format as the creation date.
+E2 58 
+
+The low 16 bits of this entry's first cluster number. Use this number to find the first cluster for this entry.
+3F 1A 
+
+The size of the file in bytes.
+06 00 00 00
+
+
+
+
+
+
+
+
+
+
+

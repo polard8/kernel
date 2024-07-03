@@ -48,6 +48,8 @@ static void __do_initialize_sdROOT(void);
 static void __do_initialize_sdGRAMADO(void);
 static void __do_initialize_sdPROGRAMS(void);
 
+static int __initialize_fs_buffers(void);
+
 //=============================
 
 // File read.
@@ -2691,6 +2693,39 @@ void initialize_FAT_and_main_directories(void)
 // ...
 }
 
+
+// The buffers used to load the directories
+// when loading a path.
+// Buffers
+// Buffers for loading the directories while walking on a pathname
+// when loading a file.
+// 0=ok | <0 = fail.
+static int __initialize_fs_buffers(void)
+{
+    register int i=0;
+// The max number of levels in a path.
+    int max = FS_N_BUFFERS;
+// 512 entries = 16KB.
+// 32*512 = 16KB.
+    const int PagesPerBuffer = 4;
+    unsigned long TmpAddr=0;
+
+// #bugbug
+// 4 pages per level.
+    for (i=0; i<max; i++)
+    {
+        TmpAddr = (unsigned long) allocPages(PagesPerBuffer);
+        if ((void*) TmpAddr == NULL){
+            goto fail;
+        }
+        fs_buffers[i] = (unsigned long) TmpAddr;
+    }
+
+    return 0;
+fail:
+    return (int) -1;
+}
+
 // ------------------------------
 // fsInit:
 // Called by I_init() in x64init.c
@@ -2701,21 +2736,10 @@ int fsInit (void)
 
     PROGRESS("fsInit:\n");
 
-// Buffers
-// Buffers for loading the directories while walking on a pathname
-// when loading a file.
-
-    int max = FS_N_BUFFERS;  // Number of levels.
-    unsigned long addr=0;
-
-    for (i=0; i<max; i++)
-    {
-        //addr = (unsigned long) allocPages(1);
-        addr = (unsigned long) allocPages(4);  //32*512=16KB
-        if ((void*) addr == NULL){
-            panic("fsInit: addr\n");
-        }
-        fs_buffers[i] = (unsigned long) addr;
+// Initialize slab buffers to load directories.
+    int buffers_ok = (int) __initialize_fs_buffers();
+    if (buffers_ok < 0){
+        panic("fsInit: buffers");
     }
 
 // Undefined fs!
@@ -4330,7 +4354,7 @@ fsSaveFile (
     unsigned long dir_address,
     int dir_entries,
     const char *file_name, 
-    unsigned long file_size,
+    unsigned long file_size,   // number of sectors
     unsigned long size_in_bytes,
     char *file_address,
     char flag )  
@@ -4457,6 +4481,10 @@ fsSaveFile (
  
 // #bugbug
 // Obs: Esse limite é improvisado.
+// see fatlib.h
+
+    // nao podemos começar do 0.
+    c = 3; 
 
     while (i < CLUSTERS_TO_SAVE_MAX)
     {
@@ -4465,6 +4493,7 @@ fsSaveFile (
 
         if (fat[c] == 0)
         {
+            // number of sectors
             // Encontrado todos os espaços livres 
             // que o arquivo precisa.
             // Marca o fim.
@@ -4497,7 +4526,6 @@ fsSaveFile (
 // Provavelmente não encontramos uma quantidade suficiente.
 
 out_of_range:  
-
     printk ("fsSaveFile: No free cluster \n");
     goto fail;
 
@@ -4513,6 +4541,8 @@ out_of_range:
 // Save!
 
 save_file:
+// saving file into the disk.
+// But remember, we goota save the fat and the root into the disk.
 
     //#debug
     //printk("fsSaveFile: save_file: \n"); 
@@ -4520,6 +4550,7 @@ save_file:
 
 // Início da lista.
     i = 0; 
+    first = i;
 
 // Size limits.
 
@@ -4529,11 +4560,6 @@ save_file:
 
     j = (512*4);
 
-// Pegamos o primeiro da lista.
-    first = fat16ClustersToSave[i];
-
-    // #debug
-    // printk("first={%x}\n",first);
 
 // Create directory entry
 // Name/ext 8.3
@@ -4575,20 +4601,33 @@ save_file:
 // 0x40: Unused
 // 0x80: Unused
 
-    DirEntry[11] = (char) flag; 
+    DirEntry[11] = (char) flag;
+
+    // #todo
+    //if (IsReadOnly)
+    //    DirEntry[11] = (char) DirEntry[11] | 0x01;
+    //if (IsHidden)
+    //    DirEntry[11] = (char) DirEntry[11] | 0x02;
+    //if (IsSystem)
+    //    DirEntry[11] = (char) DirEntry[11] | 0x04;
+    //if (IsVolumeLabel)
+    //    DirEntry[11] = (char) DirEntry[11] | 0x08;
+
 
 // Reserved
     DirEntry[12] = 0; 
+
 // Creation time. 14 15 16
-    DirEntry[13] = 0x08;  // Create Time (ms)
-    DirEntry[14] = 0x08;  // Create Time (Hrs/Mins/Secs)
-    DirEntry[15] = 0xb6;
+    DirEntry[13] = 0x97;  // Create Time (ms)
+    //
+    DirEntry[14] = 0xD3;  // Create Time (Hrs/Mins/Secs)
+    DirEntry[15] = 0xBA;
 // Creation date
-    DirEntry[16] = 0xb6;
-    DirEntry[17] = 0x4c;
+    DirEntry[16] = 0xE2;
+    DirEntry[17] = 0x58;
 // Access date
-    DirEntry[18] = 0xb8;
-    DirEntry[19] = 0x4c;
+    DirEntry[18] = 0xE2;
+    DirEntry[19] = 0x58;
 
 // First cluster. (16 bits)
 // Only used in FAT32 Systems
@@ -4597,18 +4636,27 @@ save_file:
     DirEntry[21] = 0;
 
 // Modifield time
-    DirEntry[22] = 0xa8;
-    DirEntry[23] = 0x49;
+    DirEntry[22] = 0xD3;
+    DirEntry[23] = 0xBA;
 // Modifield date
-    DirEntry[24] = 0xb8;
-    DirEntry[25] = 0x4c;
+    DirEntry[24] = 0xE2;
+    DirEntry[25] = 0x58;
 
+// #test
 // First cluster. (Low word)
-    DirEntry[26] = (char) (first);  // File/Folder Start Cluster (Low)
-    DirEntry[27] = (char) (first >> 8);
+// The low 16 bits of this entry's first cluster number. 
+// Use this number to find the first cluster for this entry.
+// first = Index in the fat16ClustersToSave[] list.
+   //int fIndex = first;  //=0.
+    unsigned short OurFirstCluster = (unsigned short) fat16ClustersToSave[0];
+    char *p = (char *) &OurFirstCluster;
+    DirEntry[26] = (char) (*p);  // File/Folder Start Cluster (Low)
+    p++;
+    DirEntry[27] = (char) (*p);
 
-// File size in bytes.  (32 bits)
+// File size in bytes. (32 bits)
 // 4 bytes: (28,29,30,31)
+// (for files)
     DirEntry[28] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[29] = (char) size_in_bytes;
@@ -4616,7 +4664,9 @@ save_file:
     DirEntry[30] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[31] = (char) size_in_bytes;
+
 // Folders will have a File Size of 0x0000
+// (for folders)
     if (flag == 0x10)
     {
         DirEntry[28] = (char) 0;
@@ -4624,7 +4674,6 @@ save_file:
         DirEntry[30] = (char) 0;
         DirEntry[31] = (char) 0;
     }
-
 
 
 // #importante:
@@ -4805,8 +4854,10 @@ save_file:
 
 do_save_dir_and_fat:
 
-    debug_print ("fsSaveFile: [DEBUG] do_save_dir_and_fat\n");
-    
+    //debug_print ("fsSaveFile: [DEBUG] do_save_dir_and_fat\n");
+    //printk("fsSaveFile: do_save_dir_and_fat:\n"); 
+    //refresh_screen();
+
 // Save root
 // #bugbug: We need to save a directory, not the root.
 // IN: root dir address, root dir lba, root dir size in sectors.
@@ -5562,11 +5613,11 @@ int sys_create_empty_file(char *file_name)
 // #todo: Allocate space for a new file.
     char buffer[BUFSIZ];
     //char *buf;
-// How many bytes.
-    int FileSizeInBytes = 512;
 // How many sectors.
 // (FileSizeInBytes/512)
-    int NumberOfSectors = 1;
+    int NumberOfSectors = 2;
+// How many bytes.
+    int FileSizeInBytes = BUFSIZ; //512 * 4;  //1014
 
     debug_print ("sys_create_empty_file:\n");
     printk      ("sys_create_empty_file:\n");
@@ -5621,9 +5672,9 @@ int sys_create_empty_directory(char *dir_name)
 
 // #bugbug: 
 // We need a buffer in another place.
-    char buffer[BUFSIZ];
-    int size_in_bytes = 512; 
-    int number_of_sectors = 1;
+    char buffer[BUFSIZ];  // 1024
+    int number_of_sectors = 2;
+    int size_in_bytes = BUFSIZ; //512*4;  //512; 
 
     debug_print ("sys_create_empty_directory:\n");
     printk      ("sys_create_empty_directory:\n");
@@ -5655,6 +5706,7 @@ int sys_create_empty_directory(char *dir_name)
 
     if (__ret < 0){
         debug_print("sys_create_empty_directory: fail\n");
+             printk("sys_create_empty_directory: fail\n");
         goto fail;
     }
 
@@ -5662,6 +5714,7 @@ int sys_create_empty_directory(char *dir_name)
 // the file structure.
     return (int) __ret;
 fail:
+    refresh_screen();
     return (int) -1;
 }
 
