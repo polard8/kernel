@@ -1,16 +1,10 @@
-;
-; Arquivo: cpuinfo.inc
-;
-; Descrição:
-;     Variáveis e rotinas sobre a CPU.
-;
-; Versão: 1.0, 2015, 2016.
-;
-
+; cpuinfo.inc
+; Variables and routines for CPU support.
+; 2015
 
 
 ;
-; Variáveis.
+; Variables
 ;
 
 global _CPUInfo
@@ -24,8 +18,8 @@ _CPUInfo:
 
 ;----------------------------------------
 ; _finding_cpu_info:
-;     Encontra informações sobre o processador 
-;     usando a instrução cpuid.   
+;     Encontra informaï¿½ï¿½es sobre o processador 
+;     usando a instruï¿½ï¿½o cpuid.   
 ;
 ; IN:  eax = info_type.
 ;	

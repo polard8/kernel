@@ -1,5 +1,5 @@
 ;
-; bm/main.asm 
+; bm2/main.asm 
 ;    Main file of Boot manager.
 ; Video modes:
 ; ============
@@ -29,24 +29,22 @@
 ; 32KB is the limit for this program?
 ; We are almost there.
 
-
-
 ;       +----------+
-;       |          | 
+;       |    ...   | 
 ;       |----------| 
-;       | BL.BIN   | 
-;       |          | 
+;       |  BL.BIN  | 
+;       |  (32bit) | Boot loader in C.
 ;       |----------| 0x2000:0x0000
 ;       |          | 
 ;       |----------| 
 ;       |          | 
-;       |BM.BIN    | 
+;       |  BM2.BIN | 
 ;       |          | The entry point.
 ;  >>>  |----------| 0x0000:0x8000 :)
 ;       |          |
 ;       |----------| 0x0000:0x6000
-;       |INITIAL   | Initial stack address.
-;       |STACK     | It goes down.
+;       |  INITIAL | Initial stack address.
+;       |   STACK  | It goes down.
 ;       |----------| 
 ;       |          |
 ;       |----------| 
@@ -404,70 +402,70 @@ bootmanager_main:
 ; 14 - Header principal. 
 ; Definições globais usadas em 32bit.
 ; Header principal em 32 bits.
-    %include "extras/header32.inc"
+    %include "k32/header32.inc"
 ; 13 - Headers. 
-    %include "extras/system.inc"       ; System configuration.
-    %include "extras/init.inc"         ; Initialization configuration.
-    %include "extras/sysvar32.inc"     ; Variáveis do sistema.
-    %include "extras/x8632/gdt32.inc"  ; Gdt
-    %include "extras/x8632/idt32.inc"  ; Idt
-    %include "extras/x8632/ldt32.inc"  ; Ldt
-    %include "extras/x8632/tss32.inc"  ; Tss
-    %include "extras/stacks32.inc"     ; Stacks
-    %include "extras/x8632/ints32.inc"    ; Handles para as interrupções.
-    %include "extras/fs/fat16header.inc"  ; Headers para o sistema de arquivos fat16.
+    %include "k32/system.inc"       ; System configuration.
+    %include "k32/init.inc"         ; Initialization configuration.
+    %include "k32/sysvar32.inc"     ; Variáveis do sistema.
+    %include "k32/x8632/gdt32.inc"  ; Gdt
+    %include "k32/x8632/idt32.inc"  ; Idt
+    %include "k32/x8632/ldt32.inc"  ; Ldt
+    %include "k32/x8632/tss32.inc"  ; Tss
+    %include "k32/stacks32.inc"     ; Stacks
+    %include "k32/x8632/ints32.inc"    ; Handles para as interrupções.
+    %include "k32/fs/fat16header.inc"  ; Headers para o sistema de arquivos fat16.
 ; 12 - Monitor.
-    %include "extras/drivers/screen32.inc"  ; Rotinas de screen em 32 bits.
-    %include "extras/drivers/input32.inc"   ; Rotinas de input 2m 32 bits.
-    %include "extras/string32.inc"  ; Rotinas de strings em 32 bits.
-    %include "extras/font32.inc"    ; Fonte.
+    %include "k32/drivers/screen32.inc"  ; Rotinas de screen em 32 bits.
+    %include "k32/drivers/input32.inc"   ; Rotinas de input 2m 32 bits.
+    %include "k32/string32.inc"  ; Rotinas de strings em 32 bits.
+    %include "k32/font32.inc"    ; Fonte.
 ; 11 - Hardware.
-    %include "extras/x8632/cpuinfo.inc"  ; CPU
-    %include "extras/hardware.inc"       ; Hardware
+    %include "k32/x8632/cpuinfo.inc"  ; CPU
+    %include "k32/hardware.inc"       ; Hardware
     ; ...
 ; 10 - Irqs.
-    %include "extras/drivers/timer.inc"     ; Irq 0, Timer.
-    %include "extras/drivers/keyboard.inc"  ; Irq 1, Keyboard.
-    %include "extras/drivers/fdc32.inc"     ; Irq 6, Fdc. (@todo: Suspender o suporte.)
-    %include "extras/drivers/clock.inc"     ; Irq 8, Clock.
-    %include "extras/drivers/hdd32.inc"     ; Irq 14/15, Hdd.
+    %include "k32/drivers/timer.inc"     ; Irq 0, Timer.
+    %include "k32/drivers/keyboard.inc"  ; Irq 1, Keyboard.
+    %include "k32/drivers/fdc32.inc"     ; Irq 6, Fdc. (@todo: Suspender o suporte.)
+    %include "k32/drivers/clock.inc"     ; Irq 8, Clock.
+    %include "k32/drivers/hdd32.inc"     ; Irq 14/15, Hdd.
     ; ...
 ; 9 - Tasks. (#no tasks)
 ; Rotinas de inicialização do sistema de tarefas.
-    %include "extras/tasks32.inc"   
+    %include "k32/tasks32.inc"   
 ; 8 - lib32.
 ; Rotinas em 32 bits. 
 ; 7 - setup  
 ; Inicializa arquitetura.
-    %include "extras/setup.inc"
+    %include "k32/setup.inc"
 ; 6 - Disk.
-    %include "extras/fs/fat12pm.inc"   ;FAT12 em 32 bits.
-    %include "extras/fs/fat16lib.inc"  ;FAT16 (rotinas).
-    %include "extras/fs/fat16.inc"     ;FAT16 (funçoes principais).
-    %include "extras/fs/ramfs.inc"     ;RamDisk fs.
-    %include "extras/fs/format.inc"    ;Formata.
-    %include "extras/fs/fs32.inc"      ;fs, (gerencia os sistemas de arquivos).
+    %include "k32/fs/fat12pm.inc"   ;FAT12 em 32 bits.
+    %include "k32/fs/fat16lib.inc"  ;FAT16 (rotinas).
+    %include "k32/fs/fat16.inc"     ;FAT16 (funçoes principais).
+    %include "k32/fs/ramfs.inc"     ;RamDisk fs.
+    %include "k32/fs/format.inc"    ;Formata.
+    %include "k32/fs/fs32.inc"      ;fs, (gerencia os sistemas de arquivos).
 ; 5 - File.
-    %include "extras/installer.inc"   ;Instala metafiles em LBAs específicas.
-    %include "extras/fs/file.inc"     ;Operaçoes com aquivos.
-    %include "extras/bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
+    %include "k32/installer.inc"   ;Instala metafiles em LBAs específicas.
+    %include "k32/fs/file.inc"     ;Operaçoes com aquivos.
+    %include "k32/bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
 ; 4 - Debug.
 ; System debug.
-    %include "extras/debug.inc"
+    %include "k32/debug.inc"
 ; 3 - blconfig.
 ; Gerencia a inicialização.
-    %include "extras/blconfig.inc"
+    %include "k32/blconfig.inc"
 ; 2 - Boot Manager 32bit Mini-Shell.
 ; Prompt de comandos.
-    %include "extras/shell32/shell.inc"
-    %include "extras/shell32/shcalls.inc"  ;Chamadas dos comandos.
-    %include "extras/shell32/shlib.inc"    ;Lib de funções do Shell.
-    %include "extras/shell32/shmsg.inc"    ;Mensagens e variáveis do Shell.
+    %include "k32/shell32/shell.inc"
+    %include "k32/shell32/shcalls.inc"  ;Chamadas dos comandos.
+    %include "k32/shell32/shlib.inc"    ;Lib de funções do Shell.
+    %include "k32/shell32/shmsg.inc"    ;Mensagens e variáveis do Shell.
 ; 1 - Start.
-    %include "extras/start.inc"
+    %include "k32/start.inc"
 ; 0 - lib32.
 ;Rotinas em 32 bits.
-    %include "extras/lib32.inc" 
+    %include "k32/lib32.inc" 
 ; ========================================================
 
 ;

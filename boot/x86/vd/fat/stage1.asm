@@ -20,9 +20,9 @@
 ;; See: main.asm 
 
 ;       +--------+
-;       |        |
+;       |   ...  |
 ;       |--------|
-;       | FAT    |
+;       |   FAT  |
 ;       |--------| 0x17C0:0x0200
 ;       |        |
 ;       |--------|
@@ -139,14 +139,15 @@ cluster     dw  0x0000
 ; The image name.
 
 
+; ---------------------------
 ; Option 1:
 ; This is the legacy boot manager.
 ; It loads the legacy version of the boot manager,
 ; with the 32bit-assembly shell.
 ;
-; ImageName db  "BM      BIN", 0x0D, 0x0A, 0x00
+;ImageName db  "BM      BIN", 0x0D, 0x0A, 0x00
 
-
+; ---------------------------
 ; Option 2:
 ; It loads a faster version of the boot manager,
 ; with NO 32bit-assembly shell.

@@ -1,29 +1,30 @@
-;
-; File: shell32/shell.inc
-;
-; Descrição:
+; shell32/shell.inc
+; This is a 32bit shell embedded inside the boot manager.
+; Credits:
+;     Original - (BareMetal OS, Return Infinity).
+; History: 
+;     2015 - Adapted by Fred Nora.
+
+
+; #todo: Long description.
 ;     Boot Manager Shell.
 ;     Arquivo principal do Shell do Boot Manager.
 ; #importante: 
 ; No Boot Manager, o interpretador de comandos se revela importante, 
-; especialmente quando é usado para ver informações sobre os dispositivos 
+; especialmente quando ï¿½ usado para ver informaï¿½ï¿½es sobre os dispositivos 
 ; de armazenamento e sobre o boot.
 ; Ou seja, o foco do interpretador de comandos do Boot Manager deve ser
-; as informações sobre o disco de boot e sobre a partição ativa. O único
-; arquivo que o boot manager deve se preocupar é o Boot Loader, no caso
+; as informaï¿½ï¿½es sobre o disco de boot e sobre a partiï¿½ï¿½o ativa. O ï¿½nico
+; arquivo que o boot manager deve se preocupar ï¿½ o Boot Loader, no caso
 ; BL.BIN.
 ; #todo: 
-; Visualizar e manipular informações no metafile sobre arquivos e 
+; Visualizar e manipular informaï¿½ï¿½es no metafile sobre arquivos e 
 ; armazenamento de dados.
 ; #importante: 
-; É obrigação da rotina que fizer alguma alteração no metafile sinalizar, 
-; configurando a flag 'shell_exit_flag' com as opções '0' ou '1'.
-; Assim a rotina exit decidirá se salva o metafile antes de iniciar ou não.
-; '1' significa salvar o metafile e '0' significa não salvar.
-; Credits:
-;     Original - (BareMetal, Return Infinity).
-; History: 
-;     2015 - Adapted by Fred Nora.
+; ï¿½ obrigaï¿½ï¿½o da rotina que fizer alguma alteraï¿½ï¿½o no metafile sinalizar, 
+; configurando a flag 'shell_exit_flag' com as opï¿½ï¿½es '0' ou '1'.
+; Assim a rotina exit decidirï¿½ se salva o metafile antes de iniciar ou nï¿½o.
+; '1' significa salvar o metafile e '0' significa nï¿½o salvar.
 
 
 align 1
@@ -32,7 +33,7 @@ align 1
 
 ;=====================================================
 ; os_command_line:
-;     Início do loop para pegar comandos.
+;     Inï¿½cio do loop para pegar comandos.
 ;     #### LOOP ####
 ; IN:
 ;     Nothing.
@@ -51,7 +52,7 @@ os_command_line:
     mov byte [key], 0
 
 ; #todo: Deprecated
-; Flag diferente de zero se haverá alguma operação com arquivo.
+; Flag diferente de zero se haverï¿½ alguma operaï¿½ï¿½o com arquivo.
     cmp byte [file_flag], 0
     je .do_prompt
 
@@ -61,14 +62,14 @@ os_command_line:
     ;mov [os_Font_Color], ebx
 
 .do_change_name:
-    ; Mostra uma string, que é um prompt para mudar o nome do arquivo.
+    ; Mostra uma string, que ï¿½ um prompt para mudar o nome do arquivo.
     mov esi, prompt_change_file
     call os_output
-    ; Não mostra o prompt.
+    ; Nï¿½o mostra o prompt.
     jmp .no_prompt
 
 ; Print new prompt.
-; See: stage3/shell/shlib.inc
+; See: shlib.inc
 .do_prompt:
     call show_prompt_string
 .no_prompt:
@@ -77,21 +78,23 @@ os_command_line:
     ;mov ebx, 0x00FFFFFF
     ;mov [os_Font_Color], ebx
 
-; Input.
-; Limit the input to 250 characters.
-; This buffer has 1024 bytes.
+; ==========================================================
+;         ++++ IMPUT ++++
+; ==========================================================
 
 ; Get a string.
-; input32.inc
+; See: input32.inc
+; Limit the input to 250 characters.
+; This buffer has 1024 bytes.
     mov edi, cli_temp_string
     mov ecx, 250
     call os_input
 
-; O [ENTER] foi pressionado, então saimos da rotina os_input.
-; The user hit enter so print a new line.
+; Now the [ENTER] key was pressed and we returned from the os_input function.
+; The user hit enter, so print a new line.
 ; 'os_input_string' stores the number of charaters received in ECX.
-; Se não há caracteres no buffer, recomeça.
-; O contador indica quantos caracteres foram armazenados.
+; If there is no chars into the buffer, se it restarts.
+; The counter tell us how many chars was stored.
 
 .newLine:
     call os_print_newline
@@ -104,8 +107,7 @@ os_command_line:
     call os_string_parse
     jecxz os_command_line    ;;Loop 
 
-; Store the number of words in the string.
-; Salva o número de palavras digitadas.
+; Store the number of words found in the string.
 .saveTotalWords:
     mov byte [app_argc], cl
 
@@ -138,23 +140,24 @@ os_command_line:
     stosb
     jmp .nextbyte1
 
+; End of the first word.
+; Let's finalize the work putting a 0x00 at the end of our tmpstring.
 .endofcommand:
     nop 
-; Finaliza a primeira palavra. 
-; Colocando um zero no fim da string.
 .finalizingWord:
     mov al, 0x00
     stosb
 
-; Observações:
+; Let's kill the white spaces.
+; Observaï¿½ï¿½es:
 ; At this point 'cli_command_string' holds at least 
 ; "a" and at most "abcdefgh.ijk".
 ; Break the contents of 'cli_temp_string' 
 ; into individual strings.
 ; #todo: Talvez devamos criar um push isso aqui,
-; já que tem um pop logo em baixo.
+; jï¿½ que tem um pop logo em baixo.
 ; Change all instances of a character in a string.
-; quando for espaço, colocaremos zero.
+; quando for espaï¿½o, colocaremos zero.
 ; OBS:  QUEM COLOCOU ISSO NA PILHA??
 ; os_string_change_char colocou e tirou esi da pilha.
 ; #BUGBUG
@@ -163,28 +166,23 @@ os_command_line:
 .killSpaces:
 
     mov esi, cli_temp_string
-    mov al, 0x20                ;Quando for espaço,
+    mov al, 0x20                ;Quando for espaï¿½o,
     mov bl, 0x00                ;Coloque zero.
     call os_string_change_char  ;lib32\string32.inc
     pop esi                     ;Pop the command string.
 
+; ==========================================================
+;         ++++ COMPARE ++++
+; ==========================================================
 
-;--------------------------------------------------------
-
-;
 ; Compare reserved word.
-;
-
-;
-; == Compare ========
-;
-
 ; Compara a primeira palavra - (edi).
 ; See: shmsg.inc
 
 ; =========
 ; 'boot'
-; Inicia o modo gráfico padrão. GUI 
+; GUI: It initializes the default graphical mode.
+; The default is boothome (800x600).
 ; See: shcalls.inc
 .xBoot:
     mov edi, boot_string
@@ -192,36 +190,42 @@ os_command_line:
     jc do_boot
 
 ; =========
+; 'bootjail'
 .xBootJail:
     mov edi, bootjail_string
     call os_string_compare
     jc do_gramado_mode_jail
 
 ; =========
+; 'bootp1'
 .xBootP1:
     mov edi, bootp1_string
     call os_string_compare
     jc do_gramado_mode_p1
 
 ; =========
+; 'boothome'
 .xBootHome:
     mov edi, boothome_string
     call os_string_compare
     jc do_gramado_mode_home
 
 ; =========
+; 'bootp2'
 .xBootP2:
     mov edi, bootp2_string
     call os_string_compare
     jc do_gramado_mode_p2
 
 ; =========
+; 'bootcastle'
 .xBootCastle:
     mov edi, bootcastle_string
     call os_string_compare
     jc do_gramado_mode_castle
 
 ; =========
+; 'bootcali'
 .xBootCalifornia:
     mov edi, bootcalifornia_string
     call os_string_compare
@@ -237,7 +241,7 @@ os_command_line:
 
 ; =========
 ; 'shutdown'
-; Desliga a máquina via APM.
+; Poweroff the machine via APM.
 .xShutdown:
     mov edi, shutdown_string
     call os_string_compare
@@ -261,8 +265,8 @@ os_command_line:
 
 ; =========
 ; 'dir' 
-; (Mostra o diretório de volumes)
-; Depois do BM,(setor 65 +fat1 +fat2)
+; (Mostra o diretï¿½rio de volumes)
+; Depois do BM, (setor 65 +fat1 +fat2)
 .xDir:
     mov edi, dir_string
     call os_string_compare
@@ -278,7 +282,9 @@ os_command_line:
 
 ; =========
 ; 'exit'
-; Está reinicianso a instancia do shell, mas deveríamos sair dele.
+; #bugbug
+; Exit the shell,
+; at this case it goes to the bootloader (BL.BIN)
 .xExit:
     mov edi, exit_string
     call os_string_compare
@@ -286,7 +292,7 @@ os_command_line:
 
 ; =========
 ; 'disk'
-; Mostra informações sobre um disco.
+; Show disk information.
 .xDisk:
     mov edi, disk_string
     call os_string_compare
@@ -294,13 +300,12 @@ os_command_line:
 
 ; =========
 ; 'part' 
-; Mostra informações sobre uma partição.
+; Show partition entries.
 .xPart:
     mov edi, part_string  
     call os_string_compare
     jc shellcallsPartitionTest
     ;jc particao_test
-
 
 ;--------------------------------------------------------
 
@@ -309,9 +314,9 @@ os_command_line:
 ;
 
 ; Obs:
-; Se a palavra digitada não for uma das palavras reservadas 
-; testadas acima, pode ser edição de arquivos.
-; Checando flags relativas à operações em arquivos.
+; Se a palavra digitada nï¿½o for uma das palavras reservadas 
+; testadas acima, pode ser ediï¿½ï¿½o de arquivos.
+; Checando flags relativas ï¿½ operaï¿½ï¿½es em arquivos.
 
     cmp byte [file_flag], 1 
     je .not_app
@@ -327,8 +332,8 @@ os_command_line:
     je .not_app
 
 ; Foi confirmado que se trata mesmo de um app.
-; Se não for nenhuma das palavras reservadas, nem edição de algum 
-; arquivo, então abre um app, '.app'. Para isso muda a flag para 7.
+; Se nï¿½o for nenhuma das palavras reservadas, nem ediï¿½ï¿½o de algum 
+; arquivo, entï¿½o abre um app, '.app'. Para isso muda a flag para 7.
 ; Que indica executar app.
 
 .is_app:
@@ -356,7 +361,7 @@ os_command_line:
 
 ; No suffix was present, so we add the default application suffix 
 ; of ".app"
-; #todo: Adicionar extensão.
+; #todo: Adicionar extensï¿½o.
 ; Calculando o tamanho.
 ; If the string is longer than 8 chars we can't add a suffix.
 
@@ -365,78 +370,78 @@ os_command_line:
     jg shellcallsFail    ;; shell\shellcalls.inc.
     ;jg fail             ;; shell\shellcalls.inc.
 
-; Opções de operações com arquivo e diretórios:
+; Opï¿½ï¿½es de operaï¿½ï¿½es com arquivo e diretï¿½rios:
 
-; Opção 1, Open file. 
+; Opï¿½ï¿½o 1, Open file. 
     cmp byte [file_flag], 1
     je full_name
-; Opção 2, Create file.
+; Opï¿½ï¿½o 2, Create file.
     cmp byte [file_flag], 2
     je full_name
-; Opção 3, Delete file.
+; Opï¿½ï¿½o 3, Delete file.
     cmp byte [file_flag], 3
     je full_name
-; Opção 4, Open dir.
+; Opï¿½ï¿½o 4, Open dir.
     cmp byte [file_flag], 4
     je add_ext_dir
-; Opção 5, Create dir.
+; Opï¿½ï¿½o 5, Create dir.
     cmp byte [file_flag], 5
     je add_ext_dir
-; Opção 6, Delete dir.
+; Opï¿½ï¿½o 6, Delete dir.
     cmp byte [file_flag], 6
     je add_ext_dir
-; Opção 7, Open app.
+; Opï¿½ï¿½o 7, Open app.
     cmp byte [file_flag], 7
     je add_ext_app
 ;?
     jmp full_name
 
-; Adicionando extenção ao nome do arquivo.
+; Adicionando extenï¿½ï¿½o ao nome do arquivo.
 
-; Adiciona extenção '.dir'.
+; Adiciona extenï¿½ï¿½o '.dir'.
 add_ext_dir:
     mov edi, cli_command_string
     mov esi, dirextension    ; .DIR.
     call os_string_append    ; Append the extension to the command string.
     jmp full_name
-; Adiciona extenção '.app'.
+; Adiciona extenï¿½ï¿½o '.app'.
 add_ext_app:
     mov edi, cli_command_string
     mov esi, appextension    ; .app.
     call os_string_append    ; Append the extension to the command string.
     jmp full_name
 
-; Ver a operação de arquivo escolhida.
+; Ver a operaï¿½ï¿½o de arquivo escolhida.
 
 full_name:
 ver_operacao_escolhida:
 
-; Opção 1, Open file. 
+; Opï¿½ï¿½o 1, Open file. 
     cmp byte [file_flag], 1
     je open_file_op
-; Opção 2, Create file.
+; Opï¿½ï¿½o 2, Create file.
     cmp byte [file_flag], 2
     je new_file_op
-; Opção 3, Delete file.
+; Opï¿½ï¿½o 3, Delete file.
     cmp byte [file_flag], 3
     je delete_file_op
-; Opção 4, Open dir.
+; Opï¿½ï¿½o 4, Open dir.
     cmp byte [file_flag], 4
     je open_dir_op
-; Opção 5, Create dir.
+; Opï¿½ï¿½o 5, Create dir.
     cmp byte [file_flag], 5
     je new_dir_op
-; Opção 6, Delete dir.
+; Opï¿½ï¿½o 6, Delete dir.
     cmp byte [file_flag], 6
     je default_op
-; Opção 7, Open app.
+; Opï¿½ï¿½o 7, Open app.
     cmp byte [file_flag], 7
     je open_app_op
 
-; A operação em arquivo foi negligenciada.
+; A operaï¿½ï¿½o em arquivo foi negligenciada.
     jmp default_op
 
-;Opção 0. Default
+;Opï¿½ï¿½o 0. Default
 default_op:
     mov esi, msg_file_op0
     call os_output
@@ -446,13 +451,13 @@ default_op:
     mov byte [file_flag], 0    ; Restaura o prompt.
     jmp os_command_line
 
-;Opção 1, Open file.
+;Opï¿½ï¿½o 1, Open file.
 open_file_op:
 	mov esi, msg_file_op1
 	call os_output
 
 	mov esi, appextension		   ;'.app'.
-	mov edi, cli_command_string    ;Inclui a extensão aqui.
+	mov edi, cli_command_string    ;Inclui a extensï¿½o aqui.
 	call os_string_append		   ;Append the extension to the command string.
 	
 	mov eax, cli_command_string
@@ -462,7 +467,7 @@ open_file_op:
 	jmp os_command_line
 	
 	
-;Opção 2, Create file.	
+;Opï¿½ï¿½o 2, Create file.	
 new_file_op:
 	mov esi, msg_file_op2
 	call os_output
@@ -473,14 +478,14 @@ new_file_op:
 	jmp os_command_line
 	
 	
-;Opção 3, Delete file.
+;Opï¿½ï¿½o 3, Delete file.
 delete_file_op:
 	mov esi, msg_file_op3
 	call os_output
 
 	jmp os_command_line
 
-;Opção 4, Open dir.
+;Opï¿½ï¿½o 4, Open dir.
 open_dir_op:
 	mov esi, msg_file_op4
 	call os_output
@@ -488,7 +493,7 @@ open_dir_op:
 	jmp os_command_line
 	
 	
-;Opção 5, Create dir.	
+;Opï¿½ï¿½o 5, Create dir.	
 new_dir_op:
 	mov esi, msg_file_op5
 	call os_output
@@ -499,14 +504,14 @@ new_dir_op:
 	jmp os_command_line
 	
 	
-;Opção 6, Delete dir.
+;Opï¿½ï¿½o 6, Delete dir.
 delete_dir_op:
 	mov esi, msg_file_op6
 	call os_output
 
 	jmp os_command_line
 
-;Opção 7, Open app.
+;Opï¿½ï¿½o 7, Open app.
 open_app_op:
 	mov esi, msg_file_op7
 	call os_output
@@ -529,7 +534,7 @@ init_shell:
 
 ;================================================
 ; shellInit:
-;     Interface para chamar o início do Shell do Boot Manager.
+;     Interface para chamar o inï¿½cio do Shell do Boot Manager.
 ;     Obs: O Essa rotina pode receber algum argumento.
 ; IN:   Nothing.
 ; OUT:  Nothing.
@@ -538,6 +543,8 @@ init_shell:
 ; in the 32bit protected mode environment.
 ;+
 shellInit: 
+; #todo:
+; Maybe we can create a loop here.
 
 ; Let's drain the keyboard output buffer.
 ; #todo: Use a loop for that.
@@ -551,11 +558,9 @@ shellInit:
 ;--
 
 ;================================================
-; shellPrintShellVersion:
-;     Print shell version.
+; Print shell version.
 ; Called by startShellLoop in start.inc
 ; See: shcalls.inc
-    
 shellPrintShellVersion:
     call print_ver
     ret
@@ -563,5 +568,3 @@ shellPrintShellVersion:
 ;
 ; End
 ;
-
-

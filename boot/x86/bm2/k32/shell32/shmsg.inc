@@ -1,19 +1,15 @@
-;
-; File: shell32/shmsg.inc 
-; Descrição:
-;     Mensagens e variáveis do Shell do Boot Manager.
-; History:
-;     2015 - Created by Fred Nora.
-;     2017 - Revision.
+; shell32/shmsg.inc 
+; + Strings for message
+; + Variables
+; 2015 - Created by Fred Nora.
 
 
-; Variáveis:
+; Variables
 ; ==========
 
 ; =============================================
 ; Struct.
-;     Estrtura de strings aleatórias para suporte ao shell 
-;     do boot manager. 
+; Structure for some random string used by the shell.
 
 SHELL:
 .prompt_string:
@@ -24,17 +20,16 @@ SHELL:
     db '>', 0
 .separador1:
     db '>', 0 
-;Em que volume está o Shell.
+;Em que volume estï¿½ o Shell.
 .volume:
     db 0
-;Em que diretório está o Shell.
+;Em que diretï¿½rio estï¿½ o Shell.
 .directory:
     db 0
 ; =============================================
 
-
 ; Prompt:   
-; Endereço da string no novo prompt.   
+; Endereï¿½o da string no novo prompt.   
 new_prompt: dd 0 
 
 ;Flag:

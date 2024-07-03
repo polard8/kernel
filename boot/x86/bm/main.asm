@@ -28,23 +28,22 @@
 ; 32KB is the limit for this program?
 ; We are almost there.
 
-
 ;       +----------+
-;       |          | 
+;       |    ...   | 
 ;       |----------| 
-;       | BL.BIN   | 
-;       |          | 
+;       |  BL.BIN  | 
+;       |  (32bit) | Boot loader in C.
 ;       |----------| 0x2000:0x0000
 ;       |          | 
 ;       |----------| 
 ;       |          | 
-;       |BM.BIN    | 
+;       |  BM.BIN  | 
 ;       |          | The entry point.
 ;  >>>  |----------| 0x0000:0x8000 :)
 ;       |          |
 ;       |----------| 0x0000:0x6000
-;       |INITIAL   | Initial stack address.
-;       |STACK     | It goes down.
+;       |  INITIAL | Initial stack address.
+;       |   STACK  | It goes down.
 ;       |----------| 
 ;       |          |
 ;       |----------| 
@@ -814,20 +813,20 @@ stage2_main:
 ;
 
 ; 16bit includes.
-    %include "rm/s2metafile.inc"
-    %include "rm/s2header.inc"
-    %include "rm/s2bpb.inc"
-    %include "rm/s2gdt.inc"
-    %include "rm/s2vesa.inc" 
-    %include "rm/s2config16.inc" 
-    %include "rm/s2a20.inc"
-    %include "rm/s2lib.inc"
-    %include "rm/s2fat12.inc"
-    %include "rm/s2fat16.inc"
-    %include "rm/s2menu16.inc"
-    %include "rm/s2modes.inc"
-    %include "rm/s2detect.inc"
-    %include "rm/lib16.inc"
+    %include "features/s2metafile.inc"
+    %include "features/s2header.inc"
+    %include "features/s2bpb.inc"
+    %include "features/s2gdt.inc"
+    %include "features/s2vesa.inc" 
+    %include "features/s2config16.inc" 
+    %include "features/s2a20.inc"
+    %include "features/s2lib.inc"
+    %include "features/s2fat12.inc"
+    %include "features/s2fat16.inc"
+    %include "features/s2menu16.inc"
+    %include "features/s2modes.inc"
+    %include "features/s2detect.inc"
+    %include "features/lib16.inc"
     ; ...
 
 ; ==============================================================
@@ -936,7 +935,7 @@ xxx_setupRegisters:
     sti
 
 ; Enable a20 line.
-; see: rm/s2a20.inc
+; see: features/s2a20.inc
 xxx_setupA20:
 
     pusha
@@ -1068,7 +1067,7 @@ stage2_msg_pe_sigFound:
 ; Switch to protected mode.
 ; Comuta para o modo protegido.
 
-    %include  "rm/pm.inc"
+    %include  "features/pm.inc"
 
 ;--------------------------------------------------------
 ; 32 bits - (Boot Manager 32bit Asm.)
@@ -1083,70 +1082,70 @@ bootmanager_main:
 ; 14 - Header principal. 
 ; Definições globais usadas em 32bit.
 ; Header principal em 32 bits.
-    %include "header32.inc"
+    %include "k32/header32.inc"
 ; 13 - Headers. 
-    %include "system.inc"     ; Arquivo de configura��o do sistema.
-    %include "init.inc"       ; Arquivo de configura��o da inicializa��o.
-    %include "sysvar32.inc"   ; Variáveis do sistema.
-    %include "x86/gdt32.inc"  ; Gdt
-    %include "x86/idt32.inc"  ; Idt
-    %include "x86/ldt32.inc"  ; Ldt
-    %include "x86/tss32.inc"  ; Tss.
-    %include "stacks32.inc"   ; Stacks
-    %include "x86/ints32.inc"      ; Handles para as interrupções.
-    %include "fs/fat16header.inc"  ; Headers para o sistema de arquivos fat16.
+    %include "k32/system.inc"     ; Arquivo de configura��o do sistema.
+    %include "k32/init.inc"       ; Arquivo de configura��o da inicializa��o.
+    %include "k32/sysvar32.inc"   ; Variáveis do sistema.
+    %include "k32/x8632/gdt32.inc"  ; Gdt
+    %include "k32/x8632/idt32.inc"  ; Idt
+    %include "k32/x8632/ldt32.inc"  ; Ldt
+    %include "k32/x8632/tss32.inc"  ; Tss.
+    %include "k32/stacks32.inc"   ; Stacks
+    %include "k32/x8632/ints32.inc"      ; Handles para as interrupções.
+    %include "k32/fs/fat16header.inc"  ; Headers para o sistema de arquivos fat16.
 ; 12 - Monitor.
-    %include "drivers/screen32.inc"  ; Rotinas de screen em 32 bits.
-    %include "drivers/input32.inc"   ; Rotinas de input 2m 32 bits.
-    %include "string32.inc"  ; Rotinas de strings em 32 bits.
-    %include "font32.inc"    ; Fonte.
+    %include "k32/drivers/screen32.inc"  ; Rotinas de screen em 32 bits.
+    %include "k32/drivers/input32.inc"   ; Rotinas de input 2m 32 bits.
+    %include "k32/string32.inc"  ; Rotinas de strings em 32 bits.
+    %include "k32/font32.inc"    ; Fonte.
 ; 11 - Hardware.
-    %include "x86/cpuinfo.inc"  ; Rotinas de detec��o e configura��o de cpu.
-    %include "hardware.inc"     ; Rotinas de detec��o e configura��o de hardware.
+    %include "k32/x8632/cpuinfo.inc"  ; Rotinas de detec��o e configura��o de cpu.
+    %include "k32/hardware.inc"     ; Rotinas de detec��o e configura��o de hardware.
     ; ...
 ; 10 - Irqs.
-    %include "drivers/timer.inc"     ; Irq 0, Timer.
-    %include "drivers/keyboard.inc"  ; Irq 1, Keyboard.
-    %include "drivers/fdc32.inc"     ; Irq 6, Fdc. (@todo: Suspender o suporte.)
-    %include "drivers/clock.inc"     ; Irq 8, Clock.
-    %include "drivers/hdd32.inc"     ; Irq 14/15, Hdd.
+    %include "k32/drivers/timer.inc"     ; Irq 0, Timer.
+    %include "k32/drivers/keyboard.inc"  ; Irq 1, Keyboard.
+    %include "k32/drivers/fdc32.inc"     ; Irq 6, Fdc. (@todo: Suspender o suporte.)
+    %include "k32/drivers/clock.inc"     ; Irq 8, Clock.
+    %include "k32/drivers/hdd32.inc"     ; Irq 14/15, Hdd.
     ; ...
 ; 9 - Tasks. (#no tasks)
 ; Rotinas de inicialização do sistema de tarefas.
-    %include "tasks32.inc"   
+    %include "k32/tasks32.inc"   
 ; 8 - lib32.
 ; Rotinas em 32 bits. 
 ; 7 - setup  
 ; Inicializa arquitetura.
-    %include "setup.inc"
+    %include "k32/setup.inc"
 ; 6 - Disk.
-    %include "fs/fat12pm.inc"   ;FAT12 em 32 bits.
-    %include "fs/fat16lib.inc"  ;FAT16 (rotinas).
-    %include "fs/fat16.inc"     ;FAT16 (fun��es principais).
-    %include "fs/ramfs.inc"     ;RamDisk fs.
-    %include "fs/format.inc"    ;Formata.
-    %include "fs/fs32.inc"      ;fs, (ger�ncia os sistemas de arquivos).
+    %include "k32/fs/fat12pm.inc"   ;FAT12 em 32 bits.
+    %include "k32/fs/fat16lib.inc"  ;FAT16 (rotinas).
+    %include "k32/fs/fat16.inc"     ;FAT16 (fun��es principais).
+    %include "k32/fs/ramfs.inc"     ;RamDisk fs.
+    %include "k32/fs/format.inc"    ;Formata.
+    %include "k32/fs/fs32.inc"      ;fs, (ger�ncia os sistemas de arquivos).
 ; 5 - File.
-    %include "installer.inc"   ;Instala metafiles em LBAs espec�ficas.
-    %include "fs/file.inc"     ;Operaçoes com aquivos.
-    %include "bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
+    %include "k32/installer.inc"   ;Instala metafiles em LBAs espec�ficas.
+    %include "k32/fs/file.inc"     ;Operaçoes com aquivos.
+    %include "k32/bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
 ; 4 - Debug.
 ; System debug.
-    %include "debug.inc"
+    %include "k32/debug.inc"
 ; 3 - blconfig.
 ; Gerencia a inicialização.
-    %include "blconfig.inc"
+    %include "k32/blconfig.inc"
 ; 2 - Boot Manager Mini-Shell.
 ; Prompt de comandos.
-    %include "shell32/shell.inc"
-    %include "shell32/shcalls.inc"  ;Chamadas dos comandos.
-    %include "shell32/shlib.inc"    ;Lib de funções do Shell.
-    %include "shell32/shmsg.inc"    ;Mensagens e variáveis do Shell.
+    %include "k32/shell32/shell.inc"
+    %include "k32/shell32/shcalls.inc"  ;Chamadas dos comandos.
+    %include "k32/shell32/shlib.inc"    ;Lib de funções do Shell.
+    %include "k32/shell32/shmsg.inc"    ;Mensagens e variáveis do Shell.
 ; 1 - Start.
-    %include "start.inc"
+    %include "k32/start.inc"
 ; 0 - lib32.
 ;Rotinas em 32 bits.
-    %include "lib32.inc" 
+    %include "k32/lib32.inc" 
 ; ========================================================
 
 ;

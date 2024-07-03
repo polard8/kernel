@@ -1,6 +1,5 @@
-
-; File: shell32/shlib.inc
-; Rotinas de apoio para o Shell do Boot Manager.
+; shell32/shlib.inc
+; This is a 32 library used by the shell.
 ; 2015 - Created.
 
 ; ========================
@@ -23,8 +22,8 @@ show_new_prompt:
 
 ;-----------------------------------------
 ; set_shell_volume:
-;     Configura o endereço do volume atual. ??
-;     Deve ser o endereço da string ?!
+;     Configura o endereï¿½o do volume atual. ??
+;     Deve ser o endereï¿½o da string ?!
 ; in = eax.
 ;++
 set_shell_volume:
@@ -36,7 +35,7 @@ set_shell_volume:
 
 ;-----------------------------------------	
 ; set_shell_volume:
-;     Configura o endereço do directory atual.
+;     Configura o endereï¿½o do directory atual.
 ; in = eax.
 ;++
 set_shell_directory:

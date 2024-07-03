@@ -1,7 +1,5 @@
-;
-; File: shell32/shcalls.inc
-; Descrição:
-;     Rotinas para atender algumas chamadas do Boot Manager.
+; shell32/shcalls.inc
+; It implements the services for some commands.
 ; 2015 - Created.
 
 ; =============================================
@@ -10,9 +8,9 @@ exit:
 
 ;===============================================================
 ; do_boot:
-; Iniciaremos o modo gráfico padrão.
+; Iniciaremos o modo grï¿½fico padrï¿½o.
 ; Chamaremos uma rotina que volta para o modo real, 
-; muda o modo de vídeo e inicializa a GUI.
+; muda o modo de vï¿½deo e inicializa a GUI.
 ; See: stage3/pm.inc 
 ; Default to 800x600.
 do_boot:
@@ -173,7 +171,7 @@ do_seleciona_d3:
 
 ;-------------------------------------
 ; do_seleciona_p0:
-;     Seleciona partição 0.
+;     Seleciona partiï¿½ï¿½o 0.
 ;++
 do_seleciona_p0:
     push eax
@@ -185,7 +183,7 @@ do_seleciona_p0:
 
 ;-------------------------------------
 ; do_seleciona_p1:
-;     Seleciona partição 1.
+;     Seleciona partiï¿½ï¿½o 1.
 ;++
 do_seleciona_p1:
     push eax
@@ -197,7 +195,7 @@ do_seleciona_p1:
 
 ;--------------------------------------
 ; do_seleciona_p2:
-;     Seleciona partição 2.
+;     Seleciona partiï¿½ï¿½o 2.
 ;++ 
 do_seleciona_p2:
     push eax
@@ -209,7 +207,7 @@ do_seleciona_p2:
 
 ;--------------------------------------
 ; do_seleciona_p3:
-;     Seleciona partição 3.
+;     Seleciona partiï¿½ï¿½o 3.
 ;++
 do_seleciona_p3:
     push eax
@@ -221,7 +219,7 @@ do_seleciona_p3:
 
 ;----------------------------------------
 ; do_ativar:
-;     Ativa a partição atual.
+;     Ativa a partiï¿½ï¿½o atual.
 ;++
 do_ativar:
     call fs32_ativar_particao_atual
@@ -230,7 +228,7 @@ do_ativar:
 
 ;----------------------------------------
 ; do_desativar:
-;     Desativa a partição atual.
+;     Desativa a partiï¿½ï¿½o atual.
 ;++
 do_desativar:
     call fs32_desativar_particao_atual
@@ -239,8 +237,8 @@ do_desativar:
 
 ;----------------------------------------
 ; hd_test:
-;     Exibir informações sobre um disco
-;     Testando operações de disco.
+;     Exibir informaï¿½ï¿½es sobre um disco
+;     Testando operaï¿½ï¿½es de disco.
 ;++
 hd_test:
     pushad
@@ -255,8 +253,8 @@ hd_test:
 
 ;----------------------------------------
 ; shellcallsPartitionTest:
-;     Exibir informações sobre uma partição.
-;     Testa qual particão está ativa.
+;     Exibir informaï¿½ï¿½es sobre uma partiï¿½ï¿½o.
+;     Testa qual particï¿½o estï¿½ ativa.
 ;++
 shellcallsPartitionTest:
     nop
