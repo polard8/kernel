@@ -48,6 +48,7 @@ int ShellFlag=FALSE;
 // global
 // Foreground console.
 int fg_console=0;
+
 // O redirecionador.
 // Redirecting console to this pointer.
 // see: tty_ioctl: TIOCCONS
@@ -3078,9 +3079,23 @@ console_ioctl (
         break;
 
 
-// REdirecionando o output do console para pty slave.
+// TIOCCONS - redirecting console output
+// Redirecionando o output do console para pty slave.
+// Return value:
+// On success, 0 is returned.  
+// On error, -1 is returned, and errno is set to indicate the error.
+// Errors:
+// EBUSY  Output was redirected already.
+// EPERM  Insufficient permission.
+// see: 
+// redirect
+// https://man7.org/linux/man-pages/man2/TIOCCONS.2const.html
+
     case TIOCCONS:
-        printk ("console_ioctl: TIOCCONS\n");
+        // #todo
+        printk ("console_ioctl: TIOCCONS #todo\n");
+        errno = 0;
+        return 0; // ok
         break;
 
     // ...
@@ -3091,7 +3106,8 @@ console_ioctl (
         break;
     };
 
-    return -1;
+fail:
+    return (int) -1;
 }
 
 /*
