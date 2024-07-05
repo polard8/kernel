@@ -1,19 +1,15 @@
-
 // socket.h
 // Header for socket implementation.
+// Created by Fred Nora.
 
 #ifndef __NET_SOCKET_H
 #define __NET_SOCKET_H    1
 
-
-/* 
- * Read using getsockopt() with SOL_SOCKET, SO_PEERCRED 
- */
-
+// Read using getsockopt() with SOL_SOCKET, SO_PEERCRED 
 struct sockpeercred 
 {
-    uid_t uid;  /* effective user id */
-    gid_t gid;  /* effective group id */
+    uid_t uid;  // effective user id 
+    gid_t gid;  // effective group id 
     pid_t pid;
 };
 
@@ -38,11 +34,9 @@ struct	accept_filter_arg {
 };
 */
 
-
 // Level number for (get/set)sockopt() to apply to socket itself.
 // Options for socket level
 //#define SOL_SOCKET    0xffff
-
 
 struct sockaddr 
 {
@@ -58,7 +52,6 @@ struct sockaddr_gram
 };
 
 
-
 /*
  * Structure used by kernel to pass protocol
  * information in raw sockets.
@@ -69,7 +62,6 @@ struct sockproto
     unsigned short sp_family;    // address family 
     unsigned short sp_protocol;  // protocol 
 };
-
 
 
 //bsd
@@ -91,7 +83,6 @@ struct sockaddr_big {
     };
 };
 */
-
 
 /*
 //#bugbug
@@ -119,7 +110,6 @@ typedef struct hostent_d  hostent;
 */
 
 //=========
-
 
 /*
 #ifndef pid_t
@@ -159,18 +149,13 @@ struct sockcred
 };
 */
 
-/*
- * socket_d:
- *     Socket structure.
- */
+// The socket structure.
 struct socket_d
 {
-    object_type_t  objectType;
+    object_type_t objectType;
     object_class_t objectClass;
-
     int used;
     int magic;
-
     int id;
 
     int family;
@@ -267,7 +252,6 @@ extern struct socket_d  *LocalHostHTTPSocket;
 // #todo:
 // Refazer esse limite proviório.
 #define SOCKET_COUNT_MAX  32
-
 extern unsigned long socketList[SOCKET_COUNT_MAX];
 
 //
@@ -356,7 +340,6 @@ sys_bind (
     const struct sockaddr *addr,
     socklen_t addrlen );
 
-    
 int 
 sys_connect ( 
     int sockfd, 

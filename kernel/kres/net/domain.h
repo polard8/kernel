@@ -1,4 +1,3 @@
-
 // domain.h
 // Network domain support.
 // 2023 - Created by Fred Nora.

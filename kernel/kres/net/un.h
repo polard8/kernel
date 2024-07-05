@@ -1,8 +1,5 @@
-/*
- * File: un.h 
- *     ring0. socket address for unix style.
- */
 // un.h
+// Socket address for unix style.
 // socket support for the base kernel.
 // ring0
 // 2020 - Created by Fred Nora.
@@ -14,7 +11,8 @@
 // #bugbug
 // It needs to be 16bit.
 // normally define in ansi.h
-typedef __uint8_t  __sa_family_t;  /* socket address family */
+/* socket address family */
+typedef __uint8_t  __sa_family_t;
 
 //#test
 // #bugbug: 
@@ -35,7 +33,4 @@ struct sockaddr_un
     char sun_path[UNIX_PATH_MAX];
 };
 
-
-
 #endif   
-

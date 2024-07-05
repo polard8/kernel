@@ -1,5 +1,6 @@
-
 // socklib.h
+// Library for socket support.
+// Created by Fred Nora.
 
 #ifndef __NET_SOCKLIB_H
 #define __NET_SOCKLIB_H    1
@@ -263,7 +264,6 @@ struct msghdr {
 };
 */
 
-
 /*
 struct mmsghdr {
 	struct msghdr msg_hdr;
@@ -358,9 +358,5 @@ struct mmsghdr {
 
 //-----------
 
-
-
-
 #endif   
-
 

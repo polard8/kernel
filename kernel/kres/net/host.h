@@ -1,13 +1,9 @@
-/*
- * File: host.h
- *     Host manager support.
- * 2016 - Created by Fred Nora.
- */
-
+// host.h
+// Host manager support.
+// 2016 - Created by Fred Nora.
 
 #ifndef ____HOST_H
 #define ____HOST_H    1
-
 
 /*
    exemplo
@@ -103,13 +99,13 @@ struct host_info_d
     int used;
     int magic;
 
-// Número identificador desse host dentro da rede interna.
+// Nï¿½mero identificador desse host dentro da rede interna.
     int hostIdentifier;
 
     char __hostname[HOST_NAME_MAX];
     size_t hostName_len;
 
-    char *hostVersion;   // string mostrando a versão. ex: (1.1.1234)
+    char *hostVersion;   // string mostrando a versï¿½o. ex: (1.1.1234)
     unsigned short hostVersionMajor;
     unsigned short hostVersionMinor; 
     unsigned short hostVersionRevision;

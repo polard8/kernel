@@ -58,10 +58,8 @@ struct network_info_d
 {
     int used;
     int magic;
-
 // Número identificador da rede.
     int id;
-
     int initialized;
 
 // Strings
@@ -115,7 +113,6 @@ extern int ____network_late_flag;
 #define ONLINE   NETWORK_ONLINE
 #define OFFLINE  NETWORK_OFFLINE
 
-
 struct network_initialization_d
 {
 
@@ -129,7 +126,6 @@ struct network_initialization_d
 // Are we online?
 // Do we already have an valid IP?
     int is_online;
-
 
 // ...
 
@@ -159,7 +155,6 @@ network_fill_ipv6(
     unsigned char *to,
     unsigned char *from );
 
-
 unsigned short 
 net_checksum(
     const unsigned char *phdr, 
@@ -175,7 +170,6 @@ network_send_raw_packet (
     size_t frame_len, 
     const char *frame_address );
 
-
 //
 // Handling packets
 //
@@ -189,7 +183,6 @@ int
 network_on_sending ( 
     const unsigned char *frame, 
     ssize_t frame_size );
-
 
 // Push and Pop data.
 int network_push_packet( void *src_buffer, int len );
