@@ -1,5 +1,6 @@
-
 // tcp.h 
+// TCP protocol support.
+// Created by Fred Nora.
 
 #ifndef __NET_TCP_H
 #define __NET_TCP_H    1
@@ -148,12 +149,10 @@ struct tcp_d
 
 // =====================================
 
-
 void 
 network_handle_tcp( 
     const unsigned char *buffer, 
     ssize_t size );
 
 #endif    
-
 

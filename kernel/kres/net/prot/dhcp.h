@@ -1,5 +1,7 @@
-
 // dhcp.h
+// DHCP protocol support.
+// Created by Fred Nora.
+
 // see:
 // https://pt.m.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol
 

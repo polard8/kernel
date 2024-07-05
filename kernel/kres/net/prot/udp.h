@@ -1,6 +1,7 @@
-
 // udp.h
+// UDP protocol support.
 // User Datagram Protocol
+// Created by Fred Nora.
 
 #ifndef __NET_UDP_H
 #define __NET_UDP_H    1
@@ -34,7 +35,6 @@ network_handle_udp(
     const unsigned char *buffer, 
     ssize_t size );
 
-
 int
 network_send_udp ( 
     uint8_t source_ip[4], 
@@ -56,5 +56,3 @@ void network_test_udp(void);
 void network_test_udp2(void);
 
 #endif   
-
-
