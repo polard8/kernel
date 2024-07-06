@@ -4,8 +4,8 @@
 // ring0
 // 2020 - Created by Fred Nora.
 
-#ifndef ____UN_H
-#define ____UN_H    1
+#ifndef __NET_UN_H
+#define __NET_UN_H    1
 
 //#test
 // #bugbug

@@ -2,8 +2,8 @@
 // Network ports support.
 // Created by Fred Nora.
 
-#ifndef ____NPORTS_H
-#define ____NPORTS_H    1
+#ifndef __NET_NPORTS_H
+#define __NET_NPORTS_H    1
 
 // Application services can subscribe to one or more port(s) 
 // to be notified if a UDP message is sent to that port  

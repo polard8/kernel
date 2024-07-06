@@ -2,8 +2,8 @@
 // TCP protocol support.
 // Created by Fred Nora.
 
-#ifndef __NET_TCP_H
-#define __NET_TCP_H    1
+#ifndef __PROT_TCP_H
+#define __PROT_TCP_H    1
 
 // Control flags:
 /*

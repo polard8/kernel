@@ -2,8 +2,8 @@
 // Host manager support.
 // 2016 - Created by Fred Nora.
 
-#ifndef ____HOST_H
-#define ____HOST_H    1
+#ifndef __NET_HOST_H
+#define __NET_HOST_H    1
 
 /*
    exemplo

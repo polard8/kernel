@@ -2,8 +2,8 @@
 // MAC address information.
 // Created by Fred Nora.
 
-#ifndef ____HAL_MAC_H
-#define ____HAL_MAC_H    1
+#ifndef __NET_MAC_H
+#define __NET_MAC_H    1
 
 
 struct mac_address_d

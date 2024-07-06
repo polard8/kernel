@@ -14,7 +14,7 @@
 
 
 // IP:Port for the server.
-const char *ServerIPString = "192.168.1.4";
+const char *ServerIPString = "192.168.1.6";
 #define PORT  11888
 
 #define MAXLINE  1024 

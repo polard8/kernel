@@ -20,7 +20,7 @@
 // #test
 // #debug
 // Sometimes it crashes the system.
-#define USE_E1000          0
+#define USE_E1000          0 
 // ...
 
 // ------------------------------------------------------

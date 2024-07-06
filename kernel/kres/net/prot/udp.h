@@ -3,8 +3,8 @@
 // User Datagram Protocol
 // Created by Fred Nora.
 
-#ifndef __NET_UDP_H
-#define __NET_UDP_H    1
+#ifndef __PROT_UDP_H
+#define __PROT_UDP_H    1
 
 #define UDP_HEADER_LENGHT  8
 

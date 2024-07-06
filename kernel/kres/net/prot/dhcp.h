@@ -12,8 +12,8 @@ request (pedido)
 acknowledge (confirmação)
 */
 
-#ifndef __DHCP_H
-#define __DHCP_H    1
+#ifndef __PROT_DHCP_H
+#define __PROT_DHCP_H    1
 
 
 // Save information about the dhcp initialization.

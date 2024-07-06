@@ -1,5 +1,6 @@
-
 ; hw2.asm
+; This file handles the traps for the x86_64 processors.
+; Only hw interrupts.
 
 ;
 ; Imports
