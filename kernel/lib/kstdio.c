@@ -1,5 +1,5 @@
-
 // kstdio.c
+// unix-like i/o support.
 // Created by Fred Nora.
 
 #include <kernel.h>
@@ -72,7 +72,9 @@ static void __initialize_inode_table(void);
 static void __initialize_stdin(void);
 static void __initialize_stdout(void);
 static void __initialize_stderr(void);
+
 static void __initialize_virtual_consoles(void);
+
 static char *_vsputs_r(char *dest, char *src);
 // ---------------------------
 
@@ -1976,13 +1978,16 @@ static void __initialize_inode_table(void)
     };
 }
 
+// Initialize virtual consoles.
+// We already made a early initialization.
+// We will reinitialize only if the console was
+// not initialized before. In the case of failure 
+// of the early initialization routine.
 static void __initialize_virtual_consoles(void)
 {
-// Reinitializing the consoles for the second time.
-// The first time was VirtualConsole_initialize() in console.c
-// See: tty.h, console.h, console.c
-
     register int i=0;
+
+    PROGRESS("__initialize_virtual_consoles: (second time)\n");
 
 // stdout:
 // At this moment we need a valid stdout structure.
@@ -2016,13 +2021,23 @@ static void __initialize_virtual_consoles(void)
 // Initialize
 // 
 
+// #bugbug
+// We have the same loop in console.c
+
+    // #debug
+    //PROGRESS("kstdio.c:\n");;
+
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
+        if (CONSOLE_TTYS[i].initialized == TRUE){
+            debug_print("__initialize_virtual_consoles: Console already initialized\n");
+        }
+
         // Make the standard initialization.
-        if ( CONSOLE_TTYS[i].initialized == FALSE)
+        if (CONSOLE_TTYS[i].initialized == FALSE)
         {
             // IN: console index, bg color, fg color
-            console_init_virtual_console(
+            DDINIT_console(
                 i,
                 bg_colors[i],
                 fg_colors[i] );
@@ -2148,8 +2163,11 @@ int kstdio_initialize(void)
     __initialize_stdout();
     __initialize_stderr();
 
-// Virtual consoles. (Second time).
+// Virtual consoles.
     __initialize_virtual_consoles();
+
+    //PROGRESS("BREAKPOINT\n");
+    //while(1){}
 
 // Background (Second time).
     displayInitializeBackground(

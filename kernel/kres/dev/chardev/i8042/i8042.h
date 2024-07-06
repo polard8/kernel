@@ -236,6 +236,13 @@ void prepare_for_output (void);
 unsigned char wait_then_read (int port);
 void wait_then_write ( int port, int data );
 
+
+
+void ps2kbd_initialize_device (void);
+void ps2mouse_initialize_device (void);
+
+int ps2_ioctl ( int fd, unsigned long request, unsigned long arg );
+
 // ================
 // Early initialization
 // Only the keyboard.
@@ -246,16 +253,7 @@ int PS2_early_initialization(void);
 // This is the full initialization.
 // #bugbug This is a test yet.
 // It fails in the real machine.
-int PS2_initialization(void);
-
-void ps2(void);
-int PS2_initialize(void);
-
-void ps2kbd_initialize_device (void);
-void ps2mouse_initialize_device (void);
-
-int ps2_ioctl ( int fd, unsigned long request, unsigned long arg );
-
+int DDINIT_ps2(void);
 
 #endif    
 

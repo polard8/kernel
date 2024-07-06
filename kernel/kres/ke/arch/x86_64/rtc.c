@@ -187,6 +187,11 @@ unsigned short rtcGetExtendedMemory(void)
 // Issa alocação deveria ser feita apenas uma vez
 // na inicialização, depois somente atualizados os valores.
 
+// #todo: 
+// Criar uma estrutura para RTC.
+// Alocar memoria para a estrutura rtc.
+// Inicializar algumas variaveis da estrutura rtc.
+
 int __rtc_init_datastructure(void)
 {
 
@@ -239,7 +244,7 @@ fail:
 }
 
 /*
- * init_rtc: 
+ * DDINIT_rtc: 
  *     Inicia a data e a hora do controlador.
  * #todo: 
  *     Essa função não deveria mostrar informações na tela.
@@ -250,16 +255,11 @@ fail:
 // CMOS
 // CLOCK - Pega informações de Hora e Data.
 
-int init_rtc(void)
+int DDINIT_rtc(void)
 {
-    debug_print("init_rtc:\n");
+    PROGRESS("DDINIT_rtc:\n");
 
     __breaker_rtc_initialized = FALSE;
-
-// #todo: 
-// Criar uma estrutura para RTC.
-// Alocar memoria para a estrutura rtc.
-// Inicializar algumas variaveis da estrutura rtc.
 
     __rtc_init_datastructure();
 
@@ -269,9 +269,10 @@ int init_rtc(void)
     //printk("CLOCK INFORMATION:\n");
     //printk("Time=%d Date=%d\n", Time, Date);
 
+// Flags
     __breaker_rtc_initialized = TRUE;
-
     g_driver_rtc_initialized = TRUE;
+
     return 0;
 }
 

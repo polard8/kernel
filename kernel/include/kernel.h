@@ -1,7 +1,6 @@
-
 // kernel.h
-// Created by Fred Nora.
 // Gramado OS headers.
+// Created by Fred Nora.
 
 #define CURRENT_ARCH_X86      1000
 #define CURRENT_ARCH_X86_64   1001
@@ -158,8 +157,8 @@
 
 #include "../kres/ke/breaker.h"
 // hal timers.
-#include "../kres/ke/pit.h"
-#include "../kres/ke/rtc.h"
+#include "../kres/ke/arch/x86_64/pit.h"
+#include "../kres/ke/arch/x86_64/rtc.h"
 // ==================================
 // ke/
 // hal global

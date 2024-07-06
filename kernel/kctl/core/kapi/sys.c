@@ -351,15 +351,14 @@ fail:
 
 int sys_initialize_component (int n)
 {
-    if(n<0)
+    if (n<0)
         return -1;
 
     switch (n)
     {
-        // ps2 full initialization.
+        // Full PS2 initialization
+        // #suspended
         case 1:
-            //Not working when called from ring3.
-            //PS2_initialize();
             return 0;
             break;
 

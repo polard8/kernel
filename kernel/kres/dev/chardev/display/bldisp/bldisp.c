@@ -1,7 +1,7 @@
-
 // bldisp.c
-// bl display device device driver.
+// Bootloader display device device driver.
 // Created by Fred Nora.
+
 // Rotinas paga gerenciar os controladores de video.
 // Crt, Vga ...
 // See:
@@ -656,10 +656,14 @@ int screenInit(void)
 
 //==============================
 
-// Called by init.c
-int bldisp_initialize(void)
+// DDINIT_bldisp:
+// Device driver initialization
+// Initialize the device driver for the bootloader display device.
+int DDINIT_bldisp(void)
 {
-// Initialize bl display device.
+// Called by keInitialize() in ke.c.
+
+    PROGRESS("DDINIT_bldisp:\n");
 
 // Memory allocation for Display device structure.
     bl_display_device = 
@@ -671,7 +675,7 @@ int bldisp_initialize(void)
 
 // xBootBlock was initialized by init.c
     if (xBootBlock.initialized != TRUE){
-        x_panic ("bldisp_initialize: xBootBlock");
+        x_panic ("DDINIT_bldisp: xBootBlock");
     }
 
 // Structure initialization.
@@ -680,7 +684,6 @@ int bldisp_initialize(void)
 // framebuffer address.
     bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
     bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
-
 
 // w, h, bpp.
     bl_display_device->framebuffer_width  = 
@@ -720,9 +723,6 @@ int bldisp_initialize(void)
     bl_display_device->magic = 1234;
 // Structure initialization.
     bl_display_device->initialized = TRUE;
-
-    //PROGRESS("bldisp_initialize: Setup display device\n");
-    //printk  ("bldisp_initialize: Setup display device\n");
 
     return 0;
 }

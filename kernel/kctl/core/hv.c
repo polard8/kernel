@@ -1,4 +1,3 @@
-
 // hv.c
 // Hypervisor support.
 // see: virt/hv.h
@@ -180,8 +179,14 @@ void hv_ps2_full_initialization(void)
     // ...
 
 // Do
+    int status = -1;
     if (fInitialize == TRUE)
-        PS2_initialization();
+    {
+        status = (int) DDINIT_ps2();
+        if (status<0)
+            panic("hv_ps2_full_initialization: DDINIT_ps2");
+    }
+        
 }
 
 // #todo: Used during the initialization.

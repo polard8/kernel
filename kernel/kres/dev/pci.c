@@ -796,7 +796,7 @@ pciHandleDevice (
             {
                 // This thing is working fine on virtualbox with piix3.
                 Status = 
-                    (int) e1000_initialization ( 
+                    (int) DDINIT_e1000 ( 
                         (unsigned char) D->bus, 
                         (unsigned char) D->dev, 
                         (unsigned char) D->func, 

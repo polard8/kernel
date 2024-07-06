@@ -1,4 +1,3 @@
-
 // kmain.c
 // This is the first C file, called after the assembly routines.
 // Created by Fred Nora.
@@ -245,8 +244,11 @@ static void preinit_Serial(void)
 // We still don't have any print support yet.
 // But at the end of this routine we can use the serial debug.
 
+// Driver initialization
+// see: serial.c
+
     int Status=FALSE;
-    Status = serial_init();
+    Status = DDINIT_serial();
     if (Status!=TRUE){
         //#bugbug
         //Oh boy!, We can't use the serial debug.
@@ -297,9 +299,11 @@ static void kernel_final_messages(void)
 
 void init_globals(void)
 {
+// Called by I_initKernelComponents() in x64init.c
 // Architecture independent?
 // Not everything here.
 // Order: cpu, ram, devices, etc.
+// #todo: maybe we can move this routine to x64init.c
 
     int Status=FALSE;
 
@@ -355,6 +359,7 @@ void init_globals(void)
 
 // Inicializa as estruturas do fluxo padrão.
 // Isso vai usar a file table.
+// It also makes the early initialization of the consoles.
     Status = (int) kstdio_initialize();
     if (Status != TRUE){
         panic("init_globals: kstdio_initialize fail\n");

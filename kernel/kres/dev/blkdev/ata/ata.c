@@ -1813,7 +1813,8 @@ done:
 //----------------------------------------------
 //--
 
-// init_ata:
+// DDINIT_ata:
+// Device driver initialization.
 // Rotina de diálogo com o driver ATA. 
 // Called by init_executive() in system.c
 // #importante
@@ -1827,7 +1828,7 @@ done:
 
 // IN: ???
 int 
-init_ata ( 
+DDINIT_ata ( 
     int msg, 
     unsigned long long1 )
 {
@@ -1836,7 +1837,7 @@ init_ata (
 
     int Status = 1;  // Error.
 
-    PROGRESS("init_ata:\n");
+    PROGRESS("DDINIT_ata:\n");
 
     switch (msg)
     {
@@ -1852,7 +1853,7 @@ init_ata (
             Status = (int) __ata_initialize((int) long1);
             // We can't live without this at the moment.
             if (Status<0){
-                panic("init_ata: ata_initialize failed\n");
+                panic("DDINIT_ata: ata_initialize failed\n");
             }
             return (int) Status;
             break;
@@ -1863,7 +1864,7 @@ init_ata (
         //    break;
 
         default:
-            panic("init_ata: Unsupported service.\n");
+            panic("DDINIT_ata: Unsupported service.\n");
             break;
     };
 

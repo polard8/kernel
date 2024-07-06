@@ -875,8 +875,10 @@ int keInitialize(int phase)
         // Import data from linker.
         __import_data_from_linker();
 
+        // Device driver for bootloader display device.
         // Initialize the structure for the bootloader display device.
-        bldisp_initialize();
+        // see: bldisp.c
+        DDINIT_bldisp();
 
         goto InitializeEnd;
 

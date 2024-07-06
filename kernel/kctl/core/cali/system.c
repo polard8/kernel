@@ -1,5 +1,5 @@
-
 // system.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -617,10 +617,18 @@ int zeroInitializeSystemComponents(void)
 
     debug_print ("zeroInitializeSystemComponents:\n");
 
+// Initializat PCI interface.
     init_pci();
-    init_rtc();
-    // IN: msg, data1.
-    init_ata( 1, FORCEPIO );
+
+// Initializat RTC device driver.
+    DDINIT_rtc();
+
+// Initializat ata device driver.
+// see: ata.c
+// IN: msg, data1.
+    DDINIT_ata( 1, FORCEPIO );
+
+    // #debug
     //while(1){}
 
     return TRUE;

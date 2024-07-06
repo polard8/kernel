@@ -238,7 +238,7 @@ e1000_send(
 
 // Driver initialization
 int 
-e1000_initialization ( 
+DDINIT_e1000 ( 
     unsigned char bus, 
     unsigned char dev, 
     unsigned char fun, 

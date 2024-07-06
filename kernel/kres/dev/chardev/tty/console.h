@@ -100,8 +100,6 @@ struct virtual_console_login_d
 // == prototypes =================
 //
 
-int VirtualConsole_initialize(void);
-
 void 
 console_banner(
     const char *product_string, 
@@ -113,12 +111,6 @@ console_interrupt(
     int target_thread, 
     int device_type, 
     int data );
-
-void 
-console_init_virtual_console(
-    int n, 
-    unsigned int bg_color, 
-    unsigned int fg_color );
 
 void console_set_current_virtual_console(int console_number);
 int console_get_current_virtual_console(void);
@@ -214,6 +206,15 @@ clear_console (
 int console_clear(void);
 
 
+int VirtualConsole_early_initialization(void);
+
+// Device driver initialization.
+// Virtual console
+void 
+DDINIT_console(
+    int n, 
+    unsigned int bg_color, 
+    unsigned int fg_color );
 
 #endif    
 

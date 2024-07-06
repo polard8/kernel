@@ -1,7 +1,7 @@
 
 // gramk/user/input.c - Input.
 // mouse/kdb/timer
-// Created by Fred Nora.
+// Created by Fred Nora. 
 
 // This is an in-kernel input event handler.
 // PS2 keyboard, PS2 mouse and pit timer events goes here.
@@ -427,9 +427,10 @@ static int __CompareStrings(void)
     if ( kstrncmp( prompt, "ps2-qemu", 8 ) == 0 )
     {
         if (HVInfo.initialized == TRUE){
-            if (HVInfo.type == HV_TYPE_TCG){
+            if (HVInfo.type == HV_TYPE_TCG)
+            {
                 printk("#test: PS2 full initialization on qemu\n");
-                PS2_initialization();
+                hv_ps2_full_initialization();
             }
         }
         goto exit_cmp;

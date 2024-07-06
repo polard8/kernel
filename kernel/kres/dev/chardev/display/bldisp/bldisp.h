@@ -1,6 +1,6 @@
-
 // bldisp.h
-// bl display device
+// Bootloader display device.
+// Created by Fred Nora.
 
 #ifndef __BLDISP_BLDISP_H
 #define __BLDISP_BLDISP_H    1
@@ -138,7 +138,9 @@ void videoSetMode (unsigned long mode);
 void videoSetupCGAStartAddress (unsigned long address);
 
 int Video_initialize(void);
-int bldisp_initialize(void);
+
+// Device driver initialization
+int DDINIT_bldisp(void);
 
 #endif    
 

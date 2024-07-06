@@ -78,7 +78,8 @@ unsigned long get_time(void);
 unsigned short rtcGetBaseMemory(void);
 unsigned short rtcGetExtendedMemory(void);
 
-int init_rtc(void);
+// Device driver initialization.
+int DDINIT_rtc(void);
 
 #endif    
 

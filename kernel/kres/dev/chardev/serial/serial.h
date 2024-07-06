@@ -1,4 +1,6 @@
 // serial.h
+// Serial port
+// Created by Fred Nora.
 
 #ifndef ____SERIAL_H
 #define ____SERIAL_H    1
@@ -60,8 +62,6 @@ void serial2_handler (void);
 void serial3_handler (void);
 void serial4_handler (void);
 
-int serial_init(void);
-
 char serial_read_char (unsigned int port);
 void serial_write_char (unsigned int port, char data);
 
@@ -73,6 +73,9 @@ unsigned int serial_in(unsigned int base, int offset);
 void serial_out(unsigned int base, int offset, int value);
 
 int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
+
+// Driver initialization
+int DDINIT_serial(void);
 
 #endif    
 

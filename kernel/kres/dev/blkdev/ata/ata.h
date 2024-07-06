@@ -581,11 +581,6 @@ ide_dma_data (
     uint8_t flg,
     uint8_t nport );
 
-int 
-init_ata ( 
-    int msg, 
-    unsigned long long1 );
-
 uint32_t diskPCIScanDevice(int class);
 
 int atapciSetupMassStorageController(struct pci_device_d *D);
@@ -598,6 +593,13 @@ void ata_show_ide_info(void);
 void ata_show_device_list_info(void);
 void ata_show_ata_controller_info(void);
 void ata_show_ata_info_for_boot_disk(void);
+
+
+// Driver initialization
+int 
+DDINIT_ata ( 
+    int msg, 
+    unsigned long long1 );
 
 #endif    
 

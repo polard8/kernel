@@ -747,7 +747,7 @@ __mapping_nic1_device_address(
 }
 
 // ---------------------------------------------
-// e1000_initialization:
+// DDINIT_e1000:
 // Called by ...
 // Initialize the driver.
 // == NIC Intel. ===================
@@ -765,7 +765,7 @@ __mapping_nic1_device_address(
 // init habilita as interrupções.
 
 int 
-e1000_initialization ( 
+DDINIT_e1000 ( 
     unsigned char bus, 
     unsigned char dev, 
     unsigned char fun, 
@@ -786,8 +786,8 @@ e1000_initialization (
     uint32_t Val=0;
 
     // #debug
-    PROGRESS ("e1000_initialization:\n");
-    printk   ("e1000_initialization:\n");
+    PROGRESS ("DDINIT_e1000:\n");
+    printk   ("DDINIT_e1000:\n");
     //printk("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
     //printk("82540EM Gigabit Ethernet Controller found\n");
 
@@ -808,8 +808,8 @@ e1000_initialization (
 
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
-        debug_print("e1000_initialization: Expected 82540EM\n");
-        panic      ("e1000_initialization: Expected 82540EM\n");
+        debug_print("DDINIT_e1000: Expected 82540EM\n");
+        panic      ("DDINIT_e1000: Expected 82540EM\n");
     }
     // #debug
     printk("Vendor=%x | Device=%x \n", Vendor, Device );
@@ -819,7 +819,7 @@ e1000_initialization (
 // passado via argumento. 
 
     if ((void *) pci_device ==  NULL){
-        panic("e1000_initialization: pci_device\n");
+        panic("DDINIT_e1000: pci_device\n");
     }
 
     pci_device->used = TRUE;
@@ -887,7 +887,7 @@ e1000_initialization (
 
     phy_address = (unsigned long) (pci_device->BAR0 & 0xFFFFFFF0);
     if (phy_address == 0){
-        panic("e1000_initialization: Invalid phy_address\n");
+        panic("DDINIT_e1000: Invalid phy_address\n");
     }
 
     // ...
@@ -911,7 +911,7 @@ e1000_initialization (
                 (unsigned long) virt_address );  // va
 
     if (map_status != 0){
-        panic("e1000_initialization: on __mapping_nic1_device_address()\n");
+        panic("DDINIT_e1000: on __mapping_nic1_device_address()\n");
     }
 
 // Endereço base.
@@ -934,7 +934,7 @@ e1000_initialization (
 
     currentNIC = (void *) kmalloc( sizeof(struct intel_nic_info_d) );
     if ((void *) currentNIC ==  NULL){
-        panic("e1000_initialization: currentNIC\n");
+        panic("DDINIT_e1000: currentNIC\n");
     }
     currentNIC->used = TRUE;
     currentNIC->magic = 1234;

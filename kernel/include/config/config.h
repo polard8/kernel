@@ -16,11 +16,11 @@
 
 // ------------------------------------------------------
 // Device flags:
-#define USE_SERIALDEBUG    1
+#define USE_SERIALDEBUG    0
 // #test
 // #debug
 // Sometimes it crashes the system.
-#define USE_E1000          1 
+#define USE_E1000          0
 // ...
 
 // ------------------------------------------------------

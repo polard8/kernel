@@ -1,4 +1,3 @@
-
 // zero.c
 // Wrappers for kernel initialization routines.
 // Created by Fred Nora.
@@ -15,7 +14,12 @@
 // crt/kstdio.c
 void zero_initialize_virtual_consoles(void)
 {
-    VirtualConsole_initialize();
+    int status = -1;
+// The early initialization of the virtual consoles,
+// it will happen again in kstdio.c if it fails here.
+    status = (int) VirtualConsole_early_initialization();
+    if (status < 0)
+        x_panic("zero_initialize_virtual_consoles");
 }
 
 // See: 

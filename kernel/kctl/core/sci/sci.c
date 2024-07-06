@@ -2372,8 +2372,7 @@ void *sci2 (
 
 // 22011 - PS2 full initialization
 // see: hv.c
-    if (number == 22011)
-    {
+    if (number == 22011){
         hv_ps2_full_initialization();
         return NULL;
     }

@@ -457,287 +457,6 @@ fail:
     return;
 }
 
-// Initializar virtual console.
-// Inicializa a estrutura de console virtual
-// configura uma entrada no diretorio dev/
-void 
-console_init_virtual_console(
-    int n, 
-    unsigned int bg_color, 
-    unsigned int fg_color )
-{
-// Initialize a given console.
-// #todo: We can pass more parameters.
-
-    register int ConsoleIndex = -1;
-    register int i=0;
-
-    debug_print ("console_init_virtual_console:\n");
-
-/*
-// Char width and height
-    int cWidth  = get_char_width();
-    int cHeight = get_char_height();
-    if ( cWidth == 0 || cHeight == 0 ){
-        x_panic ("console_init_virtual_console: cWidth cHeight");
-    }
-*/
-
-// #todo #bugbug
-// determinado: 8 = char size.
-// #todo: Use cWidth and cHeight.
-    unsigned long screen_width_in_chars = (unsigned long) (gSavedX/8);
-    unsigned long screen_height_in_chars = (unsigned long) (gSavedY/8);
-
-// Limits
-    ConsoleIndex = (int) n;
-    if (ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX){
-        debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
-        x_panic     ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
-    }
-
-//
-// Data
-//
-
-    CONSOLE_TTYS[ConsoleIndex].initialized = FALSE;
-
-    // Todo virtual console eh uma tty. Os 4.
-    CONSOLE_TTYS[ConsoleIndex].objectType = ObjectTypeTTY;
-    CONSOLE_TTYS[ConsoleIndex].objectClass = ObjectClassKernelObject;
-    CONSOLE_TTYS[ConsoleIndex].used = TRUE;
-    CONSOLE_TTYS[ConsoleIndex].magic = (int) 1234;
-
-// Owner tid
-// Uninitialized
-    CONSOLE_TTYS[ConsoleIndex].__owner_tid = (int) -1;
-
-// tty: Console/Master.
-    CONSOLE_TTYS[ConsoleIndex].type = TTY_TYPE_CONSOLE;
-    CONSOLE_TTYS[ConsoleIndex].subtype = TTY_SUBTYPE_CONSOLE_MASTER;
-
-
-    // No thread for now.
-    //CONSOLE_TTYS[ConsoleIndex].control = NULL;
-
-    // tty is a terminal, so the user logs on a terminal.
-    // No user logged yet.
-    // #test
-    // We're gonna set this pointer at the end of the 
-    // kernel initialization. see: kmain.c
-    CONSOLE_TTYS[ConsoleIndex].user_info = NULL;
-
-    // Security stuff.
-    // Nao sei se essas estruturas estao prontas para isso nesse momento
-    // ou se esses ponteiros sao nulos.
-    CONSOLE_TTYS[ConsoleIndex].user_session = NULL;  // Current user session;
-    CONSOLE_TTYS[ConsoleIndex].cgroup = NULL;        // Current cgroup
-
-    // file pointer
-    // this file handles this tty object
-    // CONSOLE[ConsoleIndex]._fp
-    
-    // tty name
-    //CONSOLE_TTYS[ConsoleIndex].name[?] 
-    CONSOLE_TTYS[ConsoleIndex].Name_len = 0;  //initialized
-
-    //#todo: Indice do dispositivo.
-    // CONSOLE_TTYS[ConsoleIndex].device = 0;   // initialized.
-
-    CONSOLE_TTYS[ConsoleIndex].driver = NULL;  //driver struct
-    CONSOLE_TTYS[ConsoleIndex].ldisc  = NULL;  //line discipline struct
-
-    //CONSOLE_TTYS[ConsoleIndex].termios??       //termios struct (not a pointer)
-
-    // process group.
-    //CONSOLE_TTYS[ConsoleIndex].gid = current_group;
-
-    // ??
-    // Quantos processos estao usando essa tty.
-    //CONSOLE_TTYS[ConsoleIndex].pid_count=0;
-
-    CONSOLE_TTYS[ConsoleIndex].type = 0;
-    CONSOLE_TTYS[ConsoleIndex].subtype = 0;
-        
-    CONSOLE_TTYS[ConsoleIndex].flags = 0;
-
-    // not stopped
-    CONSOLE_TTYS[ConsoleIndex].stopped = FALSE;
-
-    // process
-    //CONSOLE_TTYS[ConsoleIndex].process = KernelProcess;
-    
-    // thread
-    //CONSOLE_TTYS[ConsoleIndex].thread  = ?
-
-    // Qual terminal virtual esta usando essa tty.
-    CONSOLE_TTYS[ConsoleIndex].virtual_terminal_pid = 0;
-
-    // Window.
-    // When we are using the kgws.
-    // CONSOLE_TTYS[ConsoleIndex].window = NULL;
-
-//
-// == buffers ===========================
-//
-
-// #bugbug
-// No buffers fo rthe virtual consoles.
-// remember: 
-// The virtual console is used only in the 'stdout' of a process.
-    CONSOLE_TTYS[ConsoleIndex].nobuffers = TRUE;   // No buffers.
-
-
-//
-// Queues
-//
-
-
-// raw queue
-    CONSOLE_TTYS[ConsoleIndex].raw_queue.cnt = 0;
-    CONSOLE_TTYS[ConsoleIndex].raw_queue.head = 0;
-    CONSOLE_TTYS[ConsoleIndex].raw_queue.tail = 0;
-    CONSOLE_TTYS[ConsoleIndex].raw_queue.buffer_size = TTY_BUF_SIZE;
-    for(i=0; i<TTY_BUF_SIZE; i++){ CONSOLE_TTYS[ConsoleIndex].raw_queue.buf[i] = 0; }
-// canonical queue
-    CONSOLE_TTYS[ConsoleIndex].canonical_queue.cnt = 0;
-    CONSOLE_TTYS[ConsoleIndex].canonical_queue.head = 0;
-    CONSOLE_TTYS[ConsoleIndex].canonical_queue.tail = 0;
-    CONSOLE_TTYS[ConsoleIndex].canonical_queue.buffer_size = TTY_BUF_SIZE;
-    for(i=0; i<TTY_BUF_SIZE; i++){ CONSOLE_TTYS[ConsoleIndex].canonical_queue.buf[i] = 0; }
-// output queue
-    CONSOLE_TTYS[ConsoleIndex].output_queue.cnt = 0;
-    CONSOLE_TTYS[ConsoleIndex].output_queue.head = 0;
-    CONSOLE_TTYS[ConsoleIndex].output_queue.tail = 0;
-    CONSOLE_TTYS[ConsoleIndex].output_queue.buffer_size = TTY_BUF_SIZE;
-    for(i=0; i<TTY_BUF_SIZE; i++){ CONSOLE_TTYS[ConsoleIndex].output_queue.buf[i] = 0; }
-
-
-
-// Cursor dimentions in pixel.
-// #bugbug: determinado
-    CONSOLE_TTYS[ConsoleIndex].cursor_width_in_pixels = 8; 
-    CONSOLE_TTYS[ConsoleIndex].cursor_height_in_pixels = 8;
-
-// Cursor position in chars.
-    CONSOLE_TTYS[ConsoleIndex].cursor_x = 0;
-    CONSOLE_TTYS[ConsoleIndex].cursor_y = 0;
-
-// Cursor limits
-
-// Full screen
-    CONSOLE_TTYS[ConsoleIndex].fullscreen_flag = TRUE;
-    CONSOLE_TTYS[ConsoleIndex].cursor_left = 0;
-    CONSOLE_TTYS[ConsoleIndex].cursor_top  = 0;
-    CONSOLE_TTYS[ConsoleIndex].cursor_right = screen_width_in_chars;
-    CONSOLE_TTYS[ConsoleIndex].cursor_bottom = screen_height_in_chars;
-
-// Everyone has the same color.
-// White on black.
-    CONSOLE_TTYS[ConsoleIndex].bg_color = bg_color;
-    CONSOLE_TTYS[ConsoleIndex].fg_color = fg_color;
-
-/*
-// Default colors.
-// A different color for each console number.
-    if (ConsoleIndex == 0){
-        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_WHITE; 
-    }
-    if (ConsoleIndex == 1){
-        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_YELLOW; 
-    }
-    if (ConsoleIndex == 2){
-        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_GREEN; 
-    }
-    if (ConsoleIndex == 3){
-        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_CYAN; 
-    }
-*/
-
-    //#todo
-    // Buffers !!!
-    //CONSOLE_TTYS[ConsoleIndex]._rbuffer ...
-    //CONSOLE_TTYS[ConsoleIndex]._cbuffer ...    
-
-    CONSOLE_TTYS[ConsoleIndex].termios.c_lflag = ECHO;
-
-// The kernel can print string into the display device.
-    CONSOLE_TTYS[ConsoleIndex].vc_mode = 
-        (int) VC_MODE_KERNEL_VERBOSER;
-
-//
-// Charset support.
-//
-
-// see:
-// https://man7.org/linux/man-pages/man7/charsets.7.html
-
-    CONSOLE_TTYS[ConsoleIndex].charset_lowercase = (void*) map_abnt2;
-    CONSOLE_TTYS[ConsoleIndex].charset_uppercase = (void*) shift_abnt2;
-    CONSOLE_TTYS[ConsoleIndex].charset_controlcase = (void*) ctl_abnt2;
-
-    CONSOLE_TTYS[ConsoleIndex].charset_size = 
-        (size_t) ABNT2_CHARMAP_SIZE;
-
-
-// Charset name
-    size_t name_size = (size_t) strlen(ABNT2_CHARMAP_NAME);
-    memset(
-        CONSOLE_TTYS[ConsoleIndex].charset_name,
-        0,
-        64);
-    strncpy( 
-        CONSOLE_TTYS[ConsoleIndex].charset_name,
-        ABNT2_CHARMAP_NAME,
-        name_size );
-    CONSOLE_TTYS[ConsoleIndex].charset_name_size = 
-        (size_t) name_size;
-
-// ascii, unicode ...
-    CONSOLE_TTYS[ConsoleIndex].charset_id = 0;
-
-// language id.
-    CONSOLE_TTYS[ConsoleIndex].charset_lang_id = 0;
-
-// Font support.
-    CONSOLE_TTYS[ConsoleIndex].font_address = 
-        (void*) fontGetCurrentAddress();
-
-// #bugbug
-// A estrutura tem mais elementos que podem ser inicializados.
-// Tivemos problemas ao tentar inicializa-los.
-// ...
-
-    switch (ConsoleIndex){
-    case 0:
-        //console0_tty = (struct tty_d *) &CONSOLE_TTYS[0];
-        console0_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(0);
-        console0_tty->link = NULL;  // Not linked yet.
-        console0_tty->is_linked = FALSE;
-        break;
-    case 1:
-        //console1_tty = (struct tty_d *) &CONSOLE_TTYS[1];
-        console1_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(1);
-        console1_tty->link = NULL;  // Not linked yet.
-        console1_tty->is_linked = FALSE;
-        break;
-    case 2:
-        //console2_tty = (struct tty_d *) &CONSOLE_TTYS[2];
-        console2_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(2);
-        console2_tty->link = NULL;  // Not linked yet.
-        console2_tty->is_linked = FALSE;
-        break;
-    case 3:
-        //console3_tty = (struct tty_d *) &CONSOLE_TTYS[3];
-        console3_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(3);
-        console3_tty->link = NULL;  // Not linked yet.
-        console3_tty->is_linked = FALSE;
-        break;
-    };
-
-    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE; 
-}
-
 void console_set_current_virtual_console(int console_number)
 {
 // Set the new fg_console.
@@ -2666,17 +2385,25 @@ void csi_at (int nr, int console_number)
     };
 }
 
-// Intialize the support for virtual consoles.
-// Called by preinit_OutputSupport in main.c
-// #todo: Explain it better.
-// We have 4 preallocated tty structures for virtual consoles.
-int VirtualConsole_initialize(void)
-{
+// VirtualConsole_early_initialization:
 // Early initialization of the consoles.
 // It's gonna be reinitializad by __initialize_virtual_consoles()
 // in kstdio.c
+// Intialize the support for virtual consoles.
+// #todo: Explain it better.
+// We have 4 preallocated tty structures for virtual consoles.
+int VirtualConsole_early_initialization(void)
+{
+// Called by zero_initialize_virtual_consoles() in zero.c
 
     register int i=0;
+
+// Virtual Console:
+// The kernel only have four virtual consoles.
+// If this initialization fail, it will happen again
+
+    // #debug
+    PROGRESS("VirtualConsole_early_initialization: (First time)\n");;
 
 // Console em primeiro plano.
     fg_console = CONSOLE0;
@@ -2719,12 +2446,10 @@ int VirtualConsole_initialize(void)
     fg_colors[3] = (unsigned int) COLOR_YELLOW;
 
 
-// Virtual Console:
-// The kernel only have four virtual consoles.
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
         // IN: console index, bg color, fg color
-        console_init_virtual_console(
+        DDINIT_console(
             i,
             bg_colors[i],
             fg_colors[i] );
@@ -3240,6 +2965,290 @@ int console_clear(void)
 
 fail:
     return -1;
+}
+
+// DDINIT_console:
+// Initializar um virtual console.
+// Temos uma lista limitada deles.
+// Inicializa a estrutura de console virtual
+// configura uma entrada no diretorio dev/
+// IN: console index, bg color, fg color
+void 
+DDINIT_console(
+    int n, 
+    unsigned int bg_color, 
+    unsigned int fg_color )
+{
+// Initialize a given console.
+// #todo: We can pass more parameters.
+
+    register int ConsoleIndex = -1;
+    register int i=0;
+
+    PROGRESS ("DDINIT_console:\n");
+
+/*
+// Char width and height
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
+    if ( cWidth == 0 || cHeight == 0 ){
+        x_panic ("DDINIT_console: cWidth cHeight");
+    }
+*/
+
+// #todo #bugbug
+// determinado: 8 = char size.
+// #todo: Use cWidth and cHeight.
+    unsigned long screen_width_in_chars = (unsigned long) (gSavedX/8);
+    unsigned long screen_height_in_chars = (unsigned long) (gSavedY/8);
+
+// Limits
+    ConsoleIndex = (int) n;
+    if (ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX){
+        debug_print ("DDINIT_console: [FAIL] ConsoleIndex\n");
+        x_panic     ("DDINIT_console: [FAIL] ConsoleIndex\n");
+    }
+
+//
+// Data
+//
+
+    CONSOLE_TTYS[ConsoleIndex].initialized = FALSE;
+
+    // Todo virtual console eh uma tty. Os 4.
+    CONSOLE_TTYS[ConsoleIndex].objectType = ObjectTypeTTY;
+    CONSOLE_TTYS[ConsoleIndex].objectClass = ObjectClassKernelObject;
+    CONSOLE_TTYS[ConsoleIndex].used = TRUE;
+    CONSOLE_TTYS[ConsoleIndex].magic = (int) 1234;
+
+// Owner tid
+// Uninitialized
+    CONSOLE_TTYS[ConsoleIndex].__owner_tid = (int) -1;
+
+// tty: Console/Master.
+    CONSOLE_TTYS[ConsoleIndex].type = TTY_TYPE_CONSOLE;
+    CONSOLE_TTYS[ConsoleIndex].subtype = TTY_SUBTYPE_CONSOLE_MASTER;
+
+
+    // No thread for now.
+    //CONSOLE_TTYS[ConsoleIndex].control = NULL;
+
+    // tty is a terminal, so the user logs on a terminal.
+    // No user logged yet.
+    // #test
+    // We're gonna set this pointer at the end of the 
+    // kernel initialization. see: kmain.c
+    CONSOLE_TTYS[ConsoleIndex].user_info = NULL;
+
+    // Security stuff.
+    // Nao sei se essas estruturas estao prontas para isso nesse momento
+    // ou se esses ponteiros sao nulos.
+    CONSOLE_TTYS[ConsoleIndex].user_session = NULL;  // Current user session;
+    CONSOLE_TTYS[ConsoleIndex].cgroup = NULL;        // Current cgroup
+
+    // file pointer
+    // this file handles this tty object
+    // CONSOLE[ConsoleIndex]._fp
+    
+    // tty name
+    //CONSOLE_TTYS[ConsoleIndex].name[?] 
+    CONSOLE_TTYS[ConsoleIndex].Name_len = 0;  //initialized
+
+    //#todo: Indice do dispositivo.
+    // CONSOLE_TTYS[ConsoleIndex].device = 0;   // initialized.
+
+    CONSOLE_TTYS[ConsoleIndex].driver = NULL;  //driver struct
+    CONSOLE_TTYS[ConsoleIndex].ldisc  = NULL;  //line discipline struct
+
+    //CONSOLE_TTYS[ConsoleIndex].termios??       //termios struct (not a pointer)
+
+    // process group.
+    //CONSOLE_TTYS[ConsoleIndex].gid = current_group;
+
+    // ??
+    // Quantos processos estao usando essa tty.
+    //CONSOLE_TTYS[ConsoleIndex].pid_count=0;
+
+    CONSOLE_TTYS[ConsoleIndex].type = 0;
+    CONSOLE_TTYS[ConsoleIndex].subtype = 0;
+        
+    CONSOLE_TTYS[ConsoleIndex].flags = 0;
+
+    // not stopped
+    CONSOLE_TTYS[ConsoleIndex].stopped = FALSE;
+
+    // process
+    //CONSOLE_TTYS[ConsoleIndex].process = KernelProcess;
+    
+    // thread
+    //CONSOLE_TTYS[ConsoleIndex].thread  = ?
+
+    // Qual terminal virtual esta usando essa tty.
+    CONSOLE_TTYS[ConsoleIndex].virtual_terminal_pid = 0;
+
+    // Window.
+    // When we are using the kgws.
+    // CONSOLE_TTYS[ConsoleIndex].window = NULL;
+
+//
+// == buffers ===========================
+//
+
+// #bugbug
+// No buffers fo rthe virtual consoles.
+// remember: 
+// The virtual console is used only in the 'stdout' of a process.
+    CONSOLE_TTYS[ConsoleIndex].nobuffers = TRUE;   // No buffers.
+
+
+//
+// Queues
+//
+
+
+// raw queue
+    CONSOLE_TTYS[ConsoleIndex].raw_queue.cnt = 0;
+    CONSOLE_TTYS[ConsoleIndex].raw_queue.head = 0;
+    CONSOLE_TTYS[ConsoleIndex].raw_queue.tail = 0;
+    CONSOLE_TTYS[ConsoleIndex].raw_queue.buffer_size = TTY_BUF_SIZE;
+    for(i=0; i<TTY_BUF_SIZE; i++){ CONSOLE_TTYS[ConsoleIndex].raw_queue.buf[i] = 0; }
+// canonical queue
+    CONSOLE_TTYS[ConsoleIndex].canonical_queue.cnt = 0;
+    CONSOLE_TTYS[ConsoleIndex].canonical_queue.head = 0;
+    CONSOLE_TTYS[ConsoleIndex].canonical_queue.tail = 0;
+    CONSOLE_TTYS[ConsoleIndex].canonical_queue.buffer_size = TTY_BUF_SIZE;
+    for(i=0; i<TTY_BUF_SIZE; i++){ CONSOLE_TTYS[ConsoleIndex].canonical_queue.buf[i] = 0; }
+// output queue
+    CONSOLE_TTYS[ConsoleIndex].output_queue.cnt = 0;
+    CONSOLE_TTYS[ConsoleIndex].output_queue.head = 0;
+    CONSOLE_TTYS[ConsoleIndex].output_queue.tail = 0;
+    CONSOLE_TTYS[ConsoleIndex].output_queue.buffer_size = TTY_BUF_SIZE;
+    for(i=0; i<TTY_BUF_SIZE; i++){ CONSOLE_TTYS[ConsoleIndex].output_queue.buf[i] = 0; }
+
+
+
+// Cursor dimentions in pixel.
+// #bugbug: determinado
+    CONSOLE_TTYS[ConsoleIndex].cursor_width_in_pixels = 8; 
+    CONSOLE_TTYS[ConsoleIndex].cursor_height_in_pixels = 8;
+
+// Cursor position in chars.
+    CONSOLE_TTYS[ConsoleIndex].cursor_x = 0;
+    CONSOLE_TTYS[ConsoleIndex].cursor_y = 0;
+
+// Cursor limits
+
+// Full screen
+    CONSOLE_TTYS[ConsoleIndex].fullscreen_flag = TRUE;
+    CONSOLE_TTYS[ConsoleIndex].cursor_left = 0;
+    CONSOLE_TTYS[ConsoleIndex].cursor_top  = 0;
+    CONSOLE_TTYS[ConsoleIndex].cursor_right = screen_width_in_chars;
+    CONSOLE_TTYS[ConsoleIndex].cursor_bottom = screen_height_in_chars;
+
+// Everyone has the same color.
+// White on black.
+    CONSOLE_TTYS[ConsoleIndex].bg_color = bg_color;
+    CONSOLE_TTYS[ConsoleIndex].fg_color = fg_color;
+
+/*
+// Default colors.
+// A different color for each console number.
+    if (ConsoleIndex == 0){
+        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_WHITE; 
+    }
+    if (ConsoleIndex == 1){
+        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_YELLOW; 
+    }
+    if (ConsoleIndex == 2){
+        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_GREEN; 
+    }
+    if (ConsoleIndex == 3){
+        CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_CYAN; 
+    }
+*/
+
+    //#todo
+    // Buffers !!!
+    //CONSOLE_TTYS[ConsoleIndex]._rbuffer ...
+    //CONSOLE_TTYS[ConsoleIndex]._cbuffer ...    
+
+    CONSOLE_TTYS[ConsoleIndex].termios.c_lflag = ECHO;
+
+// The kernel can print string into the display device.
+    CONSOLE_TTYS[ConsoleIndex].vc_mode = 
+        (int) VC_MODE_KERNEL_VERBOSER;
+
+//
+// Charset support.
+//
+
+// see:
+// https://man7.org/linux/man-pages/man7/charsets.7.html
+
+    CONSOLE_TTYS[ConsoleIndex].charset_lowercase = (void*) map_abnt2;
+    CONSOLE_TTYS[ConsoleIndex].charset_uppercase = (void*) shift_abnt2;
+    CONSOLE_TTYS[ConsoleIndex].charset_controlcase = (void*) ctl_abnt2;
+
+    CONSOLE_TTYS[ConsoleIndex].charset_size = 
+        (size_t) ABNT2_CHARMAP_SIZE;
+
+
+// Charset name
+    size_t name_size = (size_t) strlen(ABNT2_CHARMAP_NAME);
+    memset(
+        CONSOLE_TTYS[ConsoleIndex].charset_name,
+        0,
+        64);
+    strncpy( 
+        CONSOLE_TTYS[ConsoleIndex].charset_name,
+        ABNT2_CHARMAP_NAME,
+        name_size );
+    CONSOLE_TTYS[ConsoleIndex].charset_name_size = 
+        (size_t) name_size;
+
+// ascii, unicode ...
+    CONSOLE_TTYS[ConsoleIndex].charset_id = 0;
+
+// language id.
+    CONSOLE_TTYS[ConsoleIndex].charset_lang_id = 0;
+
+// Font support.
+    CONSOLE_TTYS[ConsoleIndex].font_address = 
+        (void*) fontGetCurrentAddress();
+
+// #bugbug
+// A estrutura tem mais elementos que podem ser inicializados.
+// Tivemos problemas ao tentar inicializa-los.
+// ...
+
+    switch (ConsoleIndex){
+    case 0:
+        //console0_tty = (struct tty_d *) &CONSOLE_TTYS[0];
+        console0_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(0);
+        console0_tty->link = NULL;  // Not linked yet.
+        console0_tty->is_linked = FALSE;
+        break;
+    case 1:
+        //console1_tty = (struct tty_d *) &CONSOLE_TTYS[1];
+        console1_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(1);
+        console1_tty->link = NULL;  // Not linked yet.
+        console1_tty->is_linked = FALSE;
+        break;
+    case 2:
+        //console2_tty = (struct tty_d *) &CONSOLE_TTYS[2];
+        console2_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(2);
+        console2_tty->link = NULL;  // Not linked yet.
+        console2_tty->is_linked = FALSE;
+        break;
+    case 3:
+        //console3_tty = (struct tty_d *) &CONSOLE_TTYS[3];
+        console3_tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(3);
+        console3_tty->link = NULL;  // Not linked yet.
+        console3_tty->is_linked = FALSE;
+        break;
+    };
+
+    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE; 
 }
 
 //
