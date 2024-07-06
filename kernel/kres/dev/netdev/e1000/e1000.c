@@ -747,7 +747,7 @@ __mapping_nic1_device_address(
 }
 
 // ---------------------------------------------
-// e1000_init_nic:
+// e1000_initialization:
 // Called by ...
 // Initialize the driver.
 // == NIC Intel. ===================
@@ -765,12 +765,17 @@ __mapping_nic1_device_address(
 // init habilita as interrupções.
 
 int 
-e1000_init_nic ( 
+e1000_initialization ( 
     unsigned char bus, 
     unsigned char dev, 
     unsigned char fun, 
     struct pci_device_d *pci_device )
 {
+// #todo: Describe here the steps for the driver initialization.
+// +
+// +
+// +
+
     register uint32_t i=0;  // loop
     uint32_t data=0;        // pci info 
     unsigned short Vendor=0;
@@ -781,8 +786,8 @@ e1000_init_nic (
     uint32_t Val=0;
 
     // #debug
-    PROGRESS ("e1000_init_nic:\n");
-    printk   ("e1000_init_nic:\n");
+    PROGRESS ("e1000_initialization:\n");
+    printk   ("e1000_initialization:\n");
     //printk("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
     //printk("82540EM Gigabit Ethernet Controller found\n");
 
@@ -803,8 +808,8 @@ e1000_init_nic (
 
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
-        debug_print("e1000_init_nic: Expected 82540EM\n");
-        panic      ("e1000_init_nic: Expected 82540EM\n");
+        debug_print("e1000_initialization: Expected 82540EM\n");
+        panic      ("e1000_initialization: Expected 82540EM\n");
     }
     // #debug
     printk("Vendor=%x | Device=%x \n", Vendor, Device );
@@ -814,7 +819,7 @@ e1000_init_nic (
 // passado via argumento. 
 
     if ((void *) pci_device ==  NULL){
-        panic("e1000_init_nic: pci_device\n");
+        panic("e1000_initialization: pci_device\n");
     }
 
     pci_device->used = TRUE;
@@ -882,7 +887,7 @@ e1000_init_nic (
 
     phy_address = (unsigned long) (pci_device->BAR0 & 0xFFFFFFF0);
     if (phy_address == 0){
-        panic("e1000_init_nic: Invalid phy_address\n");
+        panic("e1000_initialization: Invalid phy_address\n");
     }
 
     // ...
@@ -906,7 +911,7 @@ e1000_init_nic (
                 (unsigned long) virt_address );  // va
 
     if (map_status != 0){
-        panic("e1000_init_nic: on __mapping_nic1_device_address()\n");
+        panic("e1000_initialization: on __mapping_nic1_device_address()\n");
     }
 
 // Endereço base.
@@ -929,7 +934,7 @@ e1000_init_nic (
 
     currentNIC = (void *) kmalloc( sizeof(struct intel_nic_info_d) );
     if ((void *) currentNIC ==  NULL){
-        panic("e1000_init_nic: currentNIC\n");
+        panic("e1000_initialization: currentNIC\n");
     }
     currentNIC->used = TRUE;
     currentNIC->magic = 1234;

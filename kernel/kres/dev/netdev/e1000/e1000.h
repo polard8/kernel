@@ -235,8 +235,10 @@ e1000_send(
     size_t len, 
     const char *data );
 
+
+// Driver initialization
 int 
-e1000_init_nic ( 
+e1000_initialization ( 
     unsigned char bus, 
     unsigned char dev, 
     unsigned char fun, 
