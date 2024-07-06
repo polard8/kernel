@@ -958,6 +958,7 @@ int keInitialize(int phase)
         // see: user.c
         gramkInitialize();
         // ws registration support.
+        // (display server)
         ws_init();
         // ws callback support.
         initialize_ws_callback_info();
@@ -976,9 +977,9 @@ int keInitialize(int phase)
 
         // ==========================
         // Network support.
+        // ?? At this moment we already initialized the e1000 driver.
         // See: network.c
         networkInit();
-        //PROGRESS("networkInit ok\n"); 
 
         goto InitializeEnd;
     } else {

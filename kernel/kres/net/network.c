@@ -793,30 +793,25 @@ void networkUpdateCounter(int the_counter)
     }
 }
 
-/*
- * networkInit: 
- * It only initializes some network structures. 
- * Not the adapters.
- * Initialize the buffers used by the NIC adapter.
- * Initialize HostInfo structure.
- * Create a default socket structure for localhost. 
- * CurrentSocket = LocalHostHTTPSocket
- */ 
-// Called by I_init() in x64init.c.
-// #fixme
-// Provavelmente esse alocador ainda nao funciona.
 
+// networkInit:
+// Called by keInitialize() in ke.c.
+// Remember, we already initialized the driver for e1000 nic device.
 int networkInit(void)
 {
-// Initializing the network infrastructure.
-// The purpose here is initialize all the components that is possible
-// without aborting the kernel initialization.
-// Maybe we can survice some failures here and re-initialize it later.
+// + Setup network status.
+// + Setup network info structure.
+// + Create queue with 32 buffers to receive data from the driver.
+// + Setup host info structure.
+// + Setup localhost socket structure.
+// + Initialize a list of sockets.
+// + Create domain structure
+// + Initialize the ARP cache.
 
     register int i=0;
     void *tmp_buffer_address;
 
-    PROGRESS("networkInit:\n");
+    PROGRESS ("networkInit:\n");
 
 //======================================
 // Network initialization structure.
@@ -836,7 +831,6 @@ int networkInit(void)
 // decodificar o buffer, caso contrário deve ignorar.
 
     ____network_late_flag=0;
-
 
 //======================================
 // Network info structure
@@ -887,7 +881,12 @@ int networkInit(void)
 
 //======================================
 
+
+//======================================
+// 32 buffers:
+
 // buffers:
+// #todo:
 // We will create 32 buffers to receive data and
 // 8 buffers to send data.
 
@@ -901,8 +900,7 @@ int networkInit(void)
     for (i=0; i<32; i++)
     {
         tmp_buffer_address = (void*) mmAllocPage();
-        if ((void *)tmp_buffer_address == NULL)
-        {
+        if ((void *)tmp_buffer_address == NULL){
             printk("on tmp_buffer_address\n");
             goto fail;
         }
@@ -912,6 +910,13 @@ int networkInit(void)
     NETWORK_BUFFER.receive_tail=0;
     NETWORK_BUFFER.receive_head=0;
 // ========================================
+
+// =====================================
+// send buffers
+// Maybe not!
+// =====================================
+
+
 // flag
     NETWORK_BUFFER.initialized = TRUE;
 
@@ -960,6 +965,9 @@ int networkInit(void)
 
     CurrentNetwork->host_info = (void*) HostInfo;
 
+// =====================================
+// Localhost socket structure.
+
 // Socket
 // Criando socket para local host porta 80;
 // Localhost (127.0.0.1):80 
@@ -968,14 +976,15 @@ int networkInit(void)
     //debug_print ("networkInit: LocalHostHTTPSocket\n");
 
     LocalHostHTTPSocket = (struct socket_d *) create_socket_object();
-    if ((void *) LocalHostHTTPSocket == NULL)
-    {
+    if ((void *) LocalHostHTTPSocket == NULL){
         printk("on LocalHostHTTPSocket\n");
         goto fail;
     }
     CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
 
+// =====================================
 // Initializes the socket list.
+
     socket_init();
 
 // Status
@@ -1005,10 +1014,9 @@ int networkInit(void)
 
 // It describes the domain this node belongs to.
 
-    struct domain_d *my_domain;
+    struct domain_d  *my_domain;
     my_domain = (void *) domain_create_domain(UTS_DOMAINNAME);
-    if ((void*) my_domain == NULL)
-    {
+    if ((void*) my_domain == NULL){
         printk("on my_domain\n");
         goto fail;
     }

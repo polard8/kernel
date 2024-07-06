@@ -781,8 +781,8 @@ e1000_init_nic (
     uint32_t Val=0;
 
     // #debug
-    PROGRESS("e1000_init_nic:\n");
-    printk     ("e1000_init_nic:\n");
+    PROGRESS ("e1000_init_nic:\n");
+    printk   ("e1000_init_nic:\n");
     //printk("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
     //printk("82540EM Gigabit Ethernet Controller found\n");
 
