@@ -1,11 +1,11 @@
 # userland - Programs running in ring 3.
 
 ```
-  * drivers/ - Some ring 3 drivers.
-  * init/ - This is the first ring 3 process.
-  * libs/ -
-  * netd/ -
-  * servers/ - Some ring 3 services.
+  * bin/ - The place for the final binaries.
+  * core/ - Libraries and init process.
+  * ftpd/ - FTP server.
+  * netd/ - Network server.
+  * telnet/ - Telnet server. 
+  * vgad/ - VGA service.
+  * webd/ - Web server.
 ```
-
-

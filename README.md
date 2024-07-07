@@ -203,7 +203,6 @@ Please make some comments on Github or send messages to Fred Nora.
 
 > See the [Gramado OS build instructions](https://github.com/gramado/kernel/blob/main/your/docs/build/build.md)
 
-
 # Folders
 
  Stating with code and ending with data and binary images.
@@ -216,11 +215,9 @@ Please make some comments on Github or send messages to Fred Nora.
   * your/      - Your stuff.
 ```
 
-
 # Warning
 
 You're reaching the boring area of this document!
-
 
 ## Documentation
 
