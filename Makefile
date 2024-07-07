@@ -362,9 +362,15 @@ usage:
 # Gramado has been tested on sda
 # and the Fred's Linux host machine is on sdb.
 danger-install-sda:
-	sudo dd if=./GRAMADO.VHD of=/dev/sda
+	sudo dd if=./GRAMHV.VHD of=/dev/sda
 danger-install-sdb:
-	sudo dd if=./GRAMADO.VHD of=/dev/sdb
+	sudo dd if=./GRAMHV.VHD of=/dev/sdb
 
-# End.
+qemu-instance:
+	-cp ./GRAMHV.VHD ./QEMU.VHD 
+#xxx-instance:
+#	-cp ./GRAMHV.VHD ./XXX.VHD 
+
+
+# End
 
