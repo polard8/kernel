@@ -8,7 +8,8 @@ BASE    = your/base
 
 DEP_B1  = ../de/commands
 DEP_B2  = ../de/ui
-DEP_B3  = ../de/user3d
+
+DEP_B3  = ../aurora/demos
 
 #DEP_B10 = ../guest0
 #DEP_B11 = ../guest1
