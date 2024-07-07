@@ -7,7 +7,8 @@
 // Buffer for the messages.
 // See: globals.c
 #define GNS_BUFFER_SIZE  512
-extern char __buffer[GNS_BUFFER_SIZE];
+#define MSG_BUFFER_SIZE  512
+extern char __buffer[MSG_BUFFER_SIZE];
 
 // Buffer
 // This is the buffer ussed for the next response.
@@ -18,6 +19,7 @@ extern char __buffer[GNS_BUFFER_SIZE];
 // prestação do serviço.
 // No início desse array fica o header.
 // see: globals.c
+#define NEXTRESPONSE_BUFFER_SIZE  32
 extern unsigned long next_response[32];
 
 

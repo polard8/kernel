@@ -32,6 +32,13 @@
 
 // static int __saved_sync_id = -1;
 
+
+// Types of response
+// Used in __send_respose().
+#define RESPONSE_IS_REPLY  1
+#define RESPONSE_IS_EVENT  2
+#define RESPONSE_IS_ERROR  3
+
 //
 // == Gramado Network Protocol ===============================
 //
@@ -95,6 +102,15 @@ static void dispatch(int fd);
 static int ServerShutdown(void);
 static int ServerInitialization(void);
 
+
+// nsSendResponse:
+// Worker
+// There is a vetor with values for the next response.
+// Called by dispatcher().
+// IN:
+// fd, 1=REPLY | 2=EVENT | 3=ERROR
+static int nsSendResponse(int fd, int type);
+
 static void 
 gns_send_error_response (int fd, int code, char *error_message);
 
@@ -103,6 +119,197 @@ static void gnssrv_yield(void);
 //
 // ===============================
 //
+
+// dsSendResponse:
+// Worker
+// There is a vetor with values for the next response.
+// Called by dispatcher().
+// IN:
+// fd, 1=REPLY | 2=EVENT | 3=ERROR
+static int nsSendResponse(int fd, int type)
+{
+// Reusing the same buffer from the request.
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];
+    int n_writes=0;
+    int Status=0;
+    register int i=0;
+
+/*
+// #bugbug
+// We gotta select a standard offset for strings.
+    char *m = (char *) (&__buffer[0] + 16); //#wrong
+    char *m = (char *) (&__buffer[8]);  //use this one?
+    sprintf( m, "~ Response from gwssrv \n");
+*/
+
+//
+// Primeiros longs do buffer.
+//
+
+// 0:
+// wid
+    message_buffer[0] = (unsigned long) next_response[0];
+    //message_buffer[0] = (unsigned long) (next_response[0] & 0xFFFFFFFF);
+
+// 1:
+// Types of reply.
+
+    switch(type){
+    // 1 - Normal reply
+    case RESPONSE_IS_REPLY:
+        message_buffer[1] = SERVER_PACKET_TYPE_REPLY;
+        break;
+    // 2 - Event
+    case RESPONSE_IS_EVENT:
+        message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
+        break;
+    // 3 - Error
+    case RESPONSE_IS_ERROR:
+    default:
+        message_buffer[1] = SERVER_PACKET_TYPE_ERROR;
+        break;
+    };
+
+// 2 and 3:
+// Signature in some cases.
+// Can we deliver values here?
+    message_buffer[2] = (unsigned long) next_response[2];  // long1
+    message_buffer[3] = (unsigned long) next_response[3];  // long2
+// 4,5,6,7
+// Data
+    message_buffer[4] = (unsigned long) next_response[4];
+    message_buffer[5] = (unsigned long) next_response[5];
+    message_buffer[6] = (unsigned long) next_response[6];
+    message_buffer[7] = (unsigned long) next_response[7];
+// 8,9,10,11
+// Data
+    message_buffer[8]  = (unsigned long) next_response[8];
+    message_buffer[9]  = (unsigned long) next_response[9];
+    message_buffer[10] = (unsigned long) next_response[10];
+    message_buffer[11] = (unsigned long) next_response[11];
+// 12,13,14,15
+// Data
+    message_buffer[12] = (unsigned long) next_response[12];
+    message_buffer[13] = (unsigned long) next_response[13];
+    message_buffer[14] = (unsigned long) next_response[14];
+    message_buffer[15] = (unsigned long) next_response[15];
+// more
+    message_buffer[16] = (unsigned long) next_response[16];
+    message_buffer[17] = (unsigned long) next_response[17];
+    message_buffer[18] = (unsigned long) next_response[18];
+    message_buffer[19] = (unsigned long) next_response[19];
+    // ...
+//__again:
+
+//
+// == Response ============================
+//
+
+    // #debug
+    //debug_print ("dsSendResponse: Sending response ...\n");
+
+    // #todo:
+    // while(1){...}
+
+    /*
+    // Is current client connected.
+    if (currentClient->is_connected == 0)
+    {
+        // [FAIL] Not connected.
+        // close?
+    }
+    */
+
+//
+// Send
+//
+
+// Limits
+    if (fd<0 || fd>31)
+    {
+        Status = -1;
+        goto exit1;
+    }
+
+// We can't write on our own socket.
+    if (fd == ____saved_server_fd){
+        printf("nsSendResponse: fd == ____saved_server_fd\n");
+        printf("The server can't write on your own socket\n");
+        while (1){
+        };
+    }
+
+// #test
+// For now, the only valid fd is 31.
+    if (fd != 31){
+        printf("nsSendResponse: fd != 31\n");
+        while (1){
+        };
+    }
+
+// Write
+    for (i=0; i<8; i++){
+
+    n_writes = write( fd, __buffer, sizeof(__buffer) );
+    //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
+
+// No. 
+// We couldn't send a response.
+// O que acontece se nao conseguirmos enviar uma resposta?
+// Certamente o cliente tentara ler e tera problemas.
+// Deveriamos fechar a conexao?
+// Deveriamos enviar um alerta
+
+    if (n_writes <= 0)
+    {
+        //#debug
+        debug_print ("nsSendResponse: response fail\n");
+        printf      ("nsSendResponse: Couldn't send reply\n");
+        //close(fd);
+        Status = -1;
+        //goto exit1;
+    }
+
+// YES, We sent the response.
+    if (n_writes > 0)
+    {
+        Status = 0; //OK
+        //goto exit0;
+        break;
+    }
+
+    };
+
+    if (Status < 0)
+        goto exit0;
+
+// Cleaning
+// Limpa se a resposta der certo ou se der errado.
+// If the sizes are equal, we can do both at the same time.
+    for (i=0; i<MSG_BUFFER_SIZE; ++i){
+        __buffer[i] = 0;
+    };
+    for (i=0; i<NEXTRESPONSE_BUFFER_SIZE; ++i){
+        next_response[i] = 0;
+    };
+
+
+    // Fall through.
+
+// Fail
+exit1:
+    message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[2] = 0;
+    message_buffer[3] = 0;
+    message_buffer[4] = 0;
+    message_buffer[5] = 0;
+exit0:
+// Sync. Set response.
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+    return (int) Status;
+}
+
 
 static void 
 gns_send_error_response (int fd, int code, char *error_message)
@@ -318,7 +525,7 @@ gnsProcedure (
         // case 1000:
         case GNS_Hello:
             serviceHello();           
-            NoReply = FALSE;
+            NoReply = FALSE;  // The client-side library is waiting for response.
             return 0;
             break;
 
@@ -350,7 +557,39 @@ gnsProcedure (
         // Refresh rectangle ... 
         case 2021:
             break;
-            
+
+        // 2222
+        // + Asynchronous commands.
+        // + No response.
+        case GNS_AsyncCommand:
+            //#todo: serviceAsyncCommand();
+            NoReply = TRUE;
+            break;
+
+        // 2240:
+        // Set a text into a buffer in the ? structure.
+        // No response.
+        case GNS_SetText:
+            // #todo: serviceSetText();
+            NoReply = TRUE;
+            break;
+
+        // 2241:
+        // Get a text from a buffer in the window structure.
+        // #test: Things like this can be used to 
+        // deliver a file as a response to the caller. html?
+        case GNS_GetText:
+            // #todo: serviceGetText();
+            NoReply = FALSE;
+            return 0;
+            break;
+
+        // 4080
+        // Quit the process if it's possible.
+        case GNS_Quit:
+            //IsTimeToQuit=TRUE;
+            break;
+
         //MSG_GNS_PROTOCOL
         case 3000:
             break;
@@ -376,10 +615,14 @@ gnsProcedure (
 // Called by main.
 static void dispatch(int fd)
 {
-    unsigned long *message_buffer = 
-        (unsigned long *) &__buffer[0];
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];
     int n_reads = 0;     // For requests.
     int n_writes = 0;    // For responses.
+
+    int Status = -1;
+    int SendErrorResponse=FALSE;
+    int SendEvent=FALSE;
+
 
 // Fail. Cleaning
     if (fd<0){
@@ -396,6 +639,7 @@ static void dispatch(int fd)
     int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
 // Not a request.
     if (value != ACTION_REQUEST){
+        //message_buffer[1] = 0;
         gnssrv_yield();
         return;
     }
@@ -407,8 +651,7 @@ static void dispatch(int fd)
     {
         debug_print("netd: dispatch n_reads\n");
         // No reply
-        rtl_set_file_sync( 
-            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         // Cleaning
         message_buffer[0] = 0;
         message_buffer[1] = 0;
@@ -425,8 +668,7 @@ static void dispatch(int fd)
     { 
         debug_print("netd: dispatch Unknown message\n");
         // No reply
-        rtl_set_file_sync( 
-            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         // Cleaning
         message_buffer[0] = 0;
         message_buffer[1] = 0;
@@ -436,15 +678,31 @@ static void dispatch(int fd)
         return;
     }
 
+// Um cliente solicitou um evento.
+// Vamos sinalizar o tipo de resposta que temos que enviar,
+// caso nenhum erro aconteça.
+    if (message_buffer[1] == GNS_GetNextEvent){
+        SendEvent = TRUE;  // The response is an EVENT, not a REPLY.
+    }
+
+
 // OK:
 // Valid message
 // Call the service!
 
-    gnsProcedure ( 
-        (void *)        message_buffer[0], 
-        (int)           message_buffer[1], 
-        (unsigned long) message_buffer[2], 
-        (unsigned long) message_buffer[3] );
+    int procStatus = -1;
+
+    procStatus = 
+        gnsProcedure ( 
+            (void *)        message_buffer[0], 
+            (int)           message_buffer[1], 
+            (unsigned long) message_buffer[2], 
+            (unsigned long) message_buffer[3] );
+
+    if (procStatus < 0){
+        // oh !
+        SendErrorResponse = TRUE;
+    }
 
 // #todo
 // Se o request foi um request de evento,
@@ -454,14 +712,59 @@ static void dispatch(int fd)
 
     if (NoReply == TRUE){
         rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        //message_buffer[0] = 0;
         return;
+        //goto exit0;
     }
 
 // ==============================================
 
 //
+// == reponse ================
+//
+
+// Types of respose.
+// IN:
+// fd, 1=REPLY | 2=EVENT | 3=ERROR
+
+// ==========================================
+// ERROR: (3)
+// Se o serviço não pode ser prestado corretamente.
+// Error message.
+    if (SendErrorResponse == TRUE){
+        Status = (int) nsSendResponse(fd,RESPONSE_IS_ERROR);
+        goto exit2;
+    }
+// ==========================================
+// EVENT: (2)
+// Se o serviço foi prestado corretamente.
+// Era uma solicitação de evento
+// Event.
+    if (SendEvent == TRUE){
+        Status = (int) nsSendResponse(fd,RESPONSE_IS_EVENT);
+        goto exit2;
+    }
+// ==========================================
+// REPLY: (1)
+// Se o serviço foi prestado corretamente.
+// Era uma solicitação de serviço normal,
+// então vamos enviar um reponse normal. Um REPLY.
+// Normal reply.
+    if (SendEvent != TRUE){
+        Status = (int) nsSendResponse(fd,RESPONSE_IS_REPLY);
+        goto exit2;
+    }
+
+
+/*
+// ===================
+
+//
 // Send reply!
 //
+
+// #ps
+// This routine for REPLY is suspended.
 
 // Insert message string int to the response buffer.
     char *m = (char *) (__buffer + 128);
@@ -504,12 +807,29 @@ static void dispatch(int fd)
 
 // Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+*/
+
+// ===================
+
+// Fall
+
+exit2:
+    message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[2] = 0;
+    message_buffer[3] = 0;
+    message_buffer[4] = 0;
+    message_buffer[5] = 0;
+exit1:
+exit0:
+    return;
 }
 
 // #todo
 static int ServerShutdown(void)
 {
     printf("netd: [todo] ServerShutdown\n");
+    // close(__server_fd);
 }
 
 // Called by main().
@@ -659,30 +979,32 @@ int main (int argc, char **argv)
     int f3= FALSE;
     int f4= FALSE;
 
-    if (argc>0)
-    {
-        for (i=0; i<argc; i++)
-        {
-            //printf("%d: {%s}\n",i,argv[i]);
+    if (argc < 0)
+        goto fail;
 
-            if ( strncmp( argv[i], "-1", 2 ) == 0 )
-                f1=TRUE;
-            if ( strncmp( argv[i], "-2", 2 ) == 0 )
-                f2=TRUE;
-            if ( strncmp( argv[i], "-3", 2 ) == 0 )
-                f3=TRUE;
-            if ( strncmp( argv[i], "-4", 2 ) == 0 )
-                f4=TRUE;
-        };
-    }
+    for (i=0; i<argc; i++)
+    {
+        //printf("%d: {%s}\n",i,argv[i]);
+
+        if ( strncmp( argv[i], "-1", 2 ) == 0 )
+            f1=TRUE;
+        if ( strncmp( argv[i], "-2", 2 ) == 0 )
+            f2=TRUE;
+        if ( strncmp( argv[i], "-3", 2 ) == 0 )
+            f3=TRUE;
+        if ( strncmp( argv[i], "-4", 2 ) == 0 )
+            f4=TRUE;
+    };
+
      
     Status = (int) ServerInitialization();
     if (Status == 0){
         ServerShutdown();
-        exit(0);
+        return (int) EXIT_SUCCESS;
     }
-    
-    return 0;
+
+fail:
+    return (int) EXIT_FAILURE;
 }
 
 //

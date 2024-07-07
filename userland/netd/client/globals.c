@@ -1,3 +1,4 @@
+// globals.c
 
 // #include <gnsint.h>
 #include <globals.h>

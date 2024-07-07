@@ -1,37 +1,17 @@
-/*
- * File: main.c
- *    Client side application for Gramado Network Server.
- *    Using socket to connect with gns.
- *    AF_GRAMADO family.
- *    O propósito é testar o servidor gns.
- * History:
- *     2020 - Created by Fred Nora.
- */
-// See:
-// https://wiki.osdev.org/Message_Passing_Tutorial
-// https://wiki.osdev.org/Synchronization_Primitives
-// ...
-// Connecting via AF_INET.
-// tutorial example taken from. 
-// https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
-/*
-    To make a process a TCP server, you need to follow the steps given below −
-    Create a socket with the socket() system call.
-    Bind the socket to an address using the bind() system call. 
-    For a server socket on the Internet, an address consists of a 
-    port number on the host machine.
-    Listen for connections with the listen() system call.
-    Accept a connection with the accept() system call. 
-    This call typically blocks until a client connects with the server.
-    Send and receive data using the read() and write() system calls.
-*/ 
+// main.c
+// 2020 - Created by Fred Nora.
+
+// NET.BIN
+// The goal of this applications is testing the 
+// connection with the server NETD.BIN
+// So, first of all you gotta launch the server.
+
 
 #include <gnsint.h>
 
-// Ports.
-#define PORTS_WS  4040
-#define PORTS_NS  4041
-#define PORTS_FS  4042
+// Ports
+#define PORTS_DS  4040  // Display server 
+#define PORTS_NS  4041  // Network server
 // ...
 
 #define IP(a, b, c, d) \
@@ -95,7 +75,6 @@ static int appInitialization(void)
     // Connecting to the network server in this machine.
     server_address.sin_port = PORTS_NS;       // htons(PORTS_NS);
     server_address.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
-
     addrlen = sizeof(server_address);
 //========================
 
@@ -107,7 +86,7 @@ static int appInitialization(void)
     if (__client_fd < 0){
        //gws_debug_print ("gnst: Couldn't create socket\n");
        printf ("net.bin: on socket()\n");
-       exit(1);
+       goto fail;
     }
 
 // Connect
@@ -124,28 +103,36 @@ static int appInitialization(void)
         }else{ break; }; 
     };
 
-    if (__client_fd<0){
+    if (__client_fd < 0){
         printf("net.bin: fd fail\n");
-        exit(1);
+        goto fail;
     }
-
 
 // ------------------
 // Send request and wait for response.
 // Ok. Its working :)
 
-    printf("\n");
+    //printf("\n");
     printf("NET.BIN: Sending hello!\n");
 
     int hello_status = (int) gns_hello(__client_fd);
     if (hello_status <= 0){
-        printf("net.bin: Service failed\n");
+        printf("net.bin: hello_status\n");
+        goto fail;
     }
 
 // Loop
 // See: 
 // libgns/
 
+// Here we're getting data from the kernel.
+// Probably the kernel is able to put data into a given 
+// buffer that this application has access.
+
+// #todo
+// Explain it better!
+
+/*
     int data_status=-1;
     int service_status = -1;
     while (1)
@@ -175,15 +162,23 @@ static int appInitialization(void)
         // Sleep
         gns_yield();
     };
+*/
 
 // Not reached
     appShutdown(__client_fd);
-    return 0;
+
+    return (int) EXIT_SUCCESS;
+fail:
+    return (int) EXIT_FAILURE;
 }
 
 int main(int argc, char *argv[])
 {
-    int Status=-1;
+    int Status = -1;
+
+    // #todo
+    // Let's parse the parameters.
+    // Each parameter can indicate one type of test to make.
 
     Status = appInitialization();
     return (int) Status;
