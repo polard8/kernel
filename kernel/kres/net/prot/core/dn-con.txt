@@ -1,0 +1,11 @@
+
+// Initializing connection
+// 1) SYN      >>
+// 2) SYN/ACK  <<
+// 3) ACK      >>
+
+// Finalizing connection
+// 1) FIN >>
+// 2) ACK <<
+// 3) FIN <<
+// 4) ACK >>

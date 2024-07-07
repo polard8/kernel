@@ -107,6 +107,18 @@ network_handle_tcp(
     // ex: 5014H
     // 0101 0000 0001 0100
 
+
+// Initializing connection
+// 1) SYN      >>
+// 2) SYN/ACK  <<
+// 3) ACK      >>
+
+// Finalizing connection
+// 1) FIN >>
+// 2) ACK <<
+// 3) FIN <<
+// 4) ACK >>
+
 //
 // ports
 //
@@ -116,11 +128,14 @@ network_handle_tcp(
     printk("TCP: dport{%d}   #debug\n",dport);
 
 // Show
-   
+
+
+// Special port.
+// Just a test.
     if (dport == 11888)
     {
         printk ("------------------------\n");
-        printk ("---- TCP -> [11888] ----\n");
+        printk ("---- [11888] << TCP ----\n");
 
         // >> Connection request: 
         // SYN=1, ACK=0
@@ -130,33 +145,39 @@ network_handle_tcp(
         printk("SYN={%d} ACK={%d}\n",fSYN,fACK);
 
         // (1) SYN
+        // A client is trying to initialize a new connection.
         if ( fSYN == 1 && fACK == 0 ){
             printk("\n");
-            printk(">>>> [TCP] SYN     (1)\n");
+            printk("<<<< [TCP] SYN     (1)\n");
             printk("SEQ={%d} | ACK={%d}\n",
                 _seq_number, _ack_number);
             // #todo
             // Connect to the process that is listening at 11888.
+            return;
         }
         // (2) SYN/ACK
+        // A server accepted the connection.
         if ( fSYN == 1 && fACK == 1 ){
             printk("\n");
-            printk(">>>> [TCP] SYN/ACK (2)\n");
+            printk("<<<< [TCP] SYN/ACK (2)\n");
             printk("SEQ={%d} | ACK={%d}\n",
                 _seq_number, _ack_number);
             // #todo
             // We received a syn/ack as a response to
             // our syn sent by a process in this machine.
+            return;
         }
         // (3) ACK
+        // A client is confirming the connection we accepted.
         if ( fSYN == 0 && fACK == 1 ){
             printk("\n");
-            printk(">>>> [TCP] ACK     (3)\n");
+            printk("<<<< [TCP] ACK     (3)\n");
             printk("SEQ={%d} | ACK={%d}\n",
                 _seq_number, _ack_number);
             // #todo
             // We received an ack as a response to
             // our syn/ack sent by a process in this machine.
+            return;
         }
     }
 
@@ -165,5 +186,9 @@ network_handle_tcp(
         //printk("TCP: MESSAGE: {%s}\n", tcp_payload );
         //memset(tcp_payload,0,sizeof(tcp_payload));
     //}
+
+    //
+    // Drop!
+    //
 }
 

@@ -41,10 +41,8 @@ network_handle_ipv4(
     //    goto fail;
     //}
 
-    unsigned char *src_ipv4 = 
-        (unsigned char *) &ip->ip_src.s_addr;
-    unsigned char *dst_ipv4 = 
-        (unsigned char *) &ip->ip_dst.s_addr;
+    unsigned char *src_ipv4 = (unsigned char *) &ip->ip_src.s_addr;
+    unsigned char *dst_ipv4 = (unsigned char *) &ip->ip_dst.s_addr;
 
 // Show data.
 // Bytes: Net-style.
@@ -70,20 +68,28 @@ network_handle_ipv4(
 // #bugbug
 // What is the style of this information?
 // little endian?
-    uint16_t ip_lenght = 
-        (uint16_t) FromNetByteOrder16(ip->ip_len);
-
-    if ( ip_lenght < 20 || 
-         ip_lenght > 65535 )
+    uint16_t ip_lenght = (uint16_t) FromNetByteOrder16(ip->ip_len);
+    if ( ip_lenght < 20 || ip_lenght > 65535 )
     {
         //#debug
         printk("IP: size={%d}\n",size);
         printk("IP: ip_lenght={%d}\n",ip_lenght);
-        
         // #todo:
         // Maybe simply drop it for now.
         panic("IP: Bad total lenght #debug\n");
     }
+
+
+    unsigned char *payload_pointer;
+    ssize_t payload_size;
+
+    payload_pointer = (buffer + IP_HEADER_LENGHT);
+    payload_size = (ip_lenght - IP_HEADER_LENGHT);
+
+
+    //printk ("target: %d.%d.%d.%d \n",
+    //    dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
+    //printk("ip_sum={%x} \n",ip->ip_sum);
 
 //
 // Protocol
@@ -93,43 +99,29 @@ network_handle_ipv4(
 // See:
 // https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 
-    Protocol = (uint8_t) ip->ip_p;
-    //printk("Protocol: {%xH}\n",Protocol);
-
 // 0x01 -  1 - ICMP - Internet Control Message Protocol
 // 0x06 -  6 - TCP  - Transmission Control Protocol
 // 0x11 - 17 - UDP  - User Datagram Protocol
 
-// UDP
-    if (Protocol == PROTOCOL_IP_UDP)
-    {
-        //printk ("target: %d.%d.%d.%d \n",
-        //    dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
-        //printk("ip_sum={%x} \n",ip->ip_sum);
-        
-        network_handle_udp(
-            (buffer + IP_HEADER_LENGHT),
-            (ip->ip_len - IP_HEADER_LENGHT) );
+    Protocol = (uint8_t) ip->ip_p;
+    //printk("Protocol: {%xH}\n",Protocol);
 
+// UDP
+    if (Protocol == PROTOCOL_IP_UDP){
+        //printk("IP: UDP Protocol\n");
+        network_handle_udp( payload_pointer, payload_size );
         return;
     }
-
-
-// ping?
-    if (Protocol == PROTOCOL_IP_ICMP)
-    {
+// ICMP: ping?
+    if (Protocol == PROTOCOL_IP_ICMP){
         //printk("IP: ICMP Protocol\n");
         //network_handle_icmp(..);
         goto drop;
     }
 // TCP
-    if (Protocol == PROTOCOL_IP_TCP)
-    {
+    if (Protocol == PROTOCOL_IP_TCP){
         //printk("IP: TCP Protocol\n");        
-        network_handle_tcp(
-            (buffer + IP_HEADER_LENGHT),
-            (ip->ip_len - IP_HEADER_LENGHT) );
-        
+        network_handle_tcp( payload_pointer, payload_size );
         return;
     }
 
@@ -139,6 +131,7 @@ network_handle_ipv4(
 drop:
     return;
 
+// debug:
 // ---------------
 // Not to me.
     /*
@@ -154,10 +147,12 @@ drop:
 
 // ---------------
 // To me.
+
     //printk ("IP: TO ME!\n");
     //printk("Src IPV4: {%x}\n", ip->ip_src.s_addr);
     //printk("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
     // destination
+
     printk ("Src: %d.%d.%d.%d\n",
         src_ipv4[0], src_ipv4[1], src_ipv4[2], src_ipv4[3]);
     printk ("Dst:  %d.%d.%d.%d\n",

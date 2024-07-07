@@ -2366,9 +2366,69 @@ void *sci2 (
         case 2:  network_test_udp();          break;
         case 3:  network_initialize_dhcp();   break;
         // case 4: break;
+        // case 5: break;
+        // case 6: break;
+        // default: break;
         };
         return NULL;
     }
+
+// =================================
+
+// #test
+// 22004 - Send ARP
+
+    /*
+    //#todo
+    if (number == 22004)
+    {
+        network_send_arp(...); //see arp.c
+        return NULL;
+    }
+    */
+
+// #test
+// 22005 - Send ETHERNET
+
+    /*
+    //#todo
+    if (number == 22005)
+    {
+        ethernet_send(...); //see ethernet.c
+        return NULL;
+    }
+    */
+
+// #test
+// 22006 - Send IP
+
+// #test
+// 22007 - Send UDP
+
+    /*
+    // #todo
+    if (number == 22007)
+    {
+        network_send_udp( 
+            dhcp_info.your_ipv4,        //__udp_gramado_default_ipv4,  // scr ip
+            __udp_target_gateway_ipv4,  //__udp_target_default_ipv4,   // dst ip
+            __udp_target_mac,           // dst mac
+            11888,      // source port
+            11999,      // dst port
+            message,    // msg
+             512 );     // msg lenght
+        return NULL;
+    }
+    */
+
+// #test
+// 22008 - Send TCP
+
+// #test
+// 22009 - Send XXX
+
+// #test
+// 22010 - Send XXX
 
 // 22011 - PS2 full initialization
 // see: hv.c
