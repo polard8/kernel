@@ -23,11 +23,11 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 #rtl
-LIBC      = ../../libs/rtl/include/
-LIBCOBJ   = ../../libs/rtl/obj
+LIBC      = ../../core/libs/rtl/include/
+LIBCOBJ   = ../../core/libs/rtl/obj
 #libgns
-LIBGNS    = ../../libs/libgns/include/
-LIBGNSOBJ = ../../libs/libgns/obj
+LIBGNS    = ../../core/libs/libgns/include/
+LIBGNSOBJ = ../../core/libs/libgns/obj
 
 # Objects
 myObjects = crt0.o main.o globals.o rtl.o \

@@ -24,8 +24,8 @@ CFLAGS = -m64 \
 	
 
 # rtl
-LIBC    = ../../libs/rtl/include/
-LIBCOBJ = ../../libs/rtl/obj
+LIBC    = ../../core/libs/rtl/include/
+LIBCOBJ = ../../core/libs/rtl/obj
 
 GWS_INCLUDES  = include/    
 

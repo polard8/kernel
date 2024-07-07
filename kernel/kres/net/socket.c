@@ -1555,8 +1555,8 @@ __connect_local (
 
         debug_print ("__connect_local: AF_GRAMADO ok\n");
 
-        // ws: Window server
-        if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 's' ){
+        // ds: Display server.
+        if ( addr->sa_data[0] == 'd' && addr->sa_data[1] == 's' ){
             target_pid = (pid_t) socket_get_gramado_port(GRAMADO_PORT_WS);
         }
         // wm: ...
@@ -1930,7 +1930,6 @@ sys_connect (
         case AF_GRAMADO:
             IsLocal = TRUE;
             break;
-
         default:
             IsLocal = FALSE;
             break;
