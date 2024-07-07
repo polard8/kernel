@@ -1,6 +1,5 @@
 
 all:
-	#make -C ftpd/
-	#make -C telnetd/
-	#make -C webd/
+#make -C client/
+#make -C server/
 

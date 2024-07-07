@@ -22,13 +22,17 @@ all:
 #	make -C webd/client/
 
 clean:
+	-rm -f *.o
+	-rm -f bin/*.BIN
+clean-all:
+	-rm -f *.o
+	-rm -f bin/*.BIN
+
 	-rm -f core/libs/libgns/obj/*.o
 	-rm -f core/libs/rtl/obj/*.o
-
 	-rm -f core/userinit/*.o
 
 	-rm -f netd/server/*.o
 	-rm -f netd/client/*.o
 
-	-rm -f bin/*.BIN
-
+# ...

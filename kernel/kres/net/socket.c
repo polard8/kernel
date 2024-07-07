@@ -1,7 +1,7 @@
-
 // socket.c
 // The APIs for the syscalls related to sockets.
 // Called by sci.c
+// Created by Fred Nora.
 
 // See:
 // https://en.wikipedia.org/wiki/Berkeley_sockets
@@ -24,7 +24,6 @@ __connect_inet (
     int sockfd, 
     const struct sockaddr *addr,
     socklen_t addrlen );
-
 
 static int 
 __connect_local ( 
@@ -70,14 +69,12 @@ int sys_socket( int family, int type, int protocol )
     struct socket_d *__socket;
 // Current process.
     struct process_d *p;
+    pid_t current_process = -1;
 // ip:port. 
 // Used in the socket struture.
-    unsigned int _ipv4 = 
-        (unsigned int) 0x00000000;
-    unsigned long _ipv6 = 
-        (unsigned long) 0x0000000000000000;
-    unsigned short port = 
-        (unsigned short) 0x0000;
+    unsigned long _ipv6 = (unsigned long)  0x0000000000000000;
+    unsigned int _ipv4  = (unsigned int)   0x00000000;
+    unsigned short port = (unsigned short) 0x0000;
     int Verbose = FALSE;
 
     // #debug
@@ -134,8 +131,12 @@ int sys_socket( int family, int type, int protocol )
         panic ("sys_socket: protocol not supported yet.\n");
     }
 
+//
+// Process
+//
+
 // Current pid.
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
@@ -169,14 +170,11 @@ int sys_socket( int family, int type, int protocol )
     __socket->type     = type;     // (SOCK_STREAM, SOCK_DGRAM, SOCK_RAW, ...) 
     __socket->protocol = protocol;
 
-
-
 // ip:port
 // Initialized with '0'.
-    __socket->ip_ipv4 = (unsigned int) _ipv4;
-    __socket->ip_ipv6 = (unsigned long) _ipv6;
-    __socket->port = 
-        (unsigned short) port;
+    __socket->ip_ipv6 = (unsigned long)  _ipv6;
+    __socket->ip_ipv4 = (unsigned int)   _ipv4;
+    __socket->port    = (unsigned short) port;
 
 // pid, uid, gid.
 // #todo: Use methods.
@@ -290,6 +288,7 @@ sys_accept (
 
 // Server process.
     struct process_d *sProcess;
+    pid_t current_process = -1;
 // Server socket and client socket.
     struct socket_d *sSocket;
     struct socket_d *cSocket;
@@ -308,8 +307,6 @@ sys_accept (
     // #debug
     // debug_print ("sys_accept:\n");
     do_credits_by_tid(current_thread);
-
-    pid_t current_process = (pid_t) get_current_process();
 
 //
 // fd Server 
@@ -342,7 +339,7 @@ sys_accept (
 
 // Current process. (The server)
 // The accept() was called by the server.
-
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0  || current_process >= PROCESS_COUNT_MAX ){
         debug_print ("sys_accept: [FAIL] current_process\n");
         printk      ("sys_accept: [FAIL] current_process\n");
@@ -350,7 +347,7 @@ sys_accept (
     }
 // Server process
     sProcess = (struct process_d *) processList[current_process];
-    if ( (void *) sProcess == NULL ){
+    if ((void *) sProcess == NULL){
         debug_print ("sys_accept: [FAIL] sProcess\n");
         printk      ("sys_accept: [FAIL] sProcess\n");
         goto fail;
@@ -366,7 +363,7 @@ sys_accept (
 // The socket is a file and belongs to the process.
 
     sFile = (file *) sProcess->Objects[fdServer];
-    if ( (void *) sFile == NULL ){
+    if ((void *) sFile == NULL){
         debug_print ("sys_accept: sFile fail\n");
         printk      ("sys_accept: sFile fail\n");
         goto fail;
@@ -392,7 +389,7 @@ sys_accept (
 // And check its validation.
 
     sSocket = (struct socket_d *) sFile->socket;
-    if ( (void *) sSocket == NULL ){
+    if ((void *) sSocket == NULL){
         debug_print ("sys_accept: [FAIL] sSocket\n");
         printk      ("sys_accept: [FAIL] sSocket\n");
         goto fail;
@@ -525,8 +522,7 @@ sys_accept (
         while (i <= sSocket->backlog_max)
         {
             cSocket = (struct socket_d *) sSocket->pending_connections[i];
-            if ((void*) cSocket != NULL)
-            {
+            if ((void*) cSocket != NULL){
                 break;
             }
             // next
@@ -647,6 +643,7 @@ sys_bind (
 // Service 7003
 
     struct process_d  *p;   // Process
+    pid_t current_process = -1;
     struct file_d     *f;   // File
     struct socket_d   *s;   // Socket
     register int i=0;
@@ -655,14 +652,6 @@ sys_bind (
     // #debug
     //debug_print ("sys_bind:\n");
     do_credits_by_tid(current_thread);
-
-    pid_t current_process = (pid_t) get_current_process();
-
-    // #debug
-    if (Verbose==TRUE){
-        printk("sys_bind: PID %d | fd %d | \n",
-            current_process, sockfd );
-    }
 
 // fd
     if ( sockfd < 0 || sockfd >= OPEN_MAX )
@@ -681,12 +670,16 @@ sys_bind (
     }
 
 // Process
-
+    current_process = (pid_t) get_current_process();
+    // #debug
+    if (Verbose==TRUE){
+        printk("sys_bind: PID %d | fd %d | \n",
+            current_process, sockfd );
+    }
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         printk("sys_bind: current_process\n");
         goto fail;
     }
-
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
         debug_print("sys_bind: p\n");
@@ -849,7 +842,6 @@ fail:
 // random port number to the client.
 // IN: client fd, address, address len
 // OUT: 0=ok <0=fail
-
 
 static int 
 __connect_inet ( 
@@ -1112,12 +1104,10 @@ __connect_inet (
 //
 
 // Vamos obter o arquivo do tipo soquete que pertence ao sender.
-
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         printk ("__connect_inet: current_process\n");
         goto fail;
     }
-
 // Client process.
 // sender's process structure.
     cProcess = (struct process_d *) processList[current_process];
@@ -1954,8 +1944,6 @@ sys_connect (
     return (int) -1;
 }
 
-
-
 int 
 sys_getsockname ( 
     int sockfd, 
@@ -1966,47 +1954,43 @@ sys_getsockname (
 
 // Process, file and socket.
     struct process_d  *p;
+    pid_t current_process = -1;
     struct file_d     *f;
     struct socket_d   *s;
 
-    pid_t current_process = (pid_t) get_current_process();
-
+// Parameter
     if ( sockfd < 0 || sockfd >= OPEN_MAX ){
         printk ("sys_getsockname: [FAIL ] sockfd\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 // process
+    current_process = (pid_t) get_current_process();
     p = (struct process_d *) processList[current_process]; 
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         printk ("sys_getsockname: p fail\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 // file
     f = (file *) p->Objects[sockfd];
-    if ( (void *) f == NULL ){
+    if ((void *) f == NULL){
         printk ("sys_getsockname: f fail\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 //socket
     s = (struct socket_d *) p->priv;
-    if ( (void *) s == NULL ){
+    if ((void *) s == NULL){
         printk ("sys_getsockname: s fail\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 // addr
 // Usando a estrutura que nos foi passada.
-    if ( (void *) addr == NULL ){
+    if ((void *) addr == NULL){
         printk ("sys_getsockname: addr fail\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 // Everything is ok.
@@ -2024,6 +2008,8 @@ sys_getsockname (
             addr->sa_data[n] = s->addr.sa_data[n];
         };
         debug_print ("sys_getsockname: copy ok\n");
+
+        // Done!
         return 0;
     }
 
@@ -2042,7 +2028,6 @@ sys_getsockname (
     refresh_screen();
     return (int) -1;
 }
-
 
 /*
  * sys_listen:
@@ -2072,19 +2057,19 @@ int sys_listen(int sockfd, int backlog)
 // Called by sci.c
 
     struct process_d  *p;
+    pid_t current_process = -1;
     file *f;
     struct socket_d  *s;
     int Backlog=0;
 
     do_credits_by_tid(current_thread);
 
-    pid_t current_process = (pid_t) get_current_process();
-
 // #debug
     //debug_print ("sys_listen: [TODO]\n");
     //printk      ("sys_listen: [TODO] fd=%d backlog=%d\n",
         //sockfd, backlog);
 
+// Parameter
 // The fd of the server's socket.
     if ( sockfd < 0 || sockfd >= OPEN_MAX )
     {
@@ -2116,14 +2101,12 @@ int sys_listen(int sockfd, int backlog)
  */
 
 // ==============================================
-
-    if ( current_process < 0 || 
-         current_process >= PROCESS_COUNT_MAX )
+    current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
     {
         printk("sys_listen: current_process\n");
         goto fail;
     }
-
 // process
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
@@ -2206,6 +2189,7 @@ int sys_socket_shutdown(int socket, int how)
 
 // The current process.
     struct process_d *p;
+    pid_t current_process = -1;
 // The file indicated by the fd.
     file *f;
 // The socket structure for the file.
@@ -2225,7 +2209,7 @@ int sys_socket_shutdown(int socket, int how)
     }
 
 // Process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if (current_process < 0  || current_process >= PROCESS_COUNT_MAX){
         printk      ("sys_socket_shutdown: p fail\n");
         goto fail;        

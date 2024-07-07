@@ -1,9 +1,8 @@
-
 // sockint.c
 // Internal routines.
 // workers.
 // Low level routines called by socket.c
-
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -133,8 +132,9 @@ struct socket_d *create_socket_object(void)
 // The counter
     s->connections_count = 0;
 
+// max backlog = 32.
     for (i=0; i<32; i++){
-        s->pending_connections[i]=0;
+        s->pending_connections[i] = 0;
     };
     s->backlog_head = 0;   //sai
     s->backlog_tail = 0;   //entra
@@ -170,10 +170,12 @@ fail:
 void show_socket_for_a_process (pid_t pid)
 {
     struct process_d  *p;
-    struct socket_d   *s;
+    struct socket_d  *s;
 
+    // #debug
     printk ("Socket info for pid %d: \n", pid);
 
+// Parameter
     if (pid<0 || pid >= PROCESS_COUNT_MAX){
         printk ("pid limits\n");
         goto fail;
@@ -193,7 +195,7 @@ void show_socket_for_a_process (pid_t pid)
 // Socket struture.
 // Pega o ponteiro para a estrutura privada de soquete.
     s = (struct socket_d *) p->priv;
-    if ( (void *) s == NULL ){
+    if ((void *) s == NULL){
         printk("s\n");
         goto fail;
     }
@@ -202,16 +204,14 @@ void show_socket_for_a_process (pid_t pid)
         goto fail;
     }
 
+//done:
 // Show
 // sockaddr structure.
-
     printk ("family %d \n",s->addr.sa_family);
     printk ("data %s   \n",s->addr.sa_data);
     //printk ("",s->);
     //printk ("",s->);
     //printk ("",s->);
-
-//done:
     //refresh_screen();
     return;
 
@@ -227,8 +227,10 @@ fail:
 struct socket_d *get_socket_from_fd(int fd)
 {
     struct process_d *p;
+    pid_t current_process = -1;
     file *_file;
 
+// Parameter
     if (fd<0 || fd>=OPEN_MAX){
         goto fail;
     }
@@ -236,7 +238,7 @@ struct socket_d *get_socket_from_fd(int fd)
 //----------------
 // #todo: We need a worker for that routine.
 // process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if (current_process<0 || current_process>=PROCESS_COUNT_MAX){
         goto fail;
     }
@@ -358,7 +360,7 @@ socket_dialog (
 
 unsigned int getSocketIPV4(struct socket_d *socket)
 {
-    if ((void *) socket ==  NULL){
+    if ((void *) socket == NULL){
         return 0;
     }
     if (socket->magic != 1234){
@@ -369,7 +371,7 @@ unsigned int getSocketIPV4(struct socket_d *socket)
 
 unsigned long getSocketIPV6(struct socket_d *socket)
 {
-    if ((void *) socket ==  NULL){
+    if ((void *) socket == NULL){
         return 0;
     }
     if (socket->magic != 1234){
@@ -380,7 +382,7 @@ unsigned long getSocketIPV6(struct socket_d *socket)
 
 unsigned short getSocketPort(struct socket_d *socket)
 {
-    if ((void *) socket ==  NULL){
+    if ((void *) socket == NULL){
         return 0;
     }
     if (socket->magic != 1234){
@@ -400,13 +402,13 @@ struct socket_d *get_socket_in_process_list(unsigned short target_port)
     {
         // Get process
         process = (struct process_d *) processList[i];
-        if ( (void*) process != NULL )
+        if ((void*) process != NULL)
         {
             if (process->magic == 1234)
             {
                 // Get the socket structure.
                 sock = (struct socket_d *) process->priv;
-                if ( (void*) sock != NULL )
+                if ((void*) sock != NULL)
                 {
                     if (sock->magic == 1234)
                     {
@@ -461,27 +463,30 @@ int socket_read ( unsigned int fd, char *buf, int count )
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
     struct process_d *p;
+    pid_t current_process = -1;
     file *f;
 
     debug_print ("socket_ioctl: TODO\n");
 
+// Parameters
     if (fd < 0 || fd >= OPEN_MAX){
         return (int) (-EBADF);
     }
+// ...
 
 // process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     p = (void*) processList[current_process];
-    if ( (void *) p == NULL ){
-        debug_print("socket_ioctl: [FAIL] p\n");
-        return -1;
+    if ((void *) p == NULL){
+        debug_print("socket_ioctl: p\n");
+        goto fail;
     }
 
 // file
     f = (file *) p->Objects[fd];
-    if ( (void *) f == NULL ){
-        debug_print("socket_ioctl: [FAIL] f\n");
-        return -1;
+    if ((void *) f == NULL){
+        debug_print("socket_ioctl: f\n");
+        goto fail;
     }
     if (f->used != TRUE || f->magic != 1234 ){
         panic("socket_ioctl: validation\n");
@@ -547,14 +552,16 @@ socket_gramado (
 {
 // Called by sys_socket().
 
+    struct process_d *Process;
+    pid_t current_process = -1;
     file *_file;
     char *buff;
     register int i=0;
     int __slot = -1;
-    struct process_d *Process;
 
     //debug_print ("socket_gramado:\n");
 
+// Parameters
     if ((void*) sock == NULL){
         debug_print ("socket_gramado: sock\n");
         goto fail;
@@ -568,7 +575,7 @@ socket_gramado (
         goto fail;
     }
 
-    sock->addr.sa_family  = family;
+    sock->addr.sa_family = family;
     sock->addr.sa_data[0] = 'x';
     sock->addr.sa_data[1] = 'x';
 
@@ -577,13 +584,13 @@ socket_gramado (
 // and the protocol needs to be GRAMADO_PROTOCOL.
 
 // Process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         printk ("socket_gramado: current_process\n");
         goto fail;
     }
     Process = (void *) processList[current_process];
-    if ( (void *) Process == NULL ){
+    if ((void *) Process == NULL){
         printk("socket_gramado: Process\n");
         goto fail;
     }
@@ -619,8 +626,7 @@ socket_gramado (
     };
 
 // Check slot validation. 
-    if (__slot == -1)
-    {
+    if (__slot == -1){
         printk ("socket_gramado: [FAIL] No free slots\n");
         goto fail;
     }
@@ -629,7 +635,7 @@ socket_gramado (
 
     //buff = (char *) newPage ();
     buff = (char *) kmalloc(BUFSIZ);
-    if ( (void *) buff == NULL ){
+    if ((void *) buff == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_gramado: buff fail\n");
         printk      ("socket_gramado: buff fail\n");
@@ -638,7 +644,7 @@ socket_gramado (
 
 // File
     _file = (void *) kmalloc ( sizeof(file) );
-    if ((void *) _file == NULL ){
+    if ((void *) _file == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_gramado: [FAIL] _file fail\n");
         printk      ("socket_gramado: [FAIL] _file fail\n");
@@ -717,6 +723,7 @@ socket_gramado (
 // ok.
 // Retornamos o fd na lista de arquivos abertos pelo processo.
     return (int) __slot;
+
 fail:
     debug_print ("socket_gramado: [FAIL]\n");
     //refresh_screen();
@@ -735,14 +742,16 @@ socket_unix (
 {
 // Called by sys_socket().
 
+    struct process_d *Process;
+    pid_t current_process = -1;
     file *_file;
     char *buff;
     register int i=0;
     int __slot = -1;
-    struct process_d *Process;
 
     //debug_print ("socket_unix:\n");
 
+// Parameters
     if ((void*) sock == NULL){
         debug_print ("socket_unix: sock\n");
         goto fail;
@@ -756,7 +765,7 @@ socket_unix (
         goto fail;
     }
 
-    sock->addr.sa_family  = family;
+    sock->addr.sa_family = family;
     sock->addr.sa_data[0] = 'x'; 
     sock->addr.sa_data[1] = 'x';
 
@@ -764,7 +773,7 @@ socket_unix (
 // GRAMADO_PROTOCOL is a valid protocol in AF_UNIX.
 
 // Process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         printk ("socket_unix: current_process\n");
         goto fail;
@@ -899,6 +908,7 @@ socket_unix (
 // ok.
 // Retornamos o fd na lista de arquivos abertos pelo processo.
     return (int) __slot;
+
 fail:
     debug_print ("socket_unix: fail\n");
     //refresh_screen();
@@ -925,12 +935,14 @@ socket_inet (
 {
 // Called by sys_socket().
 
+    struct process_d *Process;
+    pid_t current_process = -1;
     file *_file;
     char *buff;
     register int i=0;
     int __slot = -1;
-    struct process_d *Process;
 
+// Parameters
     if ((void*) sock == NULL){
         debug_print ("socket_inet: sock\n");
         goto fail;
@@ -962,7 +974,7 @@ socket_inet (
 // GRAMADO_PROTOCOL is a valid protocol in AF_INET.
 
 // Process
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         printk ("socket_inet: current_process\n");
         goto fail;
@@ -1089,13 +1101,12 @@ socket_inet (
 // ok
 // Retornamos o fd na lista de arquivos abertos pelo processo.
     return (int) __slot;
+
 fail:
     debug_print ("socket_inet: [FAIL]\n");
     //refresh_screen();
     return (int) (-1);
 }
-
-
 
 // Initialize socket list.
 int socket_init(void)
