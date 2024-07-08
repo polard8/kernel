@@ -211,12 +211,11 @@ hw_reboot:
 	jmp hw_reboot
 ; ----------------------------------------------------------------------
 
-
 ;========================================
 ; _irq1:
 ;     IRQ 1 - Keyboard.
 ; See:
-; 2io/dev/tty/chardev/hid/i8042/keyboard.c
+; keyboard.c
 ;
 extern _xxxxIRQ1_DEBUG_MESSAGE
 extern _irq1_KEYBOARD
@@ -224,77 +223,129 @@ extern _irq1_KEYBOARD
 align 4  
 global _irq1  
 _irq1:
+; ...
+
 ; Maskable interrupt
 
     cli
 
-    ;; Acumulator.
-    push rax
-   
-    push rax
-    push rbx
-    push rcx
-    push rdx
-    push rsi
-    push rdi
-    push rbp
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r13
-    push r14
-    push r15
-    
-    ;push ds
-    ;push es
-    push fs
-    push gs
-    push rsp
-    pushfq
-    cld
+; No caso do dispatcher lançar uma nova thread,
+; então ele deve acionar enviar um EIO.
 
-    ;xor rax, rax
-    ;mov ax, word 0x10 ;KERNEL_DS
-    ;mov ds, ax
-    ;mov es, ax
-    ;mov fs, ax
-    ;mov gs, ax ; Is it used ?
-    ;mov ss, ax ; Is it used ?
+    ; mov dword [_irq0PendingEOI], 1
+
+;; == Save context ====================
+    
+    ; Stack frame. (all double)
+    pop qword [_contextRIP]     ; rip
+    pop qword [_contextCS]      ; cs
+    pop qword [_contextRFLAGS]  ; rflags
+    pop qword [_contextRSP]     ; rsp
+    pop qword [_contextSS]      ; ss
+
+    mov qword [_contextRDX], rdx 
+    mov qword [_contextRCX], rcx 
+    mov qword [_contextRBX], rbx 
+    mov qword [_contextRAX], rax
+     
+    mov qword [_contextRBP], rbp
+ 
+    mov qword [_contextRDI], rdi 
+    mov qword [_contextRSI], rsi 
+
+; Data segments
+; gs,fs,es,ds
+    xor rax, rax
+    mov ax, gs
+    mov word [_contextGS], ax
+    mov ax, fs
+    mov word [_contextFS], ax
+    mov ax, es
+    mov word [_contextES], ax
+    mov ax, ds
+    mov word [_contextDS], ax
+
+; FPU
+; See:
+; https://wiki.osdev.org/SSE
+    fxsave [_context_fpu_buffer]
+
+; #todo
+; Media, float pointers, debug.
+; #important:
+; We are using the kernel segment registers.
+; Kernel data segments and stack.
+; #bugbug: sempre a mesma pilha?
+; Que pilha as interrupçoes de softwar estao usando?
+
+;
+; Calls
+;
+
+; cpl
+; Get the first 2 bits of cs.
+; see: x64cont.c
+    mov rax, qword [_contextCS]
+    and rax, 3
+    mov [_contextCPL], rax
 
 
 ; See: 
 ; keyboard.c
-
-    fxsave [__hw_fpu_buffer]
-
     call _irq1_KEYBOARD
 
-    fxrstor [__hw_fpu_buffer]
 
-    popfq
-    pop rsp
-    pop gs
-    pop fs
-    ;pop es
-    ;pop ds
+; FPU
+    fxrstor [_context_fpu_buffer]
 
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rbp
-    pop rdi
-    pop rsi
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
+; Release a bandit.
+
+; 64bit
+; This is a 64bit pointer to the pml4 table.
+
+; #bugbug
+; Não precisamos fazer refresh em todo tick,
+; somente quando houver troca de tarefa.
+
+    mov RAX, CR3  
+    IODELAY 
+    mov CR3, RAX  
+
+; Wait TLB.
+    ;IODELAY 
+;
+; == Restore context ====================
+;
+
+    ; Segments
+    xor rax, rax
+    mov ax, word [_contextDS]
+    mov ds, ax
+    mov ax, word [_contextES]
+    mov es, ax
+    mov ax, word [_contextFS]
+    mov fs, ax
+    mov ax, word [_contextGS]
+    mov gs, ax
+
+    mov rsi, qword [_contextRSI] 
+    mov rdi, qword [_contextRDI] 
+    
+    mov rbp, qword [_contextRBP] 
+    
+    mov rax, qword [_contextRAX] 
+    mov rbx, qword [_contextRBX] 
+    mov rcx, qword [_contextRCX] 
+    mov rdx, qword [_contextRDX] 
+
+
+    ;; Stack frame. (all double)
+    push qword [_contextSS]      ; ss
+    push qword [_contextRSP]     ; rsp
+    push qword [_contextRFLAGS]  ; rflags
+    push qword [_contextCS]      ; cs
+    push qword [_contextRIP]     ; rip
+
 
     ; send EOI to XT keyboard
     ;in      al, 061h
@@ -309,9 +360,17 @@ _irq1:
     MOV AL, 020h
     OUT 020h, AL
     IODELAY  
-    
-    ;; The acumulator.
-    pop rax
+
+    ;; variável usada pelo dispatcher.
+    ;mov dword [_irq0PendingEOI], 0
+
+
+    ; Acumulator.
+    mov rax, qword [_contextRAX]
+
+; #bugbug
+; We do NOT need the 'sti'. 
+; The flags in the 'eflags' will reenable it.
 
     sti
     iretq
@@ -834,7 +893,6 @@ extern _irq_E1000
 align 4  
 global _nic_handler
 _nic_handler:
-
 ; Maskable interrupt
 
     cli
