@@ -1,8 +1,9 @@
 
-// layer.h
+// layers.h
+// Kernel layers. (Work in progress)
 
-#ifndef __LAYER_H
-#define __LAYER_H    1
+#ifndef __LAYERS_H
+#define __LAYERS_H    1
 
 #define LAYER_UNDEFINED  0
 

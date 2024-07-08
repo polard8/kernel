@@ -4951,14 +4951,9 @@ do_read_file_from_disk (
         file_name++;
     }
 
-//
-// Namespace?
-//
-
 // -------------------------------------------
 // Is it inside the GRAMADO/ folder?
-// This is a kind of namespace, but this is not 
-// a new root directory for the whole system,
+// This is not a new root directory for the whole system,
 // it is only the directory where we're gonna serch
 // for the the desired file.
 // Remember: 
@@ -4983,8 +4978,7 @@ do_read_file_from_disk (
 
 // -------------------------------------------
 // Is it inside the PROGRAMS/ folder?
-// This is a kind of namespace, but this is not 
-// a new root directory for the whole system,
+// This is not a new root directory for the whole system,
 // it is only the directory where we're gonna serch
 // for the the desired file.
 // Remember: 

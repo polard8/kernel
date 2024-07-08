@@ -59,10 +59,10 @@ extern int current_usersession;
 #define USER_SESSION_COUNT_MAX  16
 extern unsigned long usessionList[USER_SESSION_COUNT_MAX];
 
-//==============================================================
-
+// ===================================================
 // cgroup
-// cgroup is all about resources management.
+// cgroups is all about resources management.
+
 struct cgroup_d
 {
 // Register some components of the cgroups.
@@ -98,6 +98,19 @@ extern int cg_counter;
 // List of cgroups.
 #define CGROUP_COUNT_MAX    16
 extern unsigned long cgroupList[CGROUP_COUNT_MAX];
+
+// ===================================================
+// namespace
+// namespaces is all about isolation.
+
+struct namespace_d
+{
+    // #todo
+
+    int dummy;
+};
+
+#define NAMESPACE_COUNT_MAX    16
 
 //
 // == prototypes ===========================

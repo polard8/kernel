@@ -1,4 +1,3 @@
-
 // syscalls.h
 // Created by Fred Nora.
 
@@ -9,7 +8,6 @@
 // So, this way we need 3 lists of numbers.
 // So, this way we have 3 headers for this purpose.
 // sci0.h, sci1.h and sci2.h 
-
 
 // #todo
 // We can change these names,

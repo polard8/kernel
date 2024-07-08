@@ -10,43 +10,27 @@
 // configuration, libc, devices ...
 
 //
-// Configuration of product and version.
+// Configuration
 //
 
-
-// ==================================
-// config/
-// Product and version.
 #include "config/product.h"  // Product type
 #include "config/version.h"  // Product version
-#include "config/config.h"
 
-// ==================================
-// ke/
-// System major info.
-#include "../kres/ke/system/bootinfo.h"
-#include "../kres/ke/system/mode.h"
-#include "../kres/ke/system/state.h"
+#include "config/config.h"   // Select components
+#include "config/utsname.h"  // System and machine
+#include "config/u.h"        // System, machine and user.
 
-// ==================================
-// config/
-// utsname
-// Structure describing the system and machine
-#include "config/utsname.h"
-#include "config/u.h"          // User
+//
+// Core control
+//
 
-// ==================================
-// virt/
-// system
+#include "../kctl/core/bootinfo.h"
+#include "../kctl/core/mode.h"
+#include "../kctl/core/state.h"
 #include "../kctl/core/system.h"
+#include "../kctl/core/klimits2.h"
+#include "../kctl/core/gdef.h"
 
-// ==================================
-// ke/
-// Supervisor:
-// Kernel configuration.
-// Compiling.
-#include "../kres/ke/system/klimits2.h"
-#include "../kres/ke/gdef.h"
 
 // ==================================
 // dev/
@@ -82,8 +66,8 @@
 #include "../lib/ktypes.h"
 #include "../lib/ktypes2.h"
 
-// ke/
-#include "../kres/ke/kobject.h"
+// Kernel objects.
+#include "../kctl/core/kobject.h"
 
 // lib/
 // Legacy stuff.
@@ -194,7 +178,7 @@
 // sw - Graphics Engine
 #include "../kres/gramk/color.h"
 #include "../kres/gramk/fonts.h"
-#include "../kres/gramk/ascii.h"
+#include "../lib/ascii.h"
 #include "../kres/gramk/bg.h"
 
 // ==================================
@@ -323,29 +307,20 @@
 #include "../kres/ke/ke.h"
 
 // ==================================
+// The user interactions.
 #include "../kres/gramk/user/user.h"
 
-// ==================================
-// ke/
-#include "../kres/ke/system/reboot.h"
-
-// ==================================
-// mod/
+// Reboot system.
+#include "../kctl/core/reboot.h"
+// Ring 0 kernel modules.
 #include "../kctl/core/mod.h"
-
-// ==================================
-// ke/
-// #deprecated?
-// This is a work in progress
-#include "../kres/ke/system/layer.h"
-
-// ==================================
-// virt/
-// Syscalls. 
-// (Called by the interrups 0x80, 0x81, 0x82, 0x83).
-#include "../kctl/core/syscalls.h"
+// Kernel layers. (Work in progress)
+#include "../kctl/core/layers.h"
+// Syscalls: (Called by the interrups 0x80, 0x81, 0x82, 0x83).
+#include "../kctl/core/sci/syscalls.h"
 // zero. (Used during the kernel initialization)
 #include "../kctl/core/zero.h"
+
 
 // ==================================
 // ke/

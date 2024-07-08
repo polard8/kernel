@@ -1,5 +1,5 @@
 
-// superv/limits.h
+// klimits.h
 // Gramado limits.
 
 #ifndef __GRAMADO_LIMITS
@@ -15,8 +15,4 @@
 #define GRAMADO_PIPE_BUF GRAMADO_BUFSIZ
 
 #endif    
-
-
-
-
 
