@@ -87,5 +87,5 @@ finalize:
 	cp $(linkTarget) ../../bin
 clean:
 	-rm *.o
-	-rm NETD.BIN 
+	-rm $(linkTarget)	
 	

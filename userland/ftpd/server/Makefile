@@ -112,5 +112,5 @@ link:
 	cp $(linkTarget) ../../bin
 clean:
 	-rm *.o
-	#-rm $(linkTarget)	
+	-rm $(linkTarget)	
 
