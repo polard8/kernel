@@ -164,10 +164,10 @@ build-gramado-os:
 # We can't survive without this one. (Only this one).
 	make -C userland/
 	cp userland/bin/INIT.BIN  $(BASE)/
-	-cp $(DEP_B1)/bin/PUBSH.BIN    $(BASE)/
-	-cp $(DEP_B1)/bin/SH7.BIN      $(BASE)/
-	-cp $(DEP_B1)/bin/SHELL.BIN    $(BASE)/
-#	-cp $(DEP_B1)/bin/SHELL00.BIN  $(BASE)/
+	-cp userland/bin/PUBSH.BIN    $(BASE)/
+	-cp userland/bin/SH7.BIN      $(BASE)/
+	-cp userland/bin/SHELL.BIN    $(BASE)/
+#	-cp userland/bin/SHELL00.BIN  $(BASE)/
 	cp userland/bin/NETD.BIN  $(BASE)/
 	cp userland/bin/NET.BIN   $(BASE)/
 
