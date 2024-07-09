@@ -366,6 +366,10 @@ void write_registers(unsigned char *regs)
    libio_outport8(VGA_CRTC_INDEX, 0x11);
    libio_outport8(VGA_CRTC_DATA, libio_inport8(VGA_CRTC_DATA) & ~0x80);
 /* make sure they remain unlocked */
+   // #bugbug:  <<< ---
+   // #danger_danger
+   // Take care about this indexes.
+   // What is exactly the 'positions' we are changing the values.
    regs[0x03] |= 0x80;
    regs[0x11] &= ~0x80;
 /* write CRTC regs */

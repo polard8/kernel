@@ -72,8 +72,9 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
 # Libraries
-LIBC    = ../../libs/rtl/include/
-LIBCOBJ = ../../libs/rtl/obj
+LIBC    = ../../core/libs/rtl/include/
+LIBCOBJ = ../../core/libs/rtl/obj
+
 
 CINCLUDES  = -I $(LIBC)  
 CINCLUDES += -I .    
@@ -108,6 +109,7 @@ main.o:
 
 link:
 	$(LD) $(linkFlags) -o $(linkTarget) $(myObjects)
+	cp $(linkTarget) ../../bin
 clean:
 	-rm *.o
 	#-rm $(linkTarget)	

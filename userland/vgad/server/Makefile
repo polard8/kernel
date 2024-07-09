@@ -1,7 +1,19 @@
-
-# vga1
+# vga service
 # Testing VGA interface using io library in ring3.
 # 2019 - Created by Fred Nora.
+
+linkTarget = VGAD.BIN
+
+# See: https://linux.die.net/man/1/ld
+# -s --strip-all:   Omit all symbol information from the output file.
+# -x --discard-all: Delete all local symbols.
+# -static: Do not link against shared libraries. 
+# -M --print-map:   Print a link map to the standard output.
+# LDFLAGS := -m elf_x86_64 -static
+# LDFLAGS := -m elf_x86_64 -s -x -static  
+linkFlags  = -m elf_x86_64 \
+-s -x -static -T ../link.ld
+
 
 VERSION = 0
 PATCHLEVEL = 0
@@ -24,11 +36,13 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-LIBC     = ../../libs/rtl/include/
-LIBCOBJ  = ../../libs/rtl/obj
+# Libraries
 
-LIBIO    = ../../libs/libio01/include/
-LIBIOOBJ = ../../libs/libio01/obj
+LIBC    = ../../core/libs/rtl/include/
+LIBCOBJ = ../../core/libs/rtl/obj
+
+LIBIO    = ../../core/libs/libio01/include/
+LIBIOOBJ = ../../core/libs/libio01/obj
 
 #Objects
 myObjects = crt0.o main.o rtl.o \
@@ -59,10 +73,9 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o  .
 
 jackpot-link:
-	ld -m elf_x86_64 -T ../link.ld -o VGA1.BIN $(myObjects)    
+	ld $(linkFlags) -o $(linkTarget) $(myObjects)    
 finalize:
-	cp VGA1.BIN  ../bin
+	cp $(linkTarget) ../../bin
 clean:
 	-rm *.o
-	-rm VGA1.BIN 
-	
+	-rm $(linkTarget) 
