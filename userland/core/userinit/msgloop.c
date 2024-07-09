@@ -214,7 +214,10 @@ processEvent (
                 if (caller_tid != 99){
                     break;
                 }
-                //printf("init.bin: 4003\n");
+                printf("init.bin: 4003, from {%d}\n",caller_tid);
+                memset(__filename_local_buffer,0,64);
+                sprintf(__filename_local_buffer,"#doc.bin");
+                rtl_clone_and_execute(__filename_local_buffer);
                 break;
             case 4004:  //app4
                 // This is a special tid used by the kernel.
@@ -222,7 +225,10 @@ processEvent (
                 if (caller_tid != 99){
                     break;
                 }
-                //printf("init.bin: 4004\n");
+                printf("init.bin: 4004, from {%d}\n",caller_tid);
+                memset(__filename_local_buffer,0,64);
+                sprintf(__filename_local_buffer,"#pubterm.bin");
+                rtl_clone_and_execute(__filename_local_buffer);
                 break;
             // ...
             default:

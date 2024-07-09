@@ -190,6 +190,8 @@ copy-extras:
 	-cp $(DEP_B1)/bin/REBOOT.BIN    $(BASE)/
 	-cp $(DEP_B1)/bin/SHUTDOWN.BIN  $(BASE)/
 	-cp $(DEP_B1)/bin/UNAME.BIN     $(BASE)/
+	-cp $(DEP_B1)/bin/SHELL.BIN     $(BASE)/
+	-cp $(DEP_B1)/bin/PUBSH.BIN     $(BASE)/
 	# Apps
 	-cp $(DEP_B2)/core/server/bin/GRAMLAND.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/
@@ -206,8 +208,6 @@ copy-extras:
 # Gotta use '@' before the command.
 
 	# Commands
-	-cp $(DEP_B1)/bin/SHELL.BIN     $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/PUBSH.BIN     $(BASE)/GRAMADO/
 	-cp $(DEP_B1)/bin/GRAMCNF.BIN   $(BASE)/GRAMADO/
 	# Apps
 	#-cp $(DEP_B2)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
