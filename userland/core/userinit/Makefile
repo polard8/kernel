@@ -31,7 +31,7 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 	
-
+# Libraries
 LIBC    = ../libs/rtl/include/
 LIBCOBJ = ../libs/rtl/obj
 

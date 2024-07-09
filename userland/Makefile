@@ -5,6 +5,11 @@ all:
 # The init process
 	make -C core/userinit/
 
+	make -C core/pubsh/
+	make -C core/sh7/
+	make -C core/shell/
+#	make -C core/shell00/
+
 #	make -C ftpd/client/
 	make -C ftpd/server/
 

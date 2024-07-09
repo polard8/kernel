@@ -164,6 +164,10 @@ build-gramado-os:
 # We can't survive without this one. (Only this one).
 	make -C userland/
 	cp userland/bin/INIT.BIN  $(BASE)/
+	-cp $(DEP_B1)/bin/PUBSH.BIN    $(BASE)/
+	-cp $(DEP_B1)/bin/SH7.BIN      $(BASE)/
+	-cp $(DEP_B1)/bin/SHELL.BIN    $(BASE)/
+#	-cp $(DEP_B1)/bin/SHELL00.BIN  $(BASE)/
 	cp userland/bin/NETD.BIN  $(BASE)/
 	cp userland/bin/NET.BIN   $(BASE)/
 
@@ -190,8 +194,6 @@ copy-extras:
 	-cp $(DEP_B1)/bin/REBOOT.BIN    $(BASE)/
 	-cp $(DEP_B1)/bin/SHUTDOWN.BIN  $(BASE)/
 	-cp $(DEP_B1)/bin/UNAME.BIN     $(BASE)/
-	-cp $(DEP_B1)/bin/SHELL.BIN     $(BASE)/
-	-cp $(DEP_B1)/bin/PUBSH.BIN     $(BASE)/
 	# Apps
 	-cp $(DEP_B2)/core/server/bin/GRAMLAND.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/

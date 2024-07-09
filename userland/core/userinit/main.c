@@ -37,6 +37,7 @@ static const char *app1_name = "gramland.bin";   // #c1
 //static const char *app2_name = "nicctl.bin";
 static const char *app3_name = "netd.bin";    // #c3
 static const char *app4_name = "net.bin";
+static const char *app5_name = "shell.bin";
 
 // ------------------------------------------
 // Command line for the display server.
@@ -358,7 +359,7 @@ static int __CompareString(void)
 // Initialize the window server.
     if ( strncmp(prompt,"ws",2) == 0 ){
         //printf ("~WS\n");
-        //rtl_clone_and_execute("gwssrv.bin");
+        //rtl_clone_and_execute("gramland.bin");
         goto exit_cmp;
     }
 // Initialize the window server and quit the command line.
@@ -397,7 +398,7 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 // Initialize the network server and quit the command line.
-    if( strncmp(prompt,"nsq",3) == 0 ){
+    if ( strncmp(prompt,"nsq",3) == 0 ){
         printf ("~NSQ\n");
         do_clear_console();
         // #c3 NETD.BIN
@@ -405,6 +406,24 @@ static int __CompareString(void)
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
+// #test
+// Launch a shell application 
+// This application will interpret the commands and send
+// data to the kernel console in ring0.
+    if ( strncmp(prompt,"shell",5) == 0 )
+    {
+        printf("Launching shell.bin #todo\n");
+        do_clear_console();
+        // #todo
+        // Let's create a shell command able to run in this environment.
+        //rtl_clone_and_execute("pubsh.bin");
+        //rtl_clone_and_execute("sh7.bin");
+        //rtl_clone_and_execute("shell.bin");
+        //rtl_clone_and_execute("shell2.bin");
+        //isTimeToQuitCmdLine = TRUE;
+        goto exit_cmp;
+    }
+
 
 //
 // 3D stuff
