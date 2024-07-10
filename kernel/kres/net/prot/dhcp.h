@@ -126,9 +126,9 @@ void network_save_dhcp_server_id( uint8_t ip[4] );
 void 
 network_dhcp_send(
     struct dhcp_d *dhcp,
+    int message_type, 
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
-    int message_type, 
     unsigned short sport, 
     unsigned short dport );
 

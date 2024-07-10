@@ -65,7 +65,7 @@ network_handle_dhcp(
         //return;
 
 // yiaddr: Your IP address.
-    your_ipv4[0] = (uint8_t) (dhcp->yiaddr          & 0xFF);
+    your_ipv4[0] = (uint8_t) (  dhcp->yiaddr        & 0xFF);
     your_ipv4[1] = (uint8_t) ( (dhcp->yiaddr >> 8)  & 0xFF);
     your_ipv4[2] = (uint8_t) ( (dhcp->yiaddr >> 16) & 0xFF);
     your_ipv4[3] = (uint8_t) ( (dhcp->yiaddr >> 24) & 0xFF);
@@ -73,7 +73,7 @@ network_handle_dhcp(
         your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
 
 // siaddr: Server IP address.
-    server_ipv4[0] = (uint8_t) (dhcp->siaddr          & 0xFF);
+    server_ipv4[0] = (uint8_t) (  dhcp->siaddr        & 0xFF);
     server_ipv4[1] = (uint8_t) ( (dhcp->siaddr >> 8)  & 0xFF);
     server_ipv4[2] = (uint8_t) ( (dhcp->siaddr >> 16) & 0xFF);
     server_ipv4[3] = (uint8_t) ( (dhcp->siaddr >> 24) & 0xFF);
@@ -95,8 +95,9 @@ network_handle_dhcp(
 
     //if (dhcp->op == 1)
         //return;
-    if (dhcp->op == 2)
+    if (dhcp->op == 2){
         printk ("DHCP: Reply received\n");
+    }
 
 // 53 = DHCP Message type.
 
@@ -105,11 +106,8 @@ network_handle_dhcp(
     //dhcp->options[1] = 0x01;  // lenght
     //dhcp->options[2] = (uint8_t) message_type;  // Discover or Request.
 
-    if ( dhcp->options[2] != DORA_O && 
-         dhcp->options[2] != DORA_A )
-    {
-        //return;
-    }
+// As a client, we send Discover and Request,
+// and only receive Offer, Acknowledge or Decline.
 
 // ---------------------------
 // Offer: d'O'ra 
@@ -117,9 +115,7 @@ network_handle_dhcp(
 // + Let's send a Request.
     if (dhcp->options[2] == DORA_O)
     {
-        printk("\n");
-        printk("--2-- DHCP-RECEIVE: DORA_O\n");
-        printk("DHCP: Send Dora Request\n");
+        printk("DHCP: DORA-O\n");
 
         // #debug
         //printk ("When receiving Offer: Your IP %d.%d.%d.%d\n",
@@ -130,9 +126,11 @@ network_handle_dhcp(
         // Request: do'R'a
         network_dhcp_send( 
             dhcp,
+            DORA_R,
             your_ipv4, 
             server_ipv4,
-            DORA_R, 68, 67 );
+            68, 
+            67 );
 
         return;
     }
@@ -151,8 +149,7 @@ network_handle_dhcp(
 // Set the online status.
     if ( dhcp->options[2] == DORA_A )
     {
-        printk("\n");
-        printk("--4-- DHCP-RECEIVE: DORA_A\n");
+        printk("DHCP: DORA-A\n");
 
         // #debug
         //printk ("When receiving ack: Your IP %d.%d.%d.%d\n",
@@ -185,8 +182,8 @@ network_handle_dhcp(
         return;
     }
 
-    //#debug
-    //die();
+// Unknown option
+    //printf("DHCP: Unknown option\n")
 }
 
 // Called by some handler to 
@@ -204,31 +201,34 @@ void network_save_dhcp_server_id( uint8_t ip[4] )
 void 
 network_dhcp_send(
     struct dhcp_d *dhcp,
+    int message_type, 
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
-    int message_type, 
     unsigned short sport, 
     unsigned short dport )
 {
     char *p; // For hostname support.
     int opt_size = 0;
 
+// Parameters
     if ((void*) dhcp == NULL){
         printk("network_dhcp_send: dhcp\n");
         goto fail;
     }
+    // DORA
+    if (message_type < 0){
+        printk("network_dhcp_send: message_type\n");
+        goto fail;       
+    }
 
-// 1=REQUEST, 2=REPLY
-    dhcp->op = 1;
-// 1 = Ethernet
-    dhcp->htype = 1;
-// MAC lenght
-    dhcp->hlen  = 6;
-// ?
-    dhcp->hops  = 0;
+    dhcp->op    = 1;  // 1=REQUEST | 2=REPLY
+    dhcp->htype = 1;  // 1 = Ethernet
+    dhcp->hlen  = 6;  // MAC lenght
+    dhcp->hops  = 0;  // ?
 
-// xid:
-// Transaction ID, a random number chosen by the client 
+// ??
+// The Transaction ID. 
+// It's a random number chosen by the client 
 // to identify an IP address allocation.
     dhcp->xid   = ToNetByteOrder32(0x3903F326);
 
@@ -258,9 +258,8 @@ network_dhcp_send(
 // Relay agent is used when the dhcp is outside the local network.
     dhcp->giaddr = (unsigned int) 0;
 
-// chaddr: 
-// Client hardware address.
-// Fill mac
+// Client MAC:
+// Let's fill it. Getting the number in the structure.
     memset( dhcp->chaddr, 0, 16 );
     register int i=0;
     if ((void*) currentNIC == NULL){
@@ -269,24 +268,21 @@ network_dhcp_send(
     }
     if ((void*) currentNIC != NULL)
     {
-        // Get our MAC address.
         for (i=0; i<6; i++){
-            dhcp->chaddr[i] = (uint8_t) currentNIC->mac_address[i];  // source 
+            dhcp->chaddr[i] = (uint8_t) currentNIC->mac_address[i];
         };
     }
 
-// sname: 
-// Server host name, from which the client obtained configuration parameters.
+// The server host name, 
+// from which the client obtained configuration parameters.
     memset(dhcp->sname, 0, 64);
 
-// file: 
-// Bootfile name and path information, defined by the server to the client.
+// Bootfile name and path information, 
+// defined by the server to the client.
     memset(dhcp->file, 0, 128);
 
-// DHCP magic cookie: 
-// 99, 130, 83, 99
-    dhcp->magic_cookie = 
-        (unsigned int) ToNetByteOrder32(0x63825363);
+// DHCP magic cookie: (99, 130, 83, 99)
+    dhcp->magic_cookie = (unsigned int) ToNetByteOrder32(0x63825363);
 
 //
 // Options
@@ -320,24 +316,20 @@ network_dhcp_send(
     dhcp->options[1] = 0x01;  // lenght
     dhcp->options[2] = (uint8_t) message_type;  // Discover or Request.
 
-// In DORA we only have two kind of send:
-// The Discover and the Request.
-    if ( message_type != DORA_D && 
-         message_type != DORA_R )
+// In DORA the client only have two kinds of send: (D|R)
+    if ( message_type != DORA_D && message_type != DORA_R )
     {
-        printk("Invalide DORA message type\n");
+        printk("Invalid DORA message type\n");
         goto fail;
     }
 
-// Message type
-
+// Message type: Only (D|R)
     switch (message_type){
 
     // Discovering and IP.
     case DORA_D:
-        printk("\n");
-        printk("--1-- DHCP-SEND: DORA_D\n");
-        
+        printk("DHCP: DORA-D\n");
+
         //++
         // Parameter Request list
         dhcp->options[3] = OPT_PARAMETER_REQUEST;
@@ -354,8 +346,7 @@ network_dhcp_send(
 
     // Requesting an IP.
     case DORA_R:
-        printk("\n");
-        printk("--3-- DHCP-SEND: DORA_R\n");
+        printk("DHCP: DORA-R\n");
 
         //++
         // Requested IP address
@@ -421,28 +412,34 @@ network_dhcp_send(
         break;   
     };
 
-//
 // Sending UDP packet.
-//
-
-    printk("network_dhcp_send: Sending udp ...\n");
-
 // UDP payload is the base of the dhcp structure.
+
     char *__udp_payload = (char *) dhcp;
-    //size_t udp_payload_size = (size_t) ( sizeof(struct dhcp_d) - 308 + opt_size );
-    size_t __udp_payload_size = (size_t) (sizeof(struct dhcp_d));
+    size_t __udp_payload_size = (size_t) ( sizeof(struct dhcp_d) );
+
+    printk("network_dhcp_send: Send UDP\n");
+
+// IN:
+// src ip, 
+// target ip,
+// target mac,
+// src port, 
+// destination port,
+// payload buffer, 
+// payload size.
 
     network_send_udp( 
-        __dhcp_source_ipv4,  // scr ip
-        __dhcp_target_ipv4,  // dst ip
-        __dhcp_target_mac,   // dst mac
-        sport,               // source port
-        dport,               // target port
-        __udp_payload,
+        __dhcp_source_ipv4, 
+        __dhcp_target_ipv4,
+        __dhcp_target_mac,
+        sport, 
+        dport,
+        __udp_payload, 
         __udp_payload_size ); 
 
 // done:
-    printk("network_dhcp_send: done :)\n");
+    printk("network_dhcp_send: Done\n");
     return;
 
 fail:
@@ -480,15 +477,15 @@ int network_initialize_dhcp(void)
 
     network_dhcp_send( 
         (struct dhcp_d *) &Ldhcp,    // dhcp header 
+        DORA_D,                      // Message code.
         __dhcp_source_ipv4,          // 255.255.255.255
         __dhcp_target_ipv4,          // FF.FF.FF.FF.FF.FF
-        DORA_D,                      // message code 
         68,                          // src port
         67 );                        // dst port
 
-    printk("network_initialize_dhcp: done\n");
+    printk("network_initialize_dhcp: Done\n");
     //dhcp_info.initialized =  TRUE;
-    
+
     //while(1){}
     return 0;
 
