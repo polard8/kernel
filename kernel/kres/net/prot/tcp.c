@@ -1,5 +1,5 @@
-
 // tcp.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -21,15 +21,20 @@ network_handle_tcp(
 
     printk("network_handle_tcp: #todo\n");
 
+
+// Parameters
+    if ((void*) buffer == NULL){
+        printk("network_handle_tcp: buffer\n");
+        return;
+    }
+    //if (size < 0){
+    //}
+
 // #warning
 // It's ok to use pointer here.
 // We're not allocating memory, we're using 
 // a pre-allocated buffer.
     tcp = (struct tcp_d *) buffer;
-    if ((void*) tcp == NULL){
-        printk("network_handle_tcp: tcp\n");
-        return;
-    }
 
     uint16_t sport = (uint16_t) FromNetByteOrder16(tcp->th_sport);
     uint16_t dport = (uint16_t) FromNetByteOrder16(tcp->th_dport);
@@ -40,34 +45,9 @@ network_handle_tcp(
 // Clean the payload local buffer.
     memset(tcp_payload,0,sizeof(tcp_payload));
 
-//
-// Create a local copy of the payload.
-//
-
-    /*
-    char *p2; 
-    p2 = (buffer + TCP_HEADER_LENGHT);
-    size_t p_size = strlen(p2);
-    if (p_size <= 512)
-    {
-        strncpy(
-            tcp_payload,
-            p2,
-            p_size );
-        tcp_payload[p_size] = 0;
-        tcp_payload[p_size +1] = 0;
-    }
+// Create a local copy of the TCP payload.
+    strncpy( tcp_payload, (buffer + TCP_HEADER_LENGHT), 1020 );
     tcp_payload[1021] = 0;
-    */
-
-    
-    strncpy(
-        tcp_payload,
-        (buffer + TCP_HEADER_LENGHT),
-        1020 );
-    
-    tcp_payload[1021] = 0;
-
 
 //
 // Control fields

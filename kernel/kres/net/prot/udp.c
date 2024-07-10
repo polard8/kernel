@@ -309,7 +309,7 @@ network_send_udp (
     uint8_t target_mac[6], 
     unsigned short source_port,
     unsigned short target_port,
-    char *data_buffer,
+    char *data_buffer,   // UDP payload
     size_t data_lenght )
 {
 // Buffers:
@@ -628,13 +628,14 @@ network_send_udp (
 // Send
 //
 
+// #bugbug
+// I guess we don't need the routine above.
+// It's because ethernet_send() will put the given data into 
+// the right place.
 
-    // Send frame via NIC.
-    //e1000_send( currentNIC, FRAME_SIZE, frame );
-    // #test
-    // Creating a sender for ethernet packet.
+// Send frame via NIC.
     ethernet_send( currentNIC, FRAME_SIZE, frame );
-    
+
 // #debug
 // Send frame to myself.
     //network_on_receiving(frame,FRAME_SIZE);

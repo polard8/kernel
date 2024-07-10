@@ -104,6 +104,16 @@ network_handle_ipv4(
     ssize_t size );
 
 
+int 
+ipv4_send (
+    unsigned char protocol, 
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6],
+    char *data_buffer, 
+    size_t data_lenght );
+
+
 #endif   
 
 

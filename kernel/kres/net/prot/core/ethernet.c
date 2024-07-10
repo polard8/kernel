@@ -1,4 +1,3 @@
-
 // ethernet.c
 
 #include <kernel.h>
