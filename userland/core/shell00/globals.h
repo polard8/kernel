@@ -1,12 +1,13 @@
 /*
  * File: globals.h
- * 
  * Global variables.
- *
  * History:
  *     2018 - Created by Fred Nora.
  */
- 
+
+#ifndef __SHELL00_GLOBALS_H
+#define __SHELL00_GLOBALS_H    1
+
 //"global command" stuff 
 #define glob_percent_sign '%' 
 #define glob_underscore '_'
@@ -18,11 +19,9 @@
 #define glob_question_mark '?'
 //... 
  
- 
 #define SHELL_TERMINAL_COLOR 0
 #define SHELL_TERMINAL_COLOR2 0x303030
 //...
-
 
 /*
 #define BLACK       0
@@ -43,12 +42,9 @@
 #define WHITE       15 
 */ 
  
- 
- 
 //#ifndef whitespace
 //#define whitespace(c) (((c) == ' ') || ((c) == '\t'))
 //#endif 
-
 
 //#ifndef digit
 //#define digit(c)  ((c) >= '0' && (c) <= '9')
@@ -62,15 +58,10 @@
 //#define digit_value(c) ((c) - '0')
 //#endif
  
- 
 //#define NEWLINE '\n' 
 //#define TAB '\t'
 //#define SPACE 0x020
  
-
-
-
-
 //
 // Estrutura para mainpular linhas dentro do screen_buffer[]
 //
@@ -304,16 +295,11 @@ static unsigned long screen_buffer_saved_y = 0;
 
 //...
 
-
 //
 // WINDOW SUPPORT
 //
 
-
-
 //...
-
-
 
 //
 // Colors
@@ -322,5 +308,7 @@ static unsigned long screen_buffer_saved_y = 0;
 //cores do texto. 
 unsigned long backgroung_color;  //pano de fundo.
 unsigned long foregroung_color;  //texto.
+
+#endif   
 
 

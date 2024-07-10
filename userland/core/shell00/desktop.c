@@ -1,12 +1,9 @@
-
+// desktop.c
 
 // gerenciamento do desktop,
 // manipulação dos ícones no desktop.
-//
-
 
 #include "shell.h"
-
 
 //desktop folders.
 
@@ -21,14 +18,11 @@ char *primary_desktop_folder = PDESKTOPFOLDER;
 char *secondary_desktop_folder = SDESKTOPFOLDER;
 
 
-
-int desktopInitialize (){
-	
+int desktopInitialize (void)
+{	
 	printf("Initializing desktop ...\n");
 	printf("%s\n",primary_desktop_folder);
-    printf("%s\n",secondary_desktop_folder);	
-	
+    printf("%s\n",secondary_desktop_folder);		
 	return 0;
 }
-
 

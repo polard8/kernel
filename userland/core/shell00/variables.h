@@ -1,11 +1,13 @@
 /* 
  File: variables.h 
      Data structures for shell variables. 
- 
  History:
     2018 - Ported from bash 1.05.
-	
  */
+
+
+#ifndef __SHELL00_VARIABLES_H
+#define __SHELL00_VARIABLES_H    1
 
 /* 
  What a shell variable looks like. 
@@ -80,8 +82,6 @@ struct variable_d
 // # value #
 #define value_cell(var) ((var)->value)
 
-
-
 /* 
  Stuff for hacking variables. 
  */
@@ -93,5 +93,5 @@ extern char **export_env;
 extern int variable_context;
 */
 
-
+#endif   
 

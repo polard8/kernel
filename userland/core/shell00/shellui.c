@@ -151,7 +151,7 @@ shellTopbarProcedure ( struct window_d *window,
 				case VK_F1:
 				    //APISetFocus(i1Window);
 					//APIredraw_window(i1Window);
-					MessageBox( 1, "Gramado Core - Shell Topbar","F1: HELP");
+					//MessageBox( 1, "Gramado Core - Shell Topbar","F1: HELP");
 					break;
 				
                 //full screen
@@ -159,7 +159,7 @@ shellTopbarProcedure ( struct window_d *window,
 		        case VK_F2:
 				    //APISetFocus(i2Window);
 					//APIredraw_window(i2Window);				
-				    MessageBox( 1, "Gramado Core - Shell Topbar","F2: ");
+				    //MessageBox( 1, "Gramado Core - Shell Topbar","F2: ");
 					//ShellFlag = SHELLFLAG_COMMANDLINE;
 					break;
 					
@@ -183,7 +183,7 @@ shellTopbarProcedure ( struct window_d *window,
 				//O MENU APPLICATION É O CONTEXT MENU.
 				//
 				case VK_APPS:
-				    MessageBox( 1, "Gramado Core Shell Topbar:","Context Menu");
+				    //MessageBox( 1, "Gramado Core Shell Topbar:","Context Menu");
 					break;
 			}		
 		    break;
@@ -202,7 +202,7 @@ shellTopbarProcedure ( struct window_d *window,
 				// Abre uma janela e oferece informações sobre o aplicativo.
 				case CMD_ABOUT:
 				    // Test.
-				    MessageBox( 1, "Shell test Topbar","Testing MSG_COMMAND.CMD_ABOUT.");
+				    //MessageBox( 1, "Shell test Topbar","Testing MSG_COMMAND.CMD_ABOUT.");
 				    break;
 
 				//default:
@@ -238,7 +238,7 @@ shellTopbarProcedure ( struct window_d *window,
 		    break;
 		
 		case MSG_SETFOCUS:
-		    APISetFocus(window);
+		    //APISetFocus(window);
 			break;
 			
 		case MSG_KILLFOCUS:
@@ -462,13 +462,12 @@ done:
     return (unsigned long) 0;	
 }
 
-
 // Criando edit box
 // o tipo dois funciona.
 // testando colocar o ponteiro no edit box. setar foco.
-
-void shellCreateEditBox (){
-    
+void shellCreateEditBox (void)
+{ 
+/*  
 	editboxWindow = (void *) APICreateWindow ( WT_EDITBOX, 1, 1, "shell-editbox1",     
                                 10, 600-100, 300, 24,    
                                 0, 0, COLOR_WINDOW, COLOR_WINDOW );
@@ -476,8 +475,7 @@ void shellCreateEditBox (){
 									   
 	if ( (void *) editboxWindow == NULL)
 	{	
-		printf("shellCreateEditBox: fail");
-		
+		printf("shellCreateEditBox: fail");		
 		refresh_screen();
 		while(1){}
 		//exit(0);
@@ -485,15 +483,12 @@ void shellCreateEditBox (){
 	
 	//Registrar.
     APIRegisterWindow (editboxWindow);
-
-	//shellSetCursor ( 8, 8 );								   
+	//shellSetCursor ( 8, 8 );		
+*/						   
 }
 
-
 /*
- ******************** 
  * shellCreateMainWindow:
- *
  *     CRIANDO A TOP BAR.
  *     Obs: Essa é uma janela filha.
  *     @todo: ?? e o procedimento de janela ?? e as mensagens ??
@@ -505,8 +500,10 @@ void shellCreateEditBox (){
 // #todo
 // Vamos criar a main window do tamanho da tela. get system metrics. 
  
-struct window_d *shellCreateMainWindow ( int status ){
-	
+struct window_d *shellCreateMainWindow (int status)
+{
+/*
+
 	unsigned long left;
 	unsigned long top;
 	
@@ -577,15 +574,16 @@ struct window_d *shellCreateMainWindow ( int status ){
 	apiShowWindow (w);
 	
 	return w;
+*/
+    return NULL;
 }
 
-
-void testCreateWindow (){
-	
+void testCreateWindow (void)
+{
+/*
 	struct window_d *hWindow;	
 	
-	apiBeginPaint ();
-	
+	apiBeginPaint();
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "XXX",     
                            10, 10, 200, 200,
                            0, 0, COLOR_RED, COLOR_YELLOW ); //xCOLOR_GRAY1, xCOLOR_GRAY1 );
@@ -594,7 +592,6 @@ void testCreateWindow (){
 	{
 		printf ("FAIL!");
 		while(1){}
-		
 		die ("shell.bin: hWindow fail");
 	}
 	
@@ -602,30 +599,26 @@ void testCreateWindow (){
 	
     APIRegisterWindow (hWindow);
 	apiShowWindow (hWindow);	
-
     apiEndPaint ();
-	
     printf ("ok\n");
+*/
 }
 
-
 /*
- *************************************
  * shellDisplayBMP:
  *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
  */
+int shellDisplayBMP (char *file_name)
+{	
 
-int shellDisplayBMP (char *file_name){	
-	
+/*
 	// #bugbug @todo: Aumenta o tamanho do heap do processo.
 	// Esse heap é gerenciando nas bibliotecas ou na API.
 	//Obs: 32Kb é alem do limite.
 	
 	// testando malloc.
-	void *b = (void *) malloc (1024*30); 	
-    
-	if ( (void *) b == NULL )
-	{
+	void *b = (void *) malloc (1024*30); 	    
+	if ( (void *) b == NULL ){
 		printf("shellTestDisplayBMP: allocation fail\n");
 		//while(1){}
 		return -1;
@@ -633,7 +626,6 @@ int shellDisplayBMP (char *file_name){
 	
 	//Carregando o arquivo.
 loadFile:
-
     shellui_fntos ( (char *) file_name );
 
     //@todo: Usar alguma rotina da API específica para carregar arquivo.
@@ -674,21 +666,20 @@ loadFile:
 	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
 	//printf("buffer %x \n",bmp);
 	//printf("data area address %x \n",&bmp[base]);
-	
+
+*/
 	return 0;
 }
 
-
 /*
- *************************************
  * shellDisplayBMP:
  *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
  *  tamanho dado em kb
  */
+int shellDisplayBMPEx (char *file_name, int size )
+{	
 
-int shellDisplayBMPEx (char *file_name, int size ){	
-	
-	
+/*
     //naõ pode ser igual a zero, nem menor que zero, nem maior que 3mb.	
 	if ( size <= 0 || size > (1024*3) )
 	{
@@ -697,9 +688,7 @@ int shellDisplayBMPEx (char *file_name, int size ){
 	
 	// testando malloc.
 	void *b = (void *) malloc (1024*size); 	
-    
-	if ( (void *) b == NULL )
-	{
+	if ( (void *) b == NULL ){
 		printf("shellTestDisplayBMP: allocation fail\n");
 		//while(1){}
 		return -1;
@@ -707,7 +696,6 @@ int shellDisplayBMPEx (char *file_name, int size ){
 	
 	//Carregando o arquivo.
 loadFile:
-
     shellui_fntos ( (char *) file_name );
 
     //@todo: Usar alguma rotina da API específica para carregar arquivo.
@@ -748,27 +736,23 @@ loadFile:
 	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
 	//printf("buffer %x \n",bmp);
 	//printf("data area address %x \n",&bmp[base]);
-	
+*/
+
 	return 0;
 }
 
-
-
+// shellTestDisplayBMP:
+// Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+// Devemos usar a função oferecida pela api.
+void shellTestDisplayBMP (void)
+{
 /*
- * shellTestDisplayBMP:
- *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
- *     Devemos usar a função oferecida pela api.
- */
 
-void shellTestDisplayBMP (){
-	
-	
 	// #bugbug @todo: Aumenta o tamanho do heap do processo.
 	// Esse heap é gerenciando nas bibliotecas ou na API.
 	// Obs: 32Kb é alem do limite.
 	
 	void *b = (void *) malloc (1024*30); 	// testando malloc.
-    
 	if ( (void *) b == NULL )
 	{
 		printf("shellTestDisplayBMP: allocation fail\n");
@@ -782,7 +766,6 @@ loadFile:
 	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) bmp1_file_name, 
 		(unsigned long) b, (unsigned long) b);	
 	
-
 	apiDisplayBMP ( (char *) b, 10, 450 );  
 	 
     //
@@ -814,6 +797,7 @@ loadFile:
 	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
 	//printf("buffer %x \n",bmp);
 	//printf("data area address %x \n",&bmp[base]);		
+*/
 }
 
 
@@ -830,7 +814,8 @@ bmpDisplayBMP ( void *address,
 				int width, 
 				int height )
 {
-    apiDisplayBMP ( (char *) address, x, y ); 
+
+    //apiDisplayBMP ( (char *) address, x, y ); 
     
 	/*
 	int i, j, base, offset;	
@@ -905,13 +890,14 @@ bmpDisplayBMP ( void *address,
 //quando clicamos no menu da barra de tarefas.
 //todo mudar o nome da função.
 
-int shellTestButtons (){
+int shellTestButtons (void)
+{
 
+/*
 	// Tamanho da tela.	
 	unsigned long ScreenWidth = apiGetSystemMetrics(1);
     unsigned long ScreenHeight = apiGetSystemMetrics(2); 	
 	
-
 	unsigned long app1Left = ((ScreenWidth/8) * 2);
 	unsigned long app2Left = ((ScreenWidth/8) * 3);
 	unsigned long app3Left = ((ScreenWidth/8) * 4);
@@ -922,8 +908,6 @@ int shellTestButtons (){
 	unsigned long app3Top = app1Top; 
 	unsigned long app4Top = app1Top;
 	
-	
-    
 	//
 	// botão de reboot
 	//
@@ -934,7 +918,6 @@ int shellTestButtons (){
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
     APIRegisterWindow (app1_button);
-
 
 	//
 	// botão de close
@@ -947,8 +930,6 @@ int shellTestButtons (){
 								
     APIRegisterWindow (app2_button);
 	
-	
-	
 	//
 	// botão de close
 	//
@@ -960,13 +941,9 @@ int shellTestButtons (){
 								
     APIRegisterWindow (app3_button);
 
-
-
-
 	//
 	// botão de close
 	//
-	
 	
     //em shell.h está o ponteiro.	
 	app4_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP4 ",     
@@ -974,8 +951,8 @@ int shellTestButtons (){
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
     APIRegisterWindow (app4_button);	
-    
 
+*/
     return 0;	
 }
 

@@ -9,6 +9,8 @@
  where everything is slightly backwards. 
  */
  
+#ifndef __SHELL00_FLAGS_H
+#define __SHELL00_FLAGS_H   1
  
 #define FLAG_ON '-'
 #define FLAG_OFF '+'
@@ -39,4 +41,6 @@ extern int
   echo_command_at_execute, lexical_scoping, no_invisible_vars,
   hashing_disabled, history_expansion, forced_interactive;
 */
+
+#endif   
 
