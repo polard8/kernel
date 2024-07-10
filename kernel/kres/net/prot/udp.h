@@ -45,7 +45,6 @@ network_send_udp (
     char *data_buffer,
     size_t data_lenght );
 
-void network_save_mac( uint8_t mac[6] );
 void 
 network_test_udp0(
     uint8_t tmac[6], 
@@ -54,5 +53,7 @@ network_test_udp0(
     unsigned short dport );
 void network_test_udp(void);
 void network_test_udp2(void);
+
+void udp_save_mac( uint8_t mac[6] );
 
 #endif   

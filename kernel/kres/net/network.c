@@ -35,12 +35,19 @@ char *default_network_version_string = "0.0.0";
 // Target MAC.
 unsigned char __saved_gateway_mac[6];
 
+// Used for responses
+unsigned char __saved_caller_mac[6];
+unsigned char __saved_our_mac[6];
+unsigned char __saved_caller_ipv4[4];
+unsigned char __saved_our_ipv4[4];
+
 // ====================================================
 
 static void __initialize_ws_info(pid_t pid);
 static void __maximize_ws_priority(pid_t pid);
 
 // ====================================================
+
 
 // Setup WindowServerInfo global structure.
 static void __initialize_ws_info(pid_t pid)
@@ -465,6 +472,10 @@ network_on_receiving (
 // Source MAC
 // Protocol type.
 
+// #todo
+// Let's save it for future use.
+// We're gonna need to send responses.
+
 /*
     printk ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
         eth->dst[0], eth->dst[1], eth->dst[2], 
@@ -478,9 +489,14 @@ network_on_receiving (
         (unsigned short) eth->type);
 */
 
+// Save the MAC of the caller.
+    network_fill_mac(__saved_caller_mac, eth->mac_src);
+// #todo
+// Here we can check if the destination is us,
+// if the packet is not for us, we simply drop it.
+
 
 // Get ethernet type
-
     Type = (uint16_t) FromNetByteOrder16(eth->type);
 
 // Handle the rthernet type

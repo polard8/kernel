@@ -1,5 +1,5 @@
-
 // ipv4.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -41,8 +41,16 @@ network_handle_ipv4(
     //    goto fail;
     //}
 
+// IP
+// #todo
+// Let's save it for future use.
+// We're gonna need to send responses.
+
     unsigned char *src_ipv4 = (unsigned char *) &ip->ip_src.s_addr;
     unsigned char *dst_ipv4 = (unsigned char *) &ip->ip_dst.s_addr;
+
+// Save the IP of the caller.
+    network_fill_ipv4(__saved_caller_ipv4, src_ipv4);
 
 // Show data.
 // Bytes: Net-style.

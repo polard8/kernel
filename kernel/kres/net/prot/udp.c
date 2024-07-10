@@ -31,12 +31,21 @@ unsigned char __udp_target_mac[6] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 
-unsigned char saved_mac[6] = { 
+unsigned char udp_saved_mac[6] = { 
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 
 
 //---------------------
+
+void udp_save_mac(uint8_t mac[6])
+{
+    register int i=0;
+    for (i=0; i<6; i++){
+        udp_saved_mac[i] = (uint8_t) mac[i];
+    };
+}
+
 
 // When receving UDP packet from NIC device.
 // IN:
@@ -52,22 +61,27 @@ network_handle_udp(
 
     //printk ("UDP: Received\n");
 
-// #warning
-// It's ok to use pointer here.
-// We're not allocating memory, we're using 
-// a pre-allocated buffer.
-    udp = (struct udp_d *) buffer;
-    if ((void*) udp == NULL){
-        printk("network_handle_udp: udp\n");
+
+// Parameters:
+    if ((void*) buffer == NULL){
+        printk("network_handle_udp: buffer\n");
         return;
     }
-
+    if (size < 0){
+        //
+    }
 // The minimum size.
 // Only the udp header.
     //if (size < UDP_HEADER_LENGHT){
     //    printk("network_handle_udp: size\n");
     //    return;
     //}
+
+// #warning
+// It's ok to use pointer here.
+// We're not allocating memory, we're using 
+// a pre-allocated buffer.
+    udp = (struct udp_d *) buffer;
 
     uint16_t sport = (uint16_t) FromNetByteOrder16(udp->uh_sport);
     uint16_t dport = (uint16_t) FromNetByteOrder16(udp->uh_dport);
@@ -123,10 +137,13 @@ network_handle_udp(
 // DHCP dialog
 // Receiving Offer and Ack.
 // Handle dhcp protocol.
+
+    //printk("UDP: dport{%d}   #debug\n",dport);
+    //die();
+
+    // DHCP ports
     if (dport == 68 || dport == 67)
     {
-        //printk("UDP: dport{%d}   #debug\n",dport);
-        //die();
         network_handle_dhcp(
             (buffer + UDP_HEADER_LENGHT),
             (udp->uh_ulen - UDP_HEADER_LENGHT) );
@@ -153,46 +170,51 @@ network_handle_udp(
          dport == 34884 )
     {
 
-        // #debug
-        if (dport == 11888){
-            printk ("------------------------\n");
-            printk ("---- UDP -> [11888] ----\n");
-        }
-
-        // Print the message for these ports.
+        // #bugbug
+        // This is just a test. Actually we're gonna put
+        // into the queue all kind of frames, not just
+        // the udp's payloads.
         if (PushIntoTheQueue == TRUE){
-            // #bugbug
-            // This is just a test. Actually we're gonna put
-            // into the queue all kind of frames, not just
-            // the udp's payloads.
+            // #test
             network_push_packet( udp_payload, 512 );
         } else {
-            printk("UDP: MESSAGE: {%s}\n", udp_payload );
+
+            // Print the message for these ports.
+            printk("UDP: { %s }\n", udp_payload );
 
             // #test
             // Send a command to the init process.
             //post_message_to_init(77888, 1234, 5678);
 
-            // #test: Respond
+            // #test: 
+            // Respond the UDP message receive on port 11888.
+            // Somente se o dhcp foi initializado.
             // + Nosso IP ficou registrado na estrutura de dhcp.
-            // + #todo: O IP do alvo deveria estar salvo em alguma estrutura
+            // + #todo: 
+            //   O IP do alvo deveria estar salvo em alguma estrutura
             //   provavelmente na estrutura de IP.
-            // + #todo: O MAC do alvo ficaria registrado na estrutura de
-            //  ethernet.
-            /*
+            // + #todo: 
+            //   O MAC do alvo ficaria registrado na estrutura de ethernet.
+            
             if (dhcp_info.initialized == TRUE)
             {
-                ksprintf(udp_payload,"This is a response");
-                network_send_udp(  
-                    dhcp_info.your_ipv4,  // scr ip
-                    __dhcp_target_ipv4,  // dst ip
-                    __dhcp_target_mac,   // dst mac
-                    dport,               // source port: "US"
-                    sport,               // target port  "Who sent"
-                    udp_payload,         // udp payload
-                    256 );               // udp payload size
+                if (dport == 11888)
+                    ksprintf(udp_payload,"This is a response from Gramado OS");
+
+                if (dport == 11888)
+                {
+                    
+                    network_send_udp(  
+                        dhcp_info.your_ipv4,  // scr ip
+                        __saved_caller_ipv4,  // dst ip
+                        __saved_caller_mac,   // dst mac
+                        dport,               // source port: "US"
+                        sport,               // target port  "Who sent"
+                        udp_payload,         // udp payload
+                        256 );               // udp payload size
+                    
+                }
             }
-            */
         };
 
         // Clear UDP local buffer.
@@ -204,14 +226,6 @@ network_handle_udp(
 }
 
 // -----------------
-
-void network_save_mac(uint8_t mac[6])
-{
-    register int i=0;
-    for (i=0; i<6; i++){
-        saved_mac[i] = (uint8_t) mac[i];
-    };
-}
 
 void network_test_udp(void)
 {
@@ -262,7 +276,7 @@ network_test_udp0(
 void network_test_udp2(void)
 {
     network_test_udp0( 
-        saved_mac,                  // linux mac
+        udp_saved_mac,                  // linux mac
         __udp_target_default_ipv4,  // linux ip
         34885,
         34884 );

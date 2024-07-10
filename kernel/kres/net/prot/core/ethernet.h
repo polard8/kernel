@@ -1,6 +1,5 @@
-
 // ethernet.h
-
+// Created by Fred Nora.
 
 #ifndef __NET_ETHERNET_H 
 #define __NET_ETHERNET_H   1

@@ -5,6 +5,13 @@
 #define __NET_NETWORK_H    1
 
 
+// Used for responses
+extern unsigned char __saved_caller_mac[6];
+extern unsigned char __saved_our_mac[6];
+extern unsigned char __saved_caller_ipv4[4];
+extern unsigned char __saved_our_ipv4[4];
+
+
 // 8192
 #define NETWORK_DEFAULT_BUFFER_SIZE  \
     E1000_DEFAULT_BUFFER_SIZE
@@ -141,6 +148,8 @@ int
 network_register_ring3_display_server(
     struct cgroup_d *cg,
     pid_t caller_pid );
+
+
 
 void 
 network_fill_mac(
