@@ -1034,9 +1034,8 @@ rtl_copy_text (
         } 
     };
 
-    return -0; 
+    return 0; 
 }
-
 
 /*
 char *johncarmack_strstr(const char *haystack, const char *needle);
