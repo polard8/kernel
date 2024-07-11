@@ -6,11 +6,9 @@
 
 BASE    = your/base
 
-DEP_B1  = ../de/commands
-DEP_B2  = ../de/ui
-
-DEP_B3  = ../aurora/demos
-
+DEP_B1  = ../commands
+DEP_B2  = ../de
+DEP_B3  = ../aurora
 #DEP_B10 = ../guest0
 #DEP_B11 = ../guest1
 # ...
@@ -190,10 +188,12 @@ copy-extras:
 # Commands and apps in root directory.
 
 	# Commands
-	-cp $(DEP_B1)/bin/CAT.BIN       $(BASE)/
-	-cp $(DEP_B1)/bin/REBOOT.BIN    $(BASE)/
-	-cp $(DEP_B1)/bin/SHUTDOWN.BIN  $(BASE)/
-	-cp $(DEP_B1)/bin/UNAME.BIN     $(BASE)/
+	-cp $(DEP_B1)/base/bin/CAT.BIN       $(BASE)/
+	-cp $(DEP_B1)/base/bin/FALSE.BIN     $(BASE)/
+	-cp $(DEP_B1)/base/bin/REBOOT.BIN    $(BASE)/
+	-cp $(DEP_B1)/base/bin/SHUTDOWN.BIN  $(BASE)/
+	-cp $(DEP_B1)/base/bin/TRUE.BIN      $(BASE)/
+	-cp $(DEP_B1)/base/bin/UNAME.BIN     $(BASE)/
 	# Apps
 	-cp $(DEP_B2)/core/server/bin/GRAMLAND.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/
@@ -201,8 +201,8 @@ copy-extras:
 	-cp $(DEP_B2)/shell/bin/GDM.BIN       $(BASE)/
 	-cp $(DEP_B2)/shell/bin/EDITOR.BIN    $(BASE)/
 	# Gramado OS 3D demos.
-	-cp $(DEP_B3)/bin/ENG.BIN  $(BASE)/
-	#-cp $(DEP_B3)/bin/ENG2.BIN  $(BASE)/
+	-cp $(DEP_B3)/demos/bin/ENG.BIN  $(BASE)/
+#	-cp $(DEP_B3)/demos/bin/ENG2.BIN  $(BASE)/
 	#...
 
 # -----------------------------
@@ -210,7 +210,11 @@ copy-extras:
 # Gotta use '@' before the command.
 
 	# Commands
-	-cp $(DEP_B1)/bin/GRAMCNF.BIN   $(BASE)/GRAMADO/
+	-cp $(DEP_B1)/sdk/bin/GRAMCNF.BIN   $(BASE)/GRAMADO/
+#	-cp $(DEP_B1)/sdk/bin/N9.BIN   $(BASE)/GRAMADO/
+#	-cp $(DEP_B1)/sdk/bin/N10.BIN  $(BASE)/GRAMADO/
+#	-cp $(DEP_B1)/sdk/bin/N11.BIN  $(BASE)/GRAMADO/
+
 	# Apps
 	#-cp $(DEP_B2)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
 	
@@ -219,16 +223,11 @@ copy-extras:
 # Gotta use '#' before the command.
 
 	# Commands
-	-cp $(DEP_B1)/bin/FALSE.BIN     $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/bin/TRUE.BIN      $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/bin/TASCII.BIN    $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/bin/TPRINTF.BIN   $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/bin/CMP.BIN       $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/bin/SUM.BIN       $(BASE)/PROGRAMS/
-	#	-cp $(DEP_B1)/bin/N9.BIN   $(BASE)/PROGRAMS/
-	#	-cp $(DEP_B1)/bin/N10.BIN  $(BASE)/PROGRAMS/
-	#	-cp $(DEP_B1)/bin/N11.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/extra/bin/CMP.BIN       $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/extra/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/extra/bin/SUM.BIN       $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/tests/bin/TASCII.BIN    $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/tests/bin/TPRINTF.BIN   $(BASE)/PROGRAMS/
 	# Apps
 	-cp $(DEP_B2)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
 	-cp $(DEP_B2)/shell/bin/BROWSER.BIN  $(BASE)/PROGRAMS/
