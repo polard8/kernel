@@ -1,11 +1,11 @@
 // system.h
-
+// Created by Fred Nora.
 
 #ifndef __SYSTEM_H
 #define __SYSTEM_H    1
 
 
-
+//#todo: Move this to another place.
 int current_taskman_server; 
 
 // getpid_t:
@@ -15,18 +15,17 @@ int current_taskman_server;
 // rodando ao mesmo tempo.
 
 typedef enum {
-
     GETPID_NULL,
     GETPID_WS,
     GETPID_WM
     //...
-
 }getpid_t;
 
 //
 // ## sys storage support ##
 //
- 
+
+//#todo: Move this to another place.
 int system_disk;
 int system_volume; 
 
@@ -47,6 +46,7 @@ int system_volume;
 
 #define SYSTEMMODE_EDITBOX  0
 #define SYSTEMMODE_TERMINAL 1
+//#todo: Move this to another place.
 int g_system_mode;  //terminal ou edibox. 
 
 // Identificação do processo que está efetuando logon e 
@@ -69,6 +69,7 @@ int g_system_mode;  //terminal ou edibox.
 // #todo
 // Isso pode ir pra outro arquivo,
 // tem um só pra pids.
+//#todo: Move this to another place.
 int gLogonPID;
 int gLogoffPID;
 
@@ -341,9 +342,12 @@ struct system_d  *System;
 // == Prototypes =====================
 //
 
-int zeroInitializeSystemComponents(void);
+
 unsigned long doGetSystemMetrics(int index);
 void doSetupVersion(void);
+
+int do_reboot(unsigned long flags);
+int zeroInitializeSystemComponents(void);
 
 #endif    
 

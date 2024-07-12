@@ -16,8 +16,8 @@ typedef int  pid_t;
 // prototypes ======================
 //
 
-int __gethostname(char *buffer);
-int __sethostname(const char *new_hostname);
+int sys_gethostname(char *ubuff);
+int sys_sethostname(const char *new_hostname, size_t len);
 
 long fpathconf(int fildes, int name);
 long pathconf(const char *pathname, int name);

@@ -23,6 +23,10 @@
 
 #define BREAK_MASK  0x80
 
+
+// If it's allowed to reboot via CAD combination.
+static int CAD_is_allowed = TRUE;
+
 // ------------------------------
 // Input targets:
 // see: input.h
@@ -54,6 +58,19 @@ __ProcessInput (
 
 
 // ------------------------------
+
+// Process CAD combination
+int gramk_process_CAD_combination(unsigned long flags)
+{
+// If it's allowed to reboot via CAD combination.
+// Calling the wrapper to have a safe reboot.
+
+    if (CAD_is_allowed == TRUE){
+        return (int) do_reboot(flags);
+    }
+
+    return (int) -1;
+}
 
 // -----------------------------------
 // Selecting the input targets.
@@ -452,7 +469,8 @@ static int __CompareStrings(void)
     }
 
 // reboot:
-    if ( kstrncmp( prompt, "reboot", 6 ) == 0 ){
+    if ( kstrncmp( prompt, "reboot", 6 ) == 0 )
+    {
         keReboot();
         goto exit_cmp;
     }
@@ -1071,7 +1089,7 @@ __ProcessInput (
                 }
                 // [Shift+F9] - Reboot
                 if (shift_status == TRUE){
-                    sys_reboot(0);
+                    do_reboot(0);
                 }
                 return 0;
                 break;
@@ -1104,9 +1122,9 @@ __ProcessInput (
                 if (alt_status == TRUE){
                     //post_message_to_ws( (int) 77111, 0, 0 );
                 }
-                // [Shift+F11] - Force reboot.
+                // [Shift+F11] - Safe reboot
                 if (shift_status == TRUE){
-                   hal_reboot();
+                   do_reboot(0);
                 }
                 return 0;
                 break;

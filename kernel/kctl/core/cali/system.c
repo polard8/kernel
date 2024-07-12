@@ -535,6 +535,52 @@ void die(void)
     die();
 }
 
+// Implementation of a safe reboot routine.
+// # We need to return when 
+// a non-superuser process call this service.
+int do_reboot(unsigned long flags)
+{
+
+    //int value = FALSE;
+
+// #todo
+// Is it the superuser?
+// We only trust in superusser for this call.
+
+    debug_print("do_reboot:\n");
+
+/*
+    value = (int) is_superuser();
+    if(value != TRUE){
+        return (-EPERM);
+    }
+*/
+
+// #todo
+// Use MAGIC arguments.
+
+// FAT cache.
+// This is the FAT cache for the system disk.
+// The boot partition.
+    int Status = -1;
+    Status = (int) fs_save_fat16_cache();
+    if ( Status < 0 || 
+         g_fat_cache_saved != FAT_CACHE_SAVED )
+    {
+        debug_print("do_reboot: Can't reboot without saving the fat cache\n");
+        goto fail;
+    }
+
+// Reboot
+    debug_print("do_reboot: Rebooting\n");
+    hal_reboot();
+    panic("do_reboot: Unexpected error\n");
+fail:
+    return (int) -1;
+}
+
+
+
 /*
  * doSetupVersion:
  *     Setup version info.     

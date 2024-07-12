@@ -3,28 +3,27 @@
 
 #include <kernel.h>    
 
-// __gethostname:
+// sys_gethostname:
 // Get host name.
 // pegando host name
 // faremos igual fizemos com usuário.
 // suporte a rotina da libc.
 // #todo: How many bytes we can copy into the buffer.
 // We need a parameter for that.
-int __gethostname(char *buffer)
+int sys_gethostname(char *ubuff)
 {
-    char *hostname_buffer = (char *) buffer;
+    char *hostname_buffer = (char *) ubuff;
     int size=0;
 
-// Invalid buffer
-    if ((void*) buffer == NULL){
-        goto fail;
+// Parameters
+// Invalid buffer. Bad address.
+    if ((void*) ubuff == NULL){
+        return (int) -EFAULT;
     }
 // Estrutura default para informações sobre o host.
 // see: host.h
-    if ((void *) HostInfo == NULL)
-    {
-        printk("__gethostname: HostInfo\n");
-        refresh_screen();
+    if ((void *) HostInfo == NULL){
+        printk("sys_gethostname: HostInfo\n");
         goto fail;
     }
 // Copy 64 bytes.
@@ -37,19 +36,24 @@ int __gethostname(char *buffer)
     return (int) size;
 
 fail:
+    refresh_screen();
     return (int) -1;
 }
 
-// __sethostname:
+// sys_sethostname:
 // Set host name.
 // #todo
 // configurando o hostname.
 // do mesmo jeito que configuramos o username,
 // só que em estruturas diferentes
-int __sethostname(const char *new_hostname)
+int sys_sethostname(const char *new_hostname, size_t len)
 {
-    size_t StringLen=0;
+// #todo: This operation needs permition
 
+    size_t StringLen=0;
+    size_t GivenLen = len;
+
+// Parameters
     if ((void*) new_hostname == NULL){
         goto fail;
     }
@@ -63,7 +67,7 @@ int __sethostname(const char *new_hostname)
 // Estrutura HostInfo em host.h 
 // (network)
     if ((void *) HostInfo == NULL){
-        printk("__sethostname: HostInfo\n");
+        printk("sys_sethostname: HostInfo\n");
         goto fail;
     }
     HostInfo->hostName_len = (size_t) StringLen;

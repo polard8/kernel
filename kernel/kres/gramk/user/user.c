@@ -236,24 +236,20 @@ int is_superuser(void)
     return FALSE;
 }
 
-int __getusername(char *buffer)
+int sys_getusername(char *ubuff)
 {
-    char *login_buffer = (char *) buffer;
+    char *p = (char *) ubuff;
 
-    if ( (void*) buffer == NULL ){
-        debug_print ("__getusername: [FAIL] buffer\n");
-        goto fail;
+// Bad address
+    if ((void*) ubuff == NULL){
+        return (int) -EFAULT;
     }
 
 // Estrutura default para informações sobre o host.
 // 64 bytes
 // host.h
-    if ( (void *) CurrentUser != NULL )
-    {
-        strcpy( 
-            login_buffer, 
-            (const char *) CurrentUser->__username );
-       
+    if ((void *) CurrentUser != NULL){
+        strcpy( p, (const char *) CurrentUser->__username );
         return (int) CurrentUser->userName_len;
     }
 
@@ -261,16 +257,17 @@ fail:
     return (int) -1;
 }
 
-// __setusername:
+// sys_setusername:
 // O novo nome está no buffer passado via argumento.
 // Ele tem o limite de 64 bytes.
 // Vamos colocar ele na estrutura de usuário.
-
-int __setusername(const char *new_username)
+int sys_setusername(const char *new_username)
 {
-    if ( (void*) new_username == NULL ){
-        debug_print ("__setusername: [FAIL] new_username\n");
-        goto fail;
+// #todo: This operation needs permition
+
+// Bad address
+    if ((void*) new_username == NULL){
+        return (int) -EFAULT;
     }
 
 // Estrutura de usuário.

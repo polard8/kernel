@@ -93,7 +93,7 @@ unsigned long sys_alarm(unsigned long seconds)
 unsigned long sys_get_system_metrics(int n)
 {
     if(n<0){
-        return 0;
+        return 0;  //#bugbug: ThIS is wrong!
     }
     return (unsigned long) doGetSystemMetrics((int)n);
 }
@@ -396,63 +396,35 @@ int sys_initialize_component (int n)
 // # We need to return when a non-superuser process call this
 // service. We don't wanna hang the system in this case.
 
-int sys_reboot(unsigned long flags)
-{
 // # We need to return when 
 // a non-superuser process call this service.
 
-    //int value = FALSE;
-
-// #todo
-// Is it the superuser?
-// We only trust in superusser for this call.
-
-    debug_print("sys_reboot:\n");
-
-/*
-    value = (int) is_superuser();
-    if(value != TRUE){
-        return (-EPERM);
-    }
-*/
-
-// #todo
-// Use MAGIC arguments.
-
-// FAT cache.
-// This is the FAT cache for the system disk.
-// The boot partition.
-    int Status = -1;
-    Status = (int) fs_save_fat16_cache();
-    if ( Status < 0 || 
-         g_fat_cache_saved != FAT_CACHE_SAVED )
-    {
-        debug_print("sys_reboot: Can't reboot without saving the fat cache\n");
-        goto fail;
-    }
-
-// Reboot
+int sys_reboot(unsigned long flags)
+{
     debug_print("sys_reboot: Rebooting\n");
-    hal_reboot();
-    panic("sys_reboot: Unexpected error\n");
-fail:
-    return -1;
-}
 
+    //#todo
+    // Here is a goot place to check the flags 
+    // and choose the bast way to do this syscall.
+
+    // Call a safe routine.
+    // see: system.c
+    return (int) do_reboot(flags);
+}
 
 // 289
-// See: sm/debug/debug.c
+// See: debug.c
 int sys_serial_debug_printk(char *s)
 {
-    if ( (void *) s == NULL )
-    {
-        return (int) (-EINVAL);
+    if ((void *) s == NULL){
+        return (int) (-EFAULT);  // Bad address
     }
-
-    debug_print ( (char *) s );
+    if (*s == 0){
+        return (int) (-EINVAL);
+    }	
+    debug_print((char *)s);
     return 0;
 }
-
 
 // Wrapper
 // Shutdown routine.
@@ -497,49 +469,43 @@ void sys_show_system_info(int n)
 }
 
 // service 377.
-// IN: Imported pointe to utsname structure.
-int sys_uname (struct utsname *ubuf)
-{
-    if ( (void *) ubuf == NULL ){
-        debug_print("sys_uname: ubuf\n");
-        return -EINVAL;
-    }
-
+// For now we're using default definitions.
 // Copy
-// #todo
 // We gotta get these information from pointer,
 // not from 'defines'
-
-// ##
-// For now we're using default definitions.
-// See:
-// beauty/utsname.h
-// beauty/u.h
-// beauty/version.h
+// See: 
+// utsname.h, u.h, version.h
+// IN: Imported pointe to utsname structure.
+int sys_uname(struct utsname *ubuf)
+{
+    // Bad address
+    if ((void *) ubuf == NULL){
+        return (int) -EFAULT;
+    }
 
     memcpy( 
         (void *) ubuf->sysname, 
-        (const void *) kernel_utsname.sysname, //OS_NAME, 
+        (const void *) kernel_utsname.sysname,
         sizeof(kernel_utsname.sysname) );
 
     memcpy( 
         (void *) ubuf->version, 
-        (const void *) kernel_utsname.version, //VERSION_NAME, 
+        (const void *) kernel_utsname.version,
         sizeof(kernel_utsname.version) ); 
 
     memcpy( 
         (void *) ubuf->release, 
-        (const void *) kernel_utsname.release,  //RELEASE_NAME, 
+        (const void *) kernel_utsname.release,
         sizeof(kernel_utsname.release) );    
 
     memcpy( 
         (void *) ubuf->machine, 
-        (const void *) kernel_utsname.machine, //MACHINE_NAME, 
+        (const void *) kernel_utsname.machine,
         sizeof(kernel_utsname.machine) );    
 
     memcpy( 
         (void *) ubuf->nodename, 
-        (const void *) kernel_utsname.nodename,  //NODE_NAME, 
+        (const void *) kernel_utsname.nodename,
         sizeof(kernel_utsname.nodename) );
 
     memcpy( 

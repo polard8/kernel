@@ -1,7 +1,6 @@
-
 // user.h
 // userinfo >> user session
-// Created by Fred Nora.
+// Created by Fred Nora.  
 
 #ifndef ____USER_H
 #define ____USER_H    1
@@ -275,8 +274,10 @@ uid_t GetCurrentUserId(void);
 void SetCurrentUserId(uid_t user_id);
 
 int is_superuser(void);
-int __getusername(char *buffer);
-int __setusername(const char *new_username);
+
+int sys_getusername(char *ubuff);
+int sys_setusername(const char *new_username);
+
 struct user_info_d *CreateUser( char *name, int type );
 
 int userCreateRootUser(void);

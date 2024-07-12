@@ -1,5 +1,4 @@
-
-// ke.c (Kernel Executive)
+// ke.c
 // ke subsystem.
 // Created by Fred Nora.
 
@@ -724,6 +723,7 @@ int keIsQemu(void)
 
 int keCloseInitProcess(void)
 {
+
     if ((void*) InitThread == NULL){
         goto fail;
     }
@@ -745,12 +745,13 @@ int keCloseInitProcess(void)
 
     return 0;
 fail:
-    return -1;
+    return (int) -1;
 }
 
 void keReboot(void)
 {
-    hal_reboot();
+// Call a safe implementation of this routine.
+    do_reboot(0);
 }
 
 void ke_x64ExecuteInitialProcess(void)

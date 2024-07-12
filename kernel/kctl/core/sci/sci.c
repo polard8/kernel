@@ -211,11 +211,27 @@ void *sci0 (
 // Getting requests from ring3 applications via systemcalls.
 // :: Services in kernel.
 
-    struct process_d *p;
+// Thread
     struct thread_d *t;
+// Process
+    struct process_d *p;
+    pid_t current_process = -1;
+// Pointer for cgroup
+    struct cgroup_d *cg;
+
     int layer = LAYER_UNDEFINED;
 
-    pid_t current_process = (pid_t) get_current_pid();
+    unsigned long *message_address = (unsigned long *) arg2;
+    unsigned long *a2 = (unsigned long*) arg2;
+    unsigned long *a3 = (unsigned long*) arg3;
+    unsigned long *a4 = (unsigned long*) arg4;
+	
+	int int_retval = 0;
+
+
+    //?? #deprecated?
+    g_profiler_ints_gde_services++;
+
 
 // ---------------------------------
 // Thread
@@ -237,27 +253,18 @@ void *sci0 (
     t->transition_counter.to_user++;
 // ---------------------------------
 
-    unsigned long *message_address = (unsigned long *) arg2;
-
-    unsigned long *a2 = (unsigned long*) arg2;
-    unsigned long *a3 = (unsigned long*) arg3;
-    unsigned long *a4 = (unsigned long*) arg4;
-
-
-// Pointer for cgroup
-    struct cgroup_d *cg;
 
     // #debug
     //debug_print("sc0:\n");
     //printk("sc0:\n");
 
-    //?? #deprecated?
-    g_profiler_ints_gde_services++;
 
 // Profiling in the process structure.
 
 // Permission
 
+// Process
+    current_process = (pid_t) get_current_pid();
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         panic("sci0: current_process\n");
     }
@@ -503,26 +510,29 @@ void *sci0 (
 // 36 - #deprecated
 // 37 - #deprecated
 
+
 // 38 - get host name
+// see: kunistd.c
     if (number == SCI_GETHOSTNAME){
-        return (void *) __gethostname((char *) arg2);
+        return (void *) sys_gethostname((char *) arg2);
+    }
+// 39 - set host name 
+// see: kunistd.c
+    if (number == SCI_SETHOSTNAME)
+    {
+        // #todo: lenght
+        // IN: name. lenght.
+        return (void *) sys_sethostname((const char *) arg2,0);
     }
 
-// 39 - set host name 
-// #todo: This operation needs permition?
-    if (number == SCI_SETHOSTNAME){
-        return (void *) __sethostname((const char *) arg2);
-    }
 
 // 40 - get user name 
     if (number == SCI_GETUSERNAME){
-        return (void *) __getusername((char *) arg2);
+        return (void *) sys_getusername((char *) arg2);
     }
-
 // 41 - Set user name 
-// #todo: This operation needs permition?
     if (number == SCI_SETUSERNAME){
-        return (void *) __setusername((const char *) arg2);
+        return (void *) sys_setusername((const char *) arg2);
     }
 
 // 42 - #deprecated
@@ -1268,12 +1278,17 @@ void *sci0 (
 // Get info to fill the utsname structure.
 // See: sys.c
     if (number == SCI_SYS_UNAME)
-    {
-        debug_print("sci0: [377]\n");
-        if ((void*) arg2 == NULL)
-            return NULL;
-        sys_uname ( (struct utsname *) arg2 );
-        return NULL;
+	{
+        int_retval = (-EFAULT); //Bad address
+        if ((void*) arg2 == NULL){
+            return (void*) (int_retval & 0xFFFFFFFF);
+        }
+        int_retval = (int) sys_uname((struct utsname *) arg2);
+        if (int_retval < 0){
+            return (void*) (int_retval & 0xFFFFFFFF);
+		}
+		// OK
+		return NULL;
     }
 
 // #bugbug
@@ -1472,20 +1487,26 @@ void *sci0 (
     }
 
 // 801 - get host name
+// see: kunistd.c
     if ( number == 801 ){
-        return (void *) __gethostname((char *) arg2);
+        return (void *) sys_gethostname((char *) arg2);
     }
 // 802 - set host name
-    if ( number == 802 ){
-        return (void *) __sethostname((const char *) arg2); 
+// see: kunistd.c
+    if (number == 802)
+    {
+        // #todo: Lenght
+        // IN: name, lenght
+        return (void *) sys_sethostname((const char *) arg2,0); 
     }
+
 // 803 - Get user name.
     if (number == 803){
-        return (void *) __getusername((char *) arg2);
+        return (void *) sys_getusername((char *) arg2);
     }
 // 804 - Set user name.
     if (number == 804){
-        return (void *) __setusername((const char *) arg2); 
+        return (void *) sys_setusername((const char *) arg2); 
     }
 
 // #todo

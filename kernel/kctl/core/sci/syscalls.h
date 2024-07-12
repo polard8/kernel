@@ -83,7 +83,7 @@ void sys_show_system_info(int n);
 int sys_uname(struct utsname *ubuf);
 void sys_vsync(void);
 
-/* zero/sys/sys.c */
+// See: sys.c
 int sys_reboot(unsigned long flags);
 void sys_shutdown(unsigned long flags);
 
