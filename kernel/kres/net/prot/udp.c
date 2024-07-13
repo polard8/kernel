@@ -165,6 +165,8 @@ network_handle_udp(
     //int PushIntoTheQueue = TRUE;
     int PushIntoTheQueue = FALSE;
 
+    int NoReply = TRUE;
+
     if ( dport == 11888 ||
          dport == 22888 ||
          dport == 34884 )
@@ -198,22 +200,73 @@ network_handle_udp(
             
             if (dhcp_info.initialized == TRUE)
             {
-                if (dport == 11888)
-                    ksprintf(udp_payload,"This is a response from Gramado OS");
-
-                if (dport == 11888)
+                // 0 = request
+                if ( udp_payload[0] == 'g' && 
+                     udp_payload[1] == ':' && 
+                     udp_payload[2] == '0' )
                 {
-                    
-                    network_send_udp(  
-                        dhcp_info.your_ipv4,  // scr ip
-                        __saved_caller_ipv4,  // dst ip
-                        __saved_caller_mac,   // dst mac
-                        dport,               // source port: "US"
-                        sport,               // target port  "Who sent"
-                        udp_payload,         // udp payload
-                        256 );               // udp payload size
-                    
+                    //printk("[request]\n"); refresh_screen();
+                    if (dport == 11888)
+                    {
+                        ksprintf(udp_payload,"g:1 ");
+                        ksprintf(
+                            (udp_payload + 4),
+                            "This is a response from Gramado OS\n");
+                        NoReply = FALSE;
+                        goto done;
+                    }
                 }
+                // 1 = reply
+                if ( udp_payload[0] == 'g' && 
+                     udp_payload[1] == ':' && 
+                     udp_payload[2] == '1' )
+                {
+                    if (dport == 11888)
+                    {
+                        //memset(udp_payload, 0, sizeof(udp_payload));
+                        NoReply = TRUE;
+                        goto done;
+                    }
+                }
+                // 2 = event
+                if ( udp_payload[0] == 'g' && 
+                     udp_payload[1] == ':' && 
+                     udp_payload[2] == '2' )
+                {
+                    if (dport == 11888)
+                    {
+                        //memset(udp_payload, 0, sizeof(udp_payload));
+                        NoReply = TRUE;
+                        goto done;
+                    }
+                }
+                // 3 = error
+                if ( udp_payload[0] == 'g' && 
+                     udp_payload[1] == ':' && 
+                     udp_payload[2] == '3' )
+                {
+                    if (dport == 11888)
+                    {
+                        //memset(udp_payload, 0, sizeof(udp_payload));
+                        NoReply = TRUE;
+                        goto done;
+                    }
+                }
+                // 4 = disconnect
+                if ( udp_payload[0] == 'g' && 
+                     udp_payload[1] == ':' && 
+                     udp_payload[2] == '4' )
+                {
+                    if (dport == 11888)
+                    {
+                        //memset(udp_payload, 0, sizeof(udp_payload));
+                        NoReply = TRUE;
+                        goto done;
+                    }
+                }
+
+                //if (dport == 11888)
+                    //ksprintf(udp_payload,"This is a response from Gramado OS");
             }
         };
 
@@ -222,6 +275,28 @@ network_handle_udp(
         //for (i=0; i<1024; i++){
         //    udp_payload[i]=0;
         //};
+    }
+
+// fail:
+    return;
+
+// Response
+done:
+    if (NoReply == TRUE)
+        return;
+    if (dport == 11888)
+    {
+        //printk ("kernel: Sending response\n");
+        //refresh_screen();
+
+        network_send_udp(  
+            dhcp_info.your_ipv4,  // scr ip
+            __saved_caller_ipv4,  // dst ip
+            __saved_caller_mac,   // dst mac
+            dport,                // source port: "US"
+            sport,                // target port  "Who sent"
+            udp_payload,          // udp payload
+            256 );                // udp payload size
     }
 }
 
