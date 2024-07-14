@@ -36,7 +36,117 @@ unsigned char udp_saved_mac[6] = {
 };
 
 
+static void __handle_gprotocol(uint16_t s_port, uint16_t d_port);
+
 //---------------------
+
+// #test: 
+// Respond the UDP message receive on port 11888.
+// Somente se o dhcp foi initializado.
+// + Nosso IP ficou registrado na estrutura de dhcp.
+// + #todo: 
+//   O IP do alvo deveria estar salvo em alguma estrutura
+//   provavelmente na estrutura de IP.
+// + #todo: 
+//   O MAC do alvo ficaria registrado na estrutura de ethernet.
+static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
+{
+    uint16_t sport = s_port;
+    uint16_t dport = d_port;
+    uint16_t OurPort = 11888;
+    size_t MessageSize = 256;
+
+    int NoReply = TRUE;
+
+    if (dhcp_info.initialized != TRUE)
+        return;
+
+    if (dport != OurPort)
+        return;
+
+// ----------------
+// 0 = request
+    if ( udp_payload[0] == 'g' && 
+         udp_payload[1] == ':' && 
+         udp_payload[2] == '0' )
+    {
+        //printk("[request]\n"); refresh_screen();
+        memset(udp_payload, 0, sizeof(udp_payload));
+        ksprintf(udp_payload,"g:1 ");
+        ksprintf(
+            (udp_payload + 4),
+            "This is a response from Gramado OS\n");
+            NoReply = FALSE;
+            goto done;
+    }
+
+// -----------------------
+// 1 = reply
+    if ( udp_payload[0] == 'g' && 
+         udp_payload[1] == ':' && 
+         udp_payload[2] == '1' )
+    {
+        //memset(udp_payload, 0, sizeof(udp_payload));
+        NoReply = TRUE;
+        goto done;
+    }
+
+// -------------------------
+// 2 = event
+    if ( udp_payload[0] == 'g' && 
+         udp_payload[1] == ':' && 
+         udp_payload[2] == '2' )
+    {
+        //memset(udp_payload, 0, sizeof(udp_payload));
+        NoReply = TRUE;
+        goto done;
+    }
+
+// ---------------------------
+// 3 = error
+    if ( udp_payload[0] == 'g' && 
+         udp_payload[1] == ':' && 
+         udp_payload[2] == '3' )
+    {
+        //memset(udp_payload, 0, sizeof(udp_payload));
+        NoReply = TRUE;
+        goto done;
+    }
+
+// --------------------------
+// 4 = disconnect
+    if ( udp_payload[0] == 'g' && 
+         udp_payload[1] == ':' && 
+         udp_payload[2] == '4' )
+    {
+        memset(udp_payload, 0, sizeof(udp_payload));
+        ksprintf(udp_payload,"g:0 ");          // Request
+        ksprintf( (udp_payload + 4), "exit");  // exit command
+        NoReply = FALSE;
+        goto done;
+    }
+
+    //if (dport == 11888)
+        //ksprintf(udp_payload,"This is a response from Gramado OS");
+
+// ---------------------
+// Response
+done:
+    if (NoReply == TRUE)
+        return;
+
+    //printk ("kernel: Sending response\n");
+    //refresh_screen();
+
+    network_send_udp(  
+        dhcp_info.your_ipv4,  // scr ip
+        __saved_caller_ipv4,  // dst ip
+        __saved_caller_mac,   // dst mac
+        dport,                // source port: "US"
+        sport,                // target port  "Who sent"
+        udp_payload,          // udp payload
+        MessageSize );        // udp payload size (Message size)
+}
 
 void udp_save_mac(uint8_t mac[6])
 {
@@ -45,7 +155,6 @@ void udp_save_mac(uint8_t mac[6])
         udp_saved_mac[i] = (uint8_t) mac[i];
     };
 }
-
 
 // When receving UDP packet from NIC device.
 // IN:
@@ -185,89 +294,11 @@ network_handle_udp(
             printk("UDP: { %s }\n", udp_payload );
 
             // #test
+            // System message
             // Send a command to the init process.
             //post_message_to_init(77888, 1234, 5678);
 
-            // #test: 
-            // Respond the UDP message receive on port 11888.
-            // Somente se o dhcp foi initializado.
-            // + Nosso IP ficou registrado na estrutura de dhcp.
-            // + #todo: 
-            //   O IP do alvo deveria estar salvo em alguma estrutura
-            //   provavelmente na estrutura de IP.
-            // + #todo: 
-            //   O MAC do alvo ficaria registrado na estrutura de ethernet.
-            
-            if (dhcp_info.initialized == TRUE)
-            {
-                // 0 = request
-                if ( udp_payload[0] == 'g' && 
-                     udp_payload[1] == ':' && 
-                     udp_payload[2] == '0' )
-                {
-                    //printk("[request]\n"); refresh_screen();
-                    if (dport == 11888)
-                    {
-                        ksprintf(udp_payload,"g:1 ");
-                        ksprintf(
-                            (udp_payload + 4),
-                            "This is a response from Gramado OS\n");
-                        NoReply = FALSE;
-                        goto done;
-                    }
-                }
-                // 1 = reply
-                if ( udp_payload[0] == 'g' && 
-                     udp_payload[1] == ':' && 
-                     udp_payload[2] == '1' )
-                {
-                    if (dport == 11888)
-                    {
-                        //memset(udp_payload, 0, sizeof(udp_payload));
-                        NoReply = TRUE;
-                        goto done;
-                    }
-                }
-                // 2 = event
-                if ( udp_payload[0] == 'g' && 
-                     udp_payload[1] == ':' && 
-                     udp_payload[2] == '2' )
-                {
-                    if (dport == 11888)
-                    {
-                        //memset(udp_payload, 0, sizeof(udp_payload));
-                        NoReply = TRUE;
-                        goto done;
-                    }
-                }
-                // 3 = error
-                if ( udp_payload[0] == 'g' && 
-                     udp_payload[1] == ':' && 
-                     udp_payload[2] == '3' )
-                {
-                    if (dport == 11888)
-                    {
-                        //memset(udp_payload, 0, sizeof(udp_payload));
-                        NoReply = TRUE;
-                        goto done;
-                    }
-                }
-                // 4 = disconnect
-                if ( udp_payload[0] == 'g' && 
-                     udp_payload[1] == ':' && 
-                     udp_payload[2] == '4' )
-                {
-                    if (dport == 11888)
-                    {
-                        //memset(udp_payload, 0, sizeof(udp_payload));
-                        NoReply = TRUE;
-                        goto done;
-                    }
-                }
-
-                //if (dport == 11888)
-                    //ksprintf(udp_payload,"This is a response from Gramado OS");
-            }
+            __handle_gprotocol(sport,dport);
         };
 
         // Clear UDP local buffer.
