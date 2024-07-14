@@ -40,14 +40,16 @@ CFLAGS = -m64 \
 LIBC    = ../../core/libs/rtl/include/
 LIBCOBJ = ../../core/libs/rtl/obj
 
-GWS_INCLUDES  = include/    
+CINCLUDES  = -I $(LIBC)  
+CINCLUDES += -I .    
+
 
 #RENDERER = renderer/include/  
 #CMDLINE = cmdline/include/   
 #TERMINAL  = terminal/include/   
 
 # Objects
-myObjects = crt0.o main.o rtl.o globals.o \
+myObjects = crt0.o main.o rtl.o globals.o gramado.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 connect.o decode.o client.o \
 termios.o ioctl.o fcntl.o    
@@ -57,13 +59,15 @@ termios.o ioctl.o fcntl.o
 all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o main.o
+	gcc  -c  main.c  $(CFLAGS) $(CINCLUDES) -o main.o
 all-c:
-	gcc -c globals.c $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o globals.o
-	gcc -c connect.c $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o connect.o
-	gcc -c decode.c  $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o decode.o
-	gcc -c client.c  $(CFLAGS) -I $(LIBC) -I $(GWS_INCLUDES) -I . -o client.o
-	
+	gcc -c globals.c $(CFLAGS) $(CINCLUDES) -o globals.o
+	gcc -c connect.c $(CFLAGS) $(CINCLUDES) -o connect.o
+	gcc -c decode.c  $(CFLAGS) $(CINCLUDES) -o decode.o
+	gcc -c client.c  $(CFLAGS) $(CINCLUDES) -o client.o
+
+	gcc -c osdep/gramado/gramado.c $(CFLAGS) $(CINCLUDES) -o gramado.o  
+
 # Grab the objects
 
 	cp $(LIBCOBJ)/crt0.o .

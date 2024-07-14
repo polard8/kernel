@@ -959,12 +959,9 @@ static int ServerInitialization(void)
     };
 
 // =======================================
-    debug_print("netd: Bye\n");
-         printf("netd: Bye\n");
     return 0;
 fail:
-    exit(1);
-    return -1;
+    return (int) -1;
 }
 
 // -------------------
@@ -996,10 +993,21 @@ int main (int argc, char **argv)
             f4=TRUE;
     };
 
-     
+
+// OS dependent code.
+    Status = (int) GramadoInitialize();
+    if (Status != TRUE){
+        printf("Couldn't initialize variables for Gramado OS.\n");
+        goto fail;
+    }
+
+// Server initialization.
     Status = (int) ServerInitialization();
-    if (Status == 0){
+    if (Status == 0)
+    {
         ServerShutdown();
+        debug_print("netd: Exit\n");
+             printf("netd: Exit\n");
         return (int) EXIT_SUCCESS;
     }
 

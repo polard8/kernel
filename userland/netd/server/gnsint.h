@@ -17,14 +17,16 @@
 // for sync
 #include <rtl/gramado.h>
 
-#include "include/gns.h"
-#include "include/globals.h"
-#include "include/vk.h"
-#include "include/wm.h"
-#include "include/protocol.h"
-#include "include/client.h"
-#include "include/connect.h"
-#include "include/packet.h"
-#include "include/decode.h"
+#include "config/config.h"
+#include "osdep/gramado/gramado.h"
 
+#include "gns.h"
+#include "globals.h"
+#include "vk.h"
+#include "wm.h"
+#include "protocol.h"
+#include "client.h"
+#include "osdep/gramado/connect.h"
+#include "osdep/gramado/packet.h"
+#include "decode.h"
 
