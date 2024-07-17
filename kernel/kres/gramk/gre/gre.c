@@ -1,7 +1,7 @@
-
 // gre.c
 // Graphics Engine.
 // Environment: kernel
+// Created by Fred Nora.
 
 #include <kernel.h>  
 

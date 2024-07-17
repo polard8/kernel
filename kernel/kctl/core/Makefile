@@ -88,6 +88,7 @@ zero.o \
 sys.o \
 sci.o \
 mod.o \
+public.o \
 kmain.o    
 
 
@@ -100,24 +101,20 @@ all:
 	$(CC) -c cali/reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o
 	$(CC) -c cali/request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
 	$(CC) -c cali/system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
-#	$(CC) -c cali/mod.c      $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o    
-	$(CC) -c cali/zero.c     $(KERNEL_INCLUDE)  $(CFLAGS)  -o zero.o
+	$(CC) -c cali/zero.c     $(KERNEL_INCLUDE) $(CFLAGS) -o zero.o
 	$(CC) -c cali/cali.c     $(KERNEL_INCLUDE) $(CFLAGS) -o cali.o
 
-# Kernel API.
-	$(CC) -c kapi/sys.c   $(KERNEL_INCLUDE)  $(CFLAGS)  -o sys.o
+# System calls support
+	$(CC) -c sci/sys.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
+	$(CC) -c sci/sci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sci.o    
 
+# Module manager.
+	$(CC) -c mod/mod.c     $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o
+	$(CC) -c mod/public.c  $(KERNEL_INCLUDE) $(CFLAGS) -o public.o
 
-# System Call Interface. (SCI_XXX).
-	$(CC) -c sci/sci.c  \
-$(KERNEL_INCLUDE)  $(CFLAGS)  -o sci.o    
+# Virtualization routines.
+	$(CC) -c virt/hv.c  $(KERNEL_INCLUDE) $(CFLAGS) -o hv.o
 
-	$(CC) -c hv.c  $(KERNEL_INCLUDE) $(CFLAGS) -o hv.o
-
-
-	$(CC) -c mod.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o
-
-# ----------------------------------------------
 # kmain
 	$(CC) -c kmain.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
 

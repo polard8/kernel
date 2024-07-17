@@ -1,8 +1,8 @@
-
 // bitblt.c
 // Bit-block Transfer.
 // Operations just like copying a rectangle while
 // doing rop operations.
+// Created by Fred Nora.
 
 #include <kernel.h>
 

@@ -123,9 +123,9 @@
 #include "../kres/ke/arch/x86_64/x64.h"
 #include "../kres/ke/detect.h"
 // ==================================
-// ke/
+
 // hv
-#include "../kctl/core/hv.h"
+#include "../kctl/core/virt/hv.h"
 // hal cpu
 #include "../kres/ke/arch/x86_64/cpuid.h"
 #include "../kres/ke/up.h"
@@ -306,21 +306,27 @@
 // Precisa de todos os componentes de ke/
 #include "../kres/ke/ke.h"
 
+
 // ==================================
 // The user interactions.
 #include "../kres/gramk/user/user.h"
 
+// Exporting some gramk functions to the other modules
+// inside the base kernel.
+#include "../kres/gramk/gramk.h"
+
 // Reboot system.
 #include "../kctl/core/reboot.h"
 // Ring 0 kernel modules.
-#include "../kctl/core/mod.h"
+#include "../kctl/core/mod/mod.h"
+#include "../kctl/core/mod/public.h"
+
 // Kernel layers. (Work in progress)
 #include "../kctl/core/layers.h"
 // Syscalls: (Called by the interrups 0x80, 0x81, 0x82, 0x83).
 #include "../kctl/core/sci/syscalls.h"
 // zero. (Used during the kernel initialization)
-#include "../kctl/core/zero.h"
-
+#include "../kctl/core/cali/zero.h"
 
 // ==================================
 // ke/

@@ -72,7 +72,8 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 # Everything is a file.
 OBJS = pixel.o line.o rect.o bitblt.o bg.o font.o char.o text.o gre.o \
-input.o dispsrv.o callback.o user.o    
+input.o dispsrv.o callback.o user.o \
+gramk.o    
 
 all:
 
@@ -92,6 +93,8 @@ all:
 	$(CC) -c user/dispsrv.c   $(KERNEL_INCLUDE) $(CFLAGS) -o dispsrv.o
 	$(CC) -c user/callback.c  $(KERNEL_INCLUDE) $(CFLAGS) -o callback.o
 	$(CC) -c user/user.c      $(KERNEL_INCLUDE) $(CFLAGS) -o user.o
+
+	$(CC) -c gramk.c     $(KERNEL_INCLUDE) $(CFLAGS) -o gramk.o
 
 # link
 	$(LD) -r -o ar_gramk.o $(OBJS)

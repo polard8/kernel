@@ -1,5 +1,4 @@
-
-// gramk/user/input.c - Input.
+// input.c - Input.
 // mouse/kdb/timer
 // Created by Fred Nora. 
 

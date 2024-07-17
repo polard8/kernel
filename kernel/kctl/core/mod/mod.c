@@ -1,4 +1,3 @@
-
 // mod.c
 // see: mod.h
 // see: kernel.h
@@ -155,30 +154,6 @@ void test_mod0(void)
     printk ("test_mod0: Done :)\n");
 }
 
-void xp_putchar_in_fgconsole(unsigned long _char)
-{
-    int c = (int) (_char & 0xFF);
-
-// Draw and refresh.
-    console_outbyte2 ( c, fg_console );
-}
-
-void xp_refresh_screen(void)
-{
-    refresh_screen();
-}
-
-void xp_reboot(void)
-{
-    keReboot();
-}
-
-void xp_putchar_test(void)
-{
-    int c='x';
-    console_outbyte2( c, fg_console );
-}
-
 // Handler for ring0 module syscall.
 // #warning:
 // The module can't use some kind of data, just like
@@ -199,12 +174,6 @@ void *ring0_module_sci(
 
     //return NULL;
     return (void*) Value;
-}
-
-void xp_die(void)
-{
-    printk("xp_die:\n");
-    keDie();
 }
 
 

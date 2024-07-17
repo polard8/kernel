@@ -76,17 +76,20 @@ _kernel_begin:
 ; header data area:
 ; Exporting ...
 ; see: mod.c
-; see: newm0/
+; see: newm0/ in the module.
+; #todo: maybe we can have this table in another place.
 
+align 4
     nop                ; Nop
     DB '__GRAMADO__'   ; Signature
-    DQ _xp_die                   ; symbol 0:  (no arg)
+    DQ _xp_die                   ; symbol 0: (no arg)
     DQ _xp_putchar_test          ; symbol 1: (no arg)
     DQ _xp_reboot                ; symbol 2: (no arg)
     DQ _xp_refresh_screen        ; symbol 3: (no arg)
-    DQ _xp_putchar_in_fgconsole  ; symbol 4: see: console.c (1 arg)
+    DQ _xp_putchar_in_fgconsole  ; symbol 4: (1 arg)
     ; ...
 ; ----------------------
+
 
 align 4
     %include "header/header2.asm"

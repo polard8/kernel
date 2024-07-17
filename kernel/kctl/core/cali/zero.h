@@ -1,4 +1,3 @@
-
 // zero.h
 // see: zero.c
 
@@ -12,5 +11,3 @@ void zero_initialize_default_kernel_font(void);
 void zero_show_banner(void);
 
 #endif   
-
-

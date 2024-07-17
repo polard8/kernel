@@ -1,4 +1,3 @@
-
 // mod.h
 // see: mod.c
 
@@ -71,19 +70,13 @@ extern unsigned long kmList[KMODULE_MAX];
 int mod_initialize_first_module(void);
 void test_mod0(void);
 
-// xp - Cross Pointers.
-void xp_putchar_in_fgconsole(unsigned long _char);
-void xp_refresh_screen(void);
-void xp_reboot(void);
-void xp_putchar_test(void);
-
 void *ring0_module_sci( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 );
 
-void xp_die(void);
+
 
 #endif   
 

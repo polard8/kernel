@@ -1,6 +1,6 @@
-
 // xpixel.c
 // Presentation: Put a pixel into the backbuffer.
+// Created by Fred Nora.
 
 //D - Destination bitmap
 //P - Selected brush (also called pattern)
