@@ -1,6 +1,6 @@
-
 // gns.c
 // This is a client-side library for the GNSSRV.
+// Created by Fred Nora.
 
 #include <types.h>
 #include <stddef.h>
@@ -64,16 +64,17 @@ int gns_get_packet( unsigned long buffer, int buffer_lenght )
     unsigned long len = (unsigned long) (buffer_lenght & 0xFFFFFFFF);
 
     if (buffer == 0)
-        return -1;
-    if (len==0)
-        return -1;
+        goto fail;
+    if (len == 0)
+        goto fail;
 
-    res = (unsigned long) gns_system_call (
-        118,     // Msg code
-        buffer,  // Buffer address
-        len,     // Buffer lenght
-        0);      // Nothing
+// IN:
+// msgcode, buffer address, buffer kenght, nothing.
+    res = (unsigned long) gns_system_call ( 118, buffer, len, 0 );
+
     return (int) (res & 0xFFFFFFFF);
+fail:
+    return (int) -1;
 }
 
 // hello request
@@ -123,10 +124,12 @@ static int __gns_hello_request(int fd)
     };
 
     if (n_writes <= 0){
-        return -1;
+        goto fail;
     }
 
     return (int) n_writes;
+fail:
+    return (int) -1;
 }
 
 static int __gns_hello_response(int fd)
@@ -136,8 +139,8 @@ static int __gns_hello_response(int fd)
     int i=0;
     char response_buffer[128];
 
-    if (fd<0){
-        return -1;
+    if (fd < 0){
+        goto fail;
     }
 
 //
@@ -158,7 +161,7 @@ static int __gns_hello_response(int fd)
 
     if (n_reads <= 0){
         printf ("__gns_hello_response: recv fail\n");
-        return -1;
+        goto fail;
     }
 
 // Get the message sended by the server.
@@ -175,23 +178,23 @@ static int __gns_hello_response(int fd)
     // error
     case GNS_SERVER_PACKET_TYPE_ERROR:
         debug_print ("__gns_hello_response: GNS_SERVER_PACKET_TYPE_ERROR\n");
-        return -1;
+        goto fail;
         break;
 
     // request
     case GNS_SERVER_PACKET_TYPE_REQUEST:
         debug_print ("__gns_hello_response: GNS_SERVER_PACKET_TYPE_REQUEST\n");
-        return -1;
+        goto fail;
         break;
 
     // event
     case GNS_SERVER_PACKET_TYPE_EVENT:
         debug_print ("__gns_hello_response: GNS_SERVER_PACKET_TYPE_EVENT\n");
-        return -1;
+        goto fail;
         break;
 
     default:
-        return -1;
+        goto fail;
         break;
     };
 
@@ -204,7 +207,7 @@ process_reply:
 // Se tem alguma coisa no buffer, mostra
 
     for (i=0; i<128; i++){
-        response_buffer[i]=0;
+        response_buffer[i] = 0;
     };
 
 // Get the payload.
@@ -217,6 +220,9 @@ process_reply:
     }
 
     return (int) n_reads;
+
+fail:
+    return (int) -1;
 }
 
 void
@@ -233,11 +239,11 @@ gns_async_command (
 // =============================================
 int gns_hello (int fd)
 {
-    int status=-1;
+    int status = -1;
 
-    if (fd<0){
+    if (fd < 0){
         debug_print("gns_hello: fd\n");
-        return FALSE;
+        goto fail;
     }
 
 // Reset flags.
@@ -256,8 +262,8 @@ int gns_hello (int fd)
 
     int req_status = -1;
     req_status = (int) __gns_hello_request(fd);
-    if (req_status<0){
-        return -1;
+    if (req_status < 0){
+        goto fail;
     }
 
 // Set a request.
@@ -286,11 +292,11 @@ int gns_hello (int fd)
             break;
         }
         if (value == ACTION_ERROR){
-            return -1;
+            goto fail;
         }
         // No reply!
         if (value == ACTION_NULL){
-            return -1; 
+            goto fail;
         }
     };
 
@@ -306,9 +312,11 @@ int gns_hello (int fd)
 
     status = (int) __gns_hello_response(fd);
     if (status <= 0){
-        return -1;
+        goto fail;
     }
     
     return TRUE;
+fail:
+    return (int) -1;
 }
 

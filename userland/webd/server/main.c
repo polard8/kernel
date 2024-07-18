@@ -15,6 +15,9 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 
+#include "actions.h"
+
+
 
 #define SERVER_BACKLOG  8
 static int running=FALSE;
@@ -41,6 +44,15 @@ unsigned long next_response[32];
 
 static void ServerInitialization(int value);
 static void dispacher(int fd);
+
+// ===============================================
+
+
+void service00(void)
+{
+    printf("service00: Hello!\n");
+}
+
 
 static void dispacher(int fd)
 {

@@ -1,5 +1,5 @@
-
 // globals.h
+// Created by Fred Nora.
 
 #ifndef __GLOBALS_H
 #define __GLOBALS_H    1
@@ -11,7 +11,7 @@
 extern char __buffer[MSG_BUFFER_SIZE];
 
 // Buffer
-// This is the buffer ussed for the next response.
+// This is the buffer used for the next response.
 // Marsheling ...
 // Esses valores serão enviados como
 // resposta ao serviço atual.
@@ -20,7 +20,7 @@ extern char __buffer[MSG_BUFFER_SIZE];
 // No início desse array fica o header.
 // see: globals.c
 #define NEXTRESPONSE_BUFFER_SIZE  32
-extern unsigned long next_response[32];
+extern unsigned long next_response[NEXTRESPONSE_BUFFER_SIZE];
 
 
 #endif    

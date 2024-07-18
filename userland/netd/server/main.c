@@ -77,11 +77,8 @@ static int NoReply = FALSE;
 
 
 //
-// Sevices
+// Local functions
 //
-
-static void serviceHello(void);
-static int serviceInitializeNetwork(void);
 
 //
 // Initialization
@@ -293,7 +290,6 @@ static int nsSendResponse(int fd, int type)
         next_response[i] = 0;
     };
 
-
     // Fall through.
 
 // Fail
@@ -309,7 +305,6 @@ exit0:
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
     return (int) Status;
 }
-
 
 static void 
 gns_send_error_response (int fd, int code, char *error_message)
@@ -419,7 +414,8 @@ static void gnssrv_yield(void)
     //  sc82 (265,0,0,0);
 }
 
-static void serviceHello(void)
+// Action
+void serviceHello(void)
 {
     //printf("\n");
     printf("netd: [1000] Hello from Gramado Network Server!\n");
@@ -431,7 +427,8 @@ static void serviceHello(void)
     rtl_yield();
 }
 
-static int serviceInitializeNetwork(void)
+// Action
+int serviceInitializeNetwork(void)
 {
     // Ring0 routine to initialize network infrastructure.
     // #remember: At this moment we are in the user app memory space.
@@ -460,6 +457,8 @@ static void __initialize_globals(void)
     };
 }
 
+// Do a service. 
+// Called by dispath();
 static int 
 gnsProcedure ( 
     void *window, 
@@ -467,8 +466,9 @@ gnsProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
-// Do a service. 
-// Called by dispath();
+// Route:
+// This is the main route. It connects the request with the 
+// controller action. And the action handles the data.
 
     int my_pid = -1;
 
@@ -524,7 +524,7 @@ gnsProcedure (
         // MSG_GNS_HELLO
         // case 1000:
         case GNS_Hello:
-            serviceHello();           
+            serviceHello();         
             NoReply = FALSE;  // The client-side library is waiting for response.
             return 0;
             break;
@@ -535,8 +535,9 @@ gnsProcedure (
             printf("netd: [1001]\n");
             // serviceInitializeNetwork();
             //printf ("\n");
+            NoReply = FALSE;
             return 0;
-            break; 
+            break;
 
         //case 1002:  break;
         //case 1003:  break;
@@ -754,7 +755,6 @@ static void dispatch(int fd)
         Status = (int) nsSendResponse(fd,RESPONSE_IS_REPLY);
         goto exit2;
     }
-
 
 /*
 // ===================

@@ -64,7 +64,6 @@ static void appShutdown(int socket_fd)
     close(socket_fd);
 }
 
-
 static int appInitialization(void)
 {
 
@@ -116,7 +115,7 @@ static int appInitialization(void)
     printf("NET.BIN: Sending hello!\n");
 
     int hello_status = (int) gns_hello(__client_fd);
-    if (hello_status <= 0){
+    if (hello_status < 0){
         printf("net.bin: hello_status\n");
         goto fail;
     }
