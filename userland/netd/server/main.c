@@ -553,7 +553,7 @@ gnsProcedure (
             break;
 
         case 2020:
-             break;
+            break;
 
         // Refresh rectangle ... 
         case 2021:
@@ -564,6 +564,10 @@ gnsProcedure (
         // + No response.
         case GNS_AsyncCommand:
             //#todo: serviceAsyncCommand();
+
+            //#debug
+            printf("netd: GNS_AsyncCommand #debug\n");
+
             NoReply = TRUE;
             break;
 

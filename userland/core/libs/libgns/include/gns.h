@@ -26,6 +26,16 @@ gns_async_command (
     unsigned long sub_request,
     unsigned long data );
 
+void
+gns_async_command2 ( 
+    int fd, 
+    unsigned long request,
+    unsigned long sub_request,
+    unsigned long data1,
+    unsigned long data2,
+    unsigned long data3,
+    unsigned long data4 );
+
 int gns_hello(int fd);
 void gns_yield(void);
 void gns_debug_print(char *string);

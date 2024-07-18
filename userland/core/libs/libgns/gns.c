@@ -15,10 +15,26 @@
 #define SIZE_DONT_CHANGE  512
 static char __gns_buffer[SIZE_DONT_CHANGE];
 
+
+//========================
+static void __gns_clear_msg_buff(void);
+
+
 //=================================
 static int __gns_hello_request(int fd);
 static int __gns_hello_response(int fd);
+
 //=================================
+
+
+static void __gns_clear_msg_buff(void)
+{
+    register int i=0;
+    for (i=0; i<512; i++){
+        __gns_buffer[i] = 0;
+    }; 
+}
+
 
 // System call.
 // 0x80 System interrupt.
@@ -225,6 +241,7 @@ fail:
     return (int) -1;
 }
 
+// Send async command
 void
 gns_async_command ( 
     int fd, 
@@ -232,9 +249,178 @@ gns_async_command (
     unsigned long sub_request,
     unsigned long data )
 {
-    // #todo
-    // Post asynchonous request to the server.
+    unsigned long *message_buffer = 
+        (unsigned long *) &__gns_buffer[0];
+    int n_writes=0;
+    int Value=0;
+    register int i=0;
+
+// Enviamos um request para o servidor.
+// Precisamos mesmo de um loop para isso?
+// Write!
+// Se foi possível enviar, então saimos do loop.  
+// Nesse caso, corremos o risco de ficarmos presos
+// caso não seja possível escrever.
+
+// --------------------
+// Clean the main buffer.
+    for (i=0; i<512; i++)
+        __gns_buffer[i] = 0;
+
+// wid, message code, request, subrequest, data1
+    message_buffer[0] = 0;
+    message_buffer[1] = GNS_AsyncCommand;
+// #todo: We need a list of services we can all with this function.
+    message_buffer[2] = request;           // request
+    message_buffer[3] = sub_request;       // sub request
+// data
+// #todo: We can deliver more data if we want.
+    message_buffer[4] = data;  // data1
+    // ...
+
+// Parameters
+    if (fd<0){
+        debug_print("gns_async_command: fd\n");
+        goto fail;
+    }
+// ...
+
+// Sending ...
+    n_writes = 
+        (int) send ( 
+                  fd,
+                  __gns_buffer, 
+                  sizeof(__gns_buffer), 
+                  0 );
+
+    if (n_writes <= 0){
+        goto fail;
+    }
+
+    rtl_set_file_sync ( 
+        fd, 
+        SYNC_REQUEST_SET_ACTION, 
+        ACTION_REQUEST );
+
+// No return.
+    while (1){
+        Value = 
+            (int) rtl_get_file_sync( 
+                      fd, 
+                      SYNC_REQUEST_GET_ACTION );
+        // Essa é a sincronização esperada.
+        // Não teremos uma resposta, mas precisamos
+        // conferir a sincronização.
+        //if (Value == ACTION_REQUEST){}
+        if (Value == ACTION_NULL )  { goto done; }
+        if (Value == ACTION_ERROR ) { goto done; }
+        //#debug
+        debug_print ("gns_async_command: Waiting sync flag\n"); 
+    };
+
+done:
+    __gns_clear_msg_buff();
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+    return; 
+fail:
+    __gns_clear_msg_buff();
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+    return; 
 }
+
+void
+gns_async_command2 ( 
+    int fd, 
+    unsigned long request,
+    unsigned long sub_request,
+    unsigned long data1,
+    unsigned long data2,
+    unsigned long data3,
+    unsigned long data4 )
+{
+    unsigned long *message_buffer = 
+        (unsigned long *) &__gns_buffer[0];
+    int n_writes=0;
+    int Value=0;
+    register int i=0;
+
+    // #debug
+    // debug_print ("gns_async_command2: send...\n"); 
+
+// Enviamos um request para o servidor.
+// Precisamos mesmo de um loop para isso?
+// Write!
+// Se foi possível enviar, então saimos do loop.  
+// Nesse caso, corremos o risco de ficarmos presos
+// caso não seja possível escrever.
+
+// --------------------
+// Clean the main buffer.
+    for (i=0; i<512; i++)
+        __gns_buffer[i] = 0;
+
+// Window ID
+    message_buffer[0] = 0;
+// Message code. (2222?)
+    message_buffer[1] = GNS_AsyncCommand;
+// #todo: We need a list of services we can all with this function.
+    message_buffer[2] = request;           // request
+    message_buffer[3] = sub_request;       // sub request
+// data
+// #todo: We can deliver more data if we want.
+    message_buffer[4] = (unsigned long) data1;  // data1
+    message_buffer[5] = (unsigned long) data2;  // data2
+    message_buffer[6] = (unsigned long) data3;  // data3
+    message_buffer[7] = (unsigned long) data4;  // data4
+    // ...
+
+    if (fd<0){
+        debug_print("gns_async_command2: fd\n");
+        goto fail;
+    }
+
+    n_writes = 
+        (int) send ( 
+                  fd,
+                  __gns_buffer, 
+                  sizeof(__gns_buffer), 
+                  0 );
+
+    if (n_writes <= 0){
+        goto fail;
+    }
+
+    rtl_set_file_sync ( 
+        fd, 
+        SYNC_REQUEST_SET_ACTION, 
+        ACTION_REQUEST );
+
+// No return.
+    while (1){
+        Value = 
+            (int) rtl_get_file_sync( 
+                      fd, 
+                      SYNC_REQUEST_GET_ACTION );
+        // Essa é a sincronização esperada.
+        // Não teremos uma resposta, mas precisamos
+        // conferir a sincronização.
+        //if (Value == ACTION_REQUEST){}
+        if (Value == ACTION_NULL )  { goto done; }
+        if (Value == ACTION_ERROR ) { goto done; }
+        //#debug
+        debug_print ("gns_async_command2: Waiting sync flag\n"); 
+    };
+
+done:
+    __gns_clear_msg_buff();
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+    return; 
+fail:
+    __gns_clear_msg_buff();
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+    return; 
+}
+
 
 // =============================================
 int gns_hello (int fd)

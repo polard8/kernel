@@ -60,6 +60,12 @@ static void appShutdown(int socket_fd)
 {
     debug_print("net.bin: appShutdown\n"); 
     printf     ("net.bin: appShutdown\n");
+
+// #test
+// Testando async command
+    gns_async_command (socket_fd, 0, 0, 0);
+    gns_async_command2(socket_fd, 0, 0, 0, 0, 0, 0);
+
 // Close the given socket.
     close(socket_fd);
 }
