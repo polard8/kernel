@@ -19,8 +19,8 @@ network_handle_tcp(
     register int i=0;
     uint16_t flags=0;
 
-    printk("network_handle_tcp: #todo\n");
-
+    // #debug
+    //printk("network_handle_tcp: #todo\n");
 
 // Parameters
     if ((void*) buffer == NULL){
@@ -105,10 +105,14 @@ network_handle_tcp(
 
     //#debug
     //printk("TCP: sport{%d}   #debug\n",sport);
-    printk("TCP: dport{%d}   #debug\n",dport);
+    //printk("TCP: dport{%d}   #debug\n",dport);
+
+    // #debug
+    if (dport == 80 || dport == 443){
+        printk("TCP: dport{%d}   #debug\n",dport);
+    }
 
 // Show
-
 
 // Special port.
 // Just a test.
