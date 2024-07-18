@@ -24,21 +24,37 @@ extern unsigned char __saved_our_ipv4[4];
 // Ethernet IPv4 TCP/UDP DATA FCS
 
 /*
-// Device
-// #test
-struct network_device_d 
+// Each NIC device needs to be represented here.
+// But each NIC device has its own internal structure
+// with elements specific for their brand.
+struct nic_device_d
 {
+    int used;
+    int magic;
     int id;
-    void *priv; //??
+
     char *dev_name;
-    unsigned char ipv4_address[4];
+    size_t name_size;
+
+    int initialized;
+
+// Opaque pointer to the archtecture specific structure.
+    void *priv;
+    int brand;  // Intel, Realteck ...
+
     unsigned char mac_address[6];
-    //virtual
-    //Nope!
-    //Void (*send)(PVoid, UIntPtr, PUInt8);
+    unsigned char ipv4_address[4];
+    unsigned char ipv6_address[6];
+
+// Navigation
+    struct nic_device_d *next;
 };
+extern struct nic_device_d *CurrentNICDevice;
 */
 
+// =================================================
+
+//#define DEFAULT_NUMBER_OF_NETWORK_BUFFERS  32
 
 struct network_buffer_d
 {
@@ -51,66 +67,12 @@ struct network_buffer_d
 // O status de cada buffer, se ele está vazio ou não.
     int is_full[32];
 };
-
 // See: network.c
 extern struct network_buffer_d  NETWORK_BUFFER;
 
+//========================================================
 
-/*
- * network_info_d:
- *     Estrutura de rede.
- */ 
-
-struct network_info_d
-{
-    int used;
-    int magic;
-// Número identificador da rede.
-    int id;
-    int initialized;
-
-// Strings
-
-// Nome da rede.
-    char *name_string;
-    size_t name_string_size;
-// String mostrando a versão. ex: (1.1.1234)
-    char *version_string;
-    size_t version_string_size;
-
-// Values
-    unsigned short version_major;
-    unsigned short version_minor;
-    unsigned short version_revision;
-
-//adaptador de rede.
-    //struct intel_nic_info_d *nic_info;
-
-    // struct user_info_d *user_info;
-    struct host_info_d *host_info;
-    //..
-
-// Gateway support
-    uint8_t gateway_ipv4[4];
-    uint8_t gateway_mac[6];
-    int gateway_initialized;
-
-// Stats
-// For all the NICs?
-    unsigned long tx_counter;
-    unsigned long rx_counter;
-
-// The domain controller.
-    //struct domain_d *domain_controller;
-
-    struct network_info_d *next;
-};
-extern struct network_info_d *CurrentNetwork;
-
-// Essa flag poderia ir para dentro da estrutura acima,
-extern int ____network_late_flag;
-
-
+// Initialized?
 #define NETWORK_INITIALIZED  TRUE
 #define NETWORK_NOT_INITIALIZED  FALSE
 
@@ -128,15 +90,93 @@ struct network_initialization_d
 // 1 - initialized
     int initialized;
 
-    int locked;
-
 // Are we online?
 // Do we already have an valid IP?
+// We are online when we already have a valid IP.
     int is_online;
+
+    int locked;
 
 // ...
 
 };
+
+// =================================================
+
+// Describe our network
+// #todo
+// There is a lot of fields here,
+// let's include pointers to another structures.
+struct network_info_d
+{
+    int used;
+    int magic;
+    int initialized;  // This structure was initialied
+
+// Número identificador da rede.
+    int id;
+
+// Strings
+
+// Nome da rede.
+    char *name_string;
+    size_t name_string_size;
+// String mostrando a versão. ex: (1.1.1234)
+    char *version_string;
+    size_t version_string_size;
+
+// Values
+// #bugbug
+// We don't need this.
+    //unsigned short version_major;
+    //unsigned short version_minor;
+    //unsigned short version_revision;
+
+// Network status
+    //int status;
+    //int is_online;
+
+//adaptador de rede.
+    //struct intel_nic_info_d *nic_info;
+
+    // struct user_info_d *user_info;
+    struct host_info_d *host_info;
+    //..
+
+// Gateway support
+    uint8_t gateway_mac[6];
+    uint8_t gateway_ipv4[4];
+    //uint8_t gateway_ipv6[6];
+    int gateway_initialized;
+
+
+// Number of nic devices in the machine.
+    int nic_counter;
+// The interface is using this nic device.
+    //int nic_in_use;
+
+// ...
+
+// Stats
+// For all the NICs?
+    unsigned long tx_counter;
+    unsigned long rx_counter;
+
+// The domain controller.
+    //struct domain_d *domain_controller;
+
+// This network interface belongs to this cgroup.
+// If a process belongs to another cgroup i will be unable to 
+// accress this interface.
+// This way we can create multiple network interface and 
+// each container/vm can use his own network interface.
+    //struct cgroup_d  *cgroup;
+
+    struct network_info_d  *next;
+};
+extern struct network_info_d *CurrentNetwork;
+
+// =================================================
 
 
 //
@@ -148,8 +188,6 @@ int
 network_register_ring3_display_server(
     struct cgroup_d *cg,
     pid_t caller_pid );
-
-
 
 void 
 network_fill_mac(

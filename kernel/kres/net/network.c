@@ -10,9 +10,6 @@
 static struct network_initialization_d  NetworkInitialization;
 
 
-// Essa flag poderia ir para dentro da estrutura acima,
-int ____network_late_flag=0;
-
 // Status para notificações.
 // Podemos ou não notificar os processo sobre os eventos de rede.
 // O shell vai habilitar essa notificação no momento em que
@@ -839,15 +836,6 @@ int networkInit(void)
 // We're offline
     networkSetOnlineStatus(NETWORK_OFFLINE);
 
-// =====================================================
-// #importante
-// Essa é a flag que indica que a última inicialização foi feita.
-// Aquela chamada por processos inicializadores em ring3.
-// Com essa flag acionada o handler do nic poderá
-// decodificar o buffer, caso contrário deve ignorar.
-
-    ____network_late_flag=0;
-
 //======================================
 // Network info structure
 
@@ -860,10 +848,14 @@ int networkInit(void)
     // Clear the structure
     memset( ni, 0, sizeof(struct network_info_d) );
     ni->initialized = FALSE;
+    // This is the first network interface,
+    // it is created when the kernel is booting.
     ni->id = 0;
-    ni->version_major = 0x0000;
-    ni->version_minor = 0x0000;
-    ni->version_revision = 0x0000;
+
+    // #deprecated
+    //ni->version_major = 0x0000;
+    //ni->version_minor = 0x0000;
+    //ni->version_revision = 0x0000;
     
     // ...
 
@@ -877,6 +869,7 @@ int networkInit(void)
 // Clear the info. (again)
     for (i=0; i<6; i++){
         ni->gateway_mac[i] = 0;
+        //ni->gateway_ipv6[i] = 0;
     };
     for (i=0; i<4; i++){
         ni->gateway_ipv4[i] = 0;
@@ -886,6 +879,8 @@ int networkInit(void)
 // Counters.
     ni->tx_counter=0;
     ni->rx_counter=0;
+
+    //ni->cgroup = NULL;
 
     ni->next = NULL;
     ni->used = TRUE;

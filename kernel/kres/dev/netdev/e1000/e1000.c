@@ -1162,8 +1162,13 @@ static void __e1000_on_receive(void)
 // #todo
 // Explain it better.
 
-    while ( ( currentNIC->legacy_rx_descs[ currentNIC->rx_cur ].status & 0x01) == 0x01 ) 
+    //while ( ( currentNIC->legacy_rx_descs[ currentNIC->rx_cur ].status & 0x01) == 0x01 ) 
+    while (1)
     {
+        // #test
+        if (( currentNIC->legacy_rx_descs[ currentNIC->rx_cur ].status & 0x01) != 0x01)
+            break;
+
         // Pega o atual e circula.
         old = currentNIC->rx_cur;
         currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
@@ -1197,17 +1202,6 @@ static void __e1000_on_receive(void)
         // REG_RXDESCTAIL
         __E1000WriteCommand ( currentNIC, 0x2818, old );
 
-        // Se o bit de statos estava acionado, então copiamos esse
-        // buffer para outro acessível pelos aplicativos.
-             
-        // Envia para o buffer do gramado.
-        //if (____network_late_flag == TRUE)
-        //{
-             //network_buffer_in ( (void *) buffer, (int) len );
-             //printk("DeviceInterface_e1000: [DEBUG] iret\n");
-             //refresh_screen();
-        //}  
-
         //#test buffer
         //eh = (void*) buffer;
         // IN:
@@ -1216,7 +1210,6 @@ static void __e1000_on_receive(void)
         // see: network.c
         if ((void*) frame != NULL)
         {
-
             network_on_receiving ( 
                 (const unsigned char*) frame, 
                 (ssize_t) (frame_lenght & 0xFFFF) );
@@ -1224,7 +1217,7 @@ static void __e1000_on_receive(void)
             e1000_rx_counter++;
             networkUpdateCounter(2);
         }
-    }
+    };
 }
 
 static void DeviceInterface_e1000(void)

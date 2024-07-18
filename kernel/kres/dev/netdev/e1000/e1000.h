@@ -34,37 +34,42 @@ extern int e1000_irq_count;
 #define INTERRUPT_SRPD    (1 << 16)  // 0x8000
 
 
-#define TDESC_STA_DD    0x01 /* indicates hardware done with descriptor */
-#define TDESC_CMD_EOP   0x01 /* indicates end of packet */
-#define TDESC_CMD_IFCS  0x02 /* insert frame checksum (FCS) */
-#define TDESC_CMD_RS    0x08 /* requests status report */
+#define TDESC_STA_DD    0x01  // Indicates hardware done with descriptor
+#define TDESC_CMD_EOP   0x01  // Indicates end of packet
+#define TDESC_CMD_IFCS  0x02  // Insert frame checksum (FCS)
+#define TDESC_CMD_RS    0x08  // Requests status report
 
 // Registers offsets:
-#define REG_CTRL 0x0000
-#define REG_STATUS 0x0008
-#define REG_EEPROM 0x0014
-#define REG_CTRL_EXT 0x0018
-#define REG_INTERRUPT_CAUSE_READ 0x00C0
-#define REG_INTERRUPT_RATE 0x00C4
-#define REG_INTERRUPT_MASK_SET 0x00D0
-#define REG_INTERRUPT_MASK_CLEAR 0x00D8
-#define REG_RCTRL 0x0100
-#define REG_RXDESCLO 0x2800
-#define REG_RXDESCHI 0x2804
-#define REG_RXDESCLEN 0x2808
-#define REG_RXDESCHEAD 0x2810
-#define REG_RXDESCTAIL 0x2818
-#define REG_TCTRL 0x0400
-#define REG_TXDESCLO 0x3800
-#define REG_TXDESCHI 0x3804
-#define REG_TXDESCLEN 0x3808
-#define REG_TXDESCHEAD 0x3810
-#define REG_TXDESCTAIL 0x3818
-#define REG_RDTR 0x2820             // RX Delay Timer Register
-#define REG_RXDCTL 0x3828           // RX Descriptor Control
-#define REG_RADV 0x282C             // RX Int. Absolute Delay Timer
-#define REG_RSRPD 0x2C00            // RX Small Packet Detect Interrupt
-#define REG_TIPG 0x0410             // Transmit Inter Packet Gap
+#define REG_CTRL  0x0000
+#define REG_STATUS  0x0008
+#define REG_EEPROM  0x0014
+#define REG_CTRL_EXT  0x0018
+#define REG_INTERRUPT_CAUSE_READ  0x00C0
+#define REG_INTERRUPT_RATE  0x00C4
+#define REG_INTERRUPT_MASK_SET  0x00D0
+#define REG_INTERRUPT_MASK_CLEAR  0x00D8
+
+#define REG_RCTRL  0x0100
+#define REG_RXDESCLO    0x2800
+#define REG_RXDESCHI    0x2804
+#define REG_RXDESCLEN   0x2808
+#define REG_RXDESCHEAD  0x2810
+#define REG_RXDESCTAIL  0x2818
+
+#define REG_TCTRL  0x0400
+#define REG_TXDESCLO    0x3800
+#define REG_TXDESCHI    0x3804
+#define REG_TXDESCLEN   0x3808
+#define REG_TXDESCHEAD  0x3810
+#define REG_TXDESCTAIL  0x3818
+
+#define REG_RDTR    0x2820    // RX Delay Timer Register
+#define REG_RXDCTL  0x3828    // RX Descriptor Control
+#define REG_RADV    0x282C    // RX Int. Absolute Delay Timer
+#define REG_RSRPD   0x2C00    // RX Small Packet Detect Interrupt
+
+#define REG_TIPG  0x0410    // Transmit Inter Packet Gap
+
 // Aliases
 #define REG_TDH    0x3810  // Transmit Descriptor Head
 #define REG_TDT    0x3818  // Transmit Descriptor Tail
@@ -83,11 +88,12 @@ extern int e1000_irq_count;
 // + The payload (IP packet, usually 1,500 bytes).
 // + Frame Check Sequence (FCS) field (4 bytes).
 
-
 // #todo
 // The buffer size limit depends on the configuration
+// 16*512
 #define E1000_DEFAULT_BUFFER_SIZE  8192
 #define E1000_DEFAULT_RECEIVE_BUFFER_SIZE  E1000_DEFAULT_BUFFER_SIZE
+//#define E1000_DEFAULT_SEND_BUFFER_SIZE     E1000_DEFAULT_BUFFER_SIZE
 
 /*
 // Buffer Sizes
@@ -114,26 +120,28 @@ extern int e1000_irq_count;
 #define CMD_IDE  (1 << 7)  // Interrupt Delay Enable
 */
 
+// ====================================================
+
 // Transmit Descriptor
 struct legacy_tx_desc 
 {
-    //uint64_t addr;
-    uint32_t addr;  //endereço físico do buffer.
+    //uint64_t addr;  // The physical address of the buffer.
+    uint32_t addr;
     uint32_t addr2;
 
     uint16_t length;
-    uint8_t cso;      /* checksum offset */
+    uint8_t cso;      // Checksum offset
     uint8_t cmd;
 
-    uint8_t status;   /* status and reserved */
-    uint8_t css;      /* checksum start */
+    uint8_t status;   // status and reserved
+    uint8_t css;      // checksum start
     uint16_t special;
 };
 
 // Receive Descriptor
 struct legacy_rx_desc 
 {
-    //uint64_t buffer_addr; // Address of the descriptor's data buffer 
+    //uint64_t buffer_addr;  // The physical address of the buffer. 
     uint32_t addr;
     uint32_t addr2;
 
@@ -144,18 +152,30 @@ struct legacy_rx_desc
     uint16_t special;
 };
 
+// ====================================================
 
-// arp cache item
+// ARP cache item
+// #bugbug:
+// Why do we have this for dedicated to the nic device
+// and not one for the whole net interface?
 struct e1000_arp_cache_item_d
 {
     int used;
     int magic;
+    int id;  // Index.
+
+// Pinned during the whole session?
+//    int pinned;
+
+// ?
+
     uint8_t mac_address[6];
+    //uint8_t ipv6_address[6];
     uint8_t ipv4_address[4];
 };
 
-
-// ## device info ##
+// ============================================================
+// Device Info
 // #bugbug
 // Me parece que isso deve ser usado apenas para dispositivos  
 // Intel. Pois cada marca terá suas características.
@@ -163,7 +183,6 @@ struct intel_nic_info_d
 {
     object_type_t objectType;
     object_class_t objectClass;
-
     int used;
     int magic;
 
@@ -171,6 +190,7 @@ struct intel_nic_info_d
     unsigned long registers_base_address;
 
     uint8_t mac_address[6];
+    //uint8_t ipv6_address[6];
     uint8_t ip_address[4];
 
     uint16_t rx_cur;
@@ -193,15 +213,18 @@ struct intel_nic_info_d
 
 // Arrays de ponteiros de buffers.
 // Ponteiros virtuais de 64bit.
-    unsigned long rx_buffers_virt[32];
-    unsigned long tx_buffers_virt[8];
+    unsigned long rx_buffers_virt[32];  // Receive
+    unsigned long tx_buffers_virt[8];   // Send
 
-// arp cache.
+// ARP cache
     struct e1000_arp_cache_item_d  arp_cache[32];
+    //int arpcache_max;
 
-//pci device.
+// PCI device.
+// The structure for this device.
     struct pci_device_d *pci;
 
+// Counting the interrupts.
     int interrupt_count;
 
     // rede.
