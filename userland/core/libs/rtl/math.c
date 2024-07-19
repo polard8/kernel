@@ -1,6 +1,7 @@
-
 // math.c
 // The system has the support for double in ring3.
+// Created by Fred Nora.
+
 // #todo
 // Remember: double is double precision float.
 
@@ -70,7 +71,7 @@ double pow(double __x, double __y)
 }
 
 
-// fsqrt:
+// sqrt:
 // Computes the square root of the source 
 // value in the ST(0) register and stores the result in ST(0).
 // OUT: Square root of __x
@@ -157,7 +158,7 @@ float power3(float x, int y)
     float temp=0;
 
     if (y == 0){
-        return (float) 1;
+        return (float) 1.0f;
     }
 
     temp = (float) power3( (float) x, (float) (y>>1) );
@@ -230,3 +231,16 @@ float tanf(float arg)
     return (float) __builtin_tan(arg);
 }
 
+// #test
+float neutral_element_of_add(void)
+{
+    float ret = 0.0f;
+    return (float) ret;
+}
+
+// #test
+float neutral_element_of_mul(void)
+{
+    float ret = 1.0f;
+    return (float) ret;
+}

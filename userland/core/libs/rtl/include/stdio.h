@@ -21,7 +21,7 @@
 
 
 // tty id desse processo.
-// Usado na inicialização da biblioteca.
+// Usado na inicializaï¿½ï¿½o da biblioteca.
 // See: stdio.c:
 
 //int __libc_tty_id;
@@ -35,9 +35,9 @@ extern int __libc_tty_id;
 
 
 // #test
-//Os caracteres são colocados em stdout.
+//Os caracteres sï¿½o colocados em stdout.
 #define LIBC_NORMAL_MODE 1
-//Os caracteres são pintados na tela.
+//Os caracteres sï¿½o pintados na tela.
 #define LIBC_DRAW_MODE 2
 // ...
 
@@ -238,8 +238,8 @@ typedef __gramado_off_t  fpos_t;
 //
 
 // #importante
-// Todo suporte à arquivos foi para libio/file.h
-// Os tipos que eles precisam ainda está aqui.
+// Todo suporte ï¿½ arquivos foi para libio/file.h
+// Os tipos que eles precisam ainda estï¿½ aqui.
 
 #include <libio/file.h>
 
@@ -295,7 +295,7 @@ typedef __gramado_off_t  fpos_t;
 
 //
 // Obs: 
-// O tipo da variável aqui é provisório. (UL).
+// O tipo da variï¿½vel aqui ï¿½ provisï¿½rio. (UL).
 //
 
 //cursor
@@ -311,8 +311,8 @@ extern unsigned long g_char_attrib;
 
 //columns and rows
 //@todo: Esse precisa ser inicializado
-//Obs: Se essas variáveis forem 0, 
-// as rotinas de stdio usarão os valores default.
+//Obs: Se essas variï¿½veis forem 0, 
+// as rotinas de stdio usarï¿½o os valores default.
 //COLUMNS e ROWS.
 //unsigned long g_columns;
 //unsigned long g_rows;
@@ -320,7 +320,7 @@ extern unsigned long g_columns;
 extern unsigned long g_rows;
 
 // ??
-// modo gráfico?
+// modo grï¿½fico?
 //int g_using_gui; 
 extern int g_using_gui; 
 
@@ -679,9 +679,7 @@ int sscanf(const char *str, const char *format, ...);
  
 long ftell (FILE *stream);
 
-
 char *uclib_gets (char *str); 
-
 
 
 //--save
@@ -694,20 +692,18 @@ int fputs2 ( const char *str, FILE *stream );
 int ungetc ( int c, FILE *stream );
 
 
-
 //++
 //===================
-// Isso vai ler no buffer da stream que está em ring3.
+// Isso vai ler no buffer da stream que estï¿½ em ring3.
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp);
-// Isso vai escrever no buffer da stream que está em ring3.
+// Isso vai escrever no buffer da stream que estï¿½ em ring3.
 size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp);
-// Isso vai ler no arquivo que está em ring0.
+// Isso vai ler no arquivo que estï¿½ em ring0.
 int linux_fgetc (FILE *f);
-// Isso vai escrever no arquivo que está em ring0.
+// Isso vai escrever no arquivo que estï¿½ em ring0.
 int linux_fputc (int c, FILE *f);
 //===================
 //--
-
 
 
 // prompt support.
@@ -718,21 +714,16 @@ int prompt_strcat (char *string);
 int prompt_flush ( int con_id );
 void prompt_clean (void);
 
-
-
 //
 // Direct Input and Output Functions
 //
  
- 
- 
+
 //
 // File Positioning Functions
 //
 
 int fseek (FILE *stream, long offset, int whence);
-
-
 
 //
 // Error Functions
@@ -753,10 +744,10 @@ int snprintf (char *str,size_t count,const char *fmt,...);
 //int vprintf (const char *fmt, va_list ap);
 
 //#test
-//ainda não foi testada
+//ainda nï¿½o foi testada
 int fscanf (FILE *stream, const char *format, ... );
 
-// inicializa o fluxo padrão para o processo.
+// inicializa o fluxo padrï¿½o para o processo.
 int stdio_initialize_standard_streams (void);
 
 
@@ -786,13 +777,16 @@ int unix_get (int ifile);
 
 int libcStartTerminal (void);
 
-/*Inicialização da biblioteca*/
+/*Inicializaï¿½ï¿½o da biblioteca*/
 void stdioInitialize(void);
 
 int
 rtl_GetS(
     unsigned char *buf,
     size_t size );
+
+size_t gets_00(char *buf, size_t buffer_size);
+
 
 int rtl_y_or_n(void);
 int rtl_are_you_sure(void);

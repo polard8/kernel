@@ -771,6 +771,17 @@ int main( int argc, char **argv)
 //#bugbug: this proces is running in ring0.
     //asm ("cli");
 
+
+// Testing gets_00
+
+/*
+    char b[512];
+    //int __si = gets_00(b,8);
+    int __si = rtl_GetS(b,8);
+    //int __si = gets(stdin);
+    printf ("%d\n",__si);
+*/
+
 //
 // Interrupts
 //

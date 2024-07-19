@@ -1,9 +1,8 @@
-
 // math.h 
+// Created by Fred Nora.
 
-
-#ifndef  _MATH_H
-#define  _MATH_H  1
+#ifndef __MATH_H
+#define __MATH_H    1
 
 // hehe
 #define GRAMADO_PI  3.14159265 
@@ -12,17 +11,14 @@ union __float_u {
 	unsigned char __dummy[sizeof(float)];
 	float __val;
 };
-
 union __double_u {
 	unsigned char __dummy[sizeof(double)];
 	double __val;
 };
-
 union __long_double_u {
 	unsigned char __dummy[sizeof(long double)];
 	long double __val;
 };
-
 
 
 /* The above constants are not adequate for computation using `long double's.
@@ -125,7 +121,10 @@ float sinf(float arg);
 float cosf(float arg);
 float tanf(float arg);
 
-
+// #test
+float neutral_element_of_add(void);
+// #test
+float neutral_element_of_mul(void);
 
 #endif    
 

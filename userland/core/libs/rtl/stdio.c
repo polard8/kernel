@@ -1695,6 +1695,7 @@ void prompt_clean (void)
     prompt_max = PROMPT_MAX_DEFAULT;  
 }
 
+
 /*
  ****************************************************************
  *    Building the function printf;
@@ -3260,22 +3261,26 @@ char *fgets2 (char *s, int count, FILE *fp)
 
     p = s;
 
+// Parameter
     if ( (void *) fp == NULL ){
        return (char *) 0;
     }
+
+// #todo
+// We need a valid 's'.
 
 // Guard against count arg == INT_MIN. 
     while (count-- > 1) 
     {
         ch = getc(fp);
-
-        if (ch == EOF){ break; }
-
+        if (ch == EOF){ 
+            break;
+        }
         *p++ = ch;
-
-        if (ch == '\n') { break; }
+        if (ch == '\n') {
+            break;
+        }
     };
-
 
     if ( ferror(fp) || (s == p) ) 
     {
@@ -3479,6 +3484,9 @@ rtl_GetS(
 // Credits: TempleOS
 // #todo: Not tested yet.
 
+   // This is a work in progress!
+
+/*
     unsigned char *st;
     int ch=0;
     int i=0;
@@ -3515,8 +3523,79 @@ rtl_GetS(
     buf[i]=0;
 
     return (int) i;
+*/
+
+    return 0;
 }
 
+// #test
+// Implemented. Not tested yet.
+// Prompt into fixed length string. 
+// Size must include terminator.
+size_t gets_00(char *buf, size_t buffer_size)
+{
+
+   // This is a work in progress!
+
+/*
+    int ch=0;
+    register size_t StringSize = 0;
+
+// Parameters 
+    if ((void*) buf == NULL)
+        return 0;
+    if ((void*) buf == NULL)
+        return 0;
+// The size must to include the terminator.
+    if (buffer_size < 1)
+        return 0;
+
+// Loop 
+    while (1)
+	{
+      ch = (int) fgetc(stdin);
+
+	  // lf
+	  if (ch == '\n') {
+        // echo
+	    printf ("%c",ch);
+		fflush(stdout);
+	    break;
+
+	  // backspace
+	  } else if (ch == '\b') {
+	    if (StringSize > 0) {
+	      StringSize--;
+          // echo
+	      printf ("%c",ch);
+		  fflush(stdout);
+	    }
+	  
+      } else if (ch == EOF) {
+
+	  // regular char
+      } else {
+	     if (StringSize < buffer_size-1) {
+
+	       buf[StringSize] = ch;
+           StringSize++;
+
+           // echo
+	       printf ("%c",ch);
+		   fflush(stdout);
+	     }
+      }
+    }
+
+// Finalize string
+    buf[StringSize]=0;
+
+// Size
+  return (size_t) StringSize;
+*/
+
+   return 0;
+}
 
 /*
 int feof(FILE *fp)
