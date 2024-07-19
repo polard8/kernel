@@ -3473,71 +3473,15 @@ int getchar6(FILE *input_stream,FILE *output_stream)
 }
 */
 
-
-
-int
-rtl_GetS(
-    unsigned char *buf,
-    size_t size )
-{
-// Prompt into fixed length string. Size must include terminator.
-// Credits: TempleOS
-// #todo: Not tested yet.
-
-   // This is a work in progress!
-
-/*
-    unsigned char *st;
-    int ch=0;
-    int i=0;
-
-    if ((void*)buf == NULL)
-        return 0;
-    if (size <= 0) 
-        return 0;
-
-    while (TRUE) 
-    {
-        ch = (int) fgetc(stdin);
-
-        if (ch == '\n') {
-            //printf("%c",ch);
-            //printf("\n");
-            fflush(stdout);
-            break;
-      
-        } else if (ch == '\b') {
-            if (i>0) {
-                i--;
-                printf("%c",ch);
-            }
-      
-        } else {
-            if (i<size-1) {
-                buf[i++]=ch;
-                printf("%c",ch);
-            }
-        };
-    }
-
-    buf[i]=0;
-
-    return (int) i;
-*/
-
-    return 0;
-}
-
 // #test
 // Implemented. Not tested yet.
 // Prompt into fixed length string. 
 // Size must include terminator.
 size_t gets_00(char *buf, size_t buffer_size)
 {
+// This is a work in progress!
+// ok. It's working
 
-   // This is a work in progress!
-
-/*
     int ch=0;
     register size_t StringSize = 0;
 
@@ -3550,51 +3494,46 @@ size_t gets_00(char *buf, size_t buffer_size)
     if (buffer_size < 1)
         return 0;
 
-// Loop 
     while (1)
-	{
-      ch = (int) fgetc(stdin);
-
-	  // lf
-	  if (ch == '\n') {
-        // echo
-	    printf ("%c",ch);
-		fflush(stdout);
-	    break;
-
-	  // backspace
-	  } else if (ch == '\b') {
-	    if (StringSize > 0) {
-	      StringSize--;
-          // echo
-	      printf ("%c",ch);
-		  fflush(stdout);
-	    }
-	  
-      } else if (ch == EOF) {
-
-	  // regular char
-      } else {
-	     if (StringSize < buffer_size-1) {
-
-	       buf[StringSize] = ch;
-           StringSize++;
-
-           // echo
-	       printf ("%c",ch);
-		   fflush(stdout);
-	     }
-      }
-    }
+    {
+        ch = (int) fgetc(stdin);
+        
+        if (ch > 0)
+        {
+            // [Enter]
+            if (ch == VK_RETURN){
+                break;
+            // Printable
+            } else if ( ch >= 0x20 && ch <= 0x7F ){
+                if (StringSize < buffer_size-1) 
+                {
+                    buf[StringSize] = ch;
+                    StringSize++;
+                    printf("%c",ch);
+                    fflush(stdout);
+                }
+            // #todo: Control chars. (0~0x1F)
+            } else if ( ch <= 0x1F ){
+                // backspace
+                if (ch == VK_BACKSPACE)
+                {
+                    // Vai borrar
+                    if (StringSize > 0) 
+                    {
+                        StringSize--;
+                        printf("%c",ch);
+                        fflush(stdout);
+                    }
+                }
+            }
+        }
+    };
 
 // Finalize string
     buf[StringSize]=0;
 
 // Size
-  return (size_t) StringSize;
-*/
-
-   return 0;
+    return (size_t) StringSize;
 }
 
 /*

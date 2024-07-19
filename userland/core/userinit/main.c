@@ -772,15 +772,21 @@ int main( int argc, char **argv)
     //asm ("cli");
 
 
+// ---------------------------------------------
 // Testing gets_00
-
 /*
     char b[512];
-    //int __si = gets_00(b,8);
-    int __si = rtl_GetS(b,8);
-    //int __si = gets(stdin);
-    printf ("%d\n",__si);
+    while (1)
+    {
+        int __si = gets_00(b,8);
+        //int __si = rtl_GetS(b,8);
+        //int __si = gets(stdin);
+        printf ("%d\n",__si);
+        //while(1){};
+    }
 */
+// ---------------------------------------------
+
 
 //
 // Interrupts
@@ -807,50 +813,7 @@ int main( int argc, char **argv)
     gramado_system_call (643,0,0,0);
     Init.scheduler_unlocked = TRUE;
 
-/*
-//================================
-
-// Clear the console and set cursor position to 0,0.
-    do_clear_console();
-
-// ====
-// Small command line interpreter.
-// We need to hang here because 
-// maybe there is no window server installed.
-
-    printf(":: Gramado OS ::\n");
-    initPrompt();
-
-    register int C=0;
-
-    while(1)
-    {
-        if( isTimeToQuitCmdLine == TRUE ){
-            break;
-        }
-        C = (int) fgetc(stdin);
-        if( C == __VK_RETURN )
-        {
-            __CompareString();
-        }
-        if( C >= 0x20 && C <= 0x7F )
-        {
-            printf("%c",C);
-            fflush(stdout);
-
-            input(C);  // coloca no prompt.
-        }
-    };
-
-    //#debug
-    //printf("~Quit\n");
-    //while(1){}
-
-//================================
-*/
-
     Init.initialized = TRUE;
-
 
 // ----------------------------
 // Headless mode

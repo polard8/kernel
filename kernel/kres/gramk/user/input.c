@@ -783,10 +783,10 @@ __ProcessInput (
                 //wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
                 //return 0;
             //}
-            if (ShellFlag==TRUE)
+            if (ShellFlag == TRUE)
             {
-                kinput('\0');               // finalize
-                __CompareStrings();   // compare
+                kinput('\0');          // finalize
+                __CompareStrings();    // compare
                 //invalidate_screen();
                 refresh_screen();
                 return 0;
@@ -814,13 +814,12 @@ __ProcessInput (
             // O teclado vai colocar o char no prompt[]
             // e exibir o char na tela somente se o prompt
             // estiver acionado.
-            if (ShellFlag==TRUE)
+            if (ShellFlag == TRUE)
             {
-                consoleInputChar(long1);
+                consoleInputChar (long1);
                 console_putchar ( (int) long1, fg_console );
                 return 0;
             }
-
 
             // Not console.
             // NO, we're not using the kernel console.
