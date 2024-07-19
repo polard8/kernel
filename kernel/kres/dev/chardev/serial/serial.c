@@ -204,18 +204,28 @@ void debug_print_string(char *data)
     };
 }
 
-
 // #todo
 // We need a ioctl for serial devices.
 int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
     debug_print("serial_ioctl: [TODO]\n");
 
-    if(fd<0){
-        return -1;
+// #todo
+// Parameters:
+    if (fd < 0){
+        goto fail;
     }
+// ...
 
-    return -1;
+// #todo: ...
+
+    //switch (xxx)
+    //{
+    // ...
+    //};
+
+fail:
+    return (int) -1;
 }
 
 
@@ -243,19 +253,19 @@ int DDINIT_serial(void)
 
     Status = serial_init_port(COM1_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return FALSE;
+        goto fail;
     }
     Status = serial_init_port(COM2_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return FALSE;
+        goto fail;
     }
     Status = serial_init_port(COM3_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return FALSE;
+        goto fail;
     }
     Status = serial_init_port(COM4_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return FALSE;
+        goto fail;
     }
 
     //__breaker_com1_initialized = 1;
@@ -265,6 +275,8 @@ int DDINIT_serial(void)
 
     Initialization.is_serial_log_initialized = TRUE;
     return TRUE;
+fail:
+    return FALSE;
 }
 
 //

@@ -1,4 +1,3 @@
-
 // kstdio.h
 // Standard io support for libc in ring0.
 // Created by Fred Nora.
@@ -24,23 +23,30 @@ extern int g_inputmode;
 
 // _flags
 // BSD-sytle
-#define __SLBF  0x0001    /* line buffered */
-#define __SNBF  0x0002    /* unbuffered */
-#define __SRD   0x0004    /* OK to read */
-#define __SWR   0x0008    /* OK to write */
-/* RD and WR are never simultaneously asserted */
-#define __SRW   0x0010    /* open for reading & writing */
-#define __SEOF  0x0020    /* found EOF */
-#define __SERR  0x0040    /* found error */
-#define __SMBF  0x0080    /* _buf is from malloc */
-#define __SAPP  0x0100    /* fdopen()ed in append mode */
-#define __SSTR  0x0200    /* this is an sprintf/snprintf string */
-#define __SOPT  0x0400    /* do fseek() optimization */
-#define __SNPT  0x0800    /* do not do fseek() optimization */
-#define __SOFF  0x1000    /* set iff _offset is in fact correct */
-#define __SMOD  0x2000    /* true => fgetln modified _p text */
-#define __SALC  0x4000    /* allocate string space dynamically */
-#define __SIGN  0x8000    /* ignore this file in _fwalk */
+#define __SLBF  0x0001    // line buffered
+#define __SNBF  0x0002    // unbuffered
+#define __SRD   0x0004    // OK to read
+#define __SWR   0x0008    // OK to write
+// #atention
+// RD and WR are never simultaneously asserted.
+#define __SRW   0x0010    // open for reading & writing
+#define __SEOF  0x0020    // found EOF
+#define __SERR  0x0040    // found error
+#define __SMBF  0x0080    // _buf is from malloc
+#define __SAPP  0x0100    // fdopen()ed in append mode
+#define __SSTR  0x0200    // This is an sprintf/snprintf string
+#define __SOPT  0x0400    // do fseek() optimization
+#define __SNPT  0x0800    // do not do fseek() optimization
+#define __SOFF  0x1000    // set iff _offset is in fact correct
+#define __SMOD  0x2000    // true => fgetln modified _p text
+#define __SALC  0x4000    // allocate string space dynamically
+#define __SIGN  0x8000    // ignore this file in _fwalk
+
+// #test
+// Gramado-style
+// File falgs
+#define FF_OK_TO_READ   __SRD
+#define FF_OK_TO_WRITE  __SWR
 
 /*
  (BSD style)
@@ -232,6 +238,9 @@ struct kstdio_sync_d
     // See: defines above.
     int action;
 
+// Is it blocked?
+    int is_blocked;
+
     // for files, ttys, sockets ...
     int can_read;
     int can_write;
@@ -248,17 +257,16 @@ struct kstdio_sync_d
     
     int block_on_read;
     int block_on_read_empty;
-    
-    int lock;
-    
+   
     // save into the disk.
     // TRUE = Save the content of the _base into the physical media.
     // FALSE = Nothing to be saved.
     
-    // #todo: See: O_SYNC O_DSYNC O_RSYNC and O_DIRECT. 
+    // #todo: 
+    // See: O_SYNC O_DSYNC O_RSYNC and O_DIRECT. 
     
     // O_SYNC: The file is opened for synchronous I/O. 
-    // Any write () s on the resulting file descriptor 
+    // Any write()s on the resulting file descriptor 
     // will block the calling process until the data has been 
     // physically written to the underlying hardware.   
     
@@ -290,6 +298,12 @@ struct file_d
 
     int used;
     int magic;
+
+// #todo
+// The file is blocked by the system,
+// and we can't read or write on it.
+    // int is_blocked;
+
     char *_tmpfname;  
 
 // File descriptor.
@@ -387,11 +401,16 @@ struct file_d
 // == (2) synchronization ========
 //
 
-    //short _flags;
+//  Is it blocked?
+// There are two kinds of synchronization,
+// the _flags and the sync.
+
+// Ex: __SRD and __SWR
     unsigned short _flags;
 
 // Sincronizando a leitura e a escrita
 // para arquivos como socket, tty, buffer ... etc.
+// Ex: .can_read and .can_write.
     struct kstdio_sync_d  sync;
 
 //----------------------------------------------

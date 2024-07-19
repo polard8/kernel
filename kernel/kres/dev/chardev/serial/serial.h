@@ -33,6 +33,9 @@ struct serial_port_d
 {
     int initialized;
 
+// #todo
+//    int is_blocked;
+
     uint16_t port_number;
     uint16_t divisor;
     char divisorLoByte;
@@ -78,21 +81,4 @@ int serial_ioctl ( int fd, unsigned long request, unsigned long arg );
 int DDINIT_serial(void);
 
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

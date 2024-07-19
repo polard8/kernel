@@ -137,7 +137,7 @@ long power2(long x, unsigned int y)
         return 0;
     }else if(y == 0){
         return (long) 1;
-    }else if ( (y%2) == 0){
+    }else if ((y%2) == 0){
         v1 = (long) power2( (long) x,  (long) (y>>1) );
         v2 = (long) power2( (long) x,  (long) (y>>1) );
         return (long) (v1*v2);
@@ -163,7 +163,7 @@ float power3(float x, int y)
 
     temp = (float) power3( (float) x, (float) (y>>1) );
 
-    if ( (y%2) == 0){
+    if ((y%2) == 0){
         return (float) (temp * temp);
     }else{
 
@@ -188,10 +188,9 @@ double power4(double x, int y)
 
     temp = (double) power3( (double) x, (double) (y>>1) );
 
-    if ( (y%2) == 0){
+    if ( (y%2) == 0 ){
         return (double) (temp * temp);
     }else{
-
         if (y > 0){
             return (double) (x * temp * temp);
         }else{

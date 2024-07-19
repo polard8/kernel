@@ -74,8 +74,6 @@ typedef enum {
 	// ...
 }thread_wait_reason_t;
 
-
-
 /*
  * thread_type_t:
  *     Enumerando os tipos de threads:
@@ -87,8 +85,6 @@ typedef enum {
     THREAD_TYPE_INTERACTIVE,  // medium priority (first plane)
     THREAD_TYPE_BATCH,        // low priority
 }thread_type_t;
-
-
 
 /*
 This part is about input redirection ...
@@ -184,10 +180,10 @@ typedef enum {
 // a fila de mensagens na current thread.
 #define INPUT_MODEL_MESSAGEQUEUE  2
 
-
+// Thread flags.
 // t->flags:
-#define BLOCKED_SENDING      0x1000
-#define BLOCKED_RECEIVING    0x2000
+#define TF_BLOCKED_SENDING      0x1000
+#define TF_BLOCKED_RECEIVING    0x2000
 // ...
 
 
@@ -227,6 +223,13 @@ struct thread_d
     object_class_t objectClass;
     int used;
     int magic;
+
+// flags:
+// TF_BLOCKED_SENDING - Blocked when trying to send.
+// TF_BLOCKED_RECEIVING - Blocked when trying to receive.
+// ...
+    unsigned long flags;
+
 // type:
 // (SYSTEM, INTERACTIVE, BATCH)
     thread_type_t type;
@@ -241,13 +244,6 @@ struct thread_d
 // We are waiting the right time to close a thread.
 // The scheduler will do this job.
     int exit_in_progress;
-
-// flags:
-// 1000 - Blocked when trying to send.
-// 2000 - Blocked when trying to receive.
-// ...
-
-    unsigned long flags;
 
 // Input model
 // Setup the input model for this thread ...

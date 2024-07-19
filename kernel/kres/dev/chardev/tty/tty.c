@@ -34,20 +34,25 @@ int tty_copy_raw_buffer( struct tty_d *tty_to, struct tty_d *tty_from )
 {
     register int i=0;
 
-    if ( (void*) tty_to == NULL )
-        return -1;
-    if ( (void*) tty_from == NULL )
-        return -1;
+// Parameters:
+    if ((void*) tty_to == NULL){
+        goto fail;
+    }
+    if ((void*) tty_from == NULL){
+        goto fail;
+    }
     if (tty_to->magic != 1234)
-        return -1;
+        goto fail;
     if (tty_from->magic != 1234)
-        return -1;
+        goto fail;
 
+// Copy
     for (i=0; i<TTY_BUF_SIZE; i++){
         tty_to->raw_queue.buf[i] = (char) tty_from->raw_queue.buf[i]; 
     };
-
     return (int) i;
+fail:
+    return (int) -1;
 }
 
 /*
@@ -76,7 +81,7 @@ __tty_read (
     // #debug
     printk("__tty_read:\n");
 
-// tty structure.
+// Parameters:
     if ((void *) tty == NULL){
         printk ("__tty_read: tty\n");
         goto fail;
@@ -85,17 +90,16 @@ __tty_read (
         printk ("__tty_read: tty validation\n");
         goto fail;
     }
-// buffer
-    if ( (char *) buffer == NULL ){
-         panic ("__tty_read: Invalid buffer\n");
+    if ((char *) buffer == NULL){
+        panic ("__tty_read: buffer\n");
     }
-// nr
     if (nr <= 0){
         printk ("__tty_read: nr\n");
         goto fail;
     }
-    //if ( tty->stopped == TRUE )
+    //if ( tty->is_blocked == TRUE )
         //return -1;
+
 // Queue 
 // A leitura nas filas vai depender do modo
 // configurado.
@@ -108,8 +112,8 @@ __tty_read (
 // Isso tem o mesmo tamanho
 // da fila de tty.
 
-    int rbytes=nr;
-    if (rbytes<=0){
+    int rbytes = nr;
+    if (rbytes <= 0){
         return 0;
     }
 
@@ -117,7 +121,6 @@ __tty_read (
     if (rbytes>TTY_BUF_SIZE){
         rbytes=TTY_BUF_SIZE;
     }
-
 
     i=0;
     while (rbytes > 0)
@@ -211,7 +214,7 @@ __tty_write (
     // #debug
     printk("__tty_write:\n");
 
-// tty
+// Parameters:
     if ((void *) tty == NULL){
         debug_print("__tty_write: tty\n");
         goto fail;
@@ -220,17 +223,15 @@ __tty_write (
         printk("__tty_write: tty validation\n");
         goto fail;
     }
-// buffer (From)
     if ((char *) buffer == NULL){
          panic("__tty_write: Invalid buffer\n");
     }
-// nr
     if (nr <= 0){
         printk("__tty_write: nr\n");
         goto fail;
     }
 
-    //if ( tty->stopped == TRUE )
+    //if ( tty->is_blocked == TRUE )
         //return -1;
 
 // Queue 
@@ -278,22 +279,19 @@ __tty_write (
         // Acabou a fila.
         // #todo: O que faremos nesse caso?
         // Deixaremos de escrever?
-        if ( tty->raw_queue.head >= TTY_BUF_SIZE ){
+        if (tty->raw_queue.head >= TTY_BUF_SIZE){
             break;
         }
 
         // Pega um char do buffer local.
         c = data[i];
-
         // Salva um char na fila do tty
         tty->raw_queue.buf[ tty->raw_queue.head ] = c;
-
         // Avança na fila.
         tty->raw_queue.head++;
 
         // Incrementa a quantidade que foi gravada.
         i++;
-
         // Quantos faltam.
         wbytes--;
         if (wbytes <= 0){
@@ -311,7 +309,7 @@ __tty_write (
     int nbytes_copied = 0;
     struct tty_d *tty_slave;
     tty_slave = (struct tty_d *) tty->link;
-    if ( (void*) tty_slave != NULL )
+    if ((void*) tty_slave != NULL)
     {
         if (tty_slave->magic == 1234)
         {
@@ -324,7 +322,7 @@ __tty_write (
     }
  
 done:
-    
+
     //#debug
     printk("__tty_write: [DONE] %d bytes written\n",i);
     printk("HEAD %d\n",tty->raw_queue.head);
@@ -365,65 +363,57 @@ tty_read (
 {
     struct tty_d *__tty;
     struct process_d *p;
+    pid_t current_process = -1;
     file *f;
 
-    //debug_print ("tty_read: [FIXME]\n");
-
-    pid_t current_process = (pid_t) get_current_process();
-
-// fd
+// Parameters:
     if ( fd < 0 || fd > 31 ){
         return (int) (-EBADF);
     }
-
 //#todo
-    //if( (void*) buffer == NULL )
-    //{
+    //if( (void*) buffer == NULL ){
     //    return (int) (-EINVAL);
     //}
+// #todo: 
+// 'n'
 
-// #todo: 'n'
 
 // process.
 // Vamos pegar o ponteiro de estrutura
 // do processo que chamou essa funçao
-
+    current_process = (pid_t) get_current_process();
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
-        return -1;
+        goto fail;
     }
     p = (struct process_d *) processList[current_process];
     if ((void*) p == NULL){
         debug_print("tty_read: p\n");
-        return -1;
+        goto fail;
     }
     if (p->magic != 1234){
-        return -1;
+        goto fail;
     }
 
-// file
-// The object
-
+// The TTY object
     f = (file *) p->Objects[fd];
     if ((void*) f == NULL){
         debug_print("tty_read: f\n");
-        return -1;
+        goto fail;
     }
     if (f->magic != 1234){
-        return -1;
+        goto fail;
     }
-
     if ( f->____object != ObjectTypeTTY ){
         debug_print("tty_read: ____object\n");
-        return -1;
+        goto fail;
     }
 
 // tty
 // Pega a tty representada pelo arquivo.
-
     __tty = (struct tty_d *) f->tty;
-    if ( (void*) __tty == NULL ){
+    if ((void*) __tty == NULL){
         debug_print("tty_read: __tty\n");
-        return -1;
+        goto fail;
     }
     // #todo
     // if(__tty->magic != 1234)
@@ -434,8 +424,10 @@ tty_read (
                       (struct tty_d *) __tty, 
                       (char *) buffer, 
                       (int) n );
-}
 
+fail:
+    return (int) -1;
+}
 
 // service 273
 // IN: 
@@ -448,78 +440,72 @@ tty_write (
 {
     struct tty_d *__tty;
     struct process_d *p;
+    pid_t current_process = -1;
     file *f;
 
-    //debug_print ("tty_write: [FIXME]\n");
-
-    pid_t current_process = (pid_t) get_current_process();
-
-// fd
+// Parameters
     if ( fd < 0 || fd > 31 ){
         return (int) (-EBADF);
     }
-
 //#todo
     //if( (void*) buffer == NULL )
     //{
     //    return (int) (-EINVAL);
     //}
-
-// #todo: 'n'
-
-
+// #todo: 
+// 'n'
 
 // process
 // vamos pegar o ponteiro do processo
 // que chamou essa funçao, dentro da lista global
 // de ponteiros de processos.
-
+    current_process = (pid_t) get_current_process();
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
-        return -1;
+        goto fail;
     }
     p = (struct process_d *) processList[current_process];
     if ((void*) p == NULL){
         debug_print("tty_write: p\n");
-        return -1;
+        goto fail;
     }
     if (p->magic != 1234){
-       return 1;
+       goto fail;
     }
 
-// file
+// The TTY object
     f = (file *) p->Objects[fd];
     if ((void*) f == NULL){
         debug_print("tty_write: f\n");
-        return -1;
+        goto fail;
     }
     if (f->magic != 1234){
-        return -1;
+        goto fail;
     }
-
-// Object tty.
     if ( f->____object != ObjectTypeTTY ){
         debug_print("tty_write: ____object\n");
-        return -1;
+        goto fail;
     }
 
 // tty
 // Pega a tty representada pelo arquivo.
     __tty = (struct tty_d *) f->tty;
-    if ( (void*) __tty == NULL ){
+    if ((void*) __tty == NULL){
         debug_print("tty_write: __tty\n");
-        return -1;
+        goto fail;
     }
     // #todo
     // if(__tty->magic != 1234)
-    //     return -1;
+    //     goto fail;
 
 // Read tty
     return (int) __tty_write ( 
                      (struct tty_d *) __tty, 
                      (char *) buffer, 
                      (int) n );
-}
 
+fail:
+    return (int) -1;
+}
 
 /*
  //#todo
@@ -560,7 +546,9 @@ int tty_change_font_address( struct tty_d *tty, void *font_address )
 
 int tty_reset_termios(struct tty_d *tty)
 {
-    if ( (void *) tty == NULL ){
+
+// Parameter
+    if ((void *) tty == NULL){
         return (int) -1;
     }
 
@@ -635,7 +623,8 @@ struct tty_d *tty_create(short type, short subtype)
     char __tmpname[64];
     register int i=0;
 
-    //debug_print ("tty_create: [FIXME] \n");
+// #todo
+// The parameters.
 
 // Create structure.
     __tty = (struct tty_d *) kmalloc( sizeof(struct tty_d) );
@@ -683,8 +672,7 @@ struct tty_d *tty_create(short type, short subtype)
     __tty->cgroup = NULL;        // #todo: Use current cgroup.
 
 // The kernel can print string into the display device.
-    __tty->vc_mode = 
-        (int) VC_MODE_KERNEL_VERBOSER;
+    __tty->vc_mode = (int) VC_MODE_KERNEL_VERBOSER;
 
 // file pointer
 // this file handles this tty object
@@ -708,8 +696,8 @@ struct tty_d *tty_create(short type, short subtype)
     //__tty->pid_count=0;
     
     __tty->flags = 0;
-// not stopped
-    __tty->stopped = FALSE;
+// not blocked
+    __tty->is_blocked = FALSE;
 // process
     // __tty->process = KernelProcess;
 // thread
@@ -783,7 +771,7 @@ struct tty_d *tty_create(short type, short subtype)
 // ==========================================
 //__ok_register:
 
-    if ( (void *) __tty == NULL ){
+    if ((void *) __tty == NULL){
         panic("tty_create: __tty\n");
     }
 
@@ -881,7 +869,7 @@ struct tty_d *tty_create(short type, short subtype)
 // OUT: tty pointer.
 struct tty_d *file_tty (file *f)
 {
-    if ( (void *)f==NULL ){
+    if ((void *)f == NULL){
         return (struct tty_d *) 0;
         //return NULL;
     }
@@ -895,22 +883,23 @@ void tty_flush(struct tty_d *tty)
     // todo
     debug_print("tty_flush: [TODO]\n");
     
-    if ( (void*) tty == NULL )
+    if ((void*) tty == NULL)
         return;
 }
 
 void tty_start(struct tty_d *tty)
 {
+
+// Parameter
     if ((void *) tty == NULL){
         debug_print("tty_start: tty\n");
         return;
     }
-// Se não está parada.
-    if (tty->stopped == FALSE){
-        //debug_print("tty_start: not stopped\n");
+// It's NOT blocked.
+    if (tty->is_blocked == FALSE){
         return;
     }
-    tty->stopped = FALSE;
+    tty->is_blocked = FALSE;
 
 /*
 // Is it a console?
@@ -928,16 +917,16 @@ void tty_start(struct tty_d *tty)
 
 void tty_stop (struct tty_d *tty)
 {
-    if ( (void *) tty == NULL ){
+    if ((void *) tty == NULL){
         debug_print("tty_stop: tty\n");
         return;
     }
-// Se ela já está parada.
-    if (tty->stopped == TRUE){
-        //debug_print("tty_stop: already stopped\n");
+
+// It's NOT blocked.
+    if (tty->is_blocked == TRUE){
         return;
     }
-    tty->stopped = TRUE;
+    tty->is_blocked = TRUE;
 
 /*
 // Is it a console?
@@ -979,14 +968,17 @@ tty_gets (
     struct tty_d *tty, 
     struct termios_d *termiosp )
 {
-    if ( (void *) tty == NULL ){
-        debug_print("tty_gets: [FAIL] tty\n");
-        return -1;
+
+// Parameters:
+    if ((void *) tty == NULL){
+        debug_print("tty_gets: tty\n");
+        goto fail;
     }
-    if ( (void *) termiosp == NULL ){
-        debug_print("tty_gets: [FAIL] termiosp\n");
-        return -1;
+    if ((void *) termiosp == NULL){
+        debug_print("tty_gets: termiosp\n");
+        goto fail;
     }
+
 // Copia a estrutura term da tty na estrutura de termios 
 // que está em ring3.
     memcpy ( 
@@ -995,8 +987,9 @@ tty_gets (
         sizeof(struct termios_d) );
 
     return 0;
+fail:
+    return (int) -1;
 }
-
 
 // Copia de ring3 para o kernel.
 int 
@@ -1007,21 +1000,18 @@ tty_sets (
 {
     int ret = -1;
 
-    if ( (void *) tty == NULL ){
-        debug_print("tty_sets: [FAIL] tty\n");
-        return -1;
+// Parameters:
+    if ((void *) tty == NULL){
+        goto fail;
     }
     if (tty->magic != 1234){
-        return -1;
+        goto fail;
     }
-
     if (options < 0){
-        debug_print("tty_sets: [FAIL] options\n");
-        return -1;
+        goto fail;
     }
-    if ( (void *) termiosp == NULL ){
-        debug_print("tty_sets: [FAIL] termiosp\n");
-        return -1;
+    if ((void *) termiosp == NULL){
+        goto fail;
     }
 
 // Options
@@ -1041,8 +1031,9 @@ tty_sets (
     };
 
     return (int) ret;
+fail:
+    return (int) -1;
 }
-
 
 int tty_init_module (void)
 {
@@ -1075,20 +1066,19 @@ tty_ioctl (
     struct tty_d *tty;
     struct tty_d *other_tty;
 
-    pid_t current_process = -1;
     struct process_d *p;
+    pid_t current_process = -1;
     file *f;
-
 
     debug_print ("tty_ioctl: TODO\n");
 
-//#debug
-    //if (request == TIOCCONS)
-        //printk("request == TIOCCONS\n");
-
+// Parameters:
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
+    //if (request == TIOCCONS)
+        //printk("request == TIOCCONS\n");
+
 
 // Current process.
 // #todo
@@ -1099,25 +1089,22 @@ tty_ioctl (
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){ 
         return -1;
     }
-
-// process
     p = (struct process_d *) processList[current_process];
-    if ( (void *) p == NULL ){
-        debug_print ("tty_ioctl: p\n");
-        return -1;
+    if ((void *) p == NULL){
+        goto fail;
     }
     if (p->magic != 1234){
-        return -1;
+        goto fail;
     }
 
 // file. (Object).
     f = (file*) p->Objects[fd];
     if ( (void *) f == NULL ){
         debug_print ("tty_ioctl: [FAIL] f\n"); 
-        return -1;
+        goto fail;
     }
     if (f->magic != 1234){
-        return -1;
+        goto fail;
     }
 
 // Is it a tty object?
@@ -1180,30 +1167,30 @@ tty_ioctl (
 // Discards data written to the object referred to by fd .
     case TCFLSH:
         debug_print ("tty_ioctl: TCFLSH [TODO]\n");
-        return -1;
+        goto fail;
         break;
     case TCIFLUSH:
         debug_print ("tty_ioctl: TCIFLUSH [TODO]\n");
-        return -1;
+        goto fail;
         break;
     case TCOFLUSH:
         debug_print ("tty_ioctl: TCOFLUSH [TODO]\n");
-        return -1;
+        goto fail;
         break;
     case TCIOFLUSH:
         debug_print ("tty_ioctl: TCIOFLUSH [TODO]\n");
-        return -1;
+        goto fail;
         break;
 // Set termio.   
     case TCGETA:
-         debug_print ("tty_ioctl: TCGETA [TODO]\n");
-         return -1;
-         break;
+        debug_print ("tty_ioctl: TCGETA [TODO]\n");
+        goto fail;
+        break;
 // Get termio.
     case TCSETA:
-         debug_print ("tty_ioctl: TCSETA [TODO]\n");
-         return -1;
-         break;
+        debug_print ("tty_ioctl: TCSETA [TODO]\n");
+        goto fail;
+        break;
 
     // TCSETSF, TCSETSW, , TCSETAF, TCSETAW, , TCSBRK
     // TCXONC
@@ -1262,7 +1249,7 @@ tty_ioctl (
             if (is_linked != TRUE){
                 redirect = NULL;
                 printk("Not linked\n");
-                return -1;
+                goto fail;
             }
         } else if (tty->subtype == TTY_SUBTYPE_PTY_SLAVE){
             redirect = tty;
@@ -1278,7 +1265,12 @@ tty_ioctl (
         break;
     };
 
-    //fail.
-    return -1;
+
+fail:
+    return (int) -1;
 }
+
+//
+// End
+//
 

@@ -2650,9 +2650,9 @@ console_ioctl (
         return (int) CONSOLE_TTYS[fg_console].initialized;
         break;
 
-// Is it stopped?
+// Is it blocked?
     case 501:
-        return (int) CONSOLE_TTYS[fg_console].stopped;
+        return (int) CONSOLE_TTYS[fg_console].is_blocked;
         break;
 
 // What process group it belongs to?
@@ -3073,9 +3073,8 @@ DDINIT_console(
     CONSOLE_TTYS[ConsoleIndex].subtype = 0;
         
     CONSOLE_TTYS[ConsoleIndex].flags = 0;
-
-    // not stopped
-    CONSOLE_TTYS[ConsoleIndex].stopped = FALSE;
+// Not blocked
+    CONSOLE_TTYS[ConsoleIndex].is_blocked = FALSE;
 
     // process
     //CONSOLE_TTYS[ConsoleIndex].process = KernelProcess;

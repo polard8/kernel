@@ -138,9 +138,7 @@ struct tty_queue
 // Eh uma lista encadeada de 
 // threads esperando nessa fila.
     struct thread_d *thread_list;
-
 };
-
 
 /*
 // tty_d:
@@ -153,10 +151,9 @@ struct tty_queue
 */
 
 
-
 struct tty_d
 {
-    object_type_t  objectType;
+    object_type_t objectType;
     object_class_t objectClass;
 // File pointer:
 // To setup the device.
@@ -174,6 +171,12 @@ struct tty_d
     //unsigned short tty_mode;
 
     int initialized;
+
+// The TTY is blocked by the system,
+// and we can't read or write on it.
+// The TTY can't receive or send data.
+// If a process try to write in a blocked TTY it will be blocked.
+    int is_blocked;
 
 // Ownership
 
@@ -241,9 +244,6 @@ struct tty_d
 
 // Synch and job control.
 // This way the TTY driver can send the input to the forground process.
-
-// If a process try to write in a stopped TTY it will be blocked.
-    int stopped;
 
 //
 // == transmition ========

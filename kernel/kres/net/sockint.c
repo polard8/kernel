@@ -678,10 +678,11 @@ socket_gramado (
     _file->sync.block_on_write = TRUE;
     _file->sync.block_on_write_full = TRUE;
 
-    _file->sync.lock = FALSE;
-
+// Is it blocked?
+    _file->sync.is_blocked = FALSE;
 // flags
-    _file->_flags = __SWR;
+    _file->_flags = __SWR;  // OK to write.
+
 // No name for now.
     _file->_tmpfname = NULL;
     //_file->_tmpfname = "socket";
@@ -867,10 +868,11 @@ socket_unix (
 
     _file->sync.block_on_write = TRUE;
     _file->sync.block_on_write_full = TRUE;
-        
-    _file->sync.lock = FALSE;
 
-    _file->_flags = __SWR;
+// Is it blocked?
+    _file->sync.is_blocked = FALSE;
+// Flags
+    _file->_flags = __SWR;  // OK to write.
 
 // No name for now.
 // #bugbug: 
@@ -1063,10 +1065,11 @@ socket_inet (
     _file->sync.block_on_write = TRUE;
     _file->sync.block_on_write_full = TRUE;
 
-    _file->sync.lock = FALSE;
-
+// Is it blocked?
+    _file->sync.is_blocked = FALSE;
 // flags 
-    _file->_flags = __SWR;
+    _file->_flags = __SWR;  // OK to write.
+
 // No name for now.
     _file->_tmpfname = NULL;
     //_file->_tmpfname = "socket";

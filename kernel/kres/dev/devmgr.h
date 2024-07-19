@@ -1,10 +1,8 @@
-
 // devmgr.h
 // Created by Fred Nora.
 
 #ifndef __DEV_DEVMGR_H
 #define __DEV_DEVMGR_H    1
-
 
 // #todo
 // In order to use this list,
@@ -12,7 +10,6 @@
 // not for a specific manufacturer.
 
 extern unsigned long nicList[8]; 
-
 
 /*
 // #test

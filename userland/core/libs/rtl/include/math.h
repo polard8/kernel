@@ -93,6 +93,7 @@ struct exception {
 #define TLOSS      5
 #define PLOSS      6
 
+
 // sin, cos, tan
 double sin(double __x);
 double cos(double __x);
