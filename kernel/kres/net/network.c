@@ -10,6 +10,9 @@
 static struct network_initialization_d  NetworkInitialization;
 
 
+static unsigned long on_receiving_counter=0;
+static unsigned long on_sending_counter=0;
+
 // Status para notificações.
 // Podemos ou não notificar os processo sobre os eventos de rede.
 // O shell vai habilitar essa notificação no momento em que
@@ -255,11 +258,13 @@ network_fill_mac(
 {
     register long i=0;
 
+// Parameters:
     if ((void*) to == NULL)
         return;
     if ((void*) from == NULL)
         return;
 
+// Copy
     for (i=0; i<6; i++)
     {
         to[i] = from[i];
@@ -273,11 +278,13 @@ network_fill_ipv4(
 {
     register long i=0;
 
+// Parameters
     if ((void*) to == NULL)
         return;
     if ((void*) from == NULL)
         return;
 
+// Copy
     for (i=0; i < 4; i++)
     {
         to[i] = from[i];
@@ -291,11 +298,13 @@ network_fill_ipv6(
 {
     register long i=0;
 
+// Parameters
     if ((void*) to == NULL)
         return;
     if ((void*) from == NULL)
         return;
 
+// Copy
     for (i=0; i < 6; i++)
     {
         to[i] = from[i];
@@ -314,6 +323,7 @@ net_checksum(
     unsigned int len = phdr_len;
     unsigned short *p = (unsigned short *) phdr;
 
+// Parameter
     if (!phdr) 
         goto no;
 
@@ -341,6 +351,8 @@ no:
 
     unsigned short final = ~checksum;
 
+// #todo:
+// Type
     return ToNetByteOrder16(final);
 }
 
@@ -423,8 +435,8 @@ network_on_receiving (
     if (NetworkInitialization.locked == TRUE)
         goto fail;
 
+// Parameters:
 // Frame validation
-
     if ((void*) frame == NULL){
         //printk("network_on_receiving: frame\n");
         goto fail;
@@ -492,19 +504,21 @@ network_on_receiving (
 // Here we can check if the destination is us,
 // if the packet is not for us, we simply drop it.
 
-
 // Get ethernet type
-    Type = (uint16_t) FromNetByteOrder16(eth->type);
-
 // Handle the rthernet type
 // See: ipv6.c, ipv4.c, arp.c.
 
+    Type = (uint16_t) FromNetByteOrder16(eth->type);
     switch (Type){
 
     // #todo
     case ETHERTYPE_IPV6:
         // Drop it
         goto fail;
+        // #todo
+        //network_handle_ipv6( 
+            //(frame + ETHERNET_HEADER_LENGHT), 
+            //(frame_size - ETHERNET_HEADER_LENGHT) );
         break;
 
     case ETHERTYPE_IPV4:
@@ -521,8 +535,9 @@ network_on_receiving (
 
     // ...
 
+    // Unsupported type.
     default:
-        // printk ("Default type\n");
+        // Drop it
         goto fail;
         break;
     };
@@ -533,22 +548,17 @@ fail:
     return (int) -1;
 }
 
-
-int 
-network_on_sending ( 
-    const unsigned char *frame, 
-    ssize_t frame_size )
+// Called when sending some raw packet.
+// #ps: We do NOT send, we're called by the sending routines.
+int network_on_sending (void)
 {
-    if (NetworkInitialization.initialized != TRUE){
-        return -1;
-    }
+// Called by ethernet_send() in core/ethernet.c.
 
-// If the network is locked
-    if (NetworkInitialization.locked == TRUE)
-        return -1;
+    on_sending_counter++;
 
-//fail:
-    return -1;
+    // ...
+
+    return 0;
 }
 
 

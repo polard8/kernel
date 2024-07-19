@@ -221,15 +221,15 @@ network_send_raw_packet (
 // Handling packets
 //
 
+// Called when a packet came in from a device driver.
 int 
 network_on_receiving ( 
     const unsigned char *frame, 
     ssize_t frame_size );
 
-int 
-network_on_sending ( 
-    const unsigned char *frame, 
-    ssize_t frame_size );
+// Called when sending some raw packet.
+// #ps: We do NOT send, we're called by the sending routines.
+int network_on_sending (void);
 
 // Push and Pop data.
 int network_push_packet( void *src_buffer, int len );
