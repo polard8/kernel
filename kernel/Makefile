@@ -83,18 +83,17 @@ CFLAGS := \
 # ========================
 # :: kctl - Resource controllers.
 objects-y := head_64.o 
-objects-y += ar_crt.o  
-#objects-y += ar_mod.o  
-objects-y += ar_zcall.o
+objects-y += i1_clibs.o  
+objects-y += i2_ke.o  
+objects-y += i3_kmain.o  
 
 # ========================
 # :: kres - Kernel resources
-objects-y += ar_dev.o  
-objects-y += ar_fs.o  
-objects-y += ar_gramk.o  
-objects-y += ar_ke.o  
-objects-y += ar_mm.o  
-objects-y += ar_net.o    
+objects-y += j1_dev.o  
+objects-y += j2_fs.o  
+objects-y += j3_gramk.o  
+objects-y += j4_mm.o  
+objects-y += j5_net.o    
 
 # ========================
 PHONY := all
@@ -110,18 +109,20 @@ k1:
 	@echo "Compiling: Compiling k1"
 # Kernel arch - Startup and entry code.
 	$(Q)$(MAKE) -C kctl/arch/x86_64/
+# kernel libraries
+	$(Q)$(MAKE) -C kctl/clibs/
+# main component. (cpu)
+	$(Q)$(MAKE) -C kctl/ke/
 # Kernel core - Top level routines.
-	$(Q)$(MAKE) -C kctl/core/
+	$(Q)$(MAKE) -C kctl/kmain/
 
 #----------------
 # Kernel resources
 k2:
 	@echo "Compiling: Compiling k2"
-	$(Q)$(MAKE) -C lib/
 	$(Q)$(MAKE) -C kres/dev/
 	$(Q)$(MAKE) -C kres/fs/
 	$(Q)$(MAKE) -C kres/gramk/
-	$(Q)$(MAKE) -C kres/ke/
 	$(Q)$(MAKE) -C kres/mm/
 	$(Q)$(MAKE) -C kres/net/
 
@@ -139,15 +140,15 @@ clean-all:
 
 	rm -rf kctl/*.o   
 	rm -rf kres/*.o   
-	rm -rf lib/*.o   
 
 	rm -rf kctl/arch/*.o   
-	rm -rf kctl/core/*.o   
+	rm -rf kctl/clibs/*.o   
+	rm -rf kctl/ke/*.o   
+	rm -rf kctl/kmain/*.o   
 
 	rm -rf kres/dev/*.o   
 	rm -rf kres/fs/*.o   
 	rm -rf kres/gramk/*.o   
-	rm -rf kres/ke/*.o   
 	rm -rf kres/mm/*.o   
 	rm -rf kres/net/*.o   
 

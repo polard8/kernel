@@ -3,7 +3,7 @@
 # Compile all the files and create ar_crt.o
 # Makefile for the libc support.
 
-INCLUDE = ../include
+INCLUDE = ../../include
 
 AS	= as
 LD	= ld
@@ -80,10 +80,10 @@ all:
 	$(CC) -c kunistd.c $(KERNEL_INCLUDE) $(CFLAGS) -o kunistd.o
 
 # link
-	$(LD) -r -o ar_crt.o $(OBJS)
-	cp ar_crt.o ../
+	$(LD) -r -o i1_clibs.o $(OBJS)
+	cp i1_clibs.o ../../
 	rm *.o
-	
+
 clean:
 	rm *.o    
 	

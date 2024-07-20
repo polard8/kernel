@@ -21,15 +21,15 @@
 #include "config/u.h"        // System, machine and user.
 
 //
-// Core control
+// Core control  kmain/
 //
 
-#include "../kctl/core/bootinfo.h"
-#include "../kctl/core/mode.h"
-#include "../kctl/core/state.h"
-#include "../kctl/core/system.h"
-#include "../kctl/core/klimits2.h"
-#include "../kctl/core/gdef.h"
+#include "../kctl/kmain/bootinfo.h"
+#include "../kctl/kmain/mode.h"
+#include "../kctl/kmain/state.h"
+#include "../kctl/kmain/system.h"
+#include "../kctl/kmain/klimits2.h"
+#include "../kctl/kmain/gdef.h"
 
 
 // ==================================
@@ -39,21 +39,21 @@
 
 // ==================================
 // ke/
-#include "../kres/ke/gspin.h"
-#include "../kres/ke/gwd.h"     // whatch dogs.
-#include "../kres/ke/pints.h"   // profiler
-#include "../kres/ke/kinit.h"   // kernel initialization.
+#include "../kctl/ke/gspin.h"
+#include "../kctl/ke/gwd.h"     // whatch dogs.
+#include "../kctl/ke/pints.h"   // profiler
+#include "../kctl/ke/kinit.h"   // kernel initialization.
 
 // ===============================
-// virt/
-#include "../kctl/core/info.h"
-#include "../kctl/core/request.h"
-#include "../kctl/core/debug.h"
+// kmain/
+#include "../kctl/kmain/info.h"
+#include "../kctl/kmain/request.h"
+#include "../kctl/kmain/debug.h"
 
 // ==================================
 // ke/
 // Gramado configuration.
-#include "../kres/ke/jiffies.h"
+#include "../kctl/ke/jiffies.h"
 
 // ==================================
 // dev/
@@ -63,36 +63,36 @@
 // ==================================
 // crt/
 // Libc support.
-#include "../lib/ktypes.h"
-#include "../lib/ktypes2.h"
+#include "../kctl/clibs/ktypes.h"
+#include "../kctl/clibs/ktypes2.h"
 
 // Kernel objects.
-#include "../kctl/core/kobject.h"
+#include "../kctl/kmain/kobject.h"
 
-// lib/
+// kctl/clibs/
 // Legacy stuff.
-#include "../lib/kstdarg.h"
-#include "../lib/kerrno.h"
-#include "../lib/kcdefs.h"
-#include "../lib/kstddef.h"
-#include "../lib/klimits.h"
-#include "../lib/kstdio.h"
-#include "../lib/kstdlib.h"
-#include "../lib/kstring.h"
-#include "../lib/kctype.h"
-#include "../lib/kiso646.h"
-#include "../lib/ksignal.h"
-#include "../lib/kunistd.h"
-#include "../lib/kfcntl.h"
-#include "../lib/kioctl.h"
-#include "../lib/kioctls.h"
-#include "../lib/ktermios.h"
-#include "../lib/kttydef.h"
+#include "../kctl/clibs/kstdarg.h"
+#include "../kctl/clibs/kerrno.h"
+#include "../kctl/clibs/kcdefs.h"
+#include "../kctl/clibs/kstddef.h"
+#include "../kctl/clibs/klimits.h"
+#include "../kctl/clibs/kstdio.h"
+#include "../kctl/clibs/kstdlib.h"
+#include "../kctl/clibs/kstring.h"
+#include "../kctl/clibs/kctype.h"
+#include "../kctl/clibs/kiso646.h"
+#include "../kctl/clibs/ksignal.h"
+#include "../kctl/clibs/kunistd.h"
+#include "../kctl/clibs/kfcntl.h"
+#include "../kctl/clibs/kioctl.h"
+#include "../kctl/clibs/kioctls.h"
+#include "../kctl/clibs/ktermios.h"
+#include "../kctl/clibs/kttydef.h"
 
 // ==================================
 // ke/
 // Globals. PIDs support.
-#include "../kres/ke/kpid.h"
+#include "../kctl/ke/kpid.h"
 
 // ==================================
 // mm/
@@ -116,37 +116,37 @@
 // ==================================
 // ke/
 // hal
-#include "../kres/ke/ports64.h"
-#include "../kres/ke/cpu.h"
-#include "../kres/ke/arch/x86_64/tss.h"
-#include "../kres/ke/arch/x86_64/x64gdt.h"
-#include "../kres/ke/arch/x86_64/x64.h"
-#include "../kres/ke/detect.h"
+#include "../kctl/ke/ports64.h"
+#include "../kctl/ke/cpu.h"
+#include "../kctl/ke/arch/x86_64/tss.h"
+#include "../kctl/ke/arch/x86_64/x64gdt.h"
+#include "../kctl/ke/arch/x86_64/x64.h"
+#include "../kctl/ke/detect.h"
 // ==================================
 
 // hv
-#include "../kctl/core/virt/hv.h"
+#include "../kctl/kmain/virt/hv.h"
 // hal cpu
-#include "../kres/ke/arch/x86_64/cpuid.h"
-#include "../kres/ke/up.h"
+#include "../kctl/ke/arch/x86_64/cpuid.h"
+#include "../kctl/ke/up.h"
 
-#include "../kres/ke/arch/x86_64/smp/mp.h"
+#include "../kctl/ke/arch/x86_64/smp/mp.h"
 
 // hal pic/apic/ioapic
-#include "../kres/ke/arch/x86_64/pic.h"
+#include "../kctl/ke/arch/x86_64/pic.h"
 
-#include "../kres/ke/arch/x86_64/smp/apic.h"
-#include "../kres/ke/arch/x86_64/smp/apictim.h"
-#include "../kres/ke/arch/x86_64/smp/ioapic.h"
+#include "../kctl/ke/arch/x86_64/smp/apic.h"
+#include "../kctl/ke/arch/x86_64/smp/apictim.h"
+#include "../kctl/ke/arch/x86_64/smp/ioapic.h"
 
-#include "../kres/ke/breaker.h"
+#include "../kctl/ke/breaker.h"
 // hal timers.
-#include "../kres/ke/arch/x86_64/pit.h"
-#include "../kres/ke/arch/x86_64/rtc.h"
+#include "../kctl/ke/arch/x86_64/pit.h"
+#include "../kctl/ke/arch/x86_64/rtc.h"
 // ==================================
 // ke/
 // hal global
-#include "../kres/ke/hal.h"
+#include "../kctl/ke/hal.h"
 
 // ==================================
 // dev/
@@ -178,12 +178,13 @@
 // sw - Graphics Engine
 #include "../kres/gramk/color.h"
 #include "../kres/gramk/fonts.h"
-#include "../lib/ascii.h"
+// #todo: Move this one above.
+#include "../kctl/clibs/ascii.h"
 #include "../kres/gramk/bg.h"
 
 // ==================================
 // ke/
-#include "../kres/ke/intake/msgcode.h"
+#include "../kctl/ke/intake/msgcode.h"
 
 // ==================================
 // gramk/
@@ -284,27 +285,27 @@
 // ke/
 // Process structures
 // ps
-#include "../kres/ke/intake/prio.h"     // Priority
-#include "../kres/ke/intake/quantum.h"  // Quantum
-#include "../kres/ke/image.h"
+#include "../kctl/ke/intake/prio.h"     // Priority
+#include "../kctl/ke/intake/quantum.h"  // Quantum
+#include "../kctl/ke/image.h"
 
-#include "../kres/ke/intake/disp/x86_64/x64cont.h"
+#include "../kctl/ke/intake/disp/x86_64/x64cont.h"
 
-#include "../kres/ke/intake/disp/ts.h"
+#include "../kctl/ke/intake/disp/ts.h"
 
-#include "../kres/ke/tasks.h"
-#include "../kres/ke/queue.h"
-#include "../kres/ke/mk.h"
-#include "../kres/ke/intake/dispatch.h"
-#include "../kres/ke/intake/msg.h"
-#include "../kres/ke/intake/thread.h"
-#include "../kres/ke/intake/process.h"
+#include "../kctl/ke/tasks.h"
+#include "../kctl/ke/queue.h"
+#include "../kctl/ke/mk.h"
+#include "../kctl/ke/intake/dispatch.h"
+#include "../kctl/ke/intake/msg.h"
+#include "../kctl/ke/intake/thread.h"
+#include "../kctl/ke/intake/process.h"
 
-#include "../kres/ke/intake/sched/sched.h"
-#include "../kres/ke/intake/sched/schedq.h"
+#include "../kctl/ke/intake/sched/sched.h"
+#include "../kctl/ke/intake/sched/schedq.h"
 
 // Precisa de todos os componentes de ke/
-#include "../kres/ke/ke.h"
+#include "../kctl/ke/ke.h"
 
 
 // ==================================
@@ -316,27 +317,27 @@
 #include "../kres/gramk/gramk.h"
 
 // Reboot system.
-#include "../kctl/core/reboot.h"
+#include "../kctl/kmain/reboot.h"
 // Ring 0 kernel modules.
-#include "../kctl/core/mod/mod.h"
-#include "../kctl/core/mod/public.h"
+#include "../kctl/kmain/mod/mod.h"
+#include "../kctl/kmain/mod/public.h"
 
 // Kernel layers. (Work in progress)
-#include "../kctl/core/layers.h"
+#include "../kctl/kmain/layers.h"
 // Syscalls: (Called by the interrups 0x80, 0x81, 0x82, 0x83).
-#include "../kctl/core/sci/syscalls.h"
+#include "../kctl/kmain/sci/syscalls.h"
 // zero. (Used during the kernel initialization)
-#include "../kctl/core/cali/zero.h"
+#include "../kctl/kmain/cali/zero.h"
 
 // ==================================
 // ke/
 // Maskable interrupts
-#include "../kres/ke/arch/x86_64/x64mi.h"
+#include "../kctl/ke/arch/x86_64/x64mi.h"
 
 // ==================================
 // virt/
 // Project California
-#include "../kctl/core/cali/cali.h"
+#include "../kctl/kmain/cali/cali.h"
 
 // Main kernel controller header.
 #include "../kctl/kctl.h"

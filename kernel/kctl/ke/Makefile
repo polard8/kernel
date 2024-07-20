@@ -142,10 +142,10 @@ all:
 	$(CC) -c hal.c    $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
 
 # link
-	$(LD) -r -o ar_ke.o $(OBJS)
-	cp ar_ke.o ../../
+	$(LD) -r -o i2_ke.o $(OBJS)
+	cp i2_ke.o ../../
 	rm *.o
-	
+
 clean:
 	rm *.o
 

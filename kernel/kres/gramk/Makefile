@@ -97,8 +97,8 @@ all:
 	$(CC) -c gramk.c     $(KERNEL_INCLUDE) $(CFLAGS) -o gramk.o
 
 # link
-	$(LD) -r -o ar_gramk.o $(OBJS)
-	cp ar_gramk.o ../../
+	$(LD) -r -o j3_gramk.o $(OBJS)
+	cp j3_gramk.o ../../
 	rm *.o
 
 clean:

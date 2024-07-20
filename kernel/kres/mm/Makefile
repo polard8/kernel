@@ -96,10 +96,10 @@ all:
 	$(CC) -c mmft.c     $(KERNEL_INCLUDE) $(CFLAGS) -o mmft.o
 
 # link
-	$(LD) -r -o ar_mm.o $(OBJS)
-	cp ar_mm.o ../../
+	$(LD) -r -o j4_mm.o $(OBJS)
+	cp j4_mm.o ../../
 	rm *.o
-	
+
 clean:
 	rm *.o    
 	

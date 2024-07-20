@@ -132,10 +132,10 @@ all:
 
 
 # link
-	$(LD) -r -o ar_dev.o $(OBJS)
-	cp ar_dev.o ../../
+	$(LD) -r -o j1_dev.o $(OBJS)
+	cp j1_dev.o ../../
 	rm *.o
-	
+
 clean:
 	rm *.o    
 
