@@ -2426,21 +2426,25 @@ void *sci2 (
 // #test
 // 22007 - Send UDP
 
+
     /*
     // #todo
+    // arg2 needs to have a pointer to a table
+    // full of parameters.
     if (number == 22007)
     {
         network_send_udp( 
-            dhcp_info.your_ipv4,        //__udp_gramado_default_ipv4,  // scr ip
-            __udp_target_gateway_ipv4,  //__udp_target_default_ipv4,   // dst ip
-            __udp_target_mac,           // dst mac
-            11888,      // source port
-            11999,      // dst port
-            message,    // msg
-             512 );     // msg lenght
+            dhcp_info.your_ipv4,   // scr ip
+            &message_buffer[0],    // dst ip  (4bytes + 4bytes pad)
+            &message_buffer[1],    // dst mac  (6bytes + 2bytes pad)
+            &message_buffer[2],    // source port  (2bytes + 6pads)
+            &message_buffer[3],    // dst port     (2bytes + 6pads)
+            &message_buffer[4],    // frame address
+            &message_buffer[5] );  // frame lenght
         return NULL;
     }
     */
+
 
 // #test
 // 22008 - Send TCP
@@ -2448,8 +2452,20 @@ void *sci2 (
 // #test
 // 22009 - Send XXX
 
+    if (number == 22009)
+    {
+        network_send_raw_packet (
+            (struct intel_nic_info_d *) currentNIC, 
+            (size_t) arg3,              // Frame lenght
+            (const char *) arg2 );  // Frame address
+
+        return NULL;
+    }
+
+//--------------
+
 // #test
-// 22010 - Send XXX
+// 22010 -
 
 // 22011 - PS2 full initialization
 // see: hv.c

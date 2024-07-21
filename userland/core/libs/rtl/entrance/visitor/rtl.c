@@ -2379,3 +2379,17 @@ long rtl_round_up(long num_to_round, long multiple)
     return (long) Result;
 }
 
+int rtl_send_raw_packet(const char *frame_address, size_t frame_lenght)
+{
+    unsigned long RetVal=0;
+
+    RetVal = 
+        (unsigned long) sc82(
+                22009,
+                (unsigned long) frame_address,
+                (unsigned long) frame_lenght,
+                0 );
+
+    return (int) (RetVal & 0xFFFFFFFF);
+}
+
