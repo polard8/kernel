@@ -104,6 +104,7 @@ int sys_socket( int family, int type, int protocol )
 // + SOCK_STREAM = tcp socket.
 // + SOCK_DGRAM  = udp socket.
 // + SOCK_RAW    = raw socket.
+// #todo: SOCK_GRAMADO_MSG
 
     if (type != SOCK_STREAM &&
         type != SOCK_DGRAM  &&
@@ -165,9 +166,10 @@ int sys_socket( int family, int type, int protocol )
         printk      ("sys_socket: __socket\n");
         goto fail;
     }
+
 // family, type and protocol.
     __socket->family   = family;
-    __socket->type     = type;     // (SOCK_STREAM, SOCK_DGRAM, SOCK_RAW, ...) 
+    __socket->type     = type;
     __socket->protocol = protocol;
 
 // ip:port
@@ -177,7 +179,7 @@ int sys_socket( int family, int type, int protocol )
     __socket->port    = (unsigned short) port;
 
 // pid, uid, gid.
-// #todo: Use methods.
+// #todo: Use methods to grab these informations.
     __socket->pid = (pid_t) current_process;
     __socket->uid = (uid_t) current_user;
     __socket->gid = (gid_t) current_group;
@@ -200,18 +202,18 @@ int sys_socket( int family, int type, int protocol )
     // see: sockint.c
     case AF_GRAMADO:
         debug_print ("sys_socket: AF_GRAMADO\n");
-        __socket->connection_type = 1;  //local connection.
+        __socket->connection_type = 1;  // (local connection) (IPC)
         return (int) socket_gramado ( (struct socket_d *) __socket, 
-                         AF_GRAMADO, type, protocol );
+                        AF_GRAMADO, type, protocol );
         break;
 
     // see: sockint.c
-    //case AF_LOCAL:
     case AF_UNIX:
+    // AF_LOCAL has the same value.
         debug_print ("sys_socket: AF_UNIX\n");
-        __socket->connection_type = 1;  //local connection
+        __socket->connection_type = 1;  // (local connection) (IPC)
         return (int) socket_unix ( (struct socket_d *) __socket, 
-                         AF_UNIX, type, protocol );
+                        AF_UNIX, type, protocol );
         break;
 
     // see: sockint.c
@@ -220,9 +222,25 @@ int sys_socket( int family, int type, int protocol )
     //para essa função, e usarmos outra estrutura.               
     case AF_INET:
         debug_print ("sys_socket: AF_INET\n");
-        __socket->connection_type = 0;//?;  //Is it really a remote connection?
+        __socket->connection_type = 0;
+        //__socket->connection_type = 1;  // Local connection.
+        // (Remote or local connection)
+        // It depends on the IP address.
+        // If the IP address is Localhost, so it is a local connection.
+        // #todo: For now we set it to '0'.
+
+        // For now we're only accepting raw sockets
+        // AF_INET sockets can also use a type of SOCK_RAW. 
+        // If this type is set, the application connects directly to the IP layer and 
+        // does not use either the TCP or UDP transport.
+        // #bugbug #todo
+        // But in this case, for local connections we're gonna use raw type
+        // and do not use any protocol ... just the raw frame.
+        if (type != SOCK_RAW)
+            panic("sys_socket: Only SOCK_RAW in AF_INET for now\n");
+
         return (int) socket_inet( (struct socket_d *) __socket, 
-                         AF_INET, type, protocol );
+                        AF_INET, type, protocol );
         break;
 
     // ...

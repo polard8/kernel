@@ -1050,7 +1050,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // #debug: 
 // limits
 // Um socket tem o tamanho de BUFSIZ.
-
     if (ubuf_len > 512){
         ubuf_len = 512;
         debug_print ("sys_write: [FIXME] Ajusting ubuf_len to 512\n");

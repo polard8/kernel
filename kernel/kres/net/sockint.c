@@ -959,8 +959,11 @@ socket_inet (
     }
 
     sock->addr_in.sin_family      = AF_INET;
-    sock->addr_in.sin_port        = 11369;  //?
     sock->addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
+    sock->addr_in.sin_port        = 11369;
+    // #todo:
+    // This is a default port number ... we need to pick 
+    // a valid one for each process created.
 
 // #todo
 // Based on the socket type when the domain is AF_INET.
@@ -1032,20 +1035,21 @@ socket_inet (
     }
 
 // File
+// Create a new file structure and clear the structure.
     _file = (void *) kmalloc( sizeof(file) );
     if ((void *) _file == NULL){
         //Process->Objects[__slot] = (unsigned long) 0;
         printk ("socket_inet: _file fail\n");
         goto fail;
     }
-// Clear the structure.
     memset( _file, 0, sizeof(struct file_d) );
 
-// #todo: Use methods.
+// #todo: Use methods to grab these values.
     _file->pid = (pid_t) current_process;
     _file->uid = (uid_t) current_user;
     _file->gid = (gid_t) current_group;
 
+// Object type
     _file->____object = ObjectTypeSocket;
 
 // sync
@@ -1097,12 +1101,12 @@ socket_inet (
 
 // fd
     _file->_file = __slot;
+// Validation
     _file->used = TRUE;
     _file->magic = 1234;
 // Colocando na lista de arquivos abertos no processo.
     Process->Objects[__slot] = (unsigned long) _file;
-// ok
-// Retornamos o fd na lista de arquivos abertos pelo processo.
+// OK, return the fd.
     return (int) __slot;
 
 fail:

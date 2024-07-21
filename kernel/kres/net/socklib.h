@@ -117,6 +117,7 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
 #define SOCK_MAX            (SOCK_GRAMADO_MSG+1)
 
+
 //=========
 /* Supported address families. */
 
@@ -197,8 +198,40 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define PF_RS232	AF_RS232
 #define PF_MAX		AF_MAX
 
-
 //-------------
+
+// -------------------------------------
+// AF_UNIX:  Unix domain socket (UDS)
+// Valid socket types in the UNIX domain are:
+// see: 
+// https://en.wikipedia.org/wiki/Unix_domain_socket
+
+/*
+ > SOCK_STREAM    (compare to TCP)  – 
+   for a stream-oriented socket
+
+ > SOCK_DGRAM     (compare to UDP)  – 
+   for a datagram-oriented socket that preserves message boundaries 
+   (as on most UNIX implementations, UNIX domain datagram sockets are 
+   always reliable and don't reorder datagrams)
+
+ > SOCK_SEQPACKET (compare to SCTP) – 
+   for a sequenced-packet socket that is connection-oriented, 
+   preserves message boundaries, and 
+   delivers messages in the order that they were sent
+*/
+
+// -------------------------------------
+// Types of network protocol
+// Datagram sockets (Connectionless sockets)      (UDP)
+// Stream sockets   (Connection-oriented sockets) (TCP) (SCTP) (DCCP)
+// Raw sockets      (No protocols?)
+//                  The application must build the entire IP datagram, 
+//                  including the IP header. 
+
+//see:
+// https://en.wikipedia.org/wiki/Network_socket
+
 
 // Maximum queue length specifiable by listen().
 //#define SOMAXCONN	128

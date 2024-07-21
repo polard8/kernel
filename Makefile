@@ -226,6 +226,7 @@ copy-extras:
 	-cp $(DEP_B1)/extra/bin/CMP.BIN       $(BASE)/PROGRAMS/
 	-cp $(DEP_B1)/extra/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
 	-cp $(DEP_B1)/extra/bin/SUM.BIN       $(BASE)/PROGRAMS/
+#	-cp $(DEP_B1)/extra/bin/UDPTEST.BIN   $(BASE)/PROGRAMS/
 	-cp $(DEP_B1)/tests/bin/TASCII.BIN    $(BASE)/PROGRAMS/
 	-cp $(DEP_B1)/tests/bin/TPRINTF.BIN   $(BASE)/PROGRAMS/
 	# Apps

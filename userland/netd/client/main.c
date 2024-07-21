@@ -72,14 +72,15 @@ static void appShutdown(int socket_fd)
 
 static int appInitialization(void)
 {
+// Connecting to the network server in this machine.
+// Using the localhost's IP.
 
 //========================
     struct sockaddr_in  server_address;
+    server_address.sin_family = AF_INET;  // Remote or local connections.
+    server_address.sin_addr.s_addr = IP(127,0,0,1);  //inet_addr("127.0.0.1");
+    server_address.sin_port = PORTS_NS;
     int addrlen=0;
-    server_address.sin_family = AF_INET;
-    // Connecting to the network server in this machine.
-    server_address.sin_port = PORTS_NS;       // htons(PORTS_NS);
-    server_address.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
     addrlen = sizeof(server_address);
 //========================
 
@@ -87,8 +88,17 @@ static int appInitialization(void)
     __initialize_globals();
 
 // Socket
-    __client_fd = (int) socket( AF_INET, SOCK_STREAM, 0 );
-    if (__client_fd < 0){
+// #bugbug
+// This connection needs to be RAW.
+    __client_fd = 
+        (int) socket( 
+            AF_INET,   // Remote or local connections 
+            SOCK_RAW,  // Type
+            0          // Protocol
+            );
+
+    if (__client_fd < 0)
+    {
        //gws_debug_print ("gnst: Couldn't create socket\n");
        printf ("net.bin: on socket()\n");
        goto fail;
