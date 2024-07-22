@@ -65,13 +65,13 @@ int sys_socket( int family, int type, int protocol )
     // call create_socket(...)
     // it will return a pointer.
 
-// Socket structure.
+// Socket structure
     struct socket_d *__socket;
-// Current process.
+// Current process
     struct process_d *p;
     pid_t current_process = -1;
-// ip:port. 
-// Used in the socket struture.
+// ip:port
+// Used in the socket struture
     unsigned long _ipv6 = (unsigned long)  0x0000000000000000;
     unsigned int _ipv4  = (unsigned int)   0x00000000;
     unsigned short port = (unsigned short) 0x0000;
@@ -93,7 +93,7 @@ int sys_socket( int family, int type, int protocol )
     do_credits_by_tid(current_thread);
 
 // Filters
-
+// For now we're only accepting AF_UNIX, AF_INET and AF_GRAMADO.
     if (family < 0){
         debug_print ("sys_socket: family not supported\n");
         return (int) (-EINVAL);
@@ -136,13 +136,13 @@ int sys_socket( int family, int type, int protocol )
 // Process
 //
 
-// Current pid.
+// Current pid
     current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
     }
-// Process structure.
+// Process structure
     p = (struct process_d *) processList[current_process];
     if ((void *) p == NULL){
         debug_print ("sys_socket: p\n");
@@ -161,7 +161,7 @@ int sys_socket( int family, int type, int protocol )
 // Criamos um socket vazio.
 // IN: ip and port.
     __socket = (struct socket_d *) create_socket_object();
-    if ( (void *) __socket == NULL ){
+    if ((void *) __socket == NULL){
         debug_print ("sys_socket: __socket\n");
         printk      ("sys_socket: __socket\n");
         goto fail;
@@ -236,6 +236,8 @@ int sys_socket( int family, int type, int protocol )
         // #bugbug #todo
         // But in this case, for local connections we're gonna use raw type
         // and do not use any protocol ... just the raw frame.
+        
+        // #debug
         if (type != SOCK_RAW)
             panic("sys_socket: Only SOCK_RAW in AF_INET for now\n");
 

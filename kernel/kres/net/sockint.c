@@ -226,6 +226,8 @@ fail:
 // ring0 socket structure.
 struct socket_d *get_socket_from_fd(int fd)
 {
+// Get from the current process.
+
     struct process_d *p;
     pid_t current_process = -1;
     file *_file;
@@ -261,10 +263,8 @@ struct socket_d *get_socket_from_fd(int fd)
 // Return the pointer for the socket structure given the fd.
     return (struct socket_d *) _file->socket;
 fail:
-    return (struct socket_d *) 0;
-    //return NULL;
+    return NULL;
 }
-
 
 // Os dois são arquivos no mesmo processo. O processo atual.
 int
@@ -320,6 +320,7 @@ socket_dialog (
     unsigned long arg4 )
 {
 
+    // #debug
     printk ("socket_dialog: number=%d \n", number);
 
     if ( number < 7000 || number >= 8000 ){
@@ -327,8 +328,7 @@ socket_dialog (
         return 0;
     }
 
-// Número do serviço.
-
+// Service numbers
     switch (number)
     {
         // socket(...)
@@ -440,7 +440,7 @@ update_socket (
 {
 // Update ipv4 and port info.
 
-    if ((void *) socket ==  NULL){
+    if ((void *) socket == NULL){
         return (int) -1;
     }
     socket->ip_ipv4 = (unsigned int) ip_ipv4;
@@ -448,16 +448,34 @@ update_socket (
     return 0;
 }
 
-int socket_write ( unsigned int fd, char *buf, int count )
-{
-    debug_print ("socket_write:[TODO]\n");
-    return -1;
-}
-
-int socket_read ( unsigned int fd, char *buf, int count )
+int socket_read ( int fd, char *buf, int count )
 {
     debug_print ("socket_read:[TODO]\n");
-    return -1;
+
+    if (fd<0)
+        return (int) -EINVAL;
+
+// #todo:
+// Here we can check if it is really a socket.
+
+    return (int) __read_imp(fd,buf,count);
+}
+
+// IN:
+// fd = The file that handles the socket structure.
+// buf
+// count.
+int socket_write ( int fd, char *buf, int count )
+{
+    debug_print ("socket_write:[TODO]\n");
+
+    if (fd<0)
+        return (int) -EINVAL;
+
+// #todo:
+// Here we can check if it is really a socket.
+
+    return (int) __write_imp(fd,buf,count);
 }
 
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )

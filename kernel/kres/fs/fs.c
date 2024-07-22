@@ -50,6 +50,7 @@ static void __do_initialize_sdPROGRAMS(void);
 
 static int __initialize_fs_buffers(void);
 
+
 //=============================
 
 // File read.
@@ -501,11 +502,9 @@ fail:
     return EOF;
 }
 
-/*
- * sys_read:
- *     ring0 read() implementation.
- *     Called via syscall.
- */
+// __read_imp
+// It implements the service for read() syscall.
+// ring0 read() implementation.
 // Service 18.
 // #todo: There's a lot to do with synchronization.
 // #todo
@@ -522,7 +521,7 @@ fail:
 // return 'ssize_t'?
 
 ssize_t 
-sys_read (
+__read_imp (
     int fd,
     char *ubuf,       //#todo: use 'void *'
     size_t count )    //#todo: use 'size_t'.
@@ -932,10 +931,18 @@ fail:
     return (ssize_t) (-1);
 }
 
-/*
- * sys_write:
- *     Implemantation of write() for libc.
- */
+ssize_t sys_read(int fd, char *ubuf, size_t count)
+{
+    if (fd<0){
+        return (ssize_t) -EINVAL;
+    }
+    return (ssize_t) __read_imp(fd, ubuf, count);
+}
+
+
+// __write_imp
+// It implements the service for write() syscall.
+// Implemantation of write() for libc.
 // service 19.
 // Copiar um buffer para um arquivo dado o descritor.
 // Aqui devemos selecionar o dispositivo à escrever.
@@ -969,7 +976,7 @@ fail:
 // 0 = Couldn't read.
 // -1 = Error.
 
-ssize_t sys_write (int fd, char *ubuf, size_t count)
+ssize_t __write_imp (int fd, char *ubuf, size_t count)
 {
 // #todo
 // Get the processor pointer
@@ -1391,7 +1398,16 @@ fail2:
     return (ssize_t) (-1);
 }
 
-// sys_open:
+ssize_t sys_write(int fd, char *ubuf, size_t count)
+{
+    if (fd<0){
+        return (ssize_t) -EINVAL;
+    }
+    return (ssize_t) __write_imp(fd, ubuf, count);
+}
+
+// __open_imp:
+// It implements the service for open() syscall.
 // open() function implementation in ring 0.
 // Syscall 16.
 // #bugbug
@@ -1406,7 +1422,7 @@ fail2:
 // OUT: fd.
 
 int 
-sys_open (
+__open_imp (
     const char *pathname, 
     int flags, 
     mode_t mode )
@@ -1424,10 +1440,10 @@ sys_open (
 // check arguments.
 
     if ((void*) pathname == NULL){
-        return (int) (-EINVAL);
+        return (int) (-EFAULT);
     }
     if (*pathname == 0){
-        return (int) (-EINVAL);
+        return (int) (-EFAULT);
     }
 
 // Local copy
@@ -1505,10 +1521,21 @@ sys_open (
     return (int) value;
 }
 
+int 
+sys_open(
+    const char *pathname, 
+    int flags, 
+    mode_t mode )
+{
+    if ((void*) pathname == NULL)
+        return (int) -EFAULT;
+    if ( *pathname == 0)
+        return (int) -EFAULT;
+    return (int) __open_imp( pathname, flags, mode );
+}
 
-/*
- *  sys_close:
- */
+// __close_imp:
+// It implements the service for close() syscall.
 // Fechar um dos objetos abertos do processo atual.
 // O descritor é um índice na sua tabela de objetos abertos.
 // #todo: Se fecharmos um socket, tem que antes destruir a estrutura
@@ -1525,7 +1552,7 @@ physically stored on the underlying disk, use fsync(2).  (It will
 depend on the disk hardware at this point.)
 */
 
-int sys_close(int fd)
+int __close_imp(int fd)
 {
     file *object;
     struct process_d *p;
@@ -1678,6 +1705,13 @@ int sys_close(int fd)
 fail:
     debug_print("sys_close: [FAIL]\n");
     return (int) (-1);
+}
+
+int sys_close(int fd)
+{
+    if (fd<0)
+        return (int) -EINVAL;
+    return (int) __close_imp(fd);
 }
 
 // sys_fcntl:

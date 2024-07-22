@@ -296,8 +296,10 @@ socket_inet (
 
 int socket_init (void);
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg );
-int socket_read ( unsigned int fd, char *buf, int count );
-int socket_write ( unsigned int fd, char *buf, int count );
+
+int socket_read ( int fd, char *buf, int count );
+int socket_write ( int fd, char *buf, int count );
+
 // gramado ports.
 pid_t socket_get_gramado_port (int port);
 int socket_set_gramado_port (int port, pid_t pid);

@@ -446,15 +446,30 @@ struct file_context_d
 int file_read_buffer( file *f, char *buffer, int len );
 int file_write_buffer( file *f, char *string, int len );
 
+// Implementations
+ssize_t __read_imp(int fd, char *ubuf, size_t count);
+ssize_t __write_imp(int fd, char *ubuf, size_t count);
+
+// syscall
 ssize_t sys_read(int fd, char *ubuf, size_t count);
 ssize_t sys_write(int fd, char *ubuf, size_t count);
 
+// Implementations
+int 
+__open_imp(
+    const char *pathname, 
+    int flags, 
+    mode_t mode );
+int __close_imp(int fd);
+
+// syscalls
 int 
 sys_open(
     const char *pathname, 
     int flags, 
     mode_t mode );
 int sys_close(int fd);
+
 
 int sys_fcntl( int fd, int cmd, unsigned long arg );
 int sys_ioctl( int fd, unsigned long request, unsigned long arg );
