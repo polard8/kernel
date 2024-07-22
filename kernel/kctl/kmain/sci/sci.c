@@ -2456,7 +2456,7 @@ void *sci2 (
     {
         network_send_raw_packet (
             (struct intel_nic_info_d *) currentNIC, 
-            (size_t) arg3,              // Frame lenght
+            (size_t) arg3,          // Frame lenght
             (const char *) arg2 );  // Frame address
 
         return NULL;
