@@ -450,31 +450,32 @@ static int __CompareString(void)
 // Testing 3D demos.
 //
 
-    // eng.bin
-    if ( strncmp(prompt,"eng",3) == 0 ){
-        printf ("Launch eng.bin\n");
+    // DEMO00.BIN
+    if ( strncmp(prompt,"demo00",6) == 0 ){
+        printf ("Launch demo00.bin\n");
         do_clear_console();
-        rtl_clone_and_execute("eng.bin");
+        rtl_clone_and_execute("demo00.bin");
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
-    // eng2.bin
-    if ( strncmp(prompt,"eng2",4) == 0 ){
-        printf ("launch eng2.bin\n");
+    // DEMO01.BIN
+    if ( strncmp(prompt,"demo01",6) == 0 ){
+        printf ("Launch demo01.bin\n");
         do_clear_console();
-        rtl_clone_and_execute("eng2.bin");
-        isTimeToQuitCmdLine = TRUE;
-        goto exit_cmp;
-    }
-    // eng3.bin
-    if ( strncmp(prompt,"eng3",4) == 0 ){
-        printf ("launch eng3.bin\n");
-        do_clear_console();
-        rtl_clone_and_execute("eng3.bin");
+        rtl_clone_and_execute("demo01.bin");
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
     // ...
+    // eng.bin
+    // This is here for retro-compatibility.
+    if ( strncmp(prompt,"eng",3) == 0 ){
+        printf ("Launch demo00.bin\n");
+        do_clear_console();
+        rtl_clone_and_execute("demo00.bin");
+        isTimeToQuitCmdLine = TRUE;
+        goto exit_cmp;
+    }
 // ----------------------------------------
 
     printf ("Command not found, type 'help' for more commands\n");

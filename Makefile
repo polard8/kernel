@@ -201,9 +201,9 @@ copy-extras:
 	-cp $(DEP_B2)/shell/bin/GDM.BIN       $(BASE)/
 	-cp $(DEP_B2)/shell/bin/EDITOR.BIN    $(BASE)/
 	# Gramado OS 3D demos.
-	-cp $(DEP_B3)/demos/bin/ENG.BIN  $(BASE)/
-#	-cp $(DEP_B3)/demos/bin/ENG2.BIN  $(BASE)/
-	#...
+	-cp $(DEP_B3)/bin/DEMO00.BIN  $(BASE)/
+	-cp $(DEP_B3)/bin/DEMO01.BIN  $(BASE)/
+#...
 
 # -----------------------------
 # Commands and apps in GRAMADO/ folder.
