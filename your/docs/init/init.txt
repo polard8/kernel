@@ -1,4 +1,0 @@
-
-  #todo:
-  Let's describe the 'init process'.
-
