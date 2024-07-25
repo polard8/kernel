@@ -195,8 +195,10 @@ copy-extras:
 	-cp $(DEP_B1)/base/bin/SHUTDOWN.BIN  $(BASE)/
 	-cp $(DEP_B1)/base/bin/TRUE.BIN      $(BASE)/
 	-cp $(DEP_B1)/base/bin/UNAME.BIN     $(BASE)/
+	# Display servers
+	-cp $(DEP_B2)/core/ds00/bin/DS00.BIN  $(BASE)/
+	#-cp $(DEP_B2)/core/ds01/bin/DS01.BIN  $(BASE)/
 	# Apps
-	-cp $(DEP_B2)/core/server/bin/GRAMLAND.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TERMINAL.BIN  $(BASE)/
 	-cp $(DEP_B2)/shell/bin/GDM.BIN       $(BASE)/
