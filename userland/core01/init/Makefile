@@ -32,8 +32,8 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 # Libraries
-LIBC    = ../libs/rtl/include/
-LIBCOBJ = ../libs/rtl/obj
+LIBC    = ../../core00/libs/rtl/include/
+LIBCOBJ = ../../core00/libs/rtl/obj
 
 # Objects
 myObjects = crt0.o main.o msgloop.o rtl.o \

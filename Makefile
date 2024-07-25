@@ -1,4 +1,3 @@
-
 # Gramado Kernel
 # License: BSD License
 # Compiling on gcc 11.4.0
@@ -161,13 +160,15 @@ build-gramado-os:
 # Copy the init process.
 # We can't survive without this one. (Only this one).
 	make -C userland/
-	cp userland/bin/INIT.BIN  $(BASE)/
+	cp userland/bin/INIT.BIN      $(BASE)/
 	-cp userland/bin/PUBSH.BIN    $(BASE)/
 	-cp userland/bin/SH7.BIN      $(BASE)/
 	-cp userland/bin/SHELL.BIN    $(BASE)/
 #	-cp userland/bin/SHELL00.BIN  $(BASE)/
-	cp userland/bin/NETD.BIN  $(BASE)/
-	cp userland/bin/NET.BIN   $(BASE)/
+	-cp userland/bin/TASCII.BIN   $(BASE)/PROGRAMS/
+	-cp userland/bin/TPRINTF.BIN  $(BASE)/PROGRAMS/
+	-cp userland/bin/NETD.BIN     $(BASE)/
+	-cp userland/bin/NET.BIN      $(BASE)/
 
 # Install BMPs from cali assets.
 # Copy the assets/
@@ -227,8 +228,6 @@ copy-extras:
 	-cp $(DEP_B1)/extra/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
 	-cp $(DEP_B1)/extra/bin/SUM.BIN       $(BASE)/PROGRAMS/
 #	-cp $(DEP_B1)/extra/bin/UDPTEST.BIN   $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/tests/bin/TASCII.BIN    $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/tests/bin/TPRINTF.BIN   $(BASE)/PROGRAMS/
 	# Apps
 	-cp $(DEP_B2)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
 	-cp $(DEP_B2)/shell/bin/BROWSER.BIN  $(BASE)/PROGRAMS/

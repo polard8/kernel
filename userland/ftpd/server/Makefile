@@ -72,8 +72,8 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
 # Libraries
-LIBC    = ../../core/libs/rtl/include/
-LIBCOBJ = ../../core/libs/rtl/obj
+LIBC    = ../../core00/libs/rtl/include/
+LIBCOBJ = ../../core00/libs/rtl/obj
 
 
 CINCLUDES  = -I $(LIBC)  

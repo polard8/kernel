@@ -37,12 +37,11 @@ CFLAGS = -m64 \
 	
 
 # Libraries
-LIBC    = ../../core/libs/rtl/include/
-LIBCOBJ = ../../core/libs/rtl/obj
+LIBC    = ../../core00/libs/rtl/include/
+LIBCOBJ = ../../core00/libs/rtl/obj
 
 CINCLUDES  = -I $(LIBC)  
 CINCLUDES += -I .    
-
 
 #RENDERER = renderer/include/  
 #CMDLINE = cmdline/include/   
