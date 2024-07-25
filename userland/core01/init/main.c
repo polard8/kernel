@@ -32,6 +32,7 @@
 static int isTimeToQuitCmdLine = FALSE;
 
 
+static const char *xapp1_name = "dsx.bin";   // #c1
 static const char *app1_name = "ds00.bin";   // #c1
 //static const char *app1_name = "nicctld.bin";  // #c2
 //static const char *app2_name = "nicctl.bin";
@@ -48,6 +49,7 @@ static const char *app5_name = "shell.bin";
 //static const char *cmdline1 = "ds00 -1 -2 -3";
 //static const char *cmdline1 = "ds00 -1 -2 -3 --dm";
 static const char *cmdline1 = "ds00 -1 -2 -3 --tb";
+static const char *xcmdline1 = "dsx -1 -2 -3 --tb";
 // ...
 
 struct init_d  Init;
@@ -69,6 +71,7 @@ static int processControlChar(int ch);
 static void do_help(void);
 static void do_launch_de(void);
 static void do_launch_de2(void);
+static void do_launch_de3(void);
 static void do_launch_list(void);
 
 static void do_clear_console(void);
@@ -173,6 +176,47 @@ static void do_launch_de2(void)
 // Quit the command line.
     isTimeToQuitCmdLine = TRUE;
 }
+
+// the gramado x display server.
+static void do_launch_de3(void)
+{
+    int ret_val=-1;
+
+    char filename[16];
+    size_t string_size=0;
+    memset(filename,0,16);
+
+    do_clear_console();
+    printf ("Launching GUI\n");
+
+// Sending cmdline via stdin
+    rewind(stdin);
+    write( fileno(stdin), xcmdline1, strlen(xcmdline1) );
+
+// Launch new process.
+    sprintf(filename,xapp1_name);
+    string_size = strlen(xapp1_name);
+    filename[string_size] = 0;
+
+// Launch
+    ret_val = (int) rtl_clone_and_execute(filename);
+    if (ret_val <= 0){
+        printf("Couldn't clone\n");
+        return;
+    }
+// Sleep (Good!)
+    //sc82( 266, 8000, 8000, 8000 );
+    //rtl_sleep_until(2000);
+
+    //printf("pid=%d\n",ret_val);
+
+// Quit the command line.
+// #warning: 
+// Quit the command line. Not the process.
+// #todo: This name is not good.
+    isTimeToQuitCmdLine = TRUE;
+}
+
 
 static void initPrompt(void)
 {
@@ -356,19 +400,19 @@ static int __CompareString(void)
 //==============================
 // Window Server:
 
-// Initialize the window server.
+// Initialize the display server.
     if ( strncmp(prompt,"ws",2) == 0 ){
         //printf ("~WS\n");
         //rtl_clone_and_execute("ds00.bin");
         goto exit_cmp;
     }
-// Initialize the window server and quit the command line.
+// Initialize the display server and quit the command line.
     if ( strncmp(prompt,"wsq",3) == 0 ){
         printf ("~WSQ\n");
         do_launch_de();
         goto exit_cmp;
     }
-// Initialize the window server, the terminal and 
+// Initialize the display server, the terminal and 
 // quit the command line.
     if ( strncmp(prompt,"wsq2",4) == 0 ){
         printf ("~WSQ2\n");
@@ -386,6 +430,14 @@ static int __CompareString(void)
         do_launch_de();
         goto exit_cmp;
     }
+
+// Initialize the display server and quit the command line.
+    if ( strncmp(prompt,"dsx",3) == 0 ){
+        printf ("~DSX\n");
+        do_launch_de3();
+        goto exit_cmp;
+    }
+
 
 //==============================
 // Network Server:

@@ -198,11 +198,14 @@ copy-extras:
 	# Display servers
 	-cp $(DEP_B2)/core/ds00/bin/DS00.BIN  $(BASE)/
 	#-cp $(DEP_B2)/core/ds01/bin/DS01.BIN  $(BASE)/
+	-cp $(DEP_B2)/core/dsx/bin/DSX.BIN  $(BASE)/
 	# Apps
 	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TERMINAL.BIN  $(BASE)/
 	-cp $(DEP_B2)/shell/bin/GDM.BIN       $(BASE)/
 	-cp $(DEP_B2)/shell/bin/EDITOR.BIN    $(BASE)/
+	# X apps
+	-cp $(DEP_B2)/shell/bin/XTB.BIN   $(BASE)/
 	# Gramado OS 3D demos.
 	-cp $(DEP_B3)/bin/DEMO00.BIN  $(BASE)/
 	-cp $(DEP_B3)/bin/DEMO01.BIN  $(BASE)/
