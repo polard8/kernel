@@ -1,5 +1,9 @@
+// pubsh.bin
+// This is a shell application that send data to a 
+// virtual terminal via stdout (actually our stderr).
+// pubsh.bin sends data to pubterm.bin.
+// Created by Fred Nora.
 
-// shell.bin
 // Shell application for Gramado OS.
 // This is gonna run on terminal.bin, sending data 
 // to it via tty. (stderr for now).
@@ -15,13 +19,6 @@
 // Internal routines.
 #include "shell.h"
 
-// ================
-// Testing (VGA embedded ring3 driver).
-// libio
-//#include <libio.h>
-#include "vga_test.h"
-//================
-
 int isTimeToQuit=FALSE;
 unsigned long device_width=0;
 unsigned long device_height=0;
@@ -29,7 +26,8 @@ unsigned long device_height=0;
 //======================================
 
 static void shellPrompt(void);
-static unsigned long shellCompare(void);
+static int shellCompare(void);  // Compare single word
+static int shellProcessCommandLine(void);  // Process command line
 static void doExit(void);
 static void doLF(void);
 
@@ -38,9 +36,14 @@ static void __test_escapesequence(void);
 
 static void __test_escapesequence(void)
 {
-
-    if ( (void*) stdout == NULL )
+    if ((void*) stdout == NULL){
         return;
+    }
+
+    //printf("shell.bin: This is the shell command\n");
+    //printf("\n");
+    //printf("\033D");
+    printf("Sending escape sequencies: ");
 
     //printf("\n");
     //printf("Testing escape sequence:\n");
@@ -149,10 +152,9 @@ static void shellPrompt(void)
 }
 
 // local
-static unsigned long shellCompare(void)
+static int shellCompare(void)
 {
-    unsigned long ret_value=0;
-    char *p;
+    char *p;  // Local pointer for 'prompt'.
 
 // The first char.
 // $(NULL)
@@ -162,17 +164,14 @@ static unsigned long shellCompare(void)
 
 // Local pointer,
     p = prompt;
-
-    //if ((void*) p == NULL)
-    //{
-    //    printf("p \n");
-    //    exit(0);
-    //}
-
-// Null string.
-    if ( *p == '\0' )
-    {
-        //shellInsertLF();
+// Invalid pointer
+    if ((void*) p == NULL){
+        printf ("Invalid prompt[]\n");
+        //exit(1);
+        goto fail;
+    }
+// Null string
+    if ( *p == '\0' ){
         goto exit_cmp;
     }
 
@@ -188,32 +187,30 @@ do_compare:
     //shellInsertLF();
     //printf("\n");
 
+// esc
 // Let's send 0x00~0x1F to the terminal.
 // Or scape sequencies.
     if ( strncmp ( prompt, "esc", 3 ) == 0 )
     {
         doLF();
-        //printf("shell.bin: This is the shell command\n");
-        //printf("\n");
-        //printf("\033D");
-        printf("Sending escape sequencies: \n");
         __test_escapesequence();
         goto exit_cmp;
     }
 
-    // cls
-    // #todo: Send escape sequence.
+// cls
+// #todo: Send escape sequence.
     if ( strncmp(prompt,"cls",3) == 0 )
     {
         doLF();
         //printf("\033D");
         printf ("~cls");
         //fflush(stdout);
+
         goto exit_cmp;
     }
  
-    // about
-    // #todo: Create do_banner();
+// about
+// #todo: Create do_banner();
     if ( strncmp ( prompt, "about", 5 ) == 0 )
     {
         doLF();
@@ -222,7 +219,7 @@ do_compare:
         goto exit_cmp;
     }
 
-    // getpid
+// getpid
     int my_pid=0;
     if ( strncmp( prompt, "getpid", 6 ) == 0 )
     {
@@ -232,7 +229,7 @@ do_compare:
         goto exit_cmp;
     }
 
-    // getppid
+// getppid
     int my_ppid=0;
     if ( strncmp( prompt, "getppid", 7 ) == 0 )
     {
@@ -243,6 +240,7 @@ do_compare:
     }
 
 // mm-size (MB)
+// Total memory installed in the machine.
     unsigned long __mm_size_mb = 0;    
     if ( strncmp( prompt, "mm-size", 7 ) == 0 )
     {
@@ -286,14 +284,15 @@ do_compare:
     }
 
 // malloc
+// 32KB.
     void *hBuffer;
     if ( strncmp( prompt, "malloc", 6 ) == 0 )
     {
         doLF();
         printf ("Testing heap: 32KB\n");
-        hBuffer = (void *) malloc( 1024*32 );        // 32 kb
+        hBuffer = (void *) malloc(32 * 1024);
         //...
-        if ( (void *) hBuffer == NULL ){
+        if ((void *) hBuffer == NULL){
             printf("Fail\n");
         }else{
             printf("OK\n");
@@ -308,6 +307,10 @@ do_compare:
 // See: unistd.c
     if ( strncmp( prompt, "sync", 4 ) == 0 )
     {
+        // #bugbug
+        // It can messup with our files,
+        // turning them unreachables.
+
         //printf ("sync: \n");
         sync();
         goto exit_cmp;
@@ -346,51 +349,70 @@ launch_app:
     // ...
 
 exit_cmp:
-    ret_value = 0;
-done:
     shellPrompt();
-    return (unsigned long) ret_value;
+    return 0;
+fail:
+    return (int) -1;
+}
+
+
+static int shellProcessCommandLine(void)
+{
+    return 0;  //#todo
 }
 
 //
 // Main
 //
 
+// pubsh.bin
+// This is a shell application that send data to a 
+// virtual terminal via stdout (actually our stderr).
+// pubsh.bin sends data to pubterm.bin.
+
 int main(int argc, char *argv[])
 {
     register int i=0;
     int C=0;
+    const int UseConnectors=TRUE;
+    int connector0_fd = 0;
+    int connector1_fd = 0;
+
     isTimeToQuit = FALSE;
 
 // -----------------------------------
+// (>>> stdin)
+// Standard
+// -----------------------------------
 // (>>> stdout)
 // Still using the kernel console.
-
+// But we're gonna change it right now.
 // -----------------------------------
 // (>>> stderr)
 // Now we have a new stdout.
-// Now we're gonna send the data to the terminal.bin
+// Now we're gonna send the data to the pubterm.bin
 // that is reading stderr.
 
     stdout = stderr;
 
+    if (UseConnectors == TRUE)
+    {
+        // Get the connector.
+        // #ps: The terminal is doing the same.
+        connector0_fd = (int) sc82(902,0,0,0);
+        //connector1_fd = (int) sc82(902,1,0,0);
 
-    int connector0_fd = 0;
-    int connector1_fd = 0;
+        // The shell is writing on connector 0,
+        // the same connector the terminal is reading from.
+        stdout->_file = (int) connector0_fd;
 
-    int UseConnectors=TRUE;
-    if (UseConnectors == TRUE){
-    connector0_fd = (int) sc82(902,0,0,0);
-    //connector1_fd = (int) sc82(902,1,0,0);
-    //#debug
-    //printf("terminal.bin: connector0_fd %d | connector1_fd %d \n",
-    //    connector0_fd, connector1_fd);
-    //while(1){}
-    // The shell is writing on connector 0,
-    // the same connector the terminal is reading from.
-     stdout->_file = (int) connector0_fd;
+        //#debug
+        //printf("terminal.bin: connector0_fd %d | connector1_fd %d \n",
+        //    connector0_fd, connector1_fd);
+        //while(1){}
     }
 
+// ---------
     doLF();
     //printf("");
     //printf("shell.bin: argc={%d} \n",argc);
@@ -433,8 +455,10 @@ int main(int argc, char *argv[])
                 //printf("%c",'$');
                 //fflush(stdout);
  
-                // #bugbug #todo: Compare the string.
+                // Compare the first word in prompt[].
                 shellCompare();
+                // #todo: Process the command line.
+                //shellProcessCommandLine();
             }
 
             // Printable chars.

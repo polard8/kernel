@@ -1,3 +1,8 @@
+// vga_test.h
+// Support for testing vga driver in ring3.
+// #todo: Move this to another project.
+// Created by Fred Nora.
+
 
 //This is a test
 //credits:
