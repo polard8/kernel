@@ -5,12 +5,10 @@
 
 BASE    = your/base
 
-DEP_B1  = ../commands
-DEP_B2  = ../de
-DEP_B3  = ../aurora
-#DEP_B10 = ../guest0
-#DEP_B11 = ../guest1
-# ...
+# Levels
+DEP_L3  = ../aurora
+DEP_L2  = ../commands
+DEP_L1  = ../de
 
 # Make variables (CC, etc...)
 AS      = as
@@ -184,59 +182,46 @@ copy-extras:
 
 	@echo "copy-extras"
 
-# -----------------------------
-# Survival kit.
-# Commands and apps in root directory.
+# ------------------------
+# LEVEL 3: (aurora/) 3D demos.
+	-cp $(DEP_L3)/bin/DEMO00.BIN  $(BASE)/
+	-cp $(DEP_L3)/bin/DEMO01.BIN  $(BASE)/
 
-	# Commands
-	-cp $(DEP_B1)/base/bin/CAT.BIN       $(BASE)/
-	-cp $(DEP_B1)/base/bin/FALSE.BIN     $(BASE)/
-	-cp $(DEP_B1)/base/bin/REBOOT.BIN    $(BASE)/
-	-cp $(DEP_B1)/base/bin/SHUTDOWN.BIN  $(BASE)/
-	-cp $(DEP_B1)/base/bin/TRUE.BIN      $(BASE)/
-	-cp $(DEP_B1)/base/bin/UNAME.BIN     $(BASE)/
-	# Display servers
-	-cp $(DEP_B2)/core/ds00/bin/DS00.BIN  $(BASE)/
-	#-cp $(DEP_B2)/core/ds01/bin/DS01.BIN  $(BASE)/
-	-cp $(DEP_B2)/core/dsx/bin/DSX.BIN  $(BASE)/
-	# Apps
-	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/
-	-cp $(DEP_B2)/shell/bin/TERMINAL.BIN  $(BASE)/
-	-cp $(DEP_B2)/shell/bin/GDM.BIN       $(BASE)/
-	-cp $(DEP_B2)/shell/bin/EDITOR.BIN    $(BASE)/
-	# X apps
-	-cp $(DEP_B2)/shell/bin/XTB.BIN   $(BASE)/
-	# Gramado OS 3D demos.
-	-cp $(DEP_B3)/bin/DEMO00.BIN  $(BASE)/
-	-cp $(DEP_B3)/bin/DEMO01.BIN  $(BASE)/
-#...
+# ------------------------
+# LEVEL 2: (commands/)  Posix comands.
+	-cp $(DEP_L2)/base/bin/CAT.BIN       $(BASE)/
+	-cp $(DEP_L2)/base/bin/FALSE.BIN     $(BASE)/
+	-cp $(DEP_L2)/base/bin/REBOOT.BIN    $(BASE)/
+	-cp $(DEP_L2)/base/bin/SHUTDOWN.BIN  $(BASE)/
+	-cp $(DEP_L2)/base/bin/TRUE.BIN      $(BASE)/
+	-cp $(DEP_L2)/base/bin/UNAME.BIN     $(BASE)/
+# use '@' prefix.
+	-cp $(DEP_L2)/sdk/bin/GRAMCNF.BIN  $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/sdk/bin/N9.BIN      $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/sdk/bin/N10.BIN     $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/sdk/bin/N11.BIN     $(BASE)/GRAMADO/
+# Use '#' prefix.
+	-cp $(DEP_L2)/extra/bin/CMP.BIN       $(BASE)/PROGRAMS/
+	-cp $(DEP_L2)/extra/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
+	-cp $(DEP_L2)/extra/bin/SUM.BIN       $(BASE)/PROGRAMS/
+	#-cp $(DEP_L2)/extra/bin/UDPTEST.BIN  $(BASE)/PROGRAMS/
 
-# -----------------------------
-# Commands and apps in GRAMADO/ folder.
-# Gotta use '@' before the command.
-
-	# Commands
-	-cp $(DEP_B1)/sdk/bin/GRAMCNF.BIN   $(BASE)/GRAMADO/
-#	-cp $(DEP_B1)/sdk/bin/N9.BIN   $(BASE)/GRAMADO/
-#	-cp $(DEP_B1)/sdk/bin/N10.BIN  $(BASE)/GRAMADO/
-#	-cp $(DEP_B1)/sdk/bin/N11.BIN  $(BASE)/GRAMADO/
-
-	# Apps
-	#-cp $(DEP_B2)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
-	
-# -----------------------------
-# Commands and apps in PROGRAMS/ folder.
-# Gotta use '#' before the command.
-
-	# Commands
-	-cp $(DEP_B1)/extra/bin/CMP.BIN       $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/extra/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
-	-cp $(DEP_B1)/extra/bin/SUM.BIN       $(BASE)/PROGRAMS/
-#	-cp $(DEP_B1)/extra/bin/UDPTEST.BIN   $(BASE)/PROGRAMS/
-	# Apps
-	-cp $(DEP_B2)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
-	-cp $(DEP_B2)/shell/bin/BROWSER.BIN  $(BASE)/PROGRAMS/
-	-cp $(DEP_B2)/shell/bin/DOC.BIN      $(BASE)/PROGRAMS/
+# ------------------------
+# LEVEL 1: (de/) Display servers and applications.
+	-cp $(DEP_L1)/core/ds00/bin/DS00.BIN   $(BASE)/
+	#-cp $(DEP_L1)/core/ds01/bin/DS01.BIN  $(BASE)/
+	-cp $(DEP_L1)/core/dsx/bin/DSX.BIN     $(BASE)/
+	-cp $(DEP_L1)/shell/bin/TASKBAR.BIN    $(BASE)/
+	-cp $(DEP_L1)/shell/bin/TERMINAL.BIN   $(BASE)/
+	-cp $(DEP_L1)/shell/bin/GDM.BIN        $(BASE)/
+	-cp $(DEP_L1)/shell/bin/EDITOR.BIN     $(BASE)/
+	-cp $(DEP_L1)/shell/bin/XTB.BIN        $(BASE)/
+# use '@' prefix.
+	#-cp $(DEP_L1)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
+# Use '#' prefix.
+	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_L1)/shell/bin/BROWSER.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/PROGRAMS/
 
 	@echo "~ copy-extras"
 
