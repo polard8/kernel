@@ -180,27 +180,20 @@ network_register_ring3_display_server(
 // Syscall implementation.
 
     struct process_d *p;
+    pid_t current_process = (pid_t) -1;
     struct thread_d *t;
-    pid_t current_process = (pid_t) get_current_process();
 
-// parameters
-
-    // cgroup
+// Parameter: cgroup
     if ((void*) cg == NULL)
         goto fail;
     if (cg->magic != 1234)
         goto fail;
 
-// Invalid caller.
-    if (caller_pid != current_process){
-        panic("network_register_ring3_display_server: caller_pid\n");
-    }
-
 //
-// Process
+// Current process
 // 
-    if ( current_process < 0 ||
-         current_process >= PROCESS_COUNT_MAX )
+    current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
     {
         panic("network_register_ring3_display_server: current_process\n");
     }
@@ -210,20 +203,34 @@ network_register_ring3_display_server(
     if (p->magic != 1234)
         panic("network_register_ring3_display_server: p magic\n");
 
+// Parameter: Caller PID.
+// Invalid caller PID.
+    if (caller_pid != current_process){
+        panic("network_register_ring3_display_server: caller_pid\n");
+    }
+
 //
 // Save
 //
 
-// Saving the display server PID into the cgroup structure.
+// The bootloader dislay device.
+// Is it the current display device?
+// Register new owner for this display device.
 
+    if ((void*) bl_display_device != NULL)
+    {
+        if (bl_display_device->magic == 1234){
+            bl_display_device->owner_pid = (pid_t) current_process;
+        }
+    }
+
+// Saving the display server PID into the cgroup structure.
 // Register_ws_process(current_process);
     cg->__display_server_pid = (pid_t) current_process;
 
 // #todo
 // Maybe this method belongs to the sys_bind() routine.
-    socket_set_gramado_port(
-        GRAMADO_PORT_WS,
-        (pid_t) current_process );
+    socket_set_gramado_port( GRAMADO_PORT_WS, (pid_t) current_process );
 
     __initialize_ws_info(current_process);
     __maximize_ws_priority(current_process);

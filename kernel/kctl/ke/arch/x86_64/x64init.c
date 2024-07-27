@@ -1,5 +1,5 @@
 // x64init.c
-
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -32,9 +32,7 @@ const char *mod_image_name = "HVMOD0  BIN";
 // Image name for the init process. INIT.BIN
 const char *init_image_name = "INIT    BIN";
 
-
 // =========================================
-
 
 //
 // == Private functions: Prototypes ========
@@ -52,7 +50,6 @@ static int __load_initbin_image(void);
 static int I_x64CreateTID0(void);
 
 // =========================================
-
 
 /*
 // #deprecated
@@ -916,7 +913,7 @@ static int I_x64CreateKernelProcess(void)
 // #warning
 // It's because the kernel was the first
 // process created. Then the pid is equal 0.
-    if ( KernelProcess->pid != GRAMADO_PID_KERNEL ){
+    if (KernelProcess->pid != GRAMADO_PID_KERNEL){
         printk ("I_x64CreateKernelProcess: pid\n");
         return FALSE;
     }

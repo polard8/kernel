@@ -680,6 +680,7 @@ int DDINIT_bldisp(void)
 
 // Structure initialization.
     bl_display_device->initialized = FALSE;
+    bl_display_device->owner_pid = (pid_t) GRAMADO_PID_KERNEL;
 
 // framebuffer address.
     bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;

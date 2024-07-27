@@ -2096,11 +2096,10 @@ struct process_d *create_and_initialize_process_object(void)
 
 // tty
 //++
-    new_process->tty = (struct tty_d *) tty_create(
-        TTY_TYPE_PTY,
-        TTY_SUBTYPE_UNDEFINED );
+    new_process->tty = 
+        (struct tty_d *) tty_create( TTY_TYPE_PTY, TTY_SUBTYPE_UNDEFINED );
     if ((void *) new_process->tty == NULL){
-         panic ("create_and_initialize_process_object: Couldn't create TTY\n");
+        panic ("create_and_initialize_process_object: Couldn't create TTY\n");
     }
     tty_start(new_process->tty);
 //--

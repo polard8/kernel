@@ -1342,13 +1342,14 @@ void *sci0 (
 // Called by the ring 3 display server.
 // >> arg2 = cgroup structure pointer.
 // >> arg3 = The display erver PID.
+// IN: cgroup, caller pid.
+// see: network.c
+
     int display_server_ok=FALSE;
     if (number == SCI_SET_WS_PID)
     {
         debug_print("sci0: SCI_SET_WS_PID\n");
         
-        // IN: cgroup, caller pid.
-        // see: network.c
         display_server_ok = 
             (int) network_register_ring3_display_server(
                 (struct cgroup_d *) arg2, (pid_t) arg3);
@@ -1358,7 +1359,6 @@ void *sci0 (
         }
         return NULL;
     }   
-
 
 // #deprecated
 // 514 - get wm PID for a given cgroup

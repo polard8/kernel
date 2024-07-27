@@ -1,6 +1,6 @@
-
 // display.h
 // Display device support.
+// Created by Fred Nora.
 
 #ifndef __COMMON_DISPLAY_H
 #define __COMMON_DISPLAY_H    1
@@ -41,7 +41,13 @@ struct display_device_d
 {
     int used;
     int magic;
-    // The file to handle this device.
+
+// PID of the owner.
+// It means that only this process is able to 
+// call routines affecting this structure.
+    pid_t owner_pid;
+
+// The file to handle this device.
     file *_file;
     //char name[64];
 
@@ -51,7 +57,6 @@ struct display_device_d
 //
 // LFB - Linear Frame Buffer
 //
-
 
 // Start
     unsigned long framebuffer_pa;
