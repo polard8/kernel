@@ -86,6 +86,8 @@ struct cgroup_d
 // Main PIDs
     pid_t __display_server_pid;   // display server
     pid_t __network_server_pid;   // network server
+    pid_t __browser_pid;   // network server
+    // ...
 
 // Navigation
     struct cgroup_d *next;

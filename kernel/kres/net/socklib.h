@@ -48,6 +48,8 @@
 #define GRAMADO_PORT_FT  18  // FTP server
 #define GRAMADO_PORT_TN  19  // Telnet server
 // ...
+#define GRAMADO_PORT_BR  20  // Gramado browser.
+
 #define GRAMADO_PORT_MAX  32
 //--
 //=====================================================

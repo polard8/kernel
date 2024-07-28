@@ -170,6 +170,7 @@ static void __maximize_ws_priority(pid_t pid)
     t->quantum = QUANTUM_MAX;
 }
 
+
 // Register display servver into a given valid cgroup.
 int 
 network_register_ring3_display_server(
@@ -257,6 +258,103 @@ network_register_ring3_display_server(
 fail:
     return (int) -1;
 }
+
+//---
+
+// Register browser into a given valid cgroup.
+int 
+network_register_ring3_browser(
+    struct cgroup_d *cg,
+    pid_t caller_pid )
+{
+// 513 - SYS_SET_WS_PID
+// Syscall implementation.
+
+    struct process_d *p;
+    pid_t current_process = (pid_t) -1;
+    struct thread_d *t;
+
+// Parameter: cgroup
+    if ((void*) cg == NULL)
+        goto fail;
+    if (cg->magic != 1234)
+        goto fail;
+
+//
+// Current process
+// 
+    current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
+    {
+        panic("network_register_ring3_display_server: current_process\n");
+    }
+    p = (struct process_d *) processList[current_process];
+    if ((void*) p == NULL)
+        panic("network_register_ring3_display_server: p\n");
+    if (p->magic != 1234)
+        panic("network_register_ring3_display_server: p magic\n");
+
+// Parameter: Caller PID.
+// Invalid caller PID.
+    if (caller_pid != current_process){
+        panic("network_register_ring3_display_server: caller_pid\n");
+    }
+
+//
+// Save
+//
+
+// The bootloader dislay device.
+// Is it the current display device?
+// Register new owner for this display device.
+
+    /*
+    if ((void*) bl_display_device != NULL)
+    {
+        if (bl_display_device->magic == 1234){
+            bl_display_device->owner_pid = (pid_t) current_process;
+        }
+    }
+    */
+
+// Saving the browser PID into the cgroup structure.
+// Register_ws_process(current_process);
+    cg->__browser_pid = (pid_t) current_process;
+
+// #todo
+// Maybe this method belongs to the sys_bind() routine.
+    socket_set_gramado_port( GRAMADO_PORT_BR, (pid_t) current_process );
+
+    // This is for display servers, not browsers
+    //__initialize_ws_info(current_process);
+    //__maximize_ws_priority(current_process);
+
+// Setup c1/
+// Change the foreground console.
+    //console_set_current_virtual_console(CONSOLE1);
+
+// Setup the new layer for this process.
+// The browser is in the same layer of display servers for now.
+    p->_layer = (int) LAYER_DISPLAY_SERVER;
+
+// #test
+    t = p->control;
+    if ((void*) t == NULL)
+        goto fail;
+    if (t->magic != 1234)
+        goto fail;
+
+// #test
+    t->pe_mode = PE_MODE_PERFORMANCE;
+
+    return TRUE;
+
+fail:
+    return (int) -1;
+}
+
+
+
 
 void 
 network_fill_mac(

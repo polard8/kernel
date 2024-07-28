@@ -189,6 +189,12 @@ network_register_ring3_display_server(
     struct cgroup_d *cg,
     pid_t caller_pid );
 
+// Register browser into a given valid cgroup.
+int 
+network_register_ring3_browser(
+    struct cgroup_d *cg,
+    pid_t caller_pid );
+
 void 
 network_fill_mac(
     unsigned char *to, 

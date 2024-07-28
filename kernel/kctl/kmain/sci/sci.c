@@ -1373,6 +1373,34 @@ void *sci0 (
         return NULL;
     }
 
+
+// 518
+// Register the ring3 browser.
+// Set browser PID for a given cgroup structure.
+// Register a display server.
+// gramado_ports[11] = ws_pid
+// Called by the ring 3 display server.
+// >> arg2 = cgroup structure pointer.
+// >> arg3 = The display erver PID.
+// IN: cgroup, caller pid.
+// see: network.c
+
+    int browser_server_ok=FALSE;
+    if (number == 518)
+    {
+        debug_print("sci0: 518\n");
+        
+        browser_server_ok = 
+            (int) network_register_ring3_browser(
+                (struct cgroup_d *) arg2, (pid_t) arg3);
+        
+        if (browser_server_ok == TRUE){
+            return (void*) TRUE;
+        }
+        return NULL;
+    }   
+
+
 // #bugbug
 // This is a ring0 pointer.
 // A ring3 process can't handle this thing.
