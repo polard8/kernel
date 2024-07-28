@@ -6,7 +6,8 @@
 BASE    = your/base
 
 # Levels
-DEP_L3  = ../aurora
+DEP_L4  = ../aurora
+DEP_L3  = ../browser
 DEP_L2  = ../commands
 DEP_L1  = ../de
 
@@ -183,9 +184,14 @@ copy-extras:
 	@echo "copy-extras"
 
 # ------------------------
-# LEVEL 3: (aurora/) 3D demos.
-	-cp $(DEP_L3)/bin/DEMO00.BIN  $(BASE)/
-	-cp $(DEP_L3)/bin/DEMO01.BIN  $(BASE)/
+# LEVEL 4: (aurora/) 3D demos.
+	-cp $(DEP_L4)/bin/DEMO00.BIN  $(BASE)/
+	-cp $(DEP_L4)/bin/DEMO01.BIN  $(BASE)/
+
+# ------------------------
+# LEVEL 3: (browser/) browser.
+# Teabox web browser
+	-cp $(DEP_L3)/teabox/bin/TEABOX.BIN  $(BASE)/PROGRAMS/
 
 # ------------------------
 # LEVEL 2: (commands/)  Posix comands.
@@ -221,8 +227,6 @@ copy-extras:
 # Use '#' prefix.
 	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
 	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/PROGRAMS/
-# Teabox web browser
-	-cp $(DEP_L1)/teabox/bin/TEABOX.BIN  $(BASE)/PROGRAMS/
 
 	@echo "~ copy-extras"
 
