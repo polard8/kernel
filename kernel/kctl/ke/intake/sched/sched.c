@@ -1,7 +1,6 @@
-
 // sched.c
+// Scheduling support.
 // Core scheduler code and related routines.
-// ...
 // Created by Fred Nora.
 
 #include <kernel.h>
@@ -21,9 +20,6 @@ static struct thread_d  *p3q;
 static struct thread_d  *p4q;
 static struct thread_d  *p5q;
 static struct thread_d  *p6q;  // Higher
-
-// The flexible conductor to create the list.
-//static struct thread_d  *tmpConductor;
 
 //
 // == Private functions: prototypes =============
@@ -76,10 +72,18 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     register int i=0;
     tid_t FirstTID = -1;
 
-    //debug_print ("scheduler: [not tested] \n");
+// These are the queues,
+// But RR will build only the p6q, the one with higher priority.
+    p1q = NULL;
+    p2q = NULL;
+    p3q = NULL;
+    p4q = NULL;
+    p5q = NULL;
+    p6q = NULL;  // Higher priority
 
-// rootConductor: 
-// The ring0 idle thread.
+// No current queue for the task switching.
+// This is the conductor.
+    currentq = NULL;
 
 // BSP - bootstrap processor
 // The linked list for the BSP will always start with the
@@ -141,15 +145,13 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // Setup Idle as the head of the currentq queue, 
 // used by the task switcher.
     currentq = (void *) Idle;
-    sched_queues[SCHED_CURRENT_QUEUE] = (unsigned long) currentq;
-    //scheq_set_element(SCHED_CURRENT_QUEUE,currentq);
+    qlist_set_element(SCHED_CURRENT_QUEUE,currentq);
 
 // Setup Idle as the head of the p6q queue, 
 // The loop below is gonna build this list.
 // The idle is the TID 0, so the loop starts at 1.
     p6q = (void*) Idle;
-    sched_queues[SCHED_P6_QUEUE] = (unsigned long) p6q;
-    //scheq_set_element(SCHED_P6_QUEUE,p6q);
+    qlist_set_element(SCHED_P6_QUEUE,p6q);
 
 // ---------------------------------------------
 // Walking
@@ -307,7 +309,6 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 {
                     if (TmpThread->tid == WindowServerInfo.tid)
                     {
-                        //TmpThread->quantum = QUANTUM_SYSTEM_THRESHOLD;
                         TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +2;
                         //TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +1;
                     }
@@ -348,11 +349,11 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 }
             }
             
-            // #test
-            // credits
+            // Credits:
+            // If this thread received more than n credits, 
+            // we increment the quantum.
             if (TmpThread->magic == 1234)
             {
-                // Set the credits.
                 if (TmpThread->credits >= 2)
                 {
                     TmpThread->quantum = (TmpThread->quantum + 1);
@@ -362,21 +363,21 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
         }
     };
 
+// Finalizing the list.
+// This way we need to re-scheduler at the end of each round.
+    p6q->next = NULL;
+
 // #todo
 // Let's try some other lists.
 
-// Finalizing the list.
-    p6q->next = NULL;               // Reescalona ao fim do round.
-
-// done:
+// Increment the counter for rr.
     SchedulerInfo.rr_round_counter++;
-
 // Start with the idle thread.
     return (tid_t) FirstTID;
 }
 
 
-// Wrapper for __scheduler();
+// Wrapper for __scheduler_rr() or other type.
 // Esperamos que o worker construa um round e
 // que a primeira tid seja a idle.
 // OUT: next tid.
@@ -481,10 +482,12 @@ int init_scheduler(unsigned long sched_flags)
 {
     register int i=0;
 
-    debug_print("init_scheduler: [TODO]\n");
-    // ...
+    debug_print("init_scheduler:\n");
+
+    SchedulerInfo.initialized = FALSE;
 
     scheduler_lock();
+    qlist_initialize();
 
 // -------------------------------
 // Scheduler policies
@@ -492,8 +495,8 @@ int init_scheduler(unsigned long sched_flags)
     SchedulerInfo.policy = SCHED_POLICY_RR;
     SchedulerInfo.rr_round_counter = 0;
     SchedulerInfo.flags = (unsigned long) sched_flags;
-    SchedulerInfo.initialized = TRUE;
 
+    SchedulerInfo.initialized = TRUE;
     return 0;
 }
 
@@ -540,6 +543,3 @@ void cut_round(struct thread_d *last_thread)
 //
 // End
 //
-
-
-

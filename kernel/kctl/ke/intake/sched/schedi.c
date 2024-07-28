@@ -1,4 +1,5 @@
 // schedi.c
+// Scheduling support.
 // Created by Fred Nora.
 
 #include <kernel.h>  

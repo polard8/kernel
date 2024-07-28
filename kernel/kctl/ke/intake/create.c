@@ -308,15 +308,9 @@ struct thread_d *create_init_thread(void)
 
 // Navigation
     t->next = NULL;
-
+    
 // Coloca na lista de estruturas.
     threadList[TID] = (unsigned long) t;
-
-// Conductor
-// #todo
-// We can use a method in the scheduler for this.
-
-    //rootConductor = (struct thread_d *) t;
 
 // counter
 // #importante

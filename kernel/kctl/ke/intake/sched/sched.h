@@ -1,5 +1,6 @@
-
 // sched.h
+// Scheduling support.
+// Created by Fred Nora.
 
 #ifndef __PS_SCHED_H
 #define __PS_SCHED_H    1

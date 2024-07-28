@@ -12,11 +12,11 @@
 // 2 classes of priority.
 
 //----------------------------
-// class 1: Normal
+// class 1: Normal priorities
 #define PRIORITY_P1  1
 #define PRIORITY_P2  2
 #define PRIORITY_P3  3
-// class 2: System
+// class 2: System priorities
 #define PRIORITY_P4  4
 #define PRIORITY_P5  5
 #define PRIORITY_P6  6
