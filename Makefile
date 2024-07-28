@@ -220,8 +220,9 @@ copy-extras:
 	#-cp $(DEP_L1)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
 # Use '#' prefix.
 	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
-	-cp $(DEP_L1)/shell/bin/BROWSER.BIN  $(BASE)/PROGRAMS/
 	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/PROGRAMS/
+# Teabox web browser
+	-cp $(DEP_L1)/teabox/bin/TEABOX.BIN  $(BASE)/PROGRAMS/
 
 	@echo "~ copy-extras"
 
