@@ -458,6 +458,7 @@ static int __CompareString(void)
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
+
 // #test
 // Launch a shell application 
 // This application will interpret the commands and send
