@@ -1,4 +1,5 @@
 // ascii.h
+// Created by Fred Nora.
 
 #ifndef __ASCII_H
 #define __ASCII_H    1

@@ -1,19 +1,6 @@
-
-// Lista de erros usados pelo kernel.
-// Essa é a mesma lista usada pelos aplicativos.
-
-//#test
-//Isso é um test ainda.
-
-/* 
- * errno.h
- * This file has no copyright assigned and is placed in the Public Domain.
- * This file is a part of the mingw-runtime package.
- * No warranty is given; refer to the file DISCLAIMER within the package.
- *
- * Error numbers and access to error reporting.
- *
- */
+// kerro.h
+// List of error numbers.
+// Created by Fred Nora.
 
 // See: 
 // https://man7.org/linux/man-pages/man3/errno.3.html
@@ -23,18 +10,7 @@
 #ifndef __ERRNO_H
 #define __ERRNO_H    1
 
-
-/* All the headers include this file. */
-// #include <_mingw.h>
-
-/*
- * Error numbers.
- * TODO: Can't be sure of some of these assignments, I guessed from the
- * names given by strerror and the defines in the Cygnus errno.h. A lot
- * of the names from the Cygnus errno.h are not represented, and a few
- * of the descriptions returned by strerror do not obviously match
- * their error naming.
- */
+// List
 #define EPERM      1	/* Operation not permitted */
 #define ENOFILE    2	/* No such file or directory */
 #define ENOENT     2
@@ -85,7 +61,6 @@
 #define ECONNREFUSED  61
 
 
-// Não sei se essa variável é usada também aqui dentro do kernel.
 // extern int errno;
 
 #endif	/* Not __ERRNO_H */    
