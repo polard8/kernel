@@ -1,10 +1,24 @@
+; finish.inc
+; This is a trampoline where we select
+; if we're gonna start the GUI or the CLI.
+; Created by Fred Nora.
 
 ; 1 = Starts system GUI.
 ; 0 = Starts the Boot Manager CLI.
 finish_saved_boot_option db 0
 
+; =======================================================
+; Messages
+
+stage2_msg_pe_sigNotFound: 
+    db "finish.inc: Signature not found", 13, 10, 0
+stage2_msg_pe_sigFound: 
+    db "finish.inc: Signature found", 13, 10, 0
+
+
 ; ==============================================================
 ; AFTER_DATA:
+; Called by load_stuff() in main.asm.
 ; Inicio real do stage 2.
 ; A primeira coisa a se fazer eh salvar os parametros de disco 
 ; passados pelo stage1.
@@ -27,7 +41,7 @@ AFTER_DATA:
     mov si, msg_bm_splash
     call DisplayMessage
 
-    ; Debug.
+    ; #debug
     ; jmp $
 
 ;; PE signature for BL.BIN image.
@@ -102,11 +116,11 @@ xxx_setupRegisters:
     mov es, ax
     ;mov fs, ax 
     ;mov gs, ax
-    ; Stack 
+    ; Stack at 0000:6000 
     xor ax, ax
     mov ss, ax
     mov sp, 0x6000
-    ; Zeros
+    ; Clear registers.
     xor dx, dx
     xor cx, cx
     xor bx, bx
@@ -169,10 +183,8 @@ xxx_Config:
 ;
 
 
-;;
+;; ===========================================
 ;; == Text mode ==============================
-;;
-
 ; text mode.
 ;   ## SET UP BOOT MODE ##
 .xxxxCLI:
@@ -181,11 +193,8 @@ xxx_Config:
     JMP s2modesActivateMode  ; s2modes.inc
     jmp $
 
-;;
+;; ===========================================
 ;; == Graphics mode ==========================
-;;
-
-
 ; gui mode.
 ; Initialize Gramado boot loader.
 ;   ## SET UP BOOT MODE ##
@@ -197,11 +206,3 @@ xxx_Config:
     JMP do_rm_startgui  ; pm.inc
     jmp $
 
-
-; =======================================================
-; Messages
-
-stage2_msg_pe_sigNotFound: 
-    db "bm-xxx_checkSig: Signature not found", 13, 10, 0
-stage2_msg_pe_sigFound: 
-    db "bm-xxx_checkSig: Signature found", 13, 10, 0

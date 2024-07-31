@@ -36,11 +36,13 @@
 ;       |  (32bit) | Boot loader in C.
 ;       |----------| 0x2000:0x0000
 ;       |          | 
-;       |----------| 
+;       |   ...    | 
+;       |          | 
+;       |----------| 0x0000:0xFFFF
 ;       |          | 
 ;       |  BM2.BIN | 
 ;       |          | The entry point.
-;  >>>  |----------| 0x0000:0x8000 :)
+;  >>>  |----------| 0x0000:0x8000
 ;       |          |
 ;       |----------| 0x0000:0x6000
 ;       |  INITIAL | Initial stack address.
@@ -55,7 +57,12 @@
 
 	%DEFINE GBM_VER '1.1'	; version number
 
+
 [ORG 0x8000]
+; We are in 0000H:8000H
+
+; 32768 - 65535 (hex: 8000h - FFFFh)
+; 32KiB space for BM2.BIN
 
 ;;=====================================
 ;;    Entry point do Boot Manager    ;;
@@ -132,8 +139,8 @@ bm_main:
 
 ; Set up registers.
 ; Adjust segment registers and stack.
-; Code located at 0000:0x8000. 
 ; Stack located at 0000:0x6000.
+; Code located at 0000:0x8000. 
 
     cli
     mov ax, 0x0000
@@ -275,13 +282,14 @@ bm_main:
     mov word [META$FILE.CYLINDERS], ax
     mov word [DISKINFO16_cylinders], ax
 
+
 ; ++
-; ---------------------------------
-restart_loop:
+; ===========================================
+menu_loop:
 
 ; Draw the background.
-    mov ax, os_init_msg       ; Set up the welcome screen
-    mov bx, os_version_msg
+    mov ax, msg_topbar       ; Set up the welcome screen
+    mov bx, msg_bottombar
     mov cx, 10011111b         ; Colour: white text on light blue
     call os_draw_background
 
@@ -305,43 +313,48 @@ restart_loop:
 ; Load the BL.BIN image.
     cmp ax, 1 
 ; >> GUI::
-    jne near load_stuff
+    jne near after_menu
 
 ; Caso contrario usaremos a opção CLI.
 ; 1 = Starts system GUI.
 ; 0 = Starts the Boot Manager CLI.
     mov byte [finish_saved_boot_option], 0
 ; >> CLI::
-    jmp load_stuff
+    jmp after_menu
 
-    jmp restart_loop
+    jmp menu_loop
     jmp $
-; ---------------------------------
+; ===========================================
 ; --
 
+; Clear the screen
+after_menu:
+    call Window.ClearScreen
+
 ;
-; Load stuff --------------------------
+; Load the BL.BIN image at 2000H:0000H
 ;
 
-load_stuff:
-; Load the BL.BIN image.
+; Load the BL.BIN image at 2000H:0000H.
+; see: feature/disk.inc
 ; This routine starts the system based on a flag,
 ; that will tell us if we start the system using the graphics mode
 ; or we start the 32bit embedded shell here in the bm.
-
-    call Window.ClearScreen
-    
 ; IN:
 ; ax = pointer to the image name.
 
-    ;mov ax, word bootmanager_ImageName1
-    ;call test_load_bl_image
+load_bootloader_image:
 
+; Load image1
+    ;mov ax, word bootmanager_ImageName1
+    ;call diskLoadBL
+; Load image2
     mov ax, word bootmanager_ImageName2
-    call test_load_bl_image
+    call diskLoadBL
 
 ; Trampoline:
 ; see: features/finish.inc
+Trampoline:
     push WORD 0
     push WORD AFTER_DATA 
     retf
@@ -351,9 +364,8 @@ load_stuff:
 ; ================================================
 ; Data for the above code...
 
-    os_init_msg     db 'Gramado Boot Manager', 0
-    ;os_version_msg  db 'Version ', GBM_VER, 0
-    os_version_msg  db ':) ', 0
+    msg_topbar     db 'Gramado Boot Manager', 0
+    msg_bottombar  db 'ENTER=Confirm', 0
 
     dialog_string_1  db 'Please select an option:', 0
     dialog_string_2  db '+ [OK] to initialize the system       ', 0

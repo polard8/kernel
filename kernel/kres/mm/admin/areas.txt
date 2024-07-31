@@ -1,0 +1,52 @@
+
+   Canonical areas of virtual memory.
+   // #check this values in the header.
+
+// --------------------------
+// va=0          | Ring 0 area.
+// --------------------------
+// va=0x00200000 | Ring 3 area.
+// --------------------------
+// va=0x30000000 | kernel image region.
+// --------------------------
+// va=0x30200000 | Frontbuffer.
+// --------------------------
+// va=0x30400000 | Backbuffer.
+// --------------------------
+// va=0x30600000 | Paged pool.
+// --------------------------
+// va=0x30800000 | Heap pool.
+// -----------------------------------
+// Extraheap 1: Used by the kernel module.
+// va=0x30A00000 | Extra heap 1.
+// -----------------------------------
+// New paged pool: //  It uses the extraheap2 and 3.
+// Extraheap 2 and 3: Used by the slab allocator.
+// va=0x30C00000 | Extra heap 2.
+// va=0x30E00000 | Extra heap 3.
+
+===========================================
+
+0x0009C000          pml4
+0x00200000          Control thread base address 
+0x00201000          Control thread entry point 
+0x003FFFF0          Control thread stack 
+0x30000000          Kernel image 
+0x30100000          Kernel heap start 
+0x301D0000          Kernel heap end
+0x301E0000          Kernel stack end 
+0x301FFFF0          Kernel stack start 
+0x0000000030200000  Frontbuffer 
+0x0000000030400000  Backbuffer
+0x0000000030600000  Paged pool 
+0x0000000030800000  Heap pool 
+0x0000000030A00000  Extra heap 1  (Module ring0)
+0x0000000030C00000  Extra heap 2
+0x0000000030E00000  Extra heap 3
+0x0000000030A01000  Module ring0 entry point 
+0x0000000031200000  e1000 NIC Intel.
+0x0000000031400000  LAPIC 
+0x0000000031600000  IOAPIC 
+0x0000000031800000  ACPI RSDT
+
+

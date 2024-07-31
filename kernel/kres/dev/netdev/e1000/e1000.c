@@ -3,6 +3,23 @@
 // Credits: Chicago OS, Italo Matias.
 // Created by Fred Nora.
 
+/*
+Key steps involved:
+
+PCI Configuration Access:
+Locate the NIC device using PCI configuration space.
+Read the Base Address Register (BAR) 0 to obtain the physical base address 
+of the device's memory-mapped region.
+
+Memory Mapping:
+Allocate a virtual memory region of appropriate size.
+Map the physical address range obtained from BAR 0 to the allocated 
+virtual memory region using the operating system's memory management functions.
+
+Accessing Device Registers:
+Use the mapped virtual addresses to access the device's registers and memory.
+*/
+
 #include <kernel.h>
 
 static int e1000_initialized = FALSE;

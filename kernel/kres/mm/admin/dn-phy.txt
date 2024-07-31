@@ -1,0 +1,107 @@
+
+    Some physical areas used by the kernel.
+    Each area has 2MB and was mapped with 512 4KB pages.
+
+See:
+    x64gpa.h, pages.c ...
+
+
+0x00000000 - 0x000003FF - Real Mode Interrupt Vector Table
+0x00000400 - 0x000004FF - BIOS Data Area
+0x00000500 - 0x00007BFF - Unused
+0x00007C00 - 0x00007DFF - Our Bootloader
+0x00007E00 - 0x0009FFFF - Unused
+0x000A0000 - 0x000BFFFF - Video RAM (VRAM) Memory
+0x000B0000 - 0x000B7777 - Monochrome Video Memory
+0x000B8000 - 0x000BFFFF - Color Video Memory
+0x000C0000 - 0x000C7FFF - Video ROM BIOS
+0x000C8000 - 0x000EFFFF - BIOS Shadow Area
+0x000F0000 - 0x000FFFFF - System BIOS
+
+
+0x1000                 Heap of tables
+0x00030000             FAT
+0x00070000             Rootdir
+0x0000000000090000     Boot block
+0x000000000009A000     pml2 KERNEL_PD_PA
+0x000000000009B000     pml3 KERNEL_PDPT_PA
+0x000000000009C000     pml4 KERNEL_PML4_PA
+0x00100000             Kernel base address 
+0x01000000             Heap pool 
+0x01000000 + 0x200000  Extraheap 1
+0x01000000 + 0x400000  Extraheap 2
+0x01000000 + 0x600000  Extraheap 3
+0x01000000 + 0x800000  Paged pool 1
+0x01000000 + 0xA00000  Paged pool 2
+0x01000000 + 0xC00000  Paged pool 3
+0x01000000 + 0xE00000  Paged pool 4
+0x02000000             Userbase (init process base)
+0x04000000             Backbuffer 
+0x08000000             Frametable start  (pageframe)
+0x10000000             Frametable  (pageframe) 
+
+0xFEC00000             IOAPIC 
+0xFEE00000             LAPIC 
+
+
+--------------------------------
+// Physical areas:
+// #check this values in the header.
+0x0                     -  0MB mark (Ring 0 area)
+0x00100000              -  1MB mark (Kernel image area)
+0x800000                -  8MB mark (Backbuffer area)
+ 0x01000000             - 16MB mark (Heappool area)
+(0x01000000 + 0x200000) - 18MB mark (Extraheap1 area)
+(0x01000000 + 0x400000) - 20MB mark (Extraheap2 area)
+(0x01000000 + 0x600000) - 22MB mark (Extraheap3 area)
+(0x01000000 + 0x800000) - 24MB mark (Pagedpool area)
+0x02000000 - 32MB mark
+--------------------------------
+
+Ring 0 area:
+    0x0 - 0MB mark
+
+Kernel image area:
+    0x00100000 - 1MB mark
+    ps: It overlaps the previous area.
+
+Backbuffer area:
+    0x800000   - 8MB mark
+
+Heappool area:
+    0x01000000 - 16MB mark
+
+Extraheap1 area:
+    (0x01000000 + 0x200000) - 18MB mark
+
+Extraheap2 area:
+    (0x01000000 + 0x400000) - 20MB mark
+
+Extraheap3 area:
+    (0x01000000 + 0x600000) - 22MB mark
+
+Pagedpool area:
+    (0x01000000 + 0x800000) - 24MB mark
+
+Ring 3 area:
+    0x02000000 - 32MB mark
+
+Frontbuffer area:
+    ?          - ?
+    This is the LFB, 
+    the physical address is provided by the bootloader.
+
+NIC0 area:
+    ?          - ?
+    This is the NIC 0, 
+    the physical address is provided by the PCI interface.
+
+LAPIC area:
+    0xFEE00000 - ?
+    Probing some table to get this address.
+    All the processors are gonna use the same address
+    to access its own information.
+
+
+
+

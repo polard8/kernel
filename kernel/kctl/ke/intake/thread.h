@@ -119,6 +119,20 @@ typedef enum {
 #define IM_MESSAGE_INPUT  2
 
 /*
+Earth-bound States (Thread Creation and Termination)
+INITIALIZED: Thread is created but not yet ready to run.
+STANDBY: Thread is ready to be scheduled for execution.
+ZOMBIE: Thread has finished executing but resources haven't been fully cleaned up.
+DEAD: Thread has been completely terminated and resources released.
+
+Space-bound States (Thread Execution)
+READY: Thread is ready to run and is waiting for CPU time.
+RUNNING: Thread is currently executing on a CPU.
+WAITING: Thread is waiting for a specific condition or event to occur.
+BLOCKED: Thread is waiting for an external resource (e.g., I/O) to become available.
+*/
+
+/*
  * thread_state_t:
  *    Enumeram os estados de uma threads, (8 estados).
  *    Existem 2 grupos, 'Earth' e 'Space'.

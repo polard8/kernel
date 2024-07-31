@@ -1,16 +1,12 @@
-
-;#todo
-; Podemos melhorar as rotinas desse modulo
-; tornando elas 'callables'. E entao chamar elas
-; do arquivo main. Num loop que pode conter
-; um dialogo e seleçao entre modo visual ou cli.
-; no estilo mikeos.
-;
+; disk.inc
+; Disk operations
+; Used to load rootdir, fat and images into the system memory.
+; Created by Fred Nora.
 
 ;----------------------------------------------   
 ; Simply load the root dir.
 ; 0:0x1000
-bootmanager_LOADROOT:
+diskLoadROOTDIR:
 
 ; Compute size of root directory and store in "cx".
     pusha
@@ -111,12 +107,11 @@ entry_address: dw 0
 
 ;---------------------------------------------
 ; Load FAT
-real_load_fat:
 ; Where? es:bx  0:0x1000
-
 ; #bugbug
 ; We're not loading the whole FAT table.
 ; Only 8 sectors of 246.
+diskLoadFAT:
 
     pusha
 
@@ -147,8 +142,8 @@ real_load_fat:
 ; Load image.
 ; Read image file into memory (0x2000:0)(es:bx)
 ; Destination for the image.
-; es:bx = (2000:0).
-real_load_image:
+; es:bx = (0x2000:0).
+diskLoadImage:
 
     pusha
 
@@ -202,17 +197,20 @@ bootmanagerDONE:
     ret
 
 ; ========================================
-; :)
+; diskLoadBL:
+; Load BL.BIN at 2000H:0000H
+;
 ; Load the image.
 ; (load fat, root and image).
 ; IN:
 ; ax = pointer to the image name.
-test_load_bl_image:
 ; Carregamos uma imagem cujo ponteiro para o nome
 ; esta e 'ax'.
 ; #todo:
 ; Podemos carregar o boot loader e mudarmos para 32bit ou
 ; uma aplicação em 16 e permanecermos em 16bit.
+
+diskLoadBL:
 
     pusha
 
@@ -222,8 +220,9 @@ test_load_bl_image:
 ; save the pointer to the image name
     mov word [image_name_pointer], ax
 
-    ; Simply load the root dir at 0h:0x1000.
-    call bootmanager_LOADROOT
+; Load ROOTDIR
+; Simply load the root dir at 0h:0x1000.
+    call diskLoadROOTDIR
 
     ; Search the name and 
     ; save the entry address in [entry_address]. 
@@ -238,16 +237,14 @@ test_load_bl_image:
     mov dx, WORD [di + 0x001A]
     mov WORD [bootmanagercluster], dx  ; file's first cluster.
 
-    ; Where? es:bx  0:0x1000
-    call real_load_fat
-
-    ;pusha
-
-    ; Message.
+; Load FAT
+; Simply load the root dir at 0h:0x1000.
+    call diskLoadFAT
+   
+; Loading the image at 2000H:0000H
     mov si, bootmanagermsgImg
     call String.Print
-    
-    call real_load_image
+    call diskLoadImage
 
     popa
     ret

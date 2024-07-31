@@ -1,7 +1,7 @@
-
 // x64gpa.h 
 // Physical memory overview.
 // Global declaration of static physical address used by the kernel.
+// Created by Fred Nora.
 
 #ifndef __MM_GPA_H
 #define __MM_GPA_H  1
@@ -24,7 +24,7 @@
 0x000F0000 - 0x000FFFFF - System BIOS
 */
 
-// Primeiros 2 MB.
+// First 2 MB.
 #define SYSTEM_ORIGIN  0
 #define SMALLSYSTEM_ORIGIN_ADDRESS   SYSTEM_ORIGIN
 #define MEDIUMSYSTEM_ORIGIN_ADDRESS  SYSTEM_ORIGIN
@@ -138,74 +138,6 @@ A conservative approach is to avoid everything above 0x00080000.
 //
 // == 512 KB ==================================================
 //
-
-// #todo
-// Tem espaço sobrando aqui ??
-// #todo
-// Deveria ter uma área de memória de onde pegaríamos 
-// as pagetables que precisamos, em ordem,
-// podendo contar um numero mínimo e máximo de pagetables
-// no sistema.
-
-// 0x0008F000 Tabela para mapear a parte mais baixa da memória física. Começa em 0.
-// 0x0008E000 Tabela para mapear a memória usada pela imagem do kernel. Começa em 0x100000.
-// 0x0008D000 Tabela para mapear uma área em user mode onde rodam códigos. Começa em 0x400000.
-// 0x0008C000 Tabela para mapear a vga. Começa em 0xb8000.
-// 0x0008B000 Tabela para mapear o frontbuffer, O começo é passado pelo Boot.
-// 0x0008A000 Tabela para mapear o backbuffer, o começo é em (0x01000000 - 0x400000) no small system.
-// // 0x00089000 Tabela de páginas para o pagedpool.
-// //...
-//?? Obs: Não sei o quanto podemos ir escolhendo endereços nessa região sem sobrepor o boot loader.
-//
-
-// System page tables:
-// Essas são as pagetables mais importantes,
-// por isso ficarão aqui isoladas.
-// Já as outras pagetables ficarão concatenadas 
-// numa lista grande em um outro lugar de fácil acesso. 
-// #importante 
-// Essas pagetable possuem endereço físico e lógico iguais.
-// Page tables.
-// ?? estao sendo usadas no momento ou nao?
-//0x00083000 - AHCI 1 - Tentando mapear alguma coisa para ahci.
-// Extra heaps.
-//0x00087000 - pagetable para mapear um pool de heaps.
-//0x00088000 - Page table para mapear um NIC.
-// 0x00089000 - Pagetable para mapear um pool.
-// Possivelmente usado por um alocador de memoria compartilhada.
-// 0x0008A000 - Pagetable para o backbuffer.
-// Esse eh o backbuffer que copiamos para o lfb.
-// 0x0008B000 - pagetable para o lfb.
-// 0x0008C000 - Pagetable para o CGA em user mode.
-// Aquele memoria de modo texto colorido.
-// 0x0008D000 - Pagetable para mapear uma area de memoria 
-// que sera usada pelos aplicativos em user mode.
-// 0x0008E000 - Pagetable para mapear o endereço onde a imagem do kernel
-// sera carregada na memoria fisica.
-// 0x0008F000 - Pagetable para mapear os primeiros 4MB de memoria fisica.
-// ring0. 1:1
-
-// ------------------------------------------
-// Pagetables. (static)
-// #test
-// We are not using this addresses anymore.
-// Now We're getting these from a small heap that starts at 0x1000.
-//#define PAGETABLE_RES7         0x00080000
-//#define PAGETABLE_RES6         0x00081000
-//#define PAGETABLE_RES5         0x00082000
-//#define PAGETABLE_AHCI1        0x00083000
-//#define PAGETABLE_EXTRAHEAP3   0x00084000
-//#define PAGETABLE_EXTRAHEAP2   0x00085000
-//#define PAGETABLE_EXTRAHEAP1   0x00086000
-//#define PAGETABLE_HEAPPOOL     0x00087000 
-//#define PAGETABLE_NIC1         0x00088000
-//#define PAGETABLE_PAGEDPOOL    0x00089000
-//#define PAGETABLE_BACKBUFFER   0x0008A000
-//#define PAGETABLE_FRONTBUFFER  0x0008B000
-//#define PAGETABLE_CGA          0x0008C000
-//#define PAGETABLE_RING3AREA    0x0008D000
-//#define PAGETABLE_KERNELIMAGE  0x0008E000
-//#define PAGETABLE_RING0AREA    0x0008F000
 
 
 //

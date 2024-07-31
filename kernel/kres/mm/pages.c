@@ -1,5 +1,30 @@
-
 // pages.c
+// Memory manager.
+// It maps the first portions of memory ised by the kernel
+// and the init process.
+// Routines valid for Intel x64 machines.
+// Created by Fred Nora.
+
+
+/*
+mmInitializePaging():
+    This is the main function here. The goal is mapping some 
+2MB blocks of memory that is gonna be used by the kernel and 
+the init process.
+
+These are static system areas, do not change them.
+// va=0          | Ring 0 area.
+// va=0x00200000 | Ring 3 area.
+// va=0x30000000 | kernel image region.
+// va=0x30200000 | Frontbuffer. (LFB)
+// va=0x30400000 | Backbuffer.
+// va=0x30600000 | Paged pool.
+// va=0x30800000 | Heap pool.
+// va=0x30A00000 | Extra heap 1. (Used by the kernel module.)
+// va=0x30C00000 | Extra heap 2. (Slab allocator)
+// va=0x30E00000 | Extra heap 3. (Slab allocator too)
+
+ */
 
 #include <kernel.h>
 
@@ -1822,7 +1847,7 @@ static void __initialize_canonical_kernel_pagetables(void)
 {
 // Called by mmInitializePaging().
 // Install some pagetables into the 
-// kernel pae directory 0.
+// kernel page directory 0.
 
 // --------------------------
 // va=0          | Ring 0 area.
@@ -1858,12 +1883,12 @@ static void __initialize_canonical_kernel_pagetables(void)
     __initialize_extraheap1();
 
 // -----------------------------------
+// New paged pool: //  It uses the extraheap2 and 3.
 // Extraheap 2 and 3: Used by the slab allocator.
 // va=0x30C00000 | Extra heap 2.
     __initialize_extraheap2();
 // va=0x30E00000 | Extra heap 3.
     __initialize_extraheap3();
-// New paged pool
 // Criado com dois blocos consecutivos de 2mb cada,
 // previamente alocados.
 // see: slab.c
@@ -1907,8 +1932,8 @@ void test(void)
 
 // ======================================
 // mmInitializePaging:
-// This routine initializes the paging infrastructure.
 // Main routine.
+// This routine initializes the paging infrastructure.
 // Initalizing the paging support.
 // Mapping the static system areas.
 // Called by mmInit() in mminit.c

@@ -1,7 +1,7 @@
-
 // x64gva.h
 // Virtual memory overview.
 // Global virtual addresses.
+// Created by Fred Nora.
 
 #ifndef __MM_GVA_H
 #define __MM_GVA_H    1
@@ -75,9 +75,9 @@
 // O processo init foi carregado na marca de 
 // 32MB fisico e 2MB virtual, entao devemos deixar 
 // esse espaço fisico para o processo init.
-
 #define RING3AREA_VA    0x0000000000200000
-
+// 0x00201000 Entrypoint
+// 0x003FFFF0 Stack 
 
 //
 // Warning:
