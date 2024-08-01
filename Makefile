@@ -3,7 +3,12 @@
 # Compiling on gcc 11.4.0
 # Linking on ld 2.38
 
-BASE    = your/base
+BASE = your/base
+
+
+#todo
+#DEP_GAME01  = ../game01 
+#DEP_GAME00  = ../game00 
 
 # Levels
 DEP_L4  = ../aurora
