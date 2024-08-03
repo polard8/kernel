@@ -1,6 +1,7 @@
-
 ; sw1.asm
 ; This file handles syscall for x86_64 processors.
+; Creaed by Fred Nora.
+
 ; ints 0x80, 0x81, 0x82
 ; int 0xC7
 ; ...
@@ -32,7 +33,6 @@ extern _sci0_cpl
 align 4  
 global _int128
 _int128:
-; Wisdom
 
 ; #todo: Maybe we can save the stack frame.
 
@@ -62,16 +62,16 @@ _int128:
     push rsp
     pushfq
 
-    ; Parameters:
-    ; RDI, RSI, RDX, RCX, R8, and R9 are used 
-    ; for integer and memory address arguments
+; Parameters:
+; Let's fill the parameters for the handler.
+; RDI, RSI, RDX, RCX, R8, and R9 are used 
+; for integer and memory address arguments
 
     mov rdi, rax  ; arg1: service number
-    mov rsi, rbx  ; arg2:
+    mov rsi, rbx  ; arg2
     push rdx      ; Saving arg4
-    mov rdx, rcx  ; arg3:
-    pop rcx       ; arg4: 
-  
+    mov rdx, rcx  ; arg3
+    pop rcx       ; arg4 
 
 ; cpl
 ; Get the first 2 bits of cs.
@@ -79,7 +79,7 @@ _int128:
 ; #importante: temos que pegar cs na pilha e nao no registrador.
 ; talvez durante a systemcall o processador mude o cs para o valor 
 ; do seletor indicado na entrada da idt.
-    xor rax, rax
+    ;xor rax, rax
     mov rax, qword [.int128_cs]
     and rax, 3
     mov qword [_sci0_cpl], rax
@@ -125,8 +125,6 @@ _int128:
 .int128_rip: dq 0
 ;--  
 
-
-
 ;;-----
 ; _int129
 ;     System Call number 0x81
@@ -150,7 +148,6 @@ extern _sci1_cpl
 align 4  
 global _int129
 _int129:
-; Power
 
 ; #todo: 
 ; Maybe we can save the stack frame.
@@ -181,16 +178,16 @@ _int129:
     push rsp
     pushfq
 
-    ; Parameters:
-    ; RDI, RSI, RDX, RCX, R8, and R9 are used 
-    ; for integer and memory address arguments
+; Parameters:
+; Let's fill the parameters for the handler.
+; RDI, RSI, RDX, RCX, R8, and R9 are used 
+; for integer and memory address arguments
 
     mov rdi, rax  ; arg1: service number
-    mov rsi, rbx  ; arg2:
+    mov rsi, rbx  ; arg2
     push rdx      ; Saving arg4
-    mov rdx, rcx  ; arg3:
-    pop rcx       ; arg4: 
-
+    mov rdx, rcx  ; arg3
+    pop rcx       ; arg4 
 
 ; cpl
 ; Get the first 2 bits of cs.
@@ -198,11 +195,10 @@ _int129:
 ; #importante: temos que pegar cs na pilha e nao no registrador.
 ; talvez durante a systemcall o processador mude o cs para o valor 
 ; do seletor indicado na entrada da idt.
-    xor rax, rax
+    ;xor rax, rax
     mov rax, qword [.int129_cs]
     and rax, 3
     mov qword [_sci1_cpl], rax
-
 
     fxsave [__sw_local_fpu_buffer]
 
@@ -245,8 +241,6 @@ _int129:
 .int129_rip: dq 0
 ;--  
 
-
-
 ;;-----
 ; _int130
 ;     System Call number 0x82
@@ -269,7 +263,6 @@ extern _sci2_cpl
 align 4  
 global _int130
 _int130:
-; Love
 
 ; #todo: Maybe we can save the stack frame.
 
@@ -300,15 +293,15 @@ _int130:
     pushfq
 
 ; Parameters:
+; Let's fill the parameters for the handler.
 ; RDI, RSI, RDX, RCX, R8, and R9 are used 
 ; for integer and memory address arguments
 
     mov rdi, rax  ; arg1: service number
-    mov rsi, rbx  ; arg2:
+    mov rsi, rbx  ; arg2
     push rdx      ; Saving arg4
-    mov rdx, rcx  ; arg3:
-    pop rcx       ; arg4: 
-
+    mov rdx, rcx  ; arg3
+    pop rcx       ; arg4 
 
 ; cpl
 ; Get the first 2 bits of cs.
@@ -316,7 +309,7 @@ _int130:
 ; #importante: temos que pegar cs na pilha e nao no registrador.
 ; talvez durante a systemcall o processador mude o cs para o valor 
 ; do seletor indicado na entrada da idt.
-    xor rax, rax
+    ;xor rax, rax
     mov rax, qword [.int130_cs]
     and rax, 3
     mov qword [_sci2_cpl], rax
@@ -362,7 +355,6 @@ _int130:
 .int130_rip: dq 0
 ;--    
 
-
 ;;-----
 ; _int131
 ;     System Call number 0x82
@@ -385,7 +377,6 @@ extern _sci3_cpl
 align 4  
 global _int131
 _int131:
-; Rest
 
 ; #todo: Maybe we can save the stack frame.
 
@@ -416,15 +407,15 @@ _int131:
     pushfq
 
 ; Parameters:
+; Let's fill the parameters for the handler.
 ; RDI, RSI, RDX, RCX, R8, and R9 are used 
 ; for integer and memory address arguments
 
     mov rdi, rax  ; arg1: service number
-    mov rsi, rbx  ; arg2:
+    mov rsi, rbx  ; arg2
     push rdx      ; Saving arg4
-    mov rdx, rcx  ; arg3:
-    pop rcx       ; arg4: 
-
+    mov rdx, rcx  ; arg3
+    pop rcx       ; arg4
 
 ; cpl
 ; Get the first 2 bits of cs.
@@ -432,7 +423,7 @@ _int131:
 ; #importante: temos que pegar cs na pilha e nao no registrador.
 ; talvez durante a systemcall o processador mude o cs para o valor 
 ; do seletor indicado na entrada da idt.
-    xor rax, rax
+    ;xor rax, rax
     mov rax, qword [.int131_cs]
     and rax, 3
     mov qword [_sci3_cpl], rax
@@ -478,8 +469,7 @@ _int131:
 .int131_rip: dq 0
 ;--    
 
-
-
+; ====================================
 ; int 198
 ; Restorer.
 ; Used to return from ring 3 to ring0

@@ -2,68 +2,6 @@
 ; This file handles the traps for the x86_64 processors.
 ; Only hw interrupts.
 
-align 16
-__hw_fpu_buffer:
-    times 512 db 0
-align 16
-
-
-;================================
-global _DisableSSE
-_DisableSSE:
-    push rax
-    mov rax, cr0
-    or ax, 1 << 3    ;Set TS
-    mov cr0, rax
-    pop rax
-    ret
-
-;================================
-global _EnableSSE
-_EnableSSE:
-    push rax
-    mov rax, cr0
-    and ax, ~(1 << 3)    ; Clear TS
-    mov cr0, rax
-    pop rax
-    ret
-
-;================================
-; Advanced Vector Extensions is a SIMD (Single Instruction, Multiple Data) 
-; instruction set introduced by Intel in 2011.
-; AVX is enabled by setting bit 2 of the XCR0 register. 
-; Bit 1 of XCR0 must also be set (indicating SSE support).
-; See: 
-; https://wiki.osdev.org/SSE
-; https://en.wikipedia.org/wiki/AVX-512
-global _x64_enable_avx
-_x64_enable_avx:
-
-    push rax
-    push rcx
-    push rdx
-
-    xor rcx, rcx
-    xgetbv     ; Load XCR0 register
-    or eax, 7  ; Set AVX, SSE, X87 bits
-    xsetbv     ; Save back to XCR0
-
-    pop rdx
-    pop rcx
-    pop rax
-    ret
-
-;;=====================================================
-;;  ## TIMER ##
-;;=====================================================
-;; _irq0: 
-;; IRQ 0. 
-;; Timer interrupt handler
-;; See:
-;; 1pump/arch/x86_64/pit.c
-;; 0mem/core/ps/disp/ts.c
-;;
-
 ;
 ; Imports
 ;
@@ -113,6 +51,84 @@ extern _context_fpu_buffer
 
 ; ...
 
+
+
+align 16
+__hw_fpu_buffer:
+    times 512 db 0
+align 16
+
+;================================
+global _DisableSSE
+_DisableSSE:
+    push rax
+    mov rax, cr0
+    or ax, 1 << 3    ;Set TS
+    mov cr0, rax
+    pop rax
+    ret
+
+;================================
+global _EnableSSE
+_EnableSSE:
+    push rax
+    mov rax, cr0
+    and ax, ~(1 << 3)    ; Clear TS
+    mov cr0, rax
+    pop rax
+    ret
+
+;================================
+; Advanced Vector Extensions is a SIMD (Single Instruction, Multiple Data) 
+; instruction set introduced by Intel in 2011.
+; AVX is enabled by setting bit 2 of the XCR0 register. 
+; Bit 1 of XCR0 must also be set (indicating SSE support).
+; See: 
+; https://wiki.osdev.org/SSE
+; https://en.wikipedia.org/wiki/AVX-512
+global _x64_enable_avx
+_x64_enable_avx:
+
+    push rax
+    push rcx
+    push rdx
+
+    xor rcx, rcx
+    xgetbv     ; Load XCR0 register
+    or eax, 7  ; Set AVX, SSE, X87 bits
+    xsetbv     ; Save back to XCR0
+
+    pop rdx
+    pop rcx
+    pop rax
+    ret
+
+
+; #todo: Move to unit 2
+; ---------------------------------------------------------------------
+; reboot -- Reboot the computer
+hw_reboot:
+	in al, 0x64
+	test al, 00000010b		; Wait for an empty Input Buffer
+	jne hw_reboot
+	mov al, 0xFE
+	out 0x64, al			; Send the reboot call to the keyboard controller
+	jmp hw_reboot
+; ----------------------------------------------------------------------
+
+
+;;=====================================================
+;;  ## TIMER ##
+;;=====================================================
+;; _irq0: 
+;; IRQ 0. 
+;; Timer interrupt handler
+;; See:
+;; 1pump/arch/x86_64/pit.c
+;; 0mem/core/ps/disp/ts.c
+;;
+
+
 ;================================
 extern _irq0_TIMER
 ; Capture context
@@ -148,7 +164,6 @@ _irq0:
     mov qword [_contextRSI], rsi 
 
 ; Data segments
-; gs,fs,es,ds
     xor rax, rax
     mov ax, gs
     mov word [_contextGS], ax
@@ -197,20 +212,6 @@ _irq0:
     jmp irq0_release
 ; --------------------------------------
 
-
-
-; #todo: Move to unit 2
-; ---------------------------------------------------------------------
-; reboot -- Reboot the computer
-hw_reboot:
-	in al, 0x64
-	test al, 00000010b		; Wait for an empty Input Buffer
-	jne hw_reboot
-	mov al, 0xFE
-	out 0x64, al			; Send the reboot call to the keyboard controller
-	jmp hw_reboot
-; ----------------------------------------------------------------------
-
 ;========================================
 ; _irq1:
 ;     IRQ 1 - Keyboard.
@@ -223,8 +224,6 @@ extern _irq1_KEYBOARD
 align 4  
 global _irq1  
 _irq1:
-; ...
-
 ; Maskable interrupt
 
     cli
@@ -254,7 +253,6 @@ _irq1:
     mov qword [_contextRSI], rsi 
 
 ; Data segments
-; gs,fs,es,ds
     xor rax, rax
     mov ax, gs
     mov word [_contextGS], ax
@@ -338,14 +336,12 @@ _irq1:
     mov rcx, qword [_contextRCX] 
     mov rdx, qword [_contextRDX] 
 
-
-    ;; Stack frame. (all double)
+; Stack frame. (all double)
     push qword [_contextSS]      ; ss
     push qword [_contextRSP]     ; rsp
     push qword [_contextRFLAGS]  ; rflags
     push qword [_contextCS]      ; cs
     push qword [_contextRIP]     ; rip
-
 
     ; send EOI to XT keyboard
     ;in      al, 061h
@@ -355,17 +351,16 @@ _irq1:
     ;mov     al, ah
     ;out     061h, al
 
-    ;; EOI - Only the first PIC.
+; EOI - Only the first PIC.
     xor rax, rax 
     MOV AL, 020h
     OUT 020h, AL
-    IODELAY  
+    ;IODELAY  
 
     ;; variável usada pelo dispatcher.
     ;mov dword [_irq0PendingEOI], 0
 
-
-    ; Acumulator.
+    ; Acumulator
     mov rax, qword [_contextRAX]
 
 ; #bugbug
@@ -374,9 +369,7 @@ _irq1:
 
     sti
     iretq
-
 ;;===========================
-
 
 ;=======================================================
 ; IRQ 3 - serial port controller for serial port 2 
@@ -389,6 +382,9 @@ align 4
 global _irq3
 _irq3:
 ; Maskable interrupt
+
+    ; #todo
+    ; Work on this routine to make it kinda like the irq0.
 
     cli
     
@@ -420,7 +416,7 @@ _irq3:
 ; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
-    IODELAY  
+    ;IODELAY  
     
     ;popad
     pop gs
@@ -466,6 +462,9 @@ global _irq4
 _irq4:
 ; Maskable interrupt
 
+    ; #todo
+    ; Work on this routine to make it kinda like the irq0.
+
     cli
     ;pushad
     push rax
@@ -495,7 +494,7 @@ _irq4:
 ; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
-    IODELAY  
+    ;IODELAY  
     
     ;popad
     pop gs
@@ -527,19 +526,15 @@ _irq4:
     iretq
 ;================================
 
-
 ;--------------
 ; IRQ 5 - parallel port 2 and 3  or  sound card
 ;_irq5:
 ;    iretd
 
-
 ;--------------
 ; IRQ 6  floppy disk controller
 ;_irq6:
 ;    iretd
-
-
 
 ;===================================================
 ;IRQ 7 parallel port 1. 
@@ -558,6 +553,9 @@ align 4
 global _irq7
 _irq7:
 ; Maskable interrupt
+
+    ; #todo
+    ; Work on this routine to make it kinda like the irq0.
 
     cli
     ;pushad
@@ -581,7 +579,6 @@ _irq7:
     ;push es
     push fs
     push gs
-
 
 ; ++
 ; ================================================
@@ -609,7 +606,7 @@ ExitParallelPort_WithEOI:
     ;xor rax, rax
     mov al, 0x20
     out 0x20, al   
-    IODELAY  
+    ;IODELAY  
 
 ; No eoi for irq 7 spurious
 ExitParallelPort_WithoutEOI:
@@ -654,6 +651,9 @@ global _irq8
 _irq8:
 ; Maskable interrupt
 
+    ; #todo
+    ; Work on this routine to make it kinda like the irq0.
+
     cli
     ;pushad
     push rax
@@ -684,9 +684,10 @@ _irq8:
     mov al, 0x20
     out 0xA0, al  
     IODELAY  
+    IODELAY
     out 0x20, al
-    IODELAY  
-    
+    ;IODELAY  
+
     ;popad
     pop gs
     pop fs
@@ -797,102 +798,22 @@ _irq9:
     sti
     iretq
 
-;;==========================================
-
-
-
-;========================================================
-; IRQ 10  The Interrupt is left open for the use 
-; of peripherals (open interrupt/available, SCSI or NIC)
-; nvidia
-; Capture context
-align 4  
-global _irq10
-_irq10:
-; Maskable interrupt
-
-    ;; #test
-    jmp unhandled_irq
-    jmp $
-
-    cli
-    ;pushad
-    push rax
-    push rbx
-    push rcx
-    push rdx
-    push rsi
-    push rdi
-    push rbp
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r13
-    push r14
-    push r15
-    
-    ;push ds
-    ;push es
-    push fs
-    push gs
-
-
-    ;call _PciHandler1
-
-    ;; EOI.
-    ;; Order: Second, first.
-    mov al, 0x20
-    out 0xA0, al  
-    IODELAY  
-    out 0x20, al
-    IODELAY  
-    
-    ;popad
-    pop gs
-    pop fs
-    ;pop es
-    ;pop ds
-    
-    ;#bugbug
-    ;#todo: Pop the registers.
-    ;popad
-    
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rbp
-    pop rdi
-    pop rsi
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
-
-    sti
-    iretq
 
 ;;==========================================
-
-;=============================
+; _irq9_nic_handler:
 ; e1000 Intel nic handler.
+; This is a work in progress!
 ; interrupção ?. irq ?;
+; Temporary: interrupção 41. irq 9
+; #bugbug: Remember, each nic can have a different interrupt 
+; number, this handler was hardcoded just for irq9 in header3.asm 
+; valid just for virtualbox. Maybe qemu uses another number.
+; See _asm_nic_create_new_idt_entry() in header3.asm
 ; see: e1000.c
-
 extern _irq_E1000
-
-;===============================================
-;  interrupção 41. irq 9
-; Capture context
 align 4  
-global _nic_handler
-_nic_handler:
+global _irq9_nic_handler
+_irq9_nic_handler:
 ; Maskable interrupt
 
     cli
@@ -1005,8 +926,7 @@ _nic_handler:
     mov rcx, qword [_contextRCX] 
     mov rdx, qword [_contextRDX] 
 
-
-    ;; Stack frame. (all double)
+; Stack frame. (all double)
     push qword [_contextSS]      ; ss
     push qword [_contextRSP]     ; rsp
     push qword [_contextRFLAGS]  ; rflags
@@ -1016,13 +936,13 @@ _nic_handler:
 ; EOI: Order: Second, first.
     mov al, 0x20
     out 0xA0, al
-    IODELAY  
-    out 0x20, al
     IODELAY
+    IODELAY
+    out 0x20, al
+    ;IODELAY
 
     ;; variável usada pelo dispatcher.
     ;mov dword [_irq0PendingEOI], 0
-
 
     ; Acumulator.
     mov rax, qword [_contextRAX]
@@ -1034,6 +954,86 @@ _nic_handler:
     sti
     iretq
 ;===========================
+
+;========================================================
+; IRQ 10  The Interrupt is left open for the use 
+; of peripherals (open interrupt/available, SCSI or NIC)
+; nvidia
+; Capture context
+align 4  
+global _irq10
+_irq10:
+; Maskable interrupt
+
+    ;; #test
+    jmp unhandled_irq
+    jmp $
+
+    cli
+    ;pushad
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push rbp
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+    
+    ;push ds
+    ;push es
+    push fs
+    push gs
+
+
+    ;call _PciHandler1
+
+    ;; EOI.
+    ;; Order: Second, first.
+    mov al, 0x20
+    out 0xA0, al  
+    IODELAY  
+    out 0x20, al
+    IODELAY  
+    
+    ;popad
+    pop gs
+    pop fs
+    ;pop es
+    ;pop ds
+    
+    ;#bugbug
+    ;#todo: Pop the registers.
+    ;popad
+    
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+
+    sti
+    iretq
+
+;;==========================================
+
 
 ;=======================================
 ; IRQ 11 - The Interrupt is left open for 
@@ -1113,7 +1113,6 @@ _irq11:
     iretq
 ;===================
 
-
 ;=======================================
 ; IRQ 12 - mouse on PS/2 connector
 ; See: /i8042/mouse.c
@@ -1125,75 +1124,148 @@ _irq12:
 ; Maskable interrupt
 
     cli
-; Acumulator.
-    push rax
 
-    push rax
-    push rbx
-    push rcx
-    push rdx
-    push rsi
-    push rdi
-    push rbp
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r13
-    push r14
-    push r15
+; No caso do dispatcher lançar uma nova thread,
+; então ele deve acionar enviar um EIO.
+
+    ; mov dword [_irq0PendingEOI], 1
+
+;; == Save context ====================
     
-    ;push ds
-    ;push es
-    push fs
-    push gs
-    push rsp
-    pushfq
-    cld
+    ; Stack frame. (all double)
+    pop qword [_contextRIP]     ; rip
+    pop qword [_contextCS]      ; cs
+    pop qword [_contextRFLAGS]  ; rflags
+    pop qword [_contextRSP]     ; rsp
+    pop qword [_contextSS]      ; ss
+
+    mov qword [_contextRDX], rdx 
+    mov qword [_contextRCX], rcx 
+    mov qword [_contextRBX], rbx 
+    mov qword [_contextRAX], rax
+     
+    mov qword [_contextRBP], rbp
+ 
+    mov qword [_contextRDI], rdi 
+    mov qword [_contextRSI], rsi 
+
+; Data segments
+; gs,fs,es,ds
+    xor rax, rax
+    mov ax, gs
+    mov word [_contextGS], ax
+    mov ax, fs
+    mov word [_contextFS], ax
+    mov ax, es
+    mov word [_contextES], ax
+    mov ax, ds
+    mov word [_contextDS], ax
+
+; FPU
+; See:
+; https://wiki.osdev.org/SSE
+    fxsave [_context_fpu_buffer]
+
+; #todo
+; Media, float pointers, debug.
+; #important:
+; We are using the kernel segment registers.
+; Kernel data segments and stack.
+; #bugbug: sempre a mesma pilha?
+; Que pilha as interrupçoes de softwar estao usando?
+
+;
+; Calls
+;
+
+; cpl
+; Get the first 2 bits of cs.
+; see: x64cont.c
+    mov rax, qword [_contextCS]
+    and rax, 3
+    mov [_contextCPL], rax
+
 
 ; See: 
-; mouse.c
-
-    fxsave [__hw_fpu_buffer]
-
+; keyboard.c
     call _irq12_MOUSE
 
-    fxrstor [__hw_fpu_buffer]
 
-    popfq
-    pop rsp
-    pop gs
-    pop fs
-    ;pop es
-    ;pop ds
+; FPU
+    fxrstor [_context_fpu_buffer]
 
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rbp
-    pop rdi
-    pop rsi
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
+; Release a bandit.
+
+; 64bit
+; This is a 64bit pointer to the pml4 table.
+
+; #bugbug
+; Não precisamos fazer refresh em todo tick,
+; somente quando houver troca de tarefa.
+
+    mov RAX, CR3  
+    IODELAY 
+    mov CR3, RAX  
+
+; Wait TLB.
+    ;IODELAY 
+;
+; == Restore context ====================
+;
+
+    ; Segments
+    xor rax, rax
+    mov ax, word [_contextDS]
+    mov ds, ax
+    mov ax, word [_contextES]
+    mov es, ax
+    mov ax, word [_contextFS]
+    mov fs, ax
+    mov ax, word [_contextGS]
+    mov gs, ax
+
+    mov rsi, qword [_contextRSI] 
+    mov rdi, qword [_contextRDI] 
+    
+    mov rbp, qword [_contextRBP] 
+    
+    mov rax, qword [_contextRAX] 
+    mov rbx, qword [_contextRBX] 
+    mov rcx, qword [_contextRCX] 
+    mov rdx, qword [_contextRDX] 
+
+; Stack frame. (all double)
+    push qword [_contextSS]      ; ss
+    push qword [_contextRSP]     ; rsp
+    push qword [_contextRFLAGS]  ; rflags
+    push qword [_contextCS]      ; cs
+    push qword [_contextRIP]     ; rip
+
+    ; send EOI to XT keyboard
+    ;in      al, 061h
+    ;mov     ah, al
+    ;or      al, 080h
+    ;out     061h, al
+    ;mov     al, ah
+    ;out     061h, al
 
 ;EOI order: Second, first.
-
     mov al, 0x20
     out 0xA0, al 
     IODELAY 
-    out 0x20, al
     IODELAY 
+    out 0x20, al
+    ;IODELAY 
 
-;The acumulator.
-    pop rax
+    ;; variável usada pelo dispatcher.
+    ;mov dword [_irq0PendingEOI], 0
+
+    ; Acumulator
+    mov rax, qword [_contextRAX]
+
+; #bugbug
+; We do NOT need the 'sti'. 
+; The flags in the 'eflags' will reenable it.
 
     sti
     iretq
@@ -1238,8 +1310,6 @@ _irq13:
     push fs
     push gs
 
-
-
     ;call _coprocessorHandler
 
     ;; EOI.
@@ -1276,12 +1346,10 @@ _irq13:
     pop rbx
     pop rax
 
-
     sti
     iretq
 
 ;==========================================
-
 
 ;============================================
 ; _irq14:
@@ -1295,6 +1363,9 @@ align 4
 global _irq14
 _irq14:
 ; Maskable interrupt
+
+    ; #todo
+    ; Work on this routine to make it kinda like the irq0.
 
     cli 
     
@@ -1334,8 +1405,8 @@ _irq14:
     IODELAY
     IODELAY  
     OUT 020h,AL
-    IODELAY
-    IODELAY  
+    ;IODELAY
+    ;IODELAY  
     
     ;POPAD
     ;pop eax
@@ -1365,9 +1436,7 @@ _irq14:
     pop rax
 
     sti
-
-    IRETQ    
-    
+    iretq 
 
 ;=================================================	
 ; _irq15:
@@ -1388,6 +1457,9 @@ align 4
 global _irq15
 _irq15:
 ; Maskable interrupt
+
+    ; #todo
+    ; Work on this routine to make it kinda like the irq0.
 
     cli
     
@@ -1414,7 +1486,6 @@ _irq15:
     push fs
     push gs
 
-
     fxsave [__hw_fpu_buffer]
 
     call _irq15_SECONDARY_IDE
@@ -1433,8 +1504,8 @@ _irq15:
     IODELAY
     IODELAY  
     OUT 020h, AL
-    IODELAY
-    IODELAY  
+    ;IODELAY
+    ;IODELAY  
 
     ;POPAD
     ;pop eax
@@ -1464,48 +1535,41 @@ _irq15:
     pop rax
 
     sti
-    IRETQ
-
+    iretq 
 ; =======================
-
-
-
-
-
-
-
-
-
-
-
 
 ;========================================
 ; unhandled_irq:
 ;     Interrupção de hardware genérica. 
 ;++ 
 
-;; #bugbug
-;; Não podemos efetuar EOI para todos 
-;; somente para as irqs.
+; #bugbug
+; Não podemos efetuar EOI para todos 
+; somente para as irqs.
 
 extern _faults
 
 unhandled_irq:
     cli
     push rax
+
+; #bugbug
+; We can't use EOI for every interrupt,
+; just for some of them.
+
     mov al, 0x20
     out 0xA0, al
     IODELAY  
     IODELAY  
+
     out 0x20, al
-    IODELAY
-    IODELAY  
+    ;IODELAY
+    ;IODELAY  
+
     pop rax
     sti 
     iretq
 ;--
-
-
 
 ;----------------------------
 ; Building trampolines for the faults.
@@ -1523,7 +1587,7 @@ _fault_N0:
 ; int 1 
 global _fault_N1
 _fault_N1:
-     mov qword [_save_fault_number], qword 1
+    mov qword [_save_fault_number], qword 1
     jmp all_faults
 
 ; int 2 
@@ -1744,24 +1808,23 @@ all_faults:
     mov qword [_contextRSI], rsi 
 
 ; Segments
-
     xor rax, rax
-    
-    ; Is it used?
     mov ax, gs
     mov word [_contextGS], ax
-    ; Is it used?
     mov ax, fs
     mov word [_contextFS], ax
-    
     mov ax, es
     mov word [_contextES], ax
     mov ax, ds
     mov word [_contextDS], ax
 
-    ; cpl
-    ; see: x64cont.c
+; FPU
+; See:
+; https://wiki.osdev.org/SSE
+    fxsave [_context_fpu_buffer]
 
+; cpl
+; see: x64cont.c
     mov rax, qword [_contextCS]
     and rax, 3
     mov [_contextCPL], rax
@@ -1771,7 +1834,10 @@ all_faults:
     mov rax, qword [_save_fault_number]
     mov rdi, rax 
     call _x64_nmi 
-    
+
+; FPU
+    fxrstor [_context_fpu_buffer]
+
     ;jmp _AllFaultsHang
 
 ; retornaremos com o contexto da proxima thread,
@@ -1783,7 +1849,6 @@ all_faults:
     mov RAX, CR3  
     IODELAY 
     mov CR3, RAX  
-
 
 ;
 ; == Restore context ====================
@@ -1818,7 +1883,7 @@ all_faults:
     push qword [_contextCS]      ; cs
     push qword [_contextRIP]     ; rip
 
-    ; Acumulator.
+    ; Acumulator
     mov rax, qword [_contextRAX]
 
 ; #bugbug
@@ -1848,7 +1913,4 @@ _save_fault_number:
     dq 0
     
 align 8
-
-
-
 

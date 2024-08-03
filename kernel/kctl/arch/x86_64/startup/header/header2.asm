@@ -1,4 +1,3 @@
-
 ; header2.asm
 ; Constants and macros.
 ; 2018 - Created by Fred Nora.

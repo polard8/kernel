@@ -1,6 +1,7 @@
 ; hw2.asm
 ; This file handles the traps for the x86_64 processors.
 ; Only hw interrupts.
+; Created by Fred Nora.
 
 ;
 ; Imports
@@ -194,24 +195,22 @@ irq0_release:
     mov rcx, qword [_contextRCX] 
     mov rdx, qword [_contextRDX] 
 
-
-    ;; Stack frame. (all double)
+; Stack frame. (all double)
     push qword [_contextSS]      ; ss
     push qword [_contextRSP]     ; rsp
     push qword [_contextRFLAGS]  ; rflags
     push qword [_contextCS]      ; cs
     push qword [_contextRIP]     ; rip
 
-    ; EOI - Only the first PIC.
+; EOI - Only the first PIC.
     mov al, 20h
     out 20h, al  
-    IODELAY  
+    ;IODELAY  
 
     ;; variável usada pelo dispatcher.
     ;mov dword [_irq0PendingEOI], 0
 
-
-    ; Acumulator.
+; Acumulator
     mov rax, qword [_contextRAX]
 
 ; #bugbug

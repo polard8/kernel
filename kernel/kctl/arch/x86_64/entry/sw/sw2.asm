@@ -1,5 +1,6 @@
-
 ; sw2.asm
+; Software interrupts support.
+; Created by Fred Nora.
 
 ;; ==============================================
 ;; unhandled interrupts
@@ -12,11 +13,4 @@ unhandled_int:
 ; #todo: 
 ; Criar um contador para isso.
     iretq
-
-
-    
-    
-
-
-
 

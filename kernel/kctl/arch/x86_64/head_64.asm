@@ -1,6 +1,6 @@
-
 ; head_64.asm
 ; Kernel entry point.
+; Created by Fred Nora.
 
 %include "header/header1.asm"
 
@@ -24,11 +24,11 @@ extern _system_state
 ; Function table
 ; see: mod.c
 ; see: newm0/
-extern _xp_die                   ;; 0 (no arg)
-extern _xp_putchar_test          ;; 1 (no arg)
-extern _xp_reboot                ;; 2 (no arg)
-extern _xp_refresh_screen        ;; 3 (no arg)
-extern _xp_putchar_in_fgconsole  ;; 4 (1 arg)
+extern _xp_die                   ; 0 (no arg)
+extern _xp_putchar_test          ; 1 (no arg)
+extern _xp_reboot                ; 2 (no arg)
+extern _xp_refresh_screen        ; 3 (no arg)
+extern _xp_putchar_in_fgconsole  ; 4 (1 arg)
 ; ...
 ;---------------------------------------------
 

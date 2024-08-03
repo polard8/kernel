@@ -1,8 +1,8 @@
-
 ; header3.asm
+; Created by Fred Nora.
 
-;; See:
-;; head_64.asm for the stack.
+; See:
+; head_64.asm for the stack.
 
 align 8
 tss0:
@@ -49,15 +49,14 @@ tss1_end:
 
 
 ; ==================================
+; Clear Nested Task bit in RFLAGS.
+; bit 14 - NT, Nested task flag.
 ; Limpar a flag nt em rflags
 ; e dar refresh na pipeline. #todo
 ; Isso evita taskswitching via hardware quando em 32bit.
 
 global _x64_clear_nt_flag
 _x64_clear_nt_flag:
-; Clear Nested Task bit in RFLAGS.
-; bit 14 - NT, Nested task flag.
-
     push rax
     push rbx
 
@@ -73,16 +72,14 @@ _x64_clear_nt_flag:
     pop rax
     ret
 
-
 ; Called by x64_init_gdt() in x64.c
 global _gdt_flush
 _gdt_flush:
 
     mov rax, rdi
-
     lgdt [rax]
 
-    mov rax, 0x10
+    mov rax, 0x10  ; Hardcoded
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -90,9 +87,6 @@ _gdt_flush:
     mov ss, ax
 
     ret
-
-
-
 
 ;=================================================
 ; setup_idt:
@@ -128,13 +122,11 @@ setup_idt:
     shr rax, 32
     mov dword [d_offset_63_32], eax
 
- 
     ;; Isso forma os primeiros 32bit da entrada.
     ;; (offset low and selector)
     ;mov eax, dword 0x00080000     ; Step1: selector = 0x0008 = cs  na parte alta.
     ;mov ax, dx                   ; Step2: uma parte do endereço na parte baixa (16 bits)
     ;mov ax, word  [d_offset_15_0] ; Step2: uma parte do endereço na parte baixa (16 bits)
-
 
     ;; #test
     ;; Se a intenção é nos proteger
@@ -201,7 +193,6 @@ rp_sidt:
 
     jne rp_sidt           ;; circula
 
-
     ; #bugbug
     ; No. We will do this later.
     ; lidt [IDT_register]
@@ -217,7 +208,6 @@ d_offset_15_0:  dw 0
 d_offset_31_16: dw 0
 d_offset_63_32: dd 0
 ;;====================================
-
 
 ; =============================================================
 ; _setup_system_interrupt: 
@@ -461,7 +451,7 @@ setup_faults:
     call _setup_system_interrupt
     pop rbx
     pop rax
-    RET
+    ret  
 
 ;=====================================
 ; setup_vectors:
@@ -582,7 +572,6 @@ setup_vectors:
 
     ret
 
-
 ;;=================================================
 ;; # NIC #
 ;; O kernel chma isso provisoriamente para criar uma entrada
@@ -612,14 +601,19 @@ _asm_nic_create_new_idt_entry:
 ;; #bugbug: não usaremos o endereço enviado pois temos que configurar 
 ;; o EOI e a pilha da rotina de handler.
 
-    mov rax, qword _nic_handler
+    mov rax, qword _irq9_nic_handler
     ;mov rax, qword [_nic_idt_entry_new_address]
 
-;; Isso é o número da interrupção. (41)
-;; #bugbug: na virtualbox é 9 mas no qemu é 11.
-    ;mov rbx, qword [_nic_idt_entry_new_number]
-    mov rbx, qword 41 ;32+9
+; (41) ?
+; Isso é o número da interrupção. 
+; #bugbug: 
+; Na virtualbox é 9 mas no qemu é 11?
+; #todo
+; We gotta get this number during the initialization
+; and setup a valid number here not this hardcoded 41.
 
+    ;mov rbx, qword [_nic_idt_entry_new_number]
+    mov rbx, qword 41  ;32+9
     call _setup_system_interrupt
 
 ;; #test: 

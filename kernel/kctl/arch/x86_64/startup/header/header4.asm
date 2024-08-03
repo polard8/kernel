@@ -1,5 +1,5 @@
-
 ; header4.asm
+; Created by Fred Nora.
 
 ;extern _Module0EntryPoint
 
@@ -20,36 +20,30 @@ _asm_initialize_module0:
 ; Send the reboot call to the keyboard controller.
 ;
 
-PS2KEYBOARD_CMD_REBOOT EQU  0xFE
+PS2KEYBOARD_PORT        EQU  0x64
+PS2KEYBOARD_CMD_REBOOT  EQU  0xFE
 
 global _asm_reboot
 _asm_reboot:
 
     xor rax, rax
-    in al, 0x64
 
-; #test ? Status ?
+; Get value and test status
+    in al, PS2KEYBOARD_PORT
     test al, 00000010b
     jne _asm_reboot
 
-; Send command.
+; Send command
     mov al, PS2KEYBOARD_CMD_REBOOT
-    out 0x64, al
-
+    out PS2KEYBOARD_PORT, al
 .Lloop:
     cli
     hlt
     jmp .Lloop
 
-; ---------------------------
-; Reboot procedure.  
-; Wrapper
+
+;=====================================
+; Wrapper for reboot function.
 unit4_reboot:
     jmp _asm_reboot
-    
-    
-
-
-
-
 
