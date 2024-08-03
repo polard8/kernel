@@ -1,6 +1,8 @@
-;
-; bm2/main.asm 
-;    Main file of Boot manager.
+; main.asm 
+; Main file of Boot manager.
+; 2005 - Created by Fred Nora. 
+
+; Credits: MikeOS (License: BSD).
 ; Video modes:
 ; ============
 ; VirtualBox:
@@ -15,9 +17,7 @@
 ; The main resolution is 800x600x24.
 ; The only way to change the resolution for now is 
 ; changing a global variable in this document.
-; History:
-; 2005 - Created by Fred Nora. 
-; Credits: MikeOS (License: BSD).
+
 ;---------------------------------------------------
 ; #importante
 ; This image was loaded in 0H:8000H.
@@ -29,31 +29,31 @@
 ; 32KB is the limit for this program?
 ; We are almost there.
 
-;       +----------+
-;       |    ...   | 
-;       |----------| 
-;       |  BL.BIN  | 
-;       |  (32bit) | Boot loader in C.
-;       |----------| 0x2000:0x0000
-;       |          | 
-;       |   ...    | 
-;       |          | 
-;       |----------| 0x0000:0xFFFF
-;       |          | 
-;       |  BM2.BIN | 
-;       |          | The entry point.
-;  >>>  |----------| 0x0000:0x8000
-;       |          |
-;       |----------| 0x0000:0x6000
-;       |  INITIAL | Initial stack address.
-;       |   STACK  | It goes down.
-;       |----------| 
-;       |          |
-;       |----------| 
-;       | FAT/ROOT |
-;       |----------| 0x0000:0x1000
-;       |          |
-;       +----------+
+;       +------------+
+;       |     ...    | 
+;       |------------| 
+;       | BLGRAM.BIN | 
+;       |   (32bit)  | Boot loader in C.
+;       |------------| 0x2000:0x0000
+;       |            | 
+;       |     ...    | 
+;       |            | 
+;       |------------| 0x0000:0xFFFF
+;       |            | 
+;       |   BM2.BIN  | 
+;       |            | The entry point.
+;  >>>  |------------| 0x0000:0x8000
+;       |            |
+;       |------------| 0x0000:0x6000
+;       |   INITIAL  | Initial stack address.
+;       |    STACK   | It goes down.
+;       |------------| 
+;       |            |
+;       |------------| 
+;       |  FAT/ROOT  |
+;       |------------| 0x0000:0x1000
+;       |            |
+;       +------------+
 
 	%DEFINE GBM_VER '1.1'	; version number
 
@@ -310,7 +310,7 @@ menu_loop:
 ; O right foi selecionado?
 ; Se não foi o right então carregue a imagem.
 ; usaremos a opçao de boot default.
-; Load the BL.BIN image.
+; Load the BLGRAM.BIN image.
     cmp ax, 1 
 ; >> GUI::
     jne near after_menu
@@ -332,10 +332,10 @@ after_menu:
     call Window.ClearScreen
 
 ;
-; Load the BL.BIN image at 2000H:0000H
+; Load the BLGRAM.BIN image at 2000H:0000H
 ;
 
-; Load the BL.BIN image at 2000H:0000H.
+; Load the BLGRAM.BIN image at 2000H:0000H.
 ; see: feature/disk.inc
 ; This routine starts the system based on a flag,
 ; that will tell us if we start the system using the graphics mode
@@ -346,11 +346,12 @@ after_menu:
 load_bootloader_image:
 
 ; Load image1
-    ;mov ax, word bootmanager_ImageName1
-    ;call diskLoadBL
-; Load image2
-    mov ax, word bootmanager_ImageName2
+    mov ax, word ImageName_GramadoOSBootloader
     call diskLoadBL
+
+; Load image2
+    ;mov ax, word ImageName_GramadoOSBootloader
+    ;call diskLoadBL
 
 ; Trampoline:
 ; see: features/finish.inc
@@ -371,10 +372,13 @@ Trampoline:
     dialog_string_2  db '+ [OK] to initialize the system       ', 0
     dialog_string_3  db '+ [Cancel] for command line           ', 0
 
-bootmanager_ImageName1:
-    db "BL      BIN", 0x0D, 0x0A, 0x00
-bootmanager_ImageName2:
-    db "BL      BIN", 0x0D, 0x0A, 0x00
+; Gramado OS bootloader.
+ImageName_GramadoOSBootloader:
+    db "BLGRAM  BIN", 0x0D, 0x0A, 0x00
+
+; Another OS bootloader.
+;ImageName_AnotherOSBootloader:
+    ;db "12345678BIN", 0x0D, 0x0A, 0x00
 
 ;
 ; == Includes ========
@@ -460,7 +464,7 @@ bootmanager_main:
 ; 5 - File.
     %include "k32/installer.inc"   ;Instala metafiles em LBAs específicas.
     %include "k32/fs/file.inc"     ;Operaçoes com aquivos.
-    %include "k32/bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
+    %include "k32/bootloader.inc"  ;Carrega o Boot Loader (BLGRAM.BIN).
 ; 4 - Debug.
 ; System debug.
     %include "k32/debug.inc"

@@ -1,10 +1,12 @@
 # Compiling Gramado Boot Loader
-# BL.BIN
+# GRAMLOAD.BIN
 # 2018 - Created by Fred Nora.
 #      - Adapted from Matheus Castello's script.
 # todo:
 # The goal here is to create a 64bit boot loader.
 # The will loader a 64bit kernel image.
+
+linkTarget = BLGRAM.BIN 
 
 VERSION = 1
 PATCHLEVEL = 0
@@ -101,15 +103,15 @@ bl-x86:
 	$(CC) -c dd/ide.c       -I include/ $(CFLAGS)  -o ide.o
 	$(CC) -c dd/storage.c   -I include/ $(CFLAGS)  -o storage.o
 
-link-x86:
 #todo:
-# Change to ELF.
-	$(LD) -m i386pe -T x86/link.ld -o BL.BIN $(myObjects)    
+# Change to 32bit ELF. Maybe.
+link-x86:
+	$(LD) -m i386pe -T x86/link.ld -o $(linkTarget) $(myObjects)    
 finalize:
-	cp BL.BIN ../bin/
+	cp $(linkTarget) ../bin/
 clean:
 	find . -type f -name '*.o' -delete
-	-rm BL.BIN
+	-rm $(linkTarget)
 clean2:
-	-rm BL.BIN
+	-rm $(linkTarget)
 	

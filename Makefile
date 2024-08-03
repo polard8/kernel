@@ -135,10 +135,10 @@ build-gramado-os:
 # Copy to the target folder.
 	cp boot/x86/bin/BM2.BIN  $(BASE)/
 
-# ::Build BL.BIN.
-	$(Q)$(MAKE) -C boot/x86/bl/ 
+# ::Build BLGRAM.BIN
+	$(Q)$(MAKE) -C boot/x86/blgram/ 
 # Copy to the target folder.
-	cp boot/x86/bin/BL.BIN  $(BASE)/
+	cp boot/x86/bin/BLGRAM.BIN  $(BASE)/
 
 #----------------------------------
 # (3) /

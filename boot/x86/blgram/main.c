@@ -1,8 +1,10 @@
+// main.c
+// This is the Gramado bootloader. (BLGRAM.BIN)
+// The main goal of this program is loading the Gramado kernel 
+// into the memory and pass the command to it.
+// Created by Fred Nora.
+
 /*
- * BL.BIN
- * Gramado Boot Loader
- * (c) Copyright 2015-2020 Fred Nora.
- * File: main.c 
  * + It loads the kernel image.
  * + ... initializes the paging.
  * + passes the command to the kernel.
@@ -12,9 +14,6 @@
  * and  the entry point will be in the address 0x00101000.
  * The virtual addresses are 0xC0000000 for the base and
  * 0xC0001000 for the entry point.
- * History:
- *     2015 - Created by Fred Nora.
- *     2020 - Revision.
  */
 
 #include <bootloader.h>

@@ -1,6 +1,8 @@
-;
-; bm/main.asm 
-;    Main file of Boot manager.
+; main.asm 
+; Main file of Boot manager.
+; 2005 - Created by Fred Nora. 
+
+; Credits: MikeOS (License: BSD).
 ; Video modes:
 ; ============
 ; VirtualBox:
@@ -15,8 +17,7 @@
 ; The main resolution is 800x600x24.
 ; The only way to change the resolution for now is 
 ; changing a global variable in this document.
-; History:
-;     2005 - Created by Fred Nora. 
+
 ;---------------------------------------------------
 ; #importante
 ; This image was loaded in 0H:8000H.
@@ -28,29 +29,32 @@
 ; 32KB is the limit for this program?
 ; We are almost there.
 
-;       +----------+
-;       |    ...   | 
-;       |----------| 
-;       |  BL.BIN  | 
-;       |  (32bit) | Boot loader in C.
-;       |----------| 0x2000:0x0000
-;       |          | 
-;       |----------| 
-;       |          | 
-;       |  BM.BIN  | 
-;       |          | The entry point.
-;  >>>  |----------| 0x0000:0x8000 :)
-;       |          |
-;       |----------| 0x0000:0x6000
-;       |  INITIAL | Initial stack address.
-;       |   STACK  | It goes down.
-;       |----------| 
-;       |          |
-;       |----------| 
-;       | FAT/ROOT |
-;       |----------| 0x0000:0x1000
-;       |          |
-;       +----------+
+;       +------------+
+;       |     ...    | 
+;       |------------| 
+;       | BLGRAM.BIN | 
+;       |   (32bit)  | Boot loader in C.
+;       |------------| 0x2000:0x0000
+;       |            | 
+;       |     ...    | 
+;       |            | 
+;       |------------| 0x0000:0xFFFF
+;       |            | 
+;       |   BM.BIN   | 
+;       |            | The entry point.
+;  >>>  |------------| 0x0000:0x8000
+;       |            |
+;       |------------| 0x0000:0x6000
+;       |   INITIAL  | Initial stack address.
+;       |    STACK   | It goes down.
+;       |------------| 
+;       |            |
+;       |------------| 
+;       |  FAT/ROOT  |
+;       |------------| 0x0000:0x1000
+;       |            |
+;       +------------+
+
 
 
 [ORG 0x8000]
@@ -351,8 +355,8 @@ bootmanager_LOADROOT:
     mov di, 0x1000                            ; root_buffer, 0x1000, locate first root entry. ?
 .bootmanagerLOOP:
     push cx
-    mov cx, 0x000B                 ; eleven character name
-    mov si, bootmanager_ImageName  ; image name to find
+    mov cx, 0x000B                         ; eleven character name
+    mov si, ImageName_GramadoOSBootloader  ; image name to find
     pusha
     call bootmanagerDisplayMessage
     popa
@@ -481,7 +485,7 @@ bootmanagerDONE:
     ;call bootmanagerDisplayMessage
 
 ;========================
-; Esse eh primeiro setor do BM.BIN, ele ira carregar o arquivo BL.BIN 
+; Esse eh primeiro setor do BM.BIN, ele ira carregar o arquivo BLGRAM.BIN 
 ; e ira passar o comando para o stage 2 do (BM).
 ;=======================
 
@@ -493,16 +497,16 @@ bootmanagerDONE:
 
 ; ===================================
 ; Importante:
-; >> Nesse momento j� conseguimos carregar o BL.BIN em 0x2000:0. Agora 
+; >> Nesse momento j� conseguimos carregar o BLGRAM.BIN em 0x2000:0. Agora 
 ; passamos o comando para o stage2 do BM, onde configuramos o m�quina,
 ; entramos em modo gr�fico, em modo protegido e por fim entramos no 
 ; mini-shell do BM.
 ; >> Observe que o in�cio do BM est� em 16bit. Aproveitamos isso para
-; carregarmos o arquivo BL.BIN com a ajuda dos recursos do BIOS. Isso
+; carregarmos o arquivo BLGRAM.BIN com a ajuda dos recursos do BIOS. Isso
 ; nos oferece um pouco de tranquilidade. Ent�o, j� que o BM, cumpriu 
 ; seu principal objetivo logo no in�cio do c�digo, podemos usar o resto 
 ; dele para rotinas mais detalhadas de obten��o de informa��es sobre a 
-; arquitetura x86. Assim podemos passar para o BL.BIN o maior n�mero de 
+; arquitetura x86. Assim podemos passar para o BLGRAM.BIN o maior n�mero de 
 ; inform��es poss�veis, e deix�-lo em um estado confort�vel.
 ; Sendo assim, o BM.BIN, pode ser um programa com um tamanho um pouco 
 ; maior, mas talvez isso torne o trabalho o MBR mais dif�cil.
@@ -646,10 +650,16 @@ bootmanagercluster     dw 0x0000  ; Cluster.
 
 ; ===============================================
 ; Messages and strings.
-; File name.
-bootmanager_ImageName:
-    db "BL      BIN", 0x0D, 0x0A, 0x00
-; Strings.
+
+; Gramado OS bootloader.
+ImageName_GramadoOSBootloader:
+    db "BLGRAM  BIN", 0x0D, 0x0A, 0x00
+
+; Another OS bootloader.
+;ImageName_AnotherOSBootloader:
+    ;db "12345678BIN", 0x0D, 0x0A, 0x00
+
+; Strings
 bootmanagermsgFAT       db  0x0D, 0x0A, "Loading FAT",   0x0D, 0x0A, 0x00
 bootmanagermsgImg       db  0x0D, 0x0A, "Loading Image", 0x0D, 0x0A, 0x00
 bootmanagermsgFailure   db  0x0D, 0x0A, "ROOT", 0x00
@@ -1128,7 +1138,7 @@ bootmanager_main:
 ; 5 - File.
     %include "k32/installer.inc"   ;Instala metafiles em LBAs espec�ficas.
     %include "k32/fs/file.inc"     ;Operaçoes com aquivos.
-    %include "k32/bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
+    %include "k32/bootloader.inc"  ;Carrega o Boot Loader (BLGRAM.BIN).
 ; 4 - Debug.
 ; System debug.
     %include "k32/debug.inc"
