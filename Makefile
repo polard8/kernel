@@ -169,8 +169,8 @@ build-gramado-os:
 	-cp userland/bin/SH7.BIN      $(BASE)/
 	-cp userland/bin/SHELL.BIN    $(BASE)/
 #	-cp userland/bin/SHELL00.BIN  $(BASE)/
-	-cp userland/bin/TASCII.BIN   $(BASE)/PROGRAMS/
-	-cp userland/bin/TPRINTF.BIN  $(BASE)/PROGRAMS/
+	-cp userland/bin/TASCII.BIN   $(BASE)/GRAMADO/
+	-cp userland/bin/TPRINTF.BIN  $(BASE)/GRAMADO/
 	-cp userland/bin/NETD.BIN     $(BASE)/
 	-cp userland/bin/NET.BIN      $(BASE)/
 
@@ -196,7 +196,7 @@ copy-extras:
 # ------------------------
 # LEVEL 3: (browser/) browser.
 # Teabox web browser
-	-cp $(DEP_L3)/teabox/bin/TEABOX.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_L3)/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
 
 # ------------------------
 # LEVEL 2: (commands/)  Posix comands.
@@ -212,10 +212,10 @@ copy-extras:
 	#-cp $(DEP_L2)/sdk/bin/N10.BIN     $(BASE)/GRAMADO/
 	#-cp $(DEP_L2)/sdk/bin/N11.BIN     $(BASE)/GRAMADO/
 # Use '#' prefix.
-	-cp $(DEP_L2)/extra/bin/CMP.BIN       $(BASE)/PROGRAMS/
-	-cp $(DEP_L2)/extra/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
-	-cp $(DEP_L2)/extra/bin/SUM.BIN       $(BASE)/PROGRAMS/
-	#-cp $(DEP_L2)/extra/bin/UDPTEST.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_L2)/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
+	-cp $(DEP_L2)/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
+	-cp $(DEP_L2)/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
 
 # ------------------------
 # LEVEL 1: (de/) Display servers and applications.
@@ -230,8 +230,8 @@ copy-extras:
 # use '@' prefix.
 	#-cp $(DEP_L1)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
 # Use '#' prefix.
-	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
-	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/PROGRAMS/
+	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/GRAMADO/
 
 	@echo "~ copy-extras"
 
@@ -340,8 +340,7 @@ clean-all: clean
 	-rm -rf $(BASE)/*.BMP
 	-rm -rf $(BASE)/EFI/BOOT/*.EFI 
 	-rm -rf $(BASE)/GRAMADO/*.BIN 
-	-rm -rf $(BASE)/PROGRAMS/*.BIN 
-	-rm -rf $(BASE)/USERS/*.BIN 
+	-rm -rf $(BASE)/GRAMRE/*.BIN 
 
 	@echo "~clean-all"
 

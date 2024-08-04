@@ -1,4 +1,3 @@
-
 // fat.h
 // Main structure and function prototypes
 // used by the fs subsystem.
@@ -45,7 +44,7 @@ struct system_fat_d
     //struct fat_d  *_fat;
     // ...
 };
-extern struct system_fat_d sfMainFAT;
+extern struct system_fat_d  bpFAT;
 
 
 extern struct fat16_directory_entry_d *vol_label_directory_entry;

@@ -24,11 +24,8 @@ struct system_directory_d
 // we're looking for a file.
 // see: fs.c
 extern struct system_directory_d  sdROOT;      // '/'
-//extern struct system_directory_d  sdEFI;       // 'EFI
-extern struct system_directory_d  sdGRAMADO;   // 'GRAMADO'
-extern struct system_directory_d  sdPROGRAMS;  // 'PROGRAMS'
-//extern struct system_directory_d  sdUSERS;     // 'USERS'
-
+extern struct system_directory_d  sdGRAMADO;   // '/GRAMADO/'
+extern struct system_directory_d  sdGRAMRE;    // '/GRAMRE/'
 
 // Buffers to walk on a pathname,
 // loading until 8 directories.
@@ -60,36 +57,12 @@ int fs_initialize_dev_dir(void);
 // =================
 
 
-
-struct directory_facility_d
-{
-    unsigned long dir_address;  // va?
-    char          dir_name[9];  // 8+1
-    int name_size;
-    int initialized;
-};
-
-// Found in the base/ of the project.
-struct directory_facility_d directory_facility_RootDir;
-struct directory_facility_d directory_facility_EFIDir;
-struct directory_facility_d directory_facility_GramadoDir;
-struct directory_facility_d directory_facility_ProgramsDir;
-struct directory_facility_d directory_facility_ubaseDir;
-struct directory_facility_d directory_facility_usersDir;
-// ...
-
-// Found in the system partition.
-// struct directory_facility_d directory_facility_???;
-// ...
-
-
 //
 // == pwd =============================
 //
 
 // See: path.h
 // A string do diretório de trabalho.
-
 
 struct cwd_d 
 {
@@ -513,7 +486,7 @@ size_t file_get_len(file *_file);
 struct inode_d *file_inode(file *f);
 int file_truncate(file *_file, size_t len);
 int fsCheckELFFile(unsigned long address);
-    
+
 int init_directory_facilities(void);
 void fsInitializeWorkingDiretoryString(void);
 
@@ -570,8 +543,12 @@ fs_load_rootdir(
     unsigned long root_lba, 
     size_t root_size );
 
-void initialize_FAT_and_main_directories(void);
+// For boot partition
+void fsbp_initialize_fat(void);
+// For boot partition
+int fsbp_initialize_bp_directories(void);
 
+// disk? not fs.
 void write_lba( unsigned long address, unsigned long lba );
 
 void 
@@ -707,9 +684,9 @@ fsLoadProgramFromGRAMADO (
     unsigned long buffer,
     unsigned long buffer_size_in_bytes );
 
-// Load an image from PROGRAM/
+// Load an image from GRAMRE/
 unsigned long 
-fsLoadProgramFromPROGRAMS (
+fsLoadProgramFromGRAMRE (
     char *program_name,
     unsigned long buffer,
     unsigned long buffer_size_in_bytes );

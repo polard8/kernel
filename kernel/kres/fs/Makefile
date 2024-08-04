@@ -72,11 +72,13 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 
 # Everything is a file.
-OBJS = fs.o fat16.o pipe.o elf.o search.o fsload.o    
+OBJS = fs.o \
+fsbp.o fat16.o pipe.o elf.o search.o fsload.o    
 
 all:
 	$(CC) -c elf.c     $(KERNEL_INCLUDE) $(CFLAGS) -o elf.o
 	$(CC) -c fs.c      $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c fsbp.c    $(KERNEL_INCLUDE) $(CFLAGS) -o fsbp.o
 	$(CC) -c pipe.c    $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
 	$(CC) -c search.c  $(KERNEL_INCLUDE) $(CFLAGS) -o search.o
 	$(CC) -c fsload.c  $(KERNEL_INCLUDE) $(CFLAGS) -o fsload.o

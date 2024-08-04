@@ -682,14 +682,14 @@ fail:
 
 
 // -------------------------------------
-// fsLoadProgramFromPROGRAMS:
-// Load an image from PROGRAM/.
+// fsLoadProgramFromGRAMRE:
+// Load an image from GRAMRE/.
 // IN:
 // + program_name: Program name.
 // + buffer: Pre-allocated buffer.
 // + buffer_size_in_bytes: Buffer size in bytes.
 unsigned long 
-fsLoadProgramFromPROGRAMS (
+fsLoadProgramFromGRAMRE (
     char *program_name,
     unsigned long buffer,
     unsigned long buffer_size_in_bytes )
@@ -699,32 +699,30 @@ fsLoadProgramFromPROGRAMS (
     unsigned long Status=1; // fail
 
     // #debug
-    //printk ("fsLoadProgramFromPROGRAMS:\n");
+    //printk ("fsLoadProgramFromGRAMRE:\n");
 
+// Parameters:
     if ((void*) buffer == NULL){
-        printk("fsLoadProgramFromPROGRAMS: buffer\n");
+        printk("fsLoadProgramFromGRAMRE: buffer\n");
         goto fail;
     }
     if (buffer_size_in_bytes == 0){
-        printk("fsLoadProgramFromPROGRAMS: buffer_size_in_bytes\n");
+        printk("fsLoadProgramFromGRAMRE: buffer_size_in_bytes\n");
         goto fail;
     }
 
-//
-// sdPROGRAMS struture.
-//
-
-    if (sdPROGRAMS.initialized != TRUE){
-        printk("fsLoadProgramFromPROGRAMS: sdPROGRAMS.initialized\n");
+// sdGRAMRE struture.
+    if (sdGRAMRE.initialized != TRUE){
+        printk("fsLoadProgramFromGRAMRE: sdGRAMRE.initialized\n");
         goto fail;
     }
-    if (sdPROGRAMS.address == 0){
-        printk("fsLoadProgramFromPROGRAMS: sdPROGRAMS.address\n");
+    if (sdGRAMRE.address == 0){
+        printk("fsLoadProgramFromGRAMRE: sdGRAMRE.address\n");
         goto fail;
     }
 // The memory address for our target directory.
     unsigned long programs_directory_address = 
-        sdPROGRAMS.address;
+        sdGRAMRE.address;
 
 /*
  *    It loads a file into the memory.
@@ -1319,7 +1317,7 @@ __try_to_load_program_from_special_folder(
         new_filename++;
         fs_fntos((char *) new_filename);
         status = 
-        (unsigned long) fsLoadProgramFromPROGRAMS( 
+        (unsigned long) fsLoadProgramFromGRAMRE( 
                             new_filename, 
                             image_va, 
                             BUGBUG_IMAGE_SIZE_LIMIT );

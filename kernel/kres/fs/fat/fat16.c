@@ -13,7 +13,6 @@ int g_fat_cache_saved=FALSE;
 int g_fat_cache_loaded=FALSE;
 
 struct fat_d  *bootvolume_fat;
-struct system_fat_d sfMainFAT;
 
 //
 // == Cluster list ===============================

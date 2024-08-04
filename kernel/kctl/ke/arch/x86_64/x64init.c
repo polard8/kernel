@@ -1227,8 +1227,13 @@ static int I_initKernelComponents(void)
 // Its because we're gonna rad the disk to get the partition tables.
     disk_initialize_mbr_info();
 
-// FAT support
-    initialize_FAT_and_main_directories();
+// FAT support for the boot partition
+    fsbp_initialize_fat();
+
+// Initialize boot partitions canonical directories.
+// see: fsbp.c
+    fsbp_initialize_bp_directories();
+    // ...
 
 // =========================================
 // ::(5)(3)(9)

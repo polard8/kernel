@@ -4,18 +4,6 @@
 
 #include <kernel.h>
 
-// Canonical:
-// The list of the main directories in the system.
-// These are the first directories searched when
-// we're looking for a file.
-// #todo: maybe create maindir.c.
-struct system_directory_d  sdROOT;      // '/'
-//struct system_directory_d  sdEFI;       // 'EFI
-struct system_directory_d  sdGRAMADO;   // 'GRAMADO'
-struct system_directory_d  sdPROGRAMS;  // 'PROGRAMS'
-//struct system_directory_d  sdUSERS;     // 'USERS'
-// ...
-
 // Buffers for 8 directories. Each one with 512 entries.
 // 32*512 = 16384
 // 16KB
@@ -38,15 +26,12 @@ struct cwd_d  CWD;
 unsigned long search_path_dir_address=0;
 unsigned long search_path_dir_entries=0;
 
+
 // ========================================
 
 //
 // == Private functions: Prototypes ===========
 //
-
-static void __do_initialize_sdROOT(void);
-static void __do_initialize_sdGRAMADO(void);
-static void __do_initialize_sdPROGRAMS(void);
 
 static int __initialize_fs_buffers(void);
 
@@ -2517,215 +2502,6 @@ int fs_initialize_dev_dir(void)
     return 0;
 }
 
-// ------------------
-// ROOT
-// Load the root dir into the memory and 
-// initialize the sdROOT structure.
-static void __do_initialize_sdROOT(void)
-{
-// Called by initialize_FAT_and_main_directories().
-
-    size_t name_size=0;
-    const char *root_name = "/";
-
-    sdROOT.initialized = FALSE;
-
-    if (sfMainFAT.initialized != TRUE)
-        x_panic("__do_initialize_sdROOT: No FAT");
-
-// -----------
-// Load the root dir into the canonical virtual address.
-    fs_load_rootdir ( 
-        VOLUME1_ROOTDIR_ADDRESS, 
-        VOLUME1_ROOTDIR_LBA, 
-        32 );
-
-// Register the va.
-    sdROOT.address = (unsigned long) VOLUME1_ROOTDIR_ADDRESS;
-// Register the number of entries.
-    sdROOT.number_of_entries = 512;
-
-//
-// name
-//
-
-// #todo
-// We need a definition for this size.
-
-// The name size.
-    name_size = strlen(root_name);
-    if (name_size <= 0 || name_size >= 64)
-        x_panic("__do_initialize_sdROOT: name");
-    sdROOT.name_size = (size_t) name_size; 
-
-// Copy the name
-    memset(sdROOT.name, 0, 64);
-    ksprintf( sdROOT.name, root_name );
-
-// Set the flag as initialized.
-    sdROOT.initialized = TRUE;
-}
-
-// GRAMADO
-// Load the directory GRAMADO/ that belongs 
-// to the root dir into the memory and 
-// initialize the sdGRAMADO structure.
-static void __do_initialize_sdGRAMADO(void)
-{
-// Called by initialize_FAT_and_main_directories().
-    size_t name_size=0;
-    const char *DirectoryName = "GRAMADO";
-    unsigned long DirectoryBufferAddress=0;
-    unsigned long DirectoryBufferSizeInBytes=0;
-
-    sdGRAMADO.initialized = FALSE;
-
-    if (sdROOT.initialized != TRUE)
-        x_panic("__do_initialize_sdGRAMADO: No sdROOT");
-
-    // #bugbug
-    // se carregarmos mais arquivos lá do que isso,
-    // então teremos problemas para ler.
-    // # isso é so um teste por enquanto.
-    // Podemos melhorar essa rotina no futuro.
-    // 32 setores, igual o root.
-    // 512 * 32 = 16384 bytes
-    // 16384/4096 = 4 páginas.
-    //#todo: A lot bigger when possible.
-    DirectoryBufferAddress = (unsigned long) allocPages(8);
-    if ((void*) DirectoryBufferAddress == NULL){
-        x_panic("__do_initialize_sdGRAMADO: buf");
-    }
-    // Size in bytes = (32 setores)
-    //(32*512) = 16384.
-    DirectoryBufferSizeInBytes = 16384;
-
-    unsigned long Ret = 1;  // 1 fail | 0 ok.
-    Ret = fsLoadFile ( 
-              (unsigned long) VOLUME1_FAT_ADDRESS,      // fat address
-              (unsigned long) VOLUME1_ROOTDIR_ADDRESS,  // dir address. onde procurar.
-              (int) 512,                                // #bugbug: Number of entries.  
-              (const char *) DirectoryName,
-              (unsigned long) DirectoryBufferAddress,  // onde carregar. 
-              (unsigned long) DirectoryBufferSizeInBytes );                            
-
-    if (Ret!=0){
-        x_panic("__do_initialize_sdGRAMADO: Load");
-    }
-
-    sdGRAMADO.address = (unsigned long) DirectoryBufferAddress;
-    sdGRAMADO.number_of_entries = 512;
-// name
-    name_size = strlen(DirectoryName);
-    if (name_size <= 0 || name_size >= 64)
-        x_panic("DirectoryName");
-    sdGRAMADO.name_size = (size_t) name_size; 
-    ksprintf( sdGRAMADO.name, DirectoryName );
-
-// Set the flags as initialized.
-    sdGRAMADO.initialized = TRUE;
-}
-
-// ------------------
-// PROGRAMS
-// Load the directory PROGRAMS/ that belongs 
-// to the root dir into the memory and 
-// initialize the sdPROGRAMS structure.
-static void __do_initialize_sdPROGRAMS(void)
-{
-// Called by initialize_FAT_and_main_directories().
-    size_t name_size=0;
-    const char *DirectoryName = "PROGRAMS";
-    unsigned long DirectoryBufferAddress=0;
-    unsigned long DirectoryBufferSizeInBytes=0;
-
-    sdPROGRAMS.initialized = FALSE;
-
-    if (sdROOT.initialized != TRUE)
-        x_panic("__do_initialize_sdPROGRAMS: No sdROOT");
-
-
-    // #bugbug
-    // se carregarmos mais arquivos lá do que isso,
-    // então teremos problemas para ler.
-    // # isso é so um teste por enquanto.
-    // Podemos melhorar essa rotina no futuro.
-    // 32 setores, igual o root.
-    // 512 * 32 = 16384 bytes
-    // 16384/4096 = 4 páginas.
-    //#todo: A lot bigger when possible.
-    DirectoryBufferAddress = (unsigned long) allocPages(8);
-    if ((void*) DirectoryBufferAddress == NULL){
-        x_panic("__do_initialize_sdPROGRAMS: buf");
-    }
-    // Size in bytes = (32 setores)
-    //(32*512) = 16384.
-    DirectoryBufferSizeInBytes = 16384;
-
-    unsigned long Ret = 1;  // 1 fail | 0 ok.
-    Ret = fsLoadFile ( 
-              (unsigned long) VOLUME1_FAT_ADDRESS,      // fat address
-              (unsigned long) VOLUME1_ROOTDIR_ADDRESS,  // dir address. onde procurar.
-              (int) 512,                                // #bugbug: Number of entries.  
-              (const char *) DirectoryName,
-              (unsigned long) DirectoryBufferAddress,  // onde carregar. 
-              (unsigned long) DirectoryBufferSizeInBytes );                            
-
-    if (Ret!=0){
-        x_panic("__do_initialize_sdPROGRAMS: Load");
-    }
-
-    sdPROGRAMS.address = (unsigned long) DirectoryBufferAddress;
-    sdPROGRAMS.number_of_entries = 512;
-// name
-    name_size = strlen(DirectoryName);
-    if (name_size <= 0 || name_size >= 64)
-        x_panic("DirectoryName");
-    sdPROGRAMS.name_size = (size_t) name_size; 
-    ksprintf( sdPROGRAMS.name, DirectoryName );
-
-// Set the flags as initialized.
-    sdPROGRAMS.initialized = TRUE;
-}
-
-// >> So podemos chamar isso depois de termos
-// inicialiado o hardware de disco ...
-// see: I_init in x64init.c
-// Load FAT for the first time
-// Load root dir for the first time.
-// Load the other main directories for the first time.
-void initialize_FAT_and_main_directories(void)
-{
-
-// ------------------
-// FAT
-// Load the FAT into the memory and setup the flag.
-    fs_load_fat( VOLUME1_FAT_ADDRESS, VOLUME1_FAT_LBA, 246 );
-    sfMainFAT.initialized = TRUE;
-
-// ------------------
-// ROOT
-// Load the root dir into the memory and 
-// initialize the sdROOT structure.
-    __do_initialize_sdROOT();
-
-// ------------------
-// GRAMADO
-// Load the directory GRAMADO/ that belongs 
-// to the root dir into the memory and 
-// initialize the sdGRAMADO structure.
-    __do_initialize_sdGRAMADO();
-
-// ------------------
-// PROGRAMS
-// Load the directory PROGRAMS/ that belongs 
-// to the root dir into the memory and 
-// initialize the sdPROGRAMS structure.
-    __do_initialize_sdPROGRAMS();
-
-// ...
-}
-
 
 // The buffers used to load the directories
 // when loading a path.
@@ -2940,8 +2716,8 @@ int fsInit (void)
 
 // -------------------------
 
-// Initialize directory facility structures.
-    init_directory_facilities();
+    // #deprecated
+    //init_directory_facilities();
 
 // CWD Structure.
 // Inicializa o pwd support.
@@ -2954,43 +2730,9 @@ int fsInit (void)
     return 0;
 }
 
-// #todo
-// Explain this unicorn.
+// #deprecated
 int init_directory_facilities(void)
 {
-
-// '/'
-    directory_facility_RootDir.dir_address = VOLUME1_ROOTDIR_ADDRESS;
-    directory_facility_RootDir.dir_name[0] = '/';
-    directory_facility_RootDir.dir_name[1] = 0;
-    directory_facility_RootDir.name_size = 1;
-    directory_facility_RootDir.initialized = TRUE;
-// EFI/
-    directory_facility_EFIDir.dir_address = 0;
-    directory_facility_EFIDir.dir_name[0] = 0;
-    directory_facility_EFIDir.name_size = 0;
-    directory_facility_EFIDir.initialized = FALSE;
-// GRAMADO/
-    directory_facility_GramadoDir.dir_address = 0;
-    directory_facility_GramadoDir.dir_name[0] = 0;
-    directory_facility_GramadoDir.name_size = 0;
-    directory_facility_GramadoDir.initialized = FALSE;
-// PROGRAMS/
-    directory_facility_ProgramsDir.dir_address = 0;
-    directory_facility_ProgramsDir.dir_name[0] = 0;
-    directory_facility_ProgramsDir.name_size = 0;
-    directory_facility_ProgramsDir.initialized = FALSE;
-// UBASE/
-    directory_facility_ubaseDir.dir_address = 0;
-    directory_facility_ubaseDir.dir_name[0] = 0;
-    directory_facility_ubaseDir.name_size = 0;
-    directory_facility_ubaseDir.initialized = FALSE;
-// USERS/
-    directory_facility_usersDir.dir_address = 0;
-    directory_facility_usersDir.dir_name[0] = 0;
-    directory_facility_usersDir.name_size = 0;
-    directory_facility_usersDir.initialized = FALSE;
-
     return 0;
 }
 
@@ -5010,25 +4752,25 @@ do_read_file_from_disk (
 // -------------------------------------------
 
 // -------------------------------------------
-// Is it inside the PROGRAMS/ folder?
+// Is it inside the GRAMRE/ folder?
 // This is not a new root directory for the whole system,
 // it is only the directory where we're gonna serch
 // for the the desired file.
 // Remember: 
 // We can setup the memory address for this directory 
-// in the structure sdPROGRAMS.
+// in the structure sdGRAMRE.
 
     if (*file_name == '#')
     {
-        if (sdPROGRAMS.initialized != TRUE){
-            printk("do_read_file_from_disk: sdPROGRAMS.initialized\n");
+        if (sdGRAMRE.initialized != TRUE){
+            printk("do_read_file_from_disk: sdGRAMRE.initialized\n");
             goto fail;
         }
-        if (sdPROGRAMS.address == 0){
-            printk("do_read_file_from_disk: sdPROGRAMS.address\n");
+        if (sdGRAMRE.address == 0){
+            printk("do_read_file_from_disk: sdGRAMRE.address\n");
             goto fail;
         }
-        TargetDirAddress = sdPROGRAMS.address;
+        TargetDirAddress = sdGRAMRE.address;
         NumberOfEntries = FAT16_ROOT_ENTRIES;
         file_name++;
     }
@@ -5807,20 +5549,12 @@ void sys_cd_command (const char *string)
 // Talvez esse tipo de tratamento precise 
 // ser feito pelo próprio shell.
 
-    if ( string[1] == 0 )
+    if (string[1] == 0)
     {
-
         // $ cd /
         // We also need to clean the name in the process structure.
         if (string[0] == '/'){
             debug_print("sys_cd_command: reseting\n");
-            
-            //if ( directory_facility_RootDir.initialized == TRUE){
-            //    fsInitTargetDir(
-            //        directory_facility_RootDir.dir_address,
-            //        directory_facility_RootDir.dir_name );
-            //}
-
             fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
             //#bugbug: invalid pid
             //fs_initialize_process_cwd ( current_directory, "/" );

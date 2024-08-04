@@ -1,6 +1,6 @@
-
 // fatlib.h
 // Definitions and structures used by the fs code.
+// Created by Fred Nora.
 
 #ifndef  __FAT_LIB_H
 #define  __FAT_LIB_H    1
@@ -72,6 +72,8 @@
 
 // fat16 support.
 #define FAT16_ROOT_ENTRIES  512  // 512 entradas no rootdir. 
+#define FAT16_DEFAULT_NUMBER_OF_ENTRIES  FAT16_ROOT_ENTRIES
+
 #define FAT16_ENTRY_SIZE    32   // Tamanho em bytes da entrada no root dir. 
 #define FAT_ERRO_1    0xffff9 
 #define FAT_ERRO_2    0xffff8

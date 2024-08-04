@@ -1,1 +1,0 @@
-/GRAMADO/X/TEXT.TXT: This is a text file.
