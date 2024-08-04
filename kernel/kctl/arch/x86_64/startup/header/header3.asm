@@ -510,10 +510,10 @@ setup_vectors:
 
 ; System interrupts
 ; see: sw1.asm
-; 128 - 0x80 - Wisdom
-; 129 - 0x81 - Power
-; 130 - 0x82 - Love
-; 131 - 0x83 - Rest
+; 128 - 0x80
+; 129 - 0x81
+; 130 - 0x82
+; 131 - 0x83
 
 ; 0x80
     mov rax,  qword _int128
@@ -543,8 +543,9 @@ setup_vectors:
 ; retornarmos para ring 3 com o contexto o último contexto salvo.
 ; #todo
 ; Explain it better.
+; See: sw2.asm and hw2.asm
 
-    mov rax,  qword _callback_restorer
+    mov rax,  qword _int198
     mov rbx,  qword 198
     call _setup_system_interrupt  
 

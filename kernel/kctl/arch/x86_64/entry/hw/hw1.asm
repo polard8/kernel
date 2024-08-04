@@ -163,6 +163,15 @@ _irq0:
     mov qword [_contextRDI], rdi 
     mov qword [_contextRSI], rsi 
 
+    mov qword [_contextR8], r8
+    mov qword [_contextR9], r9
+    mov qword [_contextR10], r10
+    mov qword [_contextR11], r11
+    mov qword [_contextR12], r12
+    mov qword [_contextR13], r13
+    mov qword [_contextR14], r14
+    mov qword [_contextR15], r15
+
 ; Data segments
     xor rax, rax
     mov ax, gs
@@ -252,6 +261,16 @@ _irq1:
     mov qword [_contextRDI], rdi 
     mov qword [_contextRSI], rsi 
 
+    mov qword [_contextR8], r8
+    mov qword [_contextR9], r9
+    mov qword [_contextR10], r10
+    mov qword [_contextR11], r11
+    mov qword [_contextR12], r12
+    mov qword [_contextR13], r13
+    mov qword [_contextR14], r14
+    mov qword [_contextR15], r15
+
+
 ; Data segments
     xor rax, rax
     mov ax, gs
@@ -325,6 +344,15 @@ _irq1:
     mov fs, ax
     mov ax, word [_contextGS]
     mov gs, ax
+
+    mov r15, qword [_contextR15]
+    mov r14, qword [_contextR14]
+    mov r13, qword [_contextR13]
+    mov r12, qword [_contextR12]
+    mov r11, qword [_contextR11]
+    mov r10, qword [_contextR10]
+    mov r9,  qword [_contextR9]
+    mov r8,  qword [_contextR8]
 
     mov rsi, qword [_contextRSI] 
     mov rdi, qword [_contextRDI] 
@@ -842,6 +870,15 @@ _irq9_nic_handler:
     mov qword [_contextRDI], rdi 
     mov qword [_contextRSI], rsi 
 
+    mov qword [_contextR8], r8
+    mov qword [_contextR9], r9
+    mov qword [_contextR10], r10
+    mov qword [_contextR11], r11
+    mov qword [_contextR12], r12
+    mov qword [_contextR13], r13
+    mov qword [_contextR14], r14
+    mov qword [_contextR15], r15
+
 ; Data segments
 ; gs,fs,es,ds
     xor rax, rax
@@ -915,6 +952,15 @@ _irq9_nic_handler:
     mov fs, ax
     mov ax, word [_contextGS]
     mov gs, ax
+
+    mov r15, qword [_contextR15]
+    mov r14, qword [_contextR14]
+    mov r13, qword [_contextR13]
+    mov r12, qword [_contextR12]
+    mov r11, qword [_contextR11]
+    mov r10, qword [_contextR10]
+    mov r9,  qword [_contextR9]
+    mov r8,  qword [_contextR8]
 
     mov rsi, qword [_contextRSI] 
     mov rdi, qword [_contextRDI] 
@@ -1149,6 +1195,15 @@ _irq12:
     mov qword [_contextRDI], rdi 
     mov qword [_contextRSI], rsi 
 
+    mov qword [_contextR8], r8
+    mov qword [_contextR9], r9
+    mov qword [_contextR10], r10
+    mov qword [_contextR11], r11
+    mov qword [_contextR12], r12
+    mov qword [_contextR13], r13
+    mov qword [_contextR14], r14
+    mov qword [_contextR15], r15
+
 ; Data segments
 ; gs,fs,es,ds
     xor rax, rax
@@ -1223,6 +1278,15 @@ _irq12:
     mov fs, ax
     mov ax, word [_contextGS]
     mov gs, ax
+
+    mov r15, qword [_contextR15]
+    mov r14, qword [_contextR14]
+    mov r13, qword [_contextR13]
+    mov r12, qword [_contextR12]
+    mov r11, qword [_contextR11]
+    mov r10, qword [_contextR10]
+    mov r9,  qword [_contextR9]
+    mov r8,  qword [_contextR8]
 
     mov rsi, qword [_contextRSI] 
     mov rdi, qword [_contextRDI] 
@@ -1807,6 +1871,15 @@ all_faults:
     mov qword [_contextRDI], rdi 
     mov qword [_contextRSI], rsi 
 
+    mov qword [_contextR8], r8
+    mov qword [_contextR9], r9
+    mov qword [_contextR10], r10
+    mov qword [_contextR11], r11
+    mov qword [_contextR12], r12
+    mov qword [_contextR13], r13
+    mov qword [_contextR14], r14
+    mov qword [_contextR15], r15
+
 ; Segments
     xor rax, rax
     mov ax, gs
@@ -1864,6 +1937,16 @@ all_faults:
     mov fs, ax
     mov ax, word [_contextGS]
     mov gs, ax
+
+    mov r15, qword [_contextR15]
+    mov r14, qword [_contextR14]
+    mov r13, qword [_contextR13]
+    mov r12, qword [_contextR12]
+    mov r11, qword [_contextR11]
+    mov r10, qword [_contextR10]
+    mov r9,  qword [_contextR9]
+    mov r8,  qword [_contextR8]
+
 
     mov rsi, qword [_contextRSI] 
     mov rdi, qword [_contextRDI] 

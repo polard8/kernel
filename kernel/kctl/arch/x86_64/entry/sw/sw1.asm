@@ -88,8 +88,8 @@ _int128:
 
     call _mi80h
 
-; ---------------
     fxrstor [__sw_local_fpu_buffer]
+
     mov qword [.int128Ret], rax 
 
     popfq
@@ -470,18 +470,7 @@ _int131:
 ;--    
 
 ; ====================================
-; int 198
-; Restorer.
-; Used to return from ring 3 to ring0
-; when the kernel calls a procedure in ring 3.
-; It can be a signal or a window procedure.
-; The purpose here is jumping to a c routine,
-; restore the context with the idle thread
-; and restart the ifle thread.
-;extern _x64_restorer
-;global _int198
-;_int198:
-;    jmp _x64_restorer
+; int 198 (0xC6) - Callback restorer.
 
 
 ; ----------------------------------------------
@@ -505,6 +494,7 @@ _int131:
 ; so, this way only a process with cpl 0
 ; is able to use instructions like in, out, cli, sti.
 align 4  
+; 0xC7
 global _int199
 _int199:
     jmp miC7H

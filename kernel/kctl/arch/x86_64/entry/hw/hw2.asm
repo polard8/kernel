@@ -61,43 +61,6 @@ extern _contextR15
 ; ...
 
 
-; -------------------------------------
-; callback restorer.
-; temos que terminal a rotina do timer e
-; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
-; #bugbug
-; We gotta check what is the process calling this routine.
-
-global _callback_restorer
-_callback_restorer:
-
-; Drop the useless stack frame.
-; We were in the middle of the timer interrupt,
-; so, we're gonna use the saved context to release the next thread.
-
-    pop rax  ; rip
-    pop rax  ; cs
-    pop rax  ; rflags
-    pop rax  ; rsp
-    pop rax  ; ss
-
-; #bugbug
-; We gotta check what is the process calling this routine.
-     ;call __xxxxCheckCallerPID
-
-; Clear the variables.
-; Clear the flag and the procedure address.
-; Desse jeito a rotina de saida não tentará
-; chamar o callback novamente.
-    mov qword [_asmflagDoCallbackAfterCR3], 0
-    mov qword [_ring3_callback_address], 0
-
-; Normal timer exit. (after cr3).
-; temos que terminal a rotina do timer e
-; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
-; que ainda é o window server.
-    jmp irq0_release
-
 ;------------------------------------------------
 ; Salta para um callback no window server em ring3.
 ; + Essa rotina foi chamada somente quando o kernel estava usando
@@ -184,6 +147,15 @@ irq0_release:
     mov fs, ax
     mov ax, word [_contextGS]
     mov gs, ax
+
+    mov r15, qword [_contextR15]
+    mov r14, qword [_contextR14]
+    mov r13, qword [_contextR13]
+    mov r12, qword [_contextR12]
+    mov r11, qword [_contextR11]
+    mov r10, qword [_contextR10]
+    mov r9,  qword [_contextR9]
+    mov r8,  qword [_contextR8]
 
     mov rsi, qword [_contextRSI] 
     mov rdi, qword [_contextRDI] 
