@@ -44,8 +44,7 @@ int elfLoadKernelImage(const char *file_name)
     unsigned long kernel_pa = KERNEL_ADDRESS;
     unsigned long kernel_va = KERNEL_VA;
 // Buffer. 0x00100000.
-    unsigned char *kernel = 
-        (unsigned char *) KERNEL_ADDRESS;      
+    unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;      
 // Path
     char Path[64];
     char DefaultPath[64];
@@ -126,16 +125,18 @@ int elfLoadKernelImage(const char *file_name)
 // 0x1BADB002
 // tem um jmp antes do header.
 
+/*
     if ( kernel[0x1008] != 0x02 ||
          kernel[0x1009] != 0xB0 ||
          kernel[0x100A] != 0xAD || 
          kernel[0x100B] != 0x1B )
     {
         //#debug
-        printf ("elfLoadKernelImage: [FAIL] 0x1BADB002 found!\n");
+        printf ("elfLoadKernelImage: FAIL\n");
         //refresh_screen();
         //while(1){}
     }
+*/
 
 // Continua ...
 

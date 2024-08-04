@@ -139,14 +139,10 @@ unsigned long fs_find_not_empty_entry ()
     return (unsigned long) 0;
 }
 
-
-/* */
 void fs_test_fat_vector ()
 {
 }
 
-
-/* */
 unsigned long fs_get_fat_entry (unsigned long n)
 {
     return (unsigned long) 0;
@@ -156,7 +152,6 @@ unsigned long fs_get_fat_entry (unsigned long n)
 /*
  * fs_create_entry:
  *     Cria uma entrada de diret�rio.
- *
  * Arguments:
  *     +Nome do arquivo.  
  *     +Id do diret�rio.
@@ -173,9 +168,8 @@ fs_create_entry (
     unsigned long cluster,
     unsigned long size )
 {
-     // Nothing for now.
+    // Nothing for now
 }
-
 
 /*
  * fsSaveFileName: 
@@ -189,9 +183,8 @@ fsSaveFileName (
     unsigned long eid, 
     unsigned long initial_cluster )
 {        
-     // Nothing for now.
+    // Nothing for now
 }
-
 
 /*
  * fs_save_entry_on_disc:
@@ -201,62 +194,45 @@ void fs_save_entry_on_disc ( unsigned long id, unsigned long eid )
 {
 }
 
-
-/* */
-
 void fs_set_structures ()
 {
 }
 
-
-/* */
 void fs_set_entry ( unsigned long id, unsigned long eid )
 {
 }
 
-
-/* */
 void fs_get_entry ( unsigned long id, unsigned long eid )
 {
 }
 
-  
-/* */
 void fs_show_dir_entry ( unsigned long id, unsigned long eid )
 {
 }
 
-/* */
 void fs_show_dir (unsigned long id)
 {
 }
 
-
 /*
  * fs_check_cluster:
  *     Confere os clusters de um diret�rio, procurando por falhas.
- *
  *     Objetivo: 
  *          Encontrar falha de diret�rio na hora 
  *          do carregamento dos arquivos do sistema.
- *
  *     Obs: Pertence ao Boot Loader.
  */
  
 unsigned long fs_check_cluster (unsigned long id)
 {
-	return 0;    // Ainda n�o implementada.
+	return 0;
 }
-
 
 /*
  * fsSaveRootDir:
  *     Salva o diret�rio raiz no disco.
-
  *     @todo: Desenvolver essa fun��o.
- *
  *     Observa��es: 
- *
  *          O Boot Loader pode querer salvar o
  *          arquivo de log de inicializa��o ou
  *          modificar alguma configura��o de inicializa��o
@@ -274,7 +250,6 @@ void fsSaveRootDir ()
 {
 }
 
-
 /*
  * fs_load_dir: 
  *     Carrega um diret�rio na mem�ria.
@@ -283,21 +258,18 @@ void fs_load_dir (unsigned long id)
 {
 }
 
-
 /*
  * fs_save_dir:
  *     Grava um diret�rio no disco.
  */
 void fs_save_dir (unsigned long id)
 {
-	//return;    //Ainda n�o implementada.
+	//return;
 }
-
 
 void fs_save_structure ()
 {
 }
-
 
 /*
  *  fs_save_entry_on_root:
@@ -307,9 +279,8 @@ void fs_save_structure ()
  */
 void fs_save_entry_on_root (unsigned long eid)
 {
-	//return;    //Ainda n�o implementada.
+	//return;
 }
-
 
 /*
  * fs_show_entry:
@@ -317,42 +288,30 @@ void fs_save_entry_on_root (unsigned long eid)
  */
 void fs_show_entry (unsigned long id, unsigned long eid)
 {
-	//return;    //Ainda n�o implementada.
+	//return;
 }
 
-
-/*
- * fs_delete_entry:
- *     Deleta uma entrada.
- */
 void fs_delete_entry (unsigned long id, unsigned long eid)
 {
-	//return;    //Ainda n�o implementada.
+	//return;
 }
 
-
-/* */
 void fs_init_bootfile_struct ()
 {
 }
 
-
-/* */
-
 unsigned long fs_get_entry_status (unsigned long id, unsigned long eid)
 {
-    return 0;    //Ainda n�o implementada.
+    return 0;
 }
 
-
-/* */
 void 
 fs_set_entry_status ( 
     unsigned long id, 
     unsigned long eid, 
     unsigned long status )
 {
-    //return;    //Ainda n�o implementada.
+    //return;
 }
 
 void fs_set_fat_entry (unsigned long n, unsigned long value)
@@ -371,9 +330,8 @@ unsigned short fs_find_empty_entry ()
  */
 void fs_relood_dir (unsigned long id)
 {
-    //return;    //Ainda n�o implementada.   
+    //return;  
 }
-
 
 /*
  * fsLoadFile:
@@ -408,12 +366,13 @@ fsLoadFile (
 // OK. Fat is constant.
 // We need a structure of 'device context' passed via argument.
 // 'dc->fat_address'
-    unsigned short *fat  = (unsigned short *) FAT16_FAT_ADDRESS;
+    unsigned short *fat = (unsigned short *) FAT16_FAT_ADDRESS;
 // Cluster inicial.
     unsigned short cluster=0;
 
-// Checks
-    if ( (void*) name == NULL ){
+
+// Parameters:
+    if ((void*) name == NULL){
         printf("fsLoadFile: name\n");
         goto fail;
     }
@@ -421,20 +380,12 @@ fsLoadFile (
         printf("fsLoadFile: *name\n");
         goto fail;
     }
-
-    // #bugbug
-    // Essa refresh screen leva muito tempo.
-    // #debug
-    //printf ("fsLoadFile: [DEBUG] Loading %s\n", (unsigned char*) name );
-    //refresh_screen();
-
-// More checks.
     if (file_address == 0){
-        printf("fsLoadFile: [FAIL] file_address\n");
+        printf("fsLoadFile: file_address\n");
         goto fail;
     }
-    if ( dir_address == 0 ){
-        printf("fsLoadFile: [FAIL] dir_address\n");
+    if (dir_address == 0){
+        printf("fsLoadFile: dir_address\n");
         goto fail;
     }
 
@@ -593,13 +544,11 @@ LOOP_next_entry:
 
     file_address = (unsigned long) (file_address + SECTOR_SIZE);
 
-// Pega o pr�ximo cluster na FAT.
+// Get the next cluster into the FAT.
     next = (unsigned short) fat[cluster];
-
-// Configura o cluster atual.
+// Setup current cluter.
     cluster = (unsigned short) next;
-
-// Ver se o cluster carregado era o �ltimo cluster do arquivo.
+//  Is it the last one in this file?
     if ( cluster == 0xFFFF || cluster == 0xFFF8 )
     {
         goto done; 
@@ -608,11 +557,8 @@ LOOP_next_entry:
     // #debug
     // printf("%d ", cluster);
 
-// Loop: 
-// Vai para pr�xima entrada na FAT.
-
+// Check next entry in FAT.
     goto LOOP_next_entry;
-
 
 // ===================================
 // O arquivo n�o pode ser carregado.
@@ -631,7 +577,6 @@ done:
     return 0;
 }
 
-
 // =========================
 // path count
 // Credits: Sirius OS.
@@ -641,20 +586,30 @@ int path_count(const char *path)
     register int i=0;
     int max = (int) (80*25);
 
-    if ( (void*) path == NULL ){
+// Parameter:
+    if ((void*) path == NULL){
         printf ("path_count: path\n");
-        return 0;
+        goto fail;
     }
     if (*path == 0){
         printf ("path_count: *path\n");
-        return 0;
+        goto fail;
     }
-    for ( i=0; i<max; i++ ){
-        if (path[i] == '\0'){ break; }
-        if (path[i] == '/') { result++; }
+
+// Count
+    for ( i=0; i<max; i++ )
+    {
+        if (path[i] == '\0'){ 
+            break; 
+        }
+        if (path[i] == '/') { 
+            result++; 
+        }
     };
 
     return (int) result;
+fail:
+    return 0;
 }
 
 /*
@@ -902,19 +857,17 @@ int load_path(unsigned char *path, unsigned long address)
                 };
             }
 
-            // Avan�amos o char se n�o foi '.', nem '/'.
+            // Go to the next char if it's was not '.' or '/'.
             p++;
         };
     };   
 
+// Abort?
+// Returning to call the rescue shell.
 fail:
-    printf("bl.bin-load_path: Fail\n");
+    printf("load_path: Fail\n");
     refresh_screen();
-
-    // Abort?
-
-    // Returning to call the rescue shell.
-    return (-1);
+    return (int) (-1);
 }
 
 // Search for a file into the root directory.
@@ -925,15 +878,15 @@ unsigned long fsSearchFile(unsigned char *name)
     unsigned long n=0;  //Deslocamento no nome.
 // Contando entradas.
     register int i=0;
-    unsigned long max = 512;  //N�mero m�ximo de entradas no diret�rio raiz.
+    unsigned long max = 512;  // Entries in rootdir.
     char name_x[13];
     unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
 // Quando encontrarmos a ultima e.
     int EndOfDir = FALSE;
     int FoundInThisEntry = -1;
 
-// Validation
-    if ( (void*) name == NULL ){
+// Parameter:
+    if ((void*) name == NULL){
         printf("fsSearchFile: name\n");
         goto file_not_found;
     }
@@ -970,7 +923,7 @@ unsigned long fsSearchFile(unsigned char *name)
     while (max > 0)
     {
         // Encontramos a primeira entrada vazia.
-        if ( root[z] == 0 ){
+        if (root[z] == 0){
             EndOfDir = TRUE;
         }
         
@@ -1066,17 +1019,15 @@ void fs_load_rootdirEx()
     };
 }
 
-
 /*
  * fs_load_rootdirEx:
  *     Carrega a FAT na mem�ria. (size = 64 setores). 
  */
-
-    // #bugbug
-    // We need to load the whole fat table.
-    // Or we will have problems to load the kernel.
-    // 64 setores de tamanho.
-    // Talvez seja 246.
+// #bugbug
+// We need to load the whole fat table.
+// Or we will have problems to load the kernel.
+// 64 setores de tamanho.
+// Talvez seja 246.
 
 void fs_load_fatEx()
 {
@@ -1195,10 +1146,7 @@ fail:
     return 0;
 }
 
-/* 
- * fs_load_rootdir: 
- *     Carrega o diret�rio raiz na mem�ria. 
- */
+// Load the rootdir.
 void fs_load_rootdir()
 {
     fs_load_rootdirEx();
@@ -1433,7 +1381,7 @@ void fsInitFat()
 // Called by fsInit.
 void fsInitStructures()
 {
-    //return;  //Ainda n�o implementada.
+    //return;
 }
 
 /*

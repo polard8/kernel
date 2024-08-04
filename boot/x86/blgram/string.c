@@ -1,4 +1,3 @@
-
 // string.c
 // 2015 - Created by Fred Nora.
 

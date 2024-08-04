@@ -2,6 +2,8 @@
 // This is the Gramado bootloader. (BLGRAM.BIN)
 // The main goal of this program is loading the Gramado kernel 
 // into the memory and pass the command to it.
+// This is a 32bit program.
+// Jumps to a 64bit kernel.
 // Created by Fred Nora.
 
 /*
@@ -17,6 +19,10 @@
  */
 
 #include <bootloader.h>
+
+
+// This is for debug via verbose in baremetal.
+// #define BAREMETAL_VERBOSE    1
 
 const char *image_name = "KERNEL.BIN";
 
@@ -269,15 +275,6 @@ static unsigned long __setup_physical_memory(void)
 
 // #bugbug
 // Are we ereasing something important?
-static void 
-__clean_memory( 
-    unsigned long start_address, 
-    unsigned long end_address )
-{
-// Actually we're cleaning only 32 MB starting at the 1MB mark;
-
-//++
-// =======================================
 // Cleaning the RAM.
 // Vamos limpar somente a parte que será usada pelos 
 // primeiros componentes do sistema.
@@ -285,15 +282,17 @@ __clean_memory(
 // e limpar as áreas alocadas.
 // 32 mb, começando de 1mb.
 // Is it slow?
+static void 
+__clean_memory( 
+    unsigned long start_address, 
+    unsigned long end_address )
+{
+// Actually we're cleaning only 32 MB starting at the 1MB mark;
 
-    int max_in_mb = 32;
-
-    unsigned long *CLEARBASE = (unsigned char *) start_address;
     register int i=0;
-
- // (32mb/4)
-    int max = 
-        ( (1024 * 1024 * max_in_mb ) / 4 );
+    unsigned long *CLEARBASE = (unsigned char *) start_address;
+    int max_in_mb = 32;
+    int max = ( (1024 * 1024 * max_in_mb ) / 4 );  // (32mb/4)
 
 // Limpamos somente se está dentro da área
 // previamente descoberta.
@@ -305,8 +304,6 @@ __clean_memory(
             CLEARBASE[i] = (unsigned long) 0;
         }
     };
-// =======================================
-//--
 }
 
 /*
@@ -474,8 +471,8 @@ static void __no_x86_64_was_found(void)
     printf("does not support x86_64 instructions.\n");
 
 // #todo
-// Maybe, in this case, we can load a 32bit version of Gramado,
-// or another funny stuff.
+// Maybe, in this case, we can load a 32bit dialog,
+// asking to shutdown the system.
 
     printf("The boot loader will not execute the kernel.\n");
 
@@ -564,14 +561,29 @@ void bl_main(void)
 // Are we ereasing something important?
 // Actually we're cleaning only 32 MB starting at the 1MB mark;
 
+#if defined(BAREMETAL_VERBOSE)
+    printf ("bl: Clear memory\n");
+    refresh_screen();
+#endif  
+
     __clean_memory(
         (unsigned long) first_address,
         (unsigned long) last_address );
 // -------------------------------------------------------
 
+#if defined(BAREMETAL_VERBOSE)
+    printf ("bl: Init heap\n");
+    refresh_screen();
+#endif  
+
 // Initialize bl heap.
 // malloc support.
     init_heap();
+
+#if defined(BAREMETAL_VERBOSE)
+    printf ("bl: Init hdd\n");
+    refresh_screen();
+#endif  
 
 // Initialize IDE support.
     init_hdd();
@@ -582,9 +594,21 @@ void bl_main(void)
         die();
     }
 
+#if defined(BAREMETAL_VERBOSE)
+    printf ("bl: Load rootdir\n");
+    refresh_screen();
+#endif  
+
 // Loading root dir.
     fs_load_rootdirEx();
     g_fat16_root_status = TRUE;
+
+
+#if defined(BAREMETAL_VERBOSE)
+    printf ("bl: Load fat\n");
+    refresh_screen();
+#endif  
+
 
 // Loading FAT.
     fs_load_fatEx();
@@ -592,16 +616,25 @@ void bl_main(void)
 
 // Loading kernel image.
 
+#if defined(BAREMETAL_VERBOSE)
+    printf ("bl: Load kernel image\n");
+    refresh_screen();
+#endif  
+
     Status = blLoadKernelImage();
     if (Status<0){
-         printf("bl_main: blLoadKernelImage fail\n");
-         refresh_screen();
-         while (1){
-             asm("cli");
-             asm("hlt");
-         };
+        printf("bl_main: blLoadKernelImage fail\n");
+        refresh_screen();
+        while (1){
+            asm("cli");
+            asm("hlt");
+        };
          //goto run_rescue_shell;
     }
+
+    //printf ("bl: breakpoint\n");
+    //refresh_screen();
+    //while(1){}
 
 // ok, depois de carregarmos a imagem do kernel de 64bit
 // então devemos configurar o long mode e a paginação para
@@ -651,7 +684,7 @@ void bl_main(void)
 */
 
     printf("bl_main: Kernel image loaded\n");
-
+    
 //#breakpoint
     //refresh_screen();
     //while(1){}

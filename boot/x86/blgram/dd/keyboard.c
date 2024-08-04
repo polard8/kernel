@@ -1,19 +1,13 @@
 /*
- * File: keyboard.c  
- * Descrição:
- *     Driver básico de teclado para o Boot Loader.
- * Environment:
- *     32bit bootloader.
- * Obs:
- * O padrão de teclado usado precisa ser revisto.
- * Pelo jeito estamos usando o padrão americano. Mas 
- * é possível adaptar para ABNT2 se muitos problemas.
- * Podemos copiar do driver do núcleo.
- * Histórico:
- *     2015 - Adaptado de versões antigas por Fred Nora.
- *     2016 - Revisão.
+ * keyboard.c 
+ * Driver bÃ¡sico de teclado para o Boot Loader.
+ * 32bit bootloader.
+ * O padrÃ£o de teclado usado precisa ser revisto.
+ * Pelo jeito estamos usando o padrï¿½o americano. Mas 
+ * Ã© possÃ­vel adaptar para ABNT2 se muitos problemas.
+ * Podemos copiar do driver do nï¿½cleo.
+ * 2015 - document created by Fred Nora.
  */
-
  
 #include <bootloader.h>
 
@@ -33,7 +27,7 @@ char keyboard_queue[8];
 int keyboard_flag=0;
 
 //
-// Variáveis internas.
+// Variï¿½veis internas.
 //
 
 //Status.
@@ -67,7 +61,7 @@ unsigned long quit_message = 1;
  
 // #todo:
 // Esse arquivo foi melhor trabalhado no Kernel. Podemos aproveitar 
-// coisas de lá.
+// coisas de lï¿½.
  
  
 /* 
@@ -109,7 +103,7 @@ VK_TAB,
 /* scan 24-31 */		
 'o' , 
 'p' , 
-'´' , 
+'ï¿½' , 
 '[' , 
 KEY_RETURN, 
 KEY_CTRL, 
@@ -124,7 +118,7 @@ KEY_CTRL,
 'j' , 
 'k' , 
 'l' , 
-'ç' ,	
+'ï¿½' ,	
 
 /* scan 40-47 */  	
 '~' , 
@@ -239,7 +233,7 @@ CPS|L,     0,     0,     0,     0,     0,     0,     0,		/* scan 64-71 */
 };
 
 
-// irq handler.
+// irq 1 handler.
 void keyboardHandler(void)
 {
 // #bugbug 
@@ -247,9 +241,7 @@ void keyboardHandler(void)
 // We need a flag to handle the modes.
 
 // Step 0: 
-// Declarações.
-
-// Variáveis para armazenar valores que pegaremos.
+// Declaraï¿½ï¿½es.
 
     unsigned char raw_byte=0;
     unsigned char scancode=0;
@@ -266,31 +258,22 @@ void keyboardHandler(void)
     unsigned long ch=0;
 
 // @todo: 
-// Uma biblioteca de video satisfatória 
+// Uma biblioteca de video satisfatï¿½ria 
 // deve existir no Boot Loader.
 
 // Text mode screen buffer.
     unsigned char *screen = (unsigned char *) 0x000B8000; 
 
 // Step1: 
-
-// Get the raw byte.
-// This is not the scancode.
-
-    raw_byte = in8(0x60);
-
-// #todo
-// Temos que considerar o teclado extendido.
-
-// Get the scancode.
-// Elimina o último bit.
-    scancode = (raw_byte & 0x7F);
+// Get the raw byte and the scancode.
+    raw_byte = (unsigned char) in8(0x60);
+    scancode = (unsigned char) (raw_byte & 0x7F);
 
 // Step 2: 
 // Trata a mensagem.
 
 // Vamos checar o bit no raw byte que
-// diz se a tecla foi liberada ou não.
+// diz se a tecla foi liberada ou nï¿½o.
 
 // ==========================
 // Se a tecla foi liberada.
@@ -299,7 +282,7 @@ void keyboardHandler(void)
         //Analiza a tecla.
         status = map[scancode]; 
 
-        //Se for teclas especiais, que são importantes para o sistema.         
+        //Se for teclas especiais, que sï¿½o importantes para o sistema.         
         if ( status == KEY_ALT || 
              status == KEY_WINKEY || 
              status == KEY_CTRL || 
@@ -321,7 +304,6 @@ void keyboardHandler(void)
             msg[0] = mensagem;
         };
 
-    
         // Analiza.
         // Se for do sistema usa o mapa de caracteres apropriado. 
         if (key_status == MSG_SYSKEYUP)
@@ -366,8 +348,7 @@ void keyboardHandler(void)
             // Envia.
             key_status = mensagem; 
             msg[0] = mensagem;
-       };
-
+        };
 
         // Analiza.
         if (key_status == MSG_SYSKEYDOWN)
@@ -376,7 +357,6 @@ void keyboardHandler(void)
             wParam[0] = ch;         //Envia.
         }
 
-
         // Analisa.
         if (key_status == MSG_KEYDOWN)
         {
@@ -384,28 +364,18 @@ void keyboardHandler(void)
             wParam[0] = ch;    //Envia. 
         }
 
-		//Nothing.
+		// Nothing
     };
 
-
 // Step 3: 
-// Debug support.
-
-// #debug: 
-// Envia um caractere pra tela.
-
-// Print it into the screen
-// in char mode.
+// Debug: Print a char into the screen using the text mode.
+// But actully we're in gaphical mode.
 
     screen[76] = (char) ch;
     screen[77] = (char) 9; 
 
 // Step 4: 
-// Send message to Boot Loader procedure.
-
-//
-// procedure
-//
+// Process input event.
 
     bl_procedure ( 
         0, 
@@ -417,7 +387,7 @@ void keyboardHandler(void)
 // queue
 //
 
-// put into the queue.
+// Put into the queue.
     keyboard_queue[keyboard_queue_tail] = ch;
     keyboard_queue_tail++;
     if (keyboard_queue_tail > 8){
@@ -429,6 +399,7 @@ void keyboardHandler(void)
 
 // Step 5: 
 // EOI. Only the first PIC.
+// #bugbug: Check if we're not doint it in assembly.
     out8(0x20,0x20);     
 }
 
@@ -436,7 +407,7 @@ char keyboad_get_char(void)
 {
     char ch=0;
 
-    ch = keyboard_queue[keyboard_queue_head];
+    ch = (char) keyboard_queue[keyboard_queue_head];
 
     keyboard_queue_head++;
     if (keyboard_queue_head > 8){
@@ -448,12 +419,12 @@ char keyboad_get_char(void)
 
 char keyboard_wait_key(void)
 {
-    while(keyboard_flag != TRUE)
+    while (keyboard_flag != TRUE)
     {
         // Nothing
     };
     
-    return keyboad_get_char();
+    return (char) keyboad_get_char();
 }
 
 //

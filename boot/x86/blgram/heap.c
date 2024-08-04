@@ -1,7 +1,6 @@
-/*
- * File: heap.c
- *     2015 - Created by Fred Nora.
- */
+// heap.c
+// Heap support for OS loader in 32bit.
+// 2015 - Created by Fred Nora.
 
 #include <bootloader.h>
 
@@ -20,8 +19,6 @@ struct mmblock_d  *current_mmblock;
 // see: heap.h
 unsigned long mmblockList[MMBLOCK_COUNT_MAX]; 
 unsigned long heapList[HEAP_COUNT_MAX]; 
-
-
 
 //Variáveis internas. 
 //todo: use static?
@@ -49,7 +46,6 @@ unsigned long mm_prev_pointer=0;    // Endereço da úntima estrutura alocada.
  * OUT: address if success. 0 if fail.
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
  */
 
 unsigned long heapAllocateMemory(unsigned long size)
@@ -369,9 +365,10 @@ void FreeHeap(void *ptr)
 {
     struct mmblock_d *Header;
 
-    if ((void *) ptr == NULL)
+// Parameter:
+    if ((void *) ptr == NULL){
         return;
-
+    }
     if ( ptr < (void *) BL_HEAP_START || ptr >= (void *) BL_HEAP_END )
     {
         return;
@@ -392,14 +389,13 @@ void FreeHeap(void *ptr)
             return;
         }
 
-		//Checa
-
-       if ( mmblockList[mmblockCount] == (unsigned long) Header && 
-            Header->Id == mmblockCount )
-       {
+		// Check
+        if ( mmblockList[mmblockCount] == (unsigned long) Header && 
+             Header->Id == mmblockCount )
+        {
             mmblockList[mmblockCount] = 0;
             mmblockCount--;
-       }
+        }
 
         // Isso invalida a estrutura, para evitar mal uso.
         Header->Used = 0;

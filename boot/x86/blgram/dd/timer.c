@@ -1,16 +1,12 @@
 /*
- * File: timer.c 
- * Descrição:
- *     Handler da irq0 para o Boot Loader.
- * Environment:
- *     32bit bootloader.
- * ATENÇÃO:
- *    O timer no Boot Loader não faz task switch.
- *    O timer será usado principalmente para timeout de driver.
- *    O timer pode ser usado para contar tempo de inicialização.
+ * timer.c 
+ * Handler da irq0 para o Boot Loader.
+ * 32bit bootloader.
+ * O timer no Boot Loader nï¿½o faz task switch.
+ * O timer serï¿½ usado principalmente para timeout de driver.
+ * O timer pode ser usado para contar tempo de inicializaï¿½ï¿½o.
  * 2015 - Created by Fred Nora.
  */
-
 
 #include <bootloader.h>
 
@@ -28,7 +24,7 @@ void timer()
 }
 
 // blTimerInit:
-// Inicializa o módulo timer.
+// Inicializa o mï¿½dulo timer.
 int blTimerInit()
 {
     int Status=0;

@@ -1,3 +1,6 @@
+// global.c
+// Created by Fred Nora.
+
 
 #include <bootloader.h>
 

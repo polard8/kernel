@@ -1,24 +1,26 @@
+// shell.c
+// Recovery shell for the 32bit OS loader.
+// Created by Fred Nora.
+
 /*
  * File:  shell.c 
- * Descrição:
+ * Descriï¿½ï¿½o:
  *     Mini-shell do Boot Loader.
  * Objetivo:
- *    Oferecer comandos básicos que ajudem na inicialização do sistema.
+ *    Oferecer comandos bï¿½sicos que ajudem na inicializaï¿½ï¿½o do sistema.
  *    Importante: No Boot Loader, o interpretador de comandos se revela
- * importante especialmente quando mostra informações sobre os recursos
- * de armazenamento, e sobre os arquivos que serão carrregados.
- *    Nesse estágio de processo de boot alguns decisões já foram tomadas,
- * como qual será o modo de video. O ponto forte do Boot Loader, que foi 
- * escrito em linguagem de alto-nivel de 32bit é a manipulação de sistema de 
- * arquivos e de gerenciamento dos arquivos que serão carregados. Esse deve ser
+ * importante especialmente quando mostra informaï¿½ï¿½es sobre os recursos
+ * de armazenamento, e sobre os arquivos que serï¿½o carrregados.
+ *    Nesse estï¿½gio de processo de boot alguns decisï¿½es jï¿½ foram tomadas,
+ * como qual serï¿½ o modo de video. O ponto forte do Boot Loader, que foi 
+ * escrito em linguagem de alto-nivel de 32bit ï¿½ a manipulaï¿½ï¿½o de sistema de 
+ * arquivos e de gerenciamento dos arquivos que serï¿½o carregados. Esse deve ser
  * o foco do boot loader e do interpretador de comando do shell.
- * Histórico:
- *     2015 - Created by Fred Nora.
+ * History:
+ * 2015 - Created by Fred Nora.
  */
 
-
 #include <bootloader.h>
-
 
 // globals
 
@@ -30,14 +32,14 @@ unsigned long prompt_pos=0;
 unsigned long g_cmd_status=0;
 
 
-
-
-// Funções importadas.
+//
+// Imported functions.
+//
 
 extern void asm_shut_down();
 
 
-// Variáveis internas.
+// Variï¿½veis internas.
 
 unsigned long deslocamento=0;
 int ret_string=0;
@@ -52,6 +54,7 @@ int shell_status=0;
 // Diminuir o tamanho do buffer.
 // ?? Usar static
 
+// #bugbug: Do not do this way.
 unsigned char *shell_string_buffer[256];
 
 // String para mensagem de ajuda.
@@ -61,9 +64,9 @@ unsigned char *shell_string_buffer[256];
 //char help_string[] = "\n help, format, install, makeboot, reboot \n";
 char help_string[] = "\n help, reboot \n";
 
-// Protótipos de funções internas.
+// Protï¿½tipos de funï¿½ï¿½es internas.
 
-// Protótipo do procedimento de janela do shell do Boot Loader.
+// Protï¿½tipo do procedimento de janela do shell do Boot Loader.
 
 int 
 shellProcedure ( 
@@ -79,11 +82,10 @@ void debug();
 
 /*
  * blShellMain:
- *     Função principal do Shell do Boot Loader.
+ *     Funï¿½ï¿½o principal do Shell do Boot Loader.
  *     Auxilia a instalacao do sistema.
  *     #todo: usar delimtador e separador de tokens igual no app shell.
  */
- 
 int blShellMain ( int argc, char *argv[] )
 {
     unsigned long ret_proc=0;
@@ -171,7 +173,7 @@ shellProcedure (
 			       input_ret = input(long1);
 				   if(input_ret == KEY_RETURN)
 				   {
-				        g_cmd_status = 1;    //Último caractere.
+				        g_cmd_status = 1;    //ï¿½ltimo caractere.
 				   }
 				   else
 				   {
@@ -196,10 +198,9 @@ shellProcedure (
  *     Inicializa o prompt do shell.
  *     Limpa o buffer de string.
  */ 
- 
 int shellInitializePrompt ()
 {
-    int i=0;
+    register int i=0;
     
 	//@todo: Usar 128.
 
@@ -223,7 +224,6 @@ int shellInitializePrompt ()
  
     return 0;
 }
-
 
 /*
  * shellWaitCmd: 
@@ -251,7 +251,7 @@ wcLoop:
 /*
  * shellCompare: 
  *     Compara comandos.
- *     Obs: O mini-shell do Boot Loader NÃO deve oferece muitos comandos.
+ *     Obs: O mini-shell do Boot Loader Nï¿½O deve oferece muitos comandos.
  */
 unsigned long shellCompare(void)
 {
@@ -372,7 +372,7 @@ void shellHelp(void)
 void boot ()
 {
 // #todo: 
-// Chama a re-inicialização do bootloader.
+// Chama a re-inicializaï¿½ï¿½o do bootloader.
 }
 
 
@@ -380,9 +380,9 @@ void boot ()
  * debug: 
  *    Uma rotina de debug do bootloader.
  * Objetivo:
- *    Checar a consistencia dos elementos de inicializaçao.
- *    Efetuar correções possíveis no processo de inicialização.
- *    Por exemplo, se há uma falha no mbr, no bootmanager, ou no sistema
+ *    Checar a consistencia dos elementos de inicializaï¿½ao.
+ *    Efetuar correï¿½ï¿½es possï¿½veis no processo de inicializaï¿½ï¿½o.
+ *    Por exemplo, se hï¿½ uma falha no mbr, no bootmanager, ou no sistema
  *    de arquivos, a falha pode ser reportada ou corrigida.
  */
 void debug ()
@@ -462,5 +462,5 @@ int rescueShell(void)
 
 
 //
-// End.
+// End
 //

@@ -1,5 +1,5 @@
-
 // stdlib.c
+// Created by Fred Nora.
 
 #include <bootloader.h>
 
@@ -8,6 +8,7 @@ void *malloc(size_t size)
     void *h;
     unsigned long s = ( unsigned long) size;
 
+// Parameter:
     if (s < 0){
         //#todo: Message
         return NULL;
