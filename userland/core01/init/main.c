@@ -532,6 +532,8 @@ static int __CompareString(void)
 // ----------------------------------------
 
     printf ("Command not found, type 'help' for more commands\n");
+    __coolmenu_loop();
+
 
 /*
  // This thing is very cool.
@@ -578,11 +580,13 @@ static int __coolmenu_loop(void)
     printf(":: Cool menu ::\n");
 
     printf("\n");
-    printf("+ (q) - Quit the cool menu\n");  
+    printf("  + (q) - Quit the cool menu\n");  
     printf("\n");
-    printf("+ (r) - Reboot the system\n");  
+    printf("  + (g) - Initialize GUI\n");  
     printf("\n");
-    printf("+ (s) - Shutdown the system\n");  
+    printf("  + (r) - Reboot the system\n");  
+    printf("\n");
+    printf("  + (s) - Shutdown the system\n");  
 
     initPrompt();
 
@@ -595,7 +599,13 @@ static int __coolmenu_loop(void)
         }
 
         C = (int) fgetc(stdin);
-        // Quit the cool menu.
+
+        if (C == 'g'){
+            do_launch_de();
+            break;
+        }
+
+        // q - Quit the cool menu.
         if (C == 'q'){
             break;
         }

@@ -192,7 +192,8 @@ processEvent (
                 if (caller_tid != 99){
                     break;
                 }
-                printf("init.bin: 4001, from {%d}\n",caller_tid);
+                //#debug
+                //printf("init.bin: 4001, from {%d}\n",caller_tid);
                 memset(__filename_local_buffer,0,64);
                 sprintf(__filename_local_buffer,"terminal.bin");
                 rtl_clone_and_execute(__filename_local_buffer);
@@ -203,7 +204,8 @@ processEvent (
                 if (caller_tid != 99){
                     break;
                 }
-                printf("init.bin: 4002, from {%d}\n",caller_tid);
+                //#debug
+                //printf("init.bin: 4002, from {%d}\n",caller_tid);
                 memset(__filename_local_buffer,0,64);
                 sprintf(__filename_local_buffer,"editor.bin");
                 rtl_clone_and_execute(__filename_local_buffer);
@@ -214,7 +216,8 @@ processEvent (
                 if (caller_tid != 99){
                     break;
                 }
-                printf("init.bin: 4003, from {%d}\n",caller_tid);
+                //#debug
+                //printf("init.bin: 4003, from {%d}\n",caller_tid);
                 memset(__filename_local_buffer,0,64);
                 //sprintf(__filename_local_buffer,"#doc.bin");
                 sprintf(__filename_local_buffer,"@teabox.bin");
@@ -226,7 +229,8 @@ processEvent (
                 if (caller_tid != 99){
                     break;
                 }
-                printf("init.bin: 4004, from {%d}\n",caller_tid);
+                //#debug
+                //printf("init.bin: 4004, from {%d}\n",caller_tid);
                 memset(__filename_local_buffer,0,64);
                 sprintf(__filename_local_buffer,"@pubterm.bin");
                 rtl_clone_and_execute(__filename_local_buffer);
