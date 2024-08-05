@@ -403,7 +403,7 @@ The remainder ??
         panic ("ts: CurrentThread->runningCount\n");
     };
 
-CrazyFail:
+//CrazyFail:
 // Crazy Fail!
 // #bugbug
 // Não deveríamos estar aqui.

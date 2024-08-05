@@ -480,7 +480,7 @@ unsigned long scheduler_get_status (void)
 
 int init_scheduler(unsigned long sched_flags)
 {
-    register int i=0;
+    //register int i=0;
 
     debug_print("init_scheduler:\n");
 
