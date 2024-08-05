@@ -2370,6 +2370,10 @@ void *sci2 (
         // #deprecated
         // it will select the next input reponder.
         // set_input_responder_tid(foreground_thread);
+        
+        do_credits(foreground_thread);
+        do_credits(foreground_thread);
+
         return NULL;
     }
 
