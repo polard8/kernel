@@ -172,8 +172,8 @@ irq0_TIMER (void)
 // In the case of spawning a new thread.
     spawn_set_eoi_state();
 
-// See: ps/disp/ts.c
-    psTaskSwitch();
+// See: disp/ts.c
+    tsTaskSwitch();
 
 // The spawn routine do not need to make a eoi.
 // Tell the spawn routine that we do not need eoi anymore.

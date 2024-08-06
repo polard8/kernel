@@ -9,14 +9,18 @@ extern unsigned long task_switch_status;
 
 // ------------------------
 
-void psTaskSwitch (void);
-void tsCallExtraRoutines(void);
+unsigned long get_taskswitch_status (void);
+void set_taskswitch_status( unsigned long status );
 
 void taskswitch_lock (void);
 void taskswitch_unlock (void);
 
-unsigned long get_task_status (void);
-void set_task_status( unsigned long status );
+void tsCallExtraRoutines(void);
+
+// Main task switching routine
+// Called by irq0_TIMER() int pit.c.
+// See also: hw.asm
+void tsTaskSwitch (void);
 
 #endif    
 

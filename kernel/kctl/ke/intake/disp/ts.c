@@ -1,4 +1,3 @@
-
 // ts.c
 // Task switching.
 // Actually it's thread scwitching.
@@ -9,11 +8,83 @@
 //Status do mecanismo de task switch. 
 unsigned long task_switch_status=0; // locked
 
-static void __task_switch (void);
-static void __on_finished_executing(struct thread_d *t);
-static void cry(unsigned long flags);
 
+static void tsOnFinishedExecuting(struct thread_d *t);
+static void tsCry(unsigned long flags);
+
+// Task switching implementation.
+static void __task_switch (void);
+
+//
 // =============================================
+//
+
+/*
+ * get_taskswitch_status:
+ *     Obtem o status do mecanismo de taskswitch.
+ * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
+ */
+//#bugbug: Mudar para int.
+unsigned long get_taskswitch_status(void)
+{
+    return (unsigned long) task_switch_status;
+}
+
+/*
+ * set_taskswitch_status:
+ *    Configura o status do mecanismo de task switch.
+ *    Se o mecanismo de taskswitch estiver desligado 
+ * não ocorrerá a mudança.
+ * @todo: Mudar o nome dessa função para taskswitchSetStatus(.);
+ */ 
+// #bugbug: Mudar para int.
+void set_taskswitch_status( unsigned long status )
+{
+    task_switch_status = (unsigned long) status;
+}
+
+void taskswitch_lock (void){
+    task_switch_status = (unsigned long) LOCKED;
+}
+
+void taskswitch_unlock (void)
+{
+    task_switch_status = (unsigned long) UNLOCKED;
+}
+
+// Call extra routines scheduled to this moment.
+// called by task_switch.
+// #importante:
+// Checaremos por atividades extras que foram agendadas pelo 
+// mecanismo de request. Isso depois do contexto ter sido 
+// salvo e antes de selecionarmos a próxima thread.
+void tsCallExtraRoutines(void)
+{
+    debug_print ("tsCallExtraRoutines: [FIXME] \n");
+
+    // Kernel requests.
+    //processDeferredKernelRequest();
+
+    // Unix signals.
+    //xxSignal();
+
+    // ...
+
+    // #todo: 
+    // Talvez possamos incluir mais atividades extras.
+}
+
+// :(
+static void tsCry(unsigned long flags)
+{
+    if (flags & 0x8000)
+        cali_shutdown(0);
+}
+
+//
+// $
+// ON FINISHED EXECUTING
+//
 
 // ## PREEMPT ##
 // Preempt
@@ -27,12 +98,12 @@ static void cry(unsigned long flags);
 // ->preempted permitisse. 
 // talvez o certo seja ->preenptable.
 
-static void __on_finished_executing(struct thread_d *t)
+static void tsOnFinishedExecuting(struct thread_d *t)
 {
     if ( (void*) t == NULL )
-        panic("__on_finished_executing: t\n");
+        panic("tsOnFinishedExecuting: t\n");
     if (t->magic!=1234)
-        panic("__on_finished_executing: t magic\n");
+        panic("tsOnFinishedExecuting: t magic\n");
 
 // #bugbug
 //  Isso está acontecendo.
@@ -78,7 +149,7 @@ static void __on_finished_executing(struct thread_d *t)
         //    printk("SIGKILL\n");
 
         //refresh_screen();    
-        //panic("__on_finished_executing: t->signal\n");
+        //panic("tsOnFinishedExecuting: t->signal\n");
     }
 
 // ---------------------------------------------------------
@@ -152,16 +223,15 @@ static void __on_finished_executing(struct thread_d *t)
     if(t->tid == INIT_TID)
     {
         if (t->_its_my_party_and_ill_cry_if_i_want_to == TRUE)
-            cry(0);
+            tsCry(0);
     }
 }
 
-// :(
-static void cry(unsigned long flags)
-{
-    if (flags & 0x8000)
-        cali_shutdown(0);
-}
+
+//
+// $
+// TASK SWITCH
+//
 
 /*
  * task_switch:
@@ -392,7 +462,7 @@ The remainder ??
 // Agora esgotou o tempo de processamento.
 // Preempt: >> MOVEMENT 3 (Running --> Ready).
     } else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
-        __on_finished_executing(CurrentThread);
+        tsOnFinishedExecuting(CurrentThread);
         // Jumping to this label for the first time.
         goto ZeroGravity;
 
@@ -705,9 +775,9 @@ fail:
 }
 
 /*
- * psTaskSwitch:
+ * tsTaskSwitch:
  *     Interface para chamar a rotina de Task Switch.
- *     KiTaskSwitch em ts.c gerencia a rotina de 
+ *     gerencia a rotina de 
  * troca de thread, realizando operações de salvamento e 
  * restauração de contexto utilizado variáveis globais e 
  * extrutura de dados, seleciona a próxima thread através 
@@ -730,10 +800,10 @@ fail:
 // ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
 */
 // Called by:
-// irq0_TIMER in pit.c.
-// _irq0 in hw.asm. 
+// Called by irq0_TIMER() int pit.c.
+// See also: hw.asm
 
-void psTaskSwitch(void)
+void tsTaskSwitch(void)
 {
     pid_t current_process_pid = -1;
     pid_t ws_pid = -1;
@@ -786,59 +856,5 @@ void psTaskSwitch(void)
 
 // The task switching routine.
     __task_switch();
-}
-
-/*
- * get_task_status:
- *     Obtem o status do mecanismo de taskswitch.
- * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
- */
-//#bugbug: Mudar para int.
-unsigned long get_task_status(void)
-{
-    return (unsigned long) task_switch_status;
-}
-
-/*
- * set_task_status:
- *    Configura o status do mecanismo de task switch.
- *    Se o mecanismo de taskswitch estiver desligado 
- * não ocorrerá a mudança.
- * @todo: Mudar o nome dessa função para taskswitchSetStatus(.);
- */ 
-// #bugbug: Mudar para int.
-void set_task_status( unsigned long status )
-{
-    task_switch_status = (unsigned long) status;
-}
-
-void taskswitch_lock (void){
-    task_switch_status = (unsigned long) LOCKED;
-}
-
-void taskswitch_unlock (void){
-    task_switch_status = (unsigned long) UNLOCKED;
-}
-
-// Call extra routines scheduled to this moment.
-// called by task_switch.
-// #importante:
-// Checaremos por atividades extras que foram agendadas pelo 
-// mecanismo de request. Isso depois do contexto ter sido 
-// salvo e antes de selecionarmos a próxima thread.
-void tsCallExtraRoutines(void)
-{
-    debug_print ("tsCallExtraRoutines: [FIXME] \n");
-
-    // Kernel requests.
-    //processDeferredKernelRequest();
-
-    // Unix signals.
-    //xxSignal();
-
-    // ...
-
-    // #todo: 
-    // Talvez possamos incluir mais atividades extras.
 }
 

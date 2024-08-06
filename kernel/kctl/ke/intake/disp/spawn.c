@@ -176,7 +176,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
 
 // Destrava o mecanismo de taskswitch.
 // Destrava o Scheduler.
-    set_task_status(UNLOCKED);
+    set_taskswitch_status(UNLOCKED);
     scheduler_unlock(); 
 
 // Paranoia: Check state.
