@@ -559,7 +559,7 @@ int gramkInitialize(void)
 
     // Enable both input targets for now.
     // stdin and thread's queue,
-    gramkSetInputTargets(TRUE,TRUE);
+    gramk_set_input_targets(TRUE,TRUE);
 
 // See: ws.h
 // hostname:Displaynumber.Screennumber

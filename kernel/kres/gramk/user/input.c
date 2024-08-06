@@ -32,16 +32,20 @@ static int CAD_is_allowed = TRUE;
 struct input_targets_d  InputTargets;
 
 
-// ------------------------------
+//
+// ================================================
+//
+
+// Workers for the 'Compare string' function.
+static void do_enter_embedded_shell(int kernel_in_debug_mode);
+static void do_exit_embedded_shell(void);
+static void do_launch_app_via_initprocess(int index);
 static void do_user(void);
 
+// Compare strings
 static int __CompareStrings(void);
 
-static void __enter_embedded_shell(int kernel_in_debug_mode);
-static void __exit_embedded_shell(void);
-
-static void __launch_app_via_initprocess(int index);
-
+// Process extended keyboard strokes.
 static int 
 __ProcessExtendedKeyboardKeyStroke(
     int prefix,
@@ -49,17 +53,30 @@ __ProcessExtendedKeyboardKeyStroke(
     unsigned long vk,
     unsigned long rawbyte );
 
+// Process input
 static int 
-__ProcessInput ( 
+__ProcessKeyboardInput ( 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
 
+//
+// ================================================
+//
 
-// ------------------------------
+void gramk_enter_kernel_console(void)
+{
+    do_enter_embedded_shell(FALSE);
+}
+
+void gramk_exit_kernel_console(void)
+{
+    do_exit_embedded_shell();
+}
+
 
 // Process CAD combination
-int gramk_process_CAD_combination(unsigned long flags)
+int gramk_process_cad_combination(unsigned long flags)
 {
 // If it's allowed to reboot via CAD combination.
 // Calling the wrapper to have a safe reboot.
@@ -77,7 +94,7 @@ int gramk_process_CAD_combination(unsigned long flags)
 // + stdin file.
 // + Message queue of the foreground thread.
 // Let's select the valid targets.
-int gramkSetInputTargets(int stdin_target, int queue_target)
+int gramk_set_input_targets(int stdin_target, int queue_target)
 {
 
 // Not initialized
@@ -110,12 +127,47 @@ int gramkSetInputTargets(int stdin_target, int queue_target)
     return 0;
 }
 
+
+//
+// $
+// ENTER/EXIT KERNEL CONSOLE
+//
+
+static void do_enter_embedded_shell(int kernel_in_debug_mode)
+{
+    int console_index = fg_console;
+    // ShellFlag = FALSE;
+
+// Set up console
+    jobcontrol_switch_console(0);
+// Message
+    if (kernel_in_debug_mode){
+        printk("[[ KERNEL IN DEBUG MODE ]]\n");
+    }
+    printk("kernel console number %d\n",console_index);
+    printk("Prompt ON: Type something\n");
+    consolePrompt();  // It will refresh the screen.
+// Flag
+    ShellFlag = TRUE;
+}
+
+static void do_exit_embedded_shell(void)
+{
+// log
+    printk("\n");
+    printk("Prompt OFF: Bye\n");
+    printk("\n");
+    refresh_screen();
+// done
+    ShellFlag = FALSE;
+}
+
 // local
 // Launch an app via init process.
 // Just a small range of messages are accepted.
 // range: 4001~4009
 
-static void __launch_app_via_initprocess(int index)
+static void do_launch_app_via_initprocess(int index)
 {
 
 // #test
@@ -297,10 +349,9 @@ static int __CompareStrings(void)
 
 // exit: Exit the embedded kernel console.
     if ( kstrncmp(prompt,"exit",4) == 0 ){
-        exit_kernel_console(); 
+        gramk_exit_kernel_console(); 
         goto exit_cmp;
     }
-
 
 // disk:
 // Show disk info.
@@ -528,47 +579,6 @@ done:
     return 0;
 }
 
-static void __enter_embedded_shell(int kernel_in_debug_mode)
-{
-    int console_index = fg_console;
-    // ShellFlag = FALSE;
-
-// Set up console
-    jobcontrol_switch_console(0);
-// Message
-    if (kernel_in_debug_mode){
-        printk("[[ KERNEL IN DEBUG MODE ]]\n");
-    }
-    printk("kernel console number %d\n",console_index);
-    printk("Prompt ON: Type something\n");
-    consolePrompt();  // It will refresh the screen.
-// Flag
-    ShellFlag = TRUE;
-}
-
-static void __exit_embedded_shell(void)
-{
-// log
-    printk("\n");
-    printk("Prompt OFF: Bye\n");
-    printk("\n");
-    refresh_screen();
-// done
-    ShellFlag = FALSE;
-}
-
-void enter_kernel_console(void)
-{
-    __enter_embedded_shell(FALSE);
-}
-
-void exit_kernel_console(void)
-{
-    __exit_embedded_shell();
-}
-
-
-
 //private
 static int 
 __ProcessExtendedKeyboardKeyStroke(
@@ -691,7 +701,7 @@ fail:
 
 
 // -------------------------------
-// __ProcessInput:
+// __ProcessKeyboardInput:
 // #bugbug: We don't wanna call the window server. Not now.
 // #important:
 // Isso garante que o usuário sempre podera alterar o foco
@@ -713,7 +723,7 @@ fail:
 // It is because each environment uses its own event format.
 
 static int 
-__ProcessInput ( 
+__ProcessKeyboardInput ( 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -743,7 +753,7 @@ __ProcessInput (
 //
 
     if (msg<0){
-        debug_print("__ProcessInput: Invalid msg\n");
+        debug_print("__ProcessKeyboardInput: Invalid msg\n");
         return -1;
     }
 
@@ -797,7 +807,7 @@ __ProcessInput (
          //case 'D':
          //    if(ctrl_status==TRUE && alt_status==TRUE)
          //    {
-         //        __enter_embedded_shell(FALSE);
+         //        do_enter_embedded_shell(FALSE);
          //        return 0;
          //    }
          //    break;
@@ -947,10 +957,10 @@ __ProcessInput (
                     // #danger: Mouse is not well implemented yet.
                     if( shift_status == TRUE){
                         //PS2_initialization();
-                        //__launch_app_via_initprocess(4001);
+                        //do_launch_app_via_initprocess(4001);
                         return 0;
                     }
-                    __launch_app_via_initprocess(4001);  //terminal
+                    do_launch_app_via_initprocess(4001);  //terminal
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -965,7 +975,7 @@ __ProcessInput (
 
             case VK_F2:
                 if (ctrl_status == TRUE){
-                    __launch_app_via_initprocess(4002);  //editor
+                    do_launch_app_via_initprocess(4002);  //editor
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -980,7 +990,7 @@ __ProcessInput (
 
             case VK_F3:
                 if (ctrl_status == TRUE){
-                    __launch_app_via_initprocess(4003);  //doc
+                    do_launch_app_via_initprocess(4003);  //doc
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -995,7 +1005,7 @@ __ProcessInput (
 
             case VK_F4:
                 if (ctrl_status == TRUE){
-                    __launch_app_via_initprocess(4004);  //#pubterm
+                    do_launch_app_via_initprocess(4004);  //#pubterm
                     return 0;
                 }
                 // alt+f4: The vm handle this combination.
@@ -1014,7 +1024,7 @@ __ProcessInput (
             // Reboot
             case VK_F5:
                 if (ctrl_status == TRUE){
-                    //__launch_app_via_initprocess(4005);
+                    //do_launch_app_via_initprocess(4005);
                     //post_message_to_ws( 33888, 0, 0 ); //#TEST
                     return 0;
                 }
@@ -1033,7 +1043,7 @@ __ProcessInput (
             // 9216 - Launch the redpill application
             case VK_F6:
                 if (ctrl_status == TRUE){
-                    // __launch_app_via_initprocess(4006);
+                    // do_launch_app_via_initprocess(4006);
                     return 0; 
                 }
                 if (alt_status == TRUE){
@@ -1048,7 +1058,7 @@ __ProcessInput (
             // Test 1.
             case VK_F7:
                 if (ctrl_status == TRUE){
-                    //__launch_app_via_initprocess(4007);
+                    //do_launch_app_via_initprocess(4007);
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1079,7 +1089,7 @@ __ProcessInput (
             case VK_F9:
                 // Enter ring0 embedded shell.
                 if (ctrl_status == TRUE){
-                    __enter_embedded_shell(FALSE);
+                    do_enter_embedded_shell(FALSE);
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1095,7 +1105,7 @@ __ProcessInput (
             case VK_F10:
                 // Exit ring0 embedded shell.
                 if (ctrl_status == TRUE){
-                    __exit_embedded_shell();
+                    do_exit_embedded_shell();
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1161,7 +1171,7 @@ __ProcessInput (
     return -1;
 
 fail:
-    debug_print("__ProcessInput: fail\n");
+    debug_print("__ProcessKeyboardInput: fail\n");
     return -1;
 }
 
@@ -1945,7 +1955,7 @@ done:
     // :: keystrokes when we are in ring0 shell mode.
     // queue:: (combinations)
     Status = 
-        (int) __ProcessInput(
+        (int) __ProcessKeyboardInput(
                   (int) Event_Message,
                   (unsigned long) Event_LongASCIICode,
                   (unsigned long) Event_LongRawByte );

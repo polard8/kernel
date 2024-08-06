@@ -1623,12 +1623,12 @@ void *sci0 (
 
 // 898 - Start the kernel console.
     if (number == 898){
-        enter_kernel_console();
+        gramk_enter_kernel_console();
         return NULL;
     }
 // 899 - Exit the kernel console.
     if (number == 899){
-        exit_kernel_console();
+        gramk_exit_kernel_console();
         return NULL;
     }
 

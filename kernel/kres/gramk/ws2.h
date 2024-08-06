@@ -312,13 +312,6 @@ bitblt(
     struct rect_d *dst_rect,
     unsigned long rop );
 
-//
-// == wm =====================
-//
-
-// See: input.c
-void enter_kernel_console(void);
-void exit_kernel_console(void);
 
 // ==========
 

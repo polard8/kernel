@@ -47,8 +47,11 @@ struct input_event_d
 
 //==========================================================
 
-int gramk_process_CAD_combination(unsigned long flags);
-int gramkSetInputTargets(int stdin_target, int queue_target);
+// See: input.c
+int gramk_process_cad_combination(unsigned long flags);
+int gramk_set_input_targets(int stdin_target, int queue_target);
+void gramk_enter_kernel_console(void);
+void gramk_exit_kernel_console(void);
 
 
 //
