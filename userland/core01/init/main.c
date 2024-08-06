@@ -57,28 +57,70 @@ struct init_d  Init;
 // -----------------------------------------------------------
 // private functions: prototypes;
 
-// Loops
-static int __coolmenu_loop(void);
-static int __stdin_loop(void);
 
-static void initPrompt(void);
-static int __CompareString(void);
-
-static int processCmdLine(void);
-static int processPrintableChar(int ch);
-static int processControlChar(int ch);
-
+// Workers called by 'compare string'.
+static void do_clear_console(void);
+static inline void do_cli(void);
+static inline void do_hlt(void);
 static void do_help(void);
+static void do_init_prompt(void);
+static inline void do_int3(void);
 static void do_launch_de(void);
 static void do_launch_de2(void);
 static void do_launch_de3(void);
 static void do_launch_list(void);
+static inline void do_sti(void);
 
-static void do_clear_console(void);
+
+// Process input events
+static int input_compare_string(void);
+static int input_process_cmdline(void);
+static int input_process_printable_char(int ch);
+static int input_process_control_char(int ch);
+
+// Loops
+static int loopSTDIN(void);
+static int loopMenu(void);
+
+//
+// ==============================================================
+//
 
 
-// ====================
+//
+// $
+// DO - (Workers for 'compare string')
+//
 
+// Clear the background of the current virtual console.
+// #todo: 
+// Create a function in rtl for this.
+static void do_clear_console(void)
+{
+// Change the console color.
+    //ioctl(1,440, 0x0011DD11);
+// White on blue.
+// Clear the background of the fg console.
+    //sc82( 8003,__COLOR_BLUE,0,0 );
+// Change the fg color of the fg console.
+    //sc82( 8004,__COLOR_WHITE,0,0 );
+
+//#todo
+// Use ioctl instead
+
+// Respeitando as cores do fg console.
+    ioctl(1,440,0);
+}
+
+static inline void do_cli(void)
+{
+    asm ("cli");
+}
+
+static inline void do_hlt(void)
+{
+    asm ("hlt");
+}
 
 static void do_help(void)
 {
@@ -91,22 +133,28 @@ static void do_help(void)
     printf ("[control + f9] to open the kernel console\n");
 }
 
-static void do_launch_list(void)
+static void do_init_prompt(void)
 {
-// Raw and ugly set of programs.
+    register int i=0;
 
-    rtl_clone_and_execute("ds00.bin");
-    rtl_clone_and_execute("taskbar.bin");
-    rtl_clone_and_execute("terminal.bin");
-    //rtl_clone_and_execute("editor.bin");
-    //rtl_clone_and_execute("browser.bin");
-    //rtl_clone_and_execute("fileman.bin");
+// Clean prompt buffer.
+    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
+        prompt[i] = (char) '\0';
+    };
+    prompt[0] = (char) '\0';
+    prompt_pos    = 0;
+    prompt_status = 0;
+    prompt_max    = PROMPT_MAX_DEFAULT;
+// Prompt
+    printf("\n");
+    putc('$',stdout);
+    putc(' ',stdout);
+    fflush(stdout);
+}
 
-// #
-// Quit the command line.
-// It's too much faster if we do not quit.
-// But we need to quit and start listening for messages.
-    isTimeToQuitCmdLine = TRUE;
+static inline void do_int3(void)
+{
+    asm ("int $3");
 }
 
 static void do_launch_de(void)
@@ -217,54 +265,22 @@ static void do_launch_de3(void)
     isTimeToQuitCmdLine = TRUE;
 }
 
-
-static void initPrompt(void)
+static void do_launch_list(void)
 {
-    register int i=0;
+// Raw and ugly set of programs.
 
-// Clean prompt buffer.
-    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
-        prompt[i] = (char) '\0';
-    };
-    prompt[0] = (char) '\0';
-    prompt_pos    = 0;
-    prompt_status = 0;
-    prompt_max    = PROMPT_MAX_DEFAULT;
-// Prompt
-    printf("\n");
-    putc('$',stdout);
-    putc(' ',stdout);
-    fflush(stdout);
-}
+    rtl_clone_and_execute("ds00.bin");
+    rtl_clone_and_execute("taskbar.bin");
+    rtl_clone_and_execute("terminal.bin");
+    //rtl_clone_and_execute("editor.bin");
+    //rtl_clone_and_execute("browser.bin");
+    //rtl_clone_and_execute("fileman.bin");
 
-// Clear the background of the current virtual console.
-// #todo: 
-// Create a function in rtl for this.
-static void do_clear_console(void)
-{
-// Change the console color.
-    //ioctl(1,440, 0x0011DD11);
-// White on blue.
-// Clear the background of the fg console.
-    //sc82( 8003,__COLOR_BLUE,0,0 );
-// Change the fg color of the fg console.
-    //sc82( 8004,__COLOR_WHITE,0,0 );
-
-//#todo
-// Use ioctl instead
-
-// Respeitando as cores do fg console.
-    ioctl(1,440,0);
-}
-
-static inline void do_int3(void)
-{
-    asm ("int $3");
-}
-
-static inline void do_cli(void)
-{
-    asm ("cli");
+// #
+// Quit the command line.
+// It's too much faster if we do not quit.
+// But we need to quit and start listening for messages.
+    isTimeToQuitCmdLine = TRUE;
 }
 
 static inline void do_sti(void)
@@ -272,12 +288,7 @@ static inline void do_sti(void)
     asm ("sti");
 }
 
-static inline void do_hlt(void)
-{
-    asm ("hlt");
-}
-
-static int __CompareString(void)
+static int input_compare_string(void)
 {
     int ret_val=-1;
     char *c;
@@ -296,9 +307,8 @@ static int __CompareString(void)
 
 // #test
 // Enter the cool menu.
-    if (strncmp(prompt,"coolmenu",8) == 0)
-    {
-        __coolmenu_loop();
+    if (strncmp(prompt,"menu",4) == 0){
+        loopMenu();
         goto exit_cmp;
     }
 
@@ -532,8 +542,7 @@ static int __CompareString(void)
 // ----------------------------------------
 
     printf ("Command not found, type 'help' for more commands\n");
-    __coolmenu_loop();
-
+    loopMenu();
 
 /*
  // This thing is very cool.
@@ -558,85 +567,16 @@ exit_cmp:
     if (isTimeToQuitCmdLine==TRUE){
         return 0;
     }
-    initPrompt();
+    do_init_prompt();
     return 0;
 }
 
-static int __coolmenu_loop(void)
+static int input_process_cmdline(void)
 {
-// Get input from sdtin.
-
-    register int C=0;
-
-// Clear the console and set cursor position to 0,0.
-    do_clear_console();
-
-// ====
-// Small command line interpreter.
-// We need to hang here because 
-// maybe there is no window server installed.
-
-    printf("\n");
-    printf(":: Cool menu ::\n");
-
-    printf("\n");
-    printf("  + (q) - Quit the cool menu\n");  
-    printf("\n");
-    printf("  + (g) - Initialize GUI\n");  
-    printf("\n");
-    printf("  + (r) - Reboot the system\n");  
-    printf("\n");
-    printf("  + (s) - Shutdown the system\n");  
-
-    initPrompt();
-
-    static int yn_result = FALSE;
-
-    while (1)
-    {
-        if (isTimeToQuitCmdLine == TRUE){
-            break;
-        }
-
-        C = (int) fgetc(stdin);
-
-        if (C == 'g'){
-            do_launch_de();
-            break;
-        }
-
-        // q - Quit the cool menu.
-        if (C == 'q'){
-            break;
-        }
-        // Reboot the system.
-        if (C =='r')
-        {
-            printf ("Reboot the system? (yn)\n");
-            yn_result = (int) rtl_y_or_n();
-            if (yn_result == TRUE){
-                rtl_clone_and_execute("reboot.bin");
-            }
-        }
-        // Poweroff the system.
-        if (C =='s')
-        {
-            printf ("Shutdown the system? (yn)\n");
-            yn_result = (int) rtl_y_or_n();
-            if (yn_result == TRUE){
-                rtl_clone_and_execute("shutdown.bin");
-            }
-        }
-    };
+    return (int) input_compare_string();
 }
 
-
-static int processCmdLine(void)
-{
-    return (int) __CompareString();
-}
-
-static int processPrintableChar(int ch)
+static int input_process_printable_char(int ch)
 {
     if (ch<0)
         return -1;
@@ -654,7 +594,7 @@ static int processPrintableChar(int ch)
     return 0;
 }
 
-static int processControlChar(int ch)
+static int input_process_control_char(int ch)
 {
     if (ch<0)
         return -1;
@@ -715,7 +655,12 @@ static int processControlChar(int ch)
     return 0;
 }
 
-static int __stdin_loop(void)
+//
+// $
+// STDIN LOOP
+//
+
+static int loopSTDIN(void)
 {
 // Get input from sdtin.
 
@@ -732,7 +677,7 @@ static int __stdin_loop(void)
 // maybe there is no window server installed.
 
     printf(":: Gramado OS ::\n");
-    initPrompt();
+    do_init_prompt();
 
     while (1)
     {
@@ -745,13 +690,13 @@ static int __stdin_loop(void)
         {
             // [Enter]
             if (C == __VK_RETURN){
-                processCmdLine();
+                input_process_cmdline();
             // Printable
             } else if ( C >= 0x20 && C <= 0x7F ){
-                processPrintableChar(C);
+                input_process_printable_char(C);
             // #todo: Control chars. (0~0x1F)
             } else if ( C <= 0x1F ){
-                processControlChar(C);
+                input_process_control_char(C);
             }
         }
     };
@@ -761,6 +706,79 @@ static int __stdin_loop(void)
     //while(1){}
 //================================
 }
+
+static int loopMenu(void)
+{
+// Get input from sdtin.
+
+    register int C=0;
+
+// Clear the console and set cursor position to 0,0.
+    do_clear_console();
+
+// ====
+// Small command line interpreter.
+// We need to hang here because 
+// maybe there is no window server installed.
+
+    printf("\n");
+    printf(":: Cool menu ::\n");
+
+    printf("\n");
+    printf("  + (q) - Quit the cool menu\n");  
+    printf("\n");
+    printf("  + (g) - Initialize GUI\n");  
+    printf("\n");
+    printf("  + (r) - Reboot the system\n");  
+    printf("\n");
+    printf("  + (s) - Shutdown the system\n");  
+
+    do_init_prompt();
+
+    static int yn_result = FALSE;
+
+    while (1)
+    {
+        if (isTimeToQuitCmdLine == TRUE){
+            break;
+        }
+
+        C = (int) fgetc(stdin);
+
+        if (C == 'g'){
+            do_launch_de();
+            break;
+        }
+
+        // q - Quit the cool menu.
+        if (C == 'q'){
+            break;
+        }
+        // Reboot the system.
+        if (C =='r')
+        {
+            printf ("Reboot the system? (yn)\n");
+            yn_result = (int) rtl_y_or_n();
+            if (yn_result == TRUE){
+                rtl_clone_and_execute("reboot.bin");
+            }
+        }
+        // Poweroff the system.
+        if (C =='s')
+        {
+            printf ("Shutdown the system? (yn)\n");
+            yn_result = (int) rtl_y_or_n();
+            if (yn_result == TRUE){
+                rtl_clone_and_execute("shutdown.bin");
+            }
+        }
+    };
+}
+
+//
+// $
+// MAIN
+//
 
 // This is the main function for the init process.
 int main( int argc, char **argv)
@@ -884,7 +902,7 @@ int main( int argc, char **argv)
     if (fHeadlessMode == TRUE)
     {
         Init.is_headless = TRUE;
-        initialize_headless_mode();
+        msgloop_RunServer_HeadlessMode();
         goto unexpected_exit;
     }
 
@@ -897,7 +915,7 @@ int main( int argc, char **argv)
 // Local function.
     int cmdline_status = -1;
     if (fRunCommandLine == TRUE){
-        cmdline_status = (int) __stdin_loop();
+        cmdline_status = (int) loopSTDIN();
     }
 
     // Fall through :)
@@ -910,7 +928,7 @@ int main( int argc, char **argv)
 // See: msgloop.c
     int eventloop_status = -1;
     if (fRunEventLoop == TRUE){
-        eventloop_status = (int) run_server();
+        eventloop_status = (int) msgloop_RunServer();
     }
     // Is it time to quit the init process?
     if (eventloop_status == 0){

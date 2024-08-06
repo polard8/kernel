@@ -1,5 +1,6 @@
-
 // init.h
+// Header for init process.
+// Created by Fred Nora.
 
 #ifndef __INIT_H
 #define __INIT_H    1
@@ -32,11 +33,13 @@ struct init_d
 };
 extern struct init_d  Init;
 
+//
+// ==================================================
+//
 
-// ---------------
-
-int run_server(void);
-int initialize_headless_mode(void);
+// See: msgloop.c
+int msgloop_RunServer(void);
+int msgloop_RunServer_HeadlessMode(void);
 
 #endif    
 

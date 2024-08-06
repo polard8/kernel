@@ -26,50 +26,36 @@ struct next_msg_d
 };
 struct next_msg_d  NextMessage;
 
+//
+// ============================================================
+//
 
-
-//-----------------------------------------
-
-static void __send_response(void);
-
-static int __idlethread_loop(void);
+// Handlers for the events processed by xxxProcessEvent().
+static void do_dhcp_dialog(void);
 static void do_hello(int src_tid);
+static void do_net_off(void);
+static void do_net_on(void);
 static void do_reboot(int src_tid);
 
-// local
+//
+// Events
+//
+
+static void xxxSendResponse(void);
+
 static int 
-processEvent ( 
+xxxProcessEvent ( 
     void *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2,
     int caller_tid );
 
-static void do_net_on(void);
-static void do_net_off(void);
-static void do_dhcp_dialog(void);
+static int xxxEventLoopSystemEvents(void);
 
-// ===========================
-
-// Enable network
-static void do_net_on(void)
-{
-    sc82 ( 
-        22001, 
-        1,  // ON 
-        0, 
-        0 );
-}
-
-// Disable network
-static void do_net_off(void)
-{
-    sc82 ( 
-        22001, 
-        0,  // OFF
-        0, 
-        0 );
-}
+//
+// ============================================================
+//
 
 // Do the dhcp dialog for the first time.
 static void do_dhcp_dialog(void)
@@ -121,6 +107,26 @@ static void do_hello(int src_tid)
 */
 }
 
+// Disable network
+static void do_net_off(void)
+{
+    sc82 ( 
+        22001, 
+        0,  // OFF
+        0, 
+        0 );
+}
+
+// Enable network
+static void do_net_on(void)
+{
+    sc82 ( 
+        22001, 
+        1,  // ON 
+        0, 
+        0 );
+}
+
 static void do_reboot(int src_tid)
 {
 // Invalid TID
@@ -135,8 +141,29 @@ static void do_reboot(int src_tid)
     rtl_reboot();
 }
 
+static void xxxSendResponse(void)
+{
+    if (NoReply == TRUE){
+        return;
+    }
+// Post next response
+    RTLEventBuffer[0] = 0;
+    RTLEventBuffer[1] = (unsigned long) (NextMessage.msg_code & 0xFFFFFFFF);
+    RTLEventBuffer[2] = (unsigned long) NextMessage.long1;
+    RTLEventBuffer[3] = (unsigned long) NextMessage.long2;
+    rtl_post_system_message( 
+        (int) NextMessage.target_tid,
+        (unsigned long) RTLEventBuffer );
+// Clear message
+    NextMessage.target_tid = 0;
+    NextMessage.msg_code = 0;
+    NextMessage.long1 = 0;
+    NextMessage.long2 = 0;
+    NoReply = TRUE;   // No more responses
+}
+
 static int 
-processEvent ( 
+xxxProcessEvent ( 
     void *window, 
     int msg, 
     unsigned long long1, 
@@ -280,28 +307,16 @@ fail:
     return (int) -1;
 }
 
-static void __send_response(void)
-{
-    if (NoReply == TRUE){
-        return;
-    }
-// Post next response
-    RTLEventBuffer[0] = 0;
-    RTLEventBuffer[1] = (unsigned long) (NextMessage.msg_code & 0xFFFFFFFF);
-    RTLEventBuffer[2] = (unsigned long) NextMessage.long1;
-    RTLEventBuffer[3] = (unsigned long) NextMessage.long2;
-    rtl_post_system_message( 
-        (int) NextMessage.target_tid,
-        (unsigned long) RTLEventBuffer );
-// Clear message
-    NextMessage.target_tid = 0;
-    NextMessage.msg_code = 0;
-    NextMessage.long1 = 0;
-    NextMessage.long2 = 0;
-    NoReply = TRUE;   // No more responses
-}
+//
+// ==========================================================
+//
 
-static int __idlethread_loop(void)
+//
+// $
+// LOOP (System events)
+//
+
+static int xxxEventLoopSystemEvents(void)
 {
 // Get input from idlethread.
 // Getting requests or events.
@@ -324,7 +339,7 @@ static int __idlethread_loop(void)
             // Get caller's tid.
             Caller.tid = (int) ( RTLEventBuffer[8] & 0xFFFF );
             // Dispatch.
-            processEvent ( 
+            xxxProcessEvent ( 
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1],  // msg 
                 RTLEventBuffer[2], 
@@ -336,12 +351,19 @@ static int __idlethread_loop(void)
         }
 
         if (NoReply == FALSE){
-            __send_response();
+            xxxSendResponse();
         }
     };
 
     return 0;
 }
+
+// =============================================================
+
+//
+// $
+// RUN SERVER
+//
 
 // This is a loop where we get messages from the threads queue.
 // Any process can send messages and the kernel can also 
@@ -349,7 +371,7 @@ static int __idlethread_loop(void)
 // We're NOT using the unix-sockets
 // just like in a regular Gramado server. 
 // We're just getting messages in the threads message queue.
-int run_server(void)
+int msgloop_RunServer(void)
 {
 // Called by main() in main.c
 
@@ -358,7 +380,7 @@ int run_server(void)
 /*
 // We need to be in the initialized state.
     if (Init.initialized != TRUE){
-        printf("run_server: Not initialized\n");
+        printf("msgloop_RunServer: Not initialized\n");
         //
     }
 */
@@ -370,9 +392,9 @@ int run_server(void)
 
     //# no focus!
     //rtl_focus_on_this_thread();
-    IdleLoopStatus = (int) __idlethread_loop();
+    IdleLoopStatus = (int) xxxEventLoopSystemEvents();
     if (IdleLoopStatus < 0){
-        printf("run_server: Loop failed\n");
+        printf("msgloop_RunServer: Loop failed\n");
         goto fail;
     }
     // It's time o quit the init process.
@@ -381,16 +403,21 @@ fail:
     return (int) -1;
 }
 
+//
+// $
+// RUN SERVER - (Headless mode)
+//
+
 // #todo
 // Maybe we can get some parameters here.
-int initialize_headless_mode(void)
+int msgloop_RunServer_HeadlessMode(void)
 {
     int Status = -1;
 
 /*
 // We need to be in the initialized state.
     if (Init.initialized != TRUE){
-        printf("run_server: Not initialized\n");
+        printf("msgloop_RunServer_HeadlessMode: Not initialized\n");
         //
     }
     if (Init.is_headless != TRUE){
@@ -420,7 +447,7 @@ int initialize_headless_mode(void)
 // Maybe this is the first time we're doing this.
     do_dhcp_dialog();
 
-    Status = (int) run_server();
+    Status = (int) msgloop_RunServer();
     if (Status<0){
         Status = -1;
         goto fail;
