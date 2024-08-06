@@ -8,6 +8,7 @@
  *     This driver was created by Nelson Cole for Sirius OS.
  *     2021 - Some new changes by Fred Nora.
  */
+
 // #todo:
 // Rever a tipagem.
 // Usar os nomes tradicionais para os tipos.
@@ -605,7 +606,7 @@ int ide_dev_init(char port)
     new_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
     if ((void *) new_dev ==  NULL){
         printf ("ide_dev_init: [FAIL] new_dev\n");
-        die();
+        bl_die();
     }
 
     data = (int) ide_identify_device(port);
@@ -719,7 +720,7 @@ int ide_dev_init(char port)
     tmp_dev = (struct st_dev *) ready_queue_dev;
     if ((void*) tmp_dev == NULL){
         printf("ide_dev_init: [FAIL] tmp_dev\n");
-        die();
+        bl_die();
     }
 
     while (tmp_dev->next){
@@ -1297,7 +1298,7 @@ diskATAPCIConfigurationSpace (
         // #panic
         printf ("diskATAPCIConfigurationSpace: [bl/dd/ide.c]\n");
         printf ("class/subclass not supported\n\n");
-        die();
+        bl_die();
     };
 
 // #obs:
@@ -1672,7 +1673,7 @@ int diskATAInitialize(int ataflag)
         ready_queue_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
         if ((void *) ready_queue_dev == NULL){
             printf("diskATAInitialize: ready_queue_dev struct fail\n");
-            die();
+            bl_die();
         }
 
         // #todo:
@@ -1692,7 +1693,7 @@ int diskATAInitialize(int ataflag)
         ata_identify_dev_buf = (_u16 *) malloc(4096);
         if ((void *) ata_identify_dev_buf == NULL){
             printf("diskATAInitialize: ata_identify_dev_buf fail\n");
-            die();
+            bl_die();
         }
 
         // Sondando dispositivos
@@ -1729,12 +1730,12 @@ int diskATAInitialize(int ataflag)
               //ahci_mass_storage_init();
 
               printf ("diskATAInitialize: AHCI not supported\n");
-              die();
+              bl_die();
 
           // Panic!
           }else{
               printf ("diskATAInitialize: IDE and AHCI not found\n");
-              die();
+              bl_die();
           };
 // Ok
 

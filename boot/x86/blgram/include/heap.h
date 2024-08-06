@@ -1,6 +1,6 @@
-
 // heap.h
-// Heap support for x86 bootloader.
+// Heap support for x86 Gramado Boot Loader.
+// Created by Fred Nora.
 
 #ifndef __HEAP_H
 #define __HEAP_H    1

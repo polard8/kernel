@@ -1,13 +1,9 @@
-/*
- * File: stddef.h 
- *     Lib C. - C99.
- *     2015 - Created by Fred Nora.
- */
-
+// stddef.h 
+// Standard definitions.
+// 2015 - Created by Fred Nora.
 
 #ifndef __STDDEF_H
 #define __STDDEF_H  1
-
 
 /* 
 Macros:

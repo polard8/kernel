@@ -1,11 +1,14 @@
+// timer.c
+// Timer support for the boot loader.
+// #ps: No plains for this.
+// 2015 - Created by Fred Nora.
+
 /*
- * timer.c 
  * Handler da irq0 para o Boot Loader.
  * 32bit bootloader.
  * O timer no Boot Loader n�o faz task switch.
  * O timer ser� usado principalmente para timeout de driver.
  * O timer pode ser usado para contar tempo de inicializa��o.
- * 2015 - Created by Fred Nora.
  */
 
 #include <bootloader.h>

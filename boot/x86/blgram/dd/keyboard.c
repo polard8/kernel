@@ -1,16 +1,16 @@
+// keyboard.c
+// PS/2 keyboard support for the bootloader.
+// 2015 - Created by Fred Nora.
+
 /*
- * keyboard.c 
- * Driver básico de teclado para o Boot Loader.
- * 32bit bootloader.
  * O padrão de teclado usado precisa ser revisto.
  * Pelo jeito estamos usando o padr�o americano. Mas 
  * é possível adaptar para ABNT2 se muitos problemas.
  * Podemos copiar do driver do n�cleo.
- * 2015 - document created by Fred Nora.
  */
- 
-#include <bootloader.h>
 
+
+#include <bootloader.h>
 
 //
 // globals

@@ -1,18 +1,10 @@
 ; sw.inc
-; Routines for software interrupts support.
-;
-; Descrição:
-;     Rotinas de software para o boot loader.
-;     Interrupções de software.
-; Obs:
-;     *As primeiras são em ordem numérica.
-;     *As outras são genéricas ou especiais.
-;     *As interrupções de software começam na 48 e vão até 255.
-; 2015~2016.
+; sw interrupts support.
+; 2015 - Created by Fred Nora.
 
 
 ;
-; Funções importadas.
+; Imported functions.
 ;
 
 extern _system_services    ;System services oferecidos pelo boot loader.
@@ -22,7 +14,7 @@ extern _system_services    ;System services oferecidos pelo boot loader.
 
 ;----------------------------------------
 ; unhandled_int:
-;     Interrupção de software genérica.
+;     Interrupï¿½ï¿½o de software genï¿½rica.
 ;
 unhandled_int:
     ;cli
@@ -34,7 +26,7 @@ unhandled_int:
 
 ;---------------------------------------------
 ; unhandled_int:
-;     Outra interrupção de software genérica.
+;     Outra interrupï¿½ï¿½o de software genï¿½rica.
 ;     Coloca um char na tela.
 
 ignore_int:
@@ -135,15 +127,15 @@ _int100:
 
 ;--------------------------------
 ; _int200:
-;     INTERRUPÇÃO DE SISTEMA.
+;     INTERRUPï¿½ï¿½O DE SISTEMA.
 
 global _int200
 _int200:
 
 	;cli    
-	;Confere o número do serviço.
+	;Confere o nï¿½mero do serviï¿½o.
 
-;sem numero do serviço
+;sem numero do serviï¿½o
     cmp dword [0x00900000], dword 0 
     je .exit_serv
 
@@ -151,9 +143,9 @@ _int200:
     cmp dword [0x00900000], dword 2048 
     jg .exit_serv
 
-;chama a rotina de atendimento aos serviços.
-;se a interrupção foi chamada com um numero de serviço
-;válido.
+;chama a rotina de atendimento aos serviï¿½os.
+;se a interrupï¿½ï¿½o foi chamada com um numero de serviï¿½o
+;vï¿½lido.
     call _system_services
     ;Nothing.
 .exit_serv:
@@ -165,8 +157,8 @@ _int200:
 ;--------------------------------
 ; _int201:
 ;     Mudar procedimento
-;    @todo: Não usar change procedure assim... 
-;           usar na interruçãode sistema.
+;    @todo: Nï¿½o usar change procedure assim... 
+;           usar na interruï¿½ï¿½ode sistema.
 ;
 global _int201 
 _int201:
@@ -178,7 +170,7 @@ _int201:
 ;-----------------------------------
 ; _int213:
 ;     Executa nova tarefa.
-;     @todo: Boot Loader não tem tarefas.
+;     @todo: Boot Loader nï¿½o tem tarefas.
 
 global _int213  
 _int213:
@@ -190,7 +182,7 @@ _int213:
 
 ;----------------------------------------
 ; system_interrupt:
-;     Outra interrupção de sistema.
+;     Outra interrupï¿½ï¿½o de sistema.
 ;
 system_interrupt:
     ;...

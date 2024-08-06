@@ -1,11 +1,6 @@
-/*
- * File: faults.c 
- * Description: 
- *     Rotinas de tratamento de faults e exception para o Boot Loader em 
- * sistema 32bit para desktop.
- * Obs: Essa rotina pertence ao Boot Loader, que est� em ring 0.
- * 2015.
- */
+// faults.c
+// Faults and exceptions for the bootloader.
+// 2015 - Created by Fred Nora.
 
 #include <bootloader.h>
 
@@ -82,7 +77,7 @@ void cpu_faults(unsigned long fault_number)
 
 //done:
     faultsShowRegisters();
-    die();
+    bl_die();
 
 //  No return
 }

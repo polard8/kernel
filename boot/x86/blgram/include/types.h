@@ -1,15 +1,10 @@
-/*
- * File: types.h 
- * 
- * Descrição:
- *     Define tipos de variáveis usados pelo Boot Loader.
- *     Padrão próprio e C99.
- */
-
+// types.h 
+// Types descriptions for C99.
+// Environment: x86 32bit machines.
+// Created by Fred Nora.
 
 #ifndef __TYPES_H
 #define __TYPES_H    1
-
 
 #define TRUE 1
 #define FALSE 0

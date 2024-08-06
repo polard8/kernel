@@ -1,10 +1,7 @@
-
+// gr.c
 
 #define VGA_VRAM 0xA0000
 #define PITCH 320
-
-
-
 
 void 
 grDirectPutPixel256 ( 

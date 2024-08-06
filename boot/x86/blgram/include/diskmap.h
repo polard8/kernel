@@ -1,39 +1,25 @@
-/*
- * File: diskmap.h
- *
- * Descrição:
- *     Header para informações sobre o disco.
- *
- * Versão: 1.0, 2015.
- */
- 
+// diskmap.h
+// Disk sectors information.
+// File system information for the first partition.
+// 2015 - Created by Fred Nora.
 
 /*
- * Referência para localização de VBR, FAT, ROOT, DATAAREA ...
- *
- *
- * partição 0 - (8MB)
- *
+ * Referï¿½ncia para localizaï¿½ï¿½o de VBR, FAT, ROOT, DATAAREA ...
+ * partiï¿½ï¿½o 0 - (8MB)
  * vbr  - ?  ;134  (depende do tanto de setores reservados.)
  * fat1 - 136
  * fat2 - 200
  * root - 264
  * data - 296
- *
  */
 
-
-//MBR.
+//MBR
 #define MBR_LBA  0
 #define FS_MBR_LBA  MBR_LBA
  
- 
-// 
 // Obs: 
 //     Valores definidos por imdisk. 
 //     @todo: 
-//
-//
 #define FS_VBR_LBA       63     //134
 #define FS_FAT_LBA       67     //136 
 #define FS_ROOTDIR_LBA   559    //264

@@ -1,14 +1,12 @@
 ; swlib.inc
 ; Support to sw.inc
-;
-; Descrição:
-;     Rotinas de apoio para rotinas de software em software.inc.
 ; 2015 - Created by Fred Nora.
 
 ; #bugbug
 ; Muda o nome do arquivo para o formato 8.3
+
 ;
-; Funções importadas.
+; Imported functions.
 ;
 
 extern _vsync
@@ -20,9 +18,9 @@ SOFTWARELIB_BACKBUFFER EQU   (0x1000000 - 0x800000)
 ;---------------------------------------------
 ; _my_buffer_load_bitmap_16x16 
 ;    Decodifica um bitmap 16x16 e coloca em um buffer.
-;    Obs: Talvez seja agradável carregar um bitmat na inicialização.
+;    Obs: Talvez seja agradï¿½vel carregar um bitmat na inicializaï¿½ï¿½o.
 ;         Mudar o nome para softwarelibLoadOnBufferBitmap16x16:.
-; a = endreço da imagem 
+; a = endreï¿½o da imagem 
 ; b = x
 ; c = y 
 ; d = null
@@ -40,7 +38,7 @@ _my_buffer_load_bitmap_16x16:
 
     ;eax contem o inicio do bmp.
     add eax, dword 036h    ;Adiciona o offset da area de dados do bmp.	
-    mov esi, eax           ;Início da area de dados da imagem.
+    mov esi, eax           ;Inï¿½cio da area de dados da imagem.
 
 ;Destino.
 
@@ -56,22 +54,22 @@ _my_buffer_load_bitmap_16x16:
 	mul edx                 ;(numero de linhas x bytes por linha)   
     add eax, ebx            ;Adiciona x.	
     
-    ;'eax', Contém o deslocamento em relação ao inicio do buffer.
+    ;'eax', Contï¿½m o deslocamento em relaï¿½ï¿½o ao inicio do buffer.
 	
 	;mov edx, dword [5000h] ;lfb
     mov edx, dword SOFTWARELIB_BACKBUFFER ;0x01000000    ;buffer
 	add eax, edx                 ;adiciona o buffer
-    mov edi, eax                 ;posição (esquerda/cima) da imagem na tela.
+    mov edi, eax                 ;posiï¿½ï¿½o (esquerda/cima) da imagem na tela.
 	
 	;sabendo a altura da imagem ...
 	mov eax, edi
 	add eax, dword 800*3*16    ;640*3*16 ;1024*4*16 ;640*4*16 ;(bytes por linha x altura).
 	
-	;'eax', Contém a posição '|____' .... (baixo/esquerda) da imagem.
+	;'eax', Contï¿½m a posiï¿½ï¿½o '|____' .... (baixo/esquerda) da imagem.
 	
 	mov edi, eax
 
-	;A sincronização é feita antes de chamar essa função.
+	;A sincronizaï¿½ï¿½o ï¿½ feita antes de chamar essa funï¿½ï¿½o.
 	;call _vsync
 
     mov ecx, dword 16    ;Quantidade de linhas.
@@ -108,7 +106,7 @@ _my_buffer_load_bitmap_16x16:
 	mov edi, eax
 	
 	loop .pinta_bmp
-	emms               ;Isso é necessário.
+	emms               ;Isso ï¿½ necessï¿½rio.
 	ret
 ;Nothing.
 .endereco: dd 0
@@ -118,13 +116,13 @@ _my_buffer_load_bitmap_16x16:
 
 ;==========================================
 ; _background:
-;     Pinta um background diretamente na memória de video.  
-;     ( #teste Não é recomendado escrever na memoria de video 
-;       sem sincronizar o retraço vertical) 
+;     Pinta um background diretamente na memï¿½ria de video.  
+;     ( #teste Nï¿½o ï¿½ recomendado escrever na memoria de video 
+;       sem sincronizar o retraï¿½o vertical) 
 ; @todo:
-;     Está escrevendo diretamente na memória de vídeo. No endereço do LFB 
+;     Estï¿½ escrevendo diretamente na memï¿½ria de vï¿½deo. No endereï¿½o do LFB 
 ; passado pelo bootmanager via argumento.
-;     É necessário criar uma um endreço lógico para o endereço físico
+;     ï¿½ necessï¿½rio criar uma um endreï¿½o lï¿½gico para o endereï¿½o fï¿½sico
 ;do LFB.
 ; IN:
 ;     EAX = COR
@@ -150,11 +148,11 @@ _background:
     call _vsync    ;Vertical sync.
 
 ;LFB.
-    mov edx, DWORD [_g_lbf_pa]    ;; Endereço físico do LFB. Passado pelo BM. 
+    mov edx, DWORD [_g_lbf_pa]    ;; Endereï¿½o fï¿½sico do LFB. Passado pelo BM. 
     mov edi, edx
 
 	;Contador de linhas
-	mov ebx, dword 600    ;número de linhas.
+	mov ebx, dword 600    ;nï¿½mero de linhas.
 .bg_newline:     	
 	;Contador de pixel por linha.
     mov ecx, dword (800*3)    ;(800*3). (800 pixel por linha, 3 bytes por pixel.).	
@@ -165,11 +163,11 @@ _background:
 	stosb 
 	mov al, byte [.b]
 	stosb    
-	loop .bg_newpixel    ;Próximo pixel. 
+	loop .bg_newpixel    ;Prï¿½ximo pixel. 
     dec   ebx         
 	
 	cmp ebx, dword 0
-	jne .bg_newline    ;Próxima linha.
+	jne .bg_newline    ;Prï¿½xima linha.
 	;Nothing.
 .exit_bg:
     popad
@@ -192,7 +190,7 @@ _gui_buffer_putpixel:
     push ebx
     push ecx
 
-    ;@todo: Isso é um ajuste provisório.
+    ;@todo: Isso ï¿½ um ajuste provisï¿½rio.
 	mov dword [.cor], eax    ;Salva cor.
 	mov dword [.x],   ebx    ;Salva x.
 	mov dword [.y],   ecx    ;Salva y.
@@ -228,7 +226,7 @@ _gui_buffer_putpixel:
     
 	;mov eax, ecx       ;[MenColor] ; eax = color
     
-	;@todo: Mudar o buffer para um endereço lógico conhecido. 
+	;@todo: Mudar o buffer para um endereï¿½o lï¿½gico conhecido. 
 	;(base) buffer 1 
 	mov ecx, dword SOFTWARELIB_BACKBUFFER ;0x01000000    ;buffer ;[ModeInfo_PhysBasePtr]
     add edi, ecx     ;(deslocamento).
@@ -260,7 +258,7 @@ _gui_buffer_putpixel:
 
 ;;==================================================================
 ;  _refresh_screen:
-;      Passa o conteúdo do Backbuffer para o LFB.
+;      Passa o conteï¿½do do Backbuffer para o LFB.
 ;      @todo: _softwarelibRefreshScreen:       
 ;
 
@@ -283,7 +281,7 @@ _refresh_screen:
 
     ;Origem, buffer.
     mov esi, dword SOFTWARELIB_BACKBUFFER  ;0x01000000 
-    ;Destino, LFB, (no início o bootloader lida com endereços fisicos).
+    ;Destino, LFB, (no inï¿½cio o bootloader lida com endereï¿½os fisicos).
     mov edx, DWORD [_g_lbf_pa]    ;[bl_lfb] 
     mov edi, edx
 

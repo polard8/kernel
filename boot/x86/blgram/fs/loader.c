@@ -1,12 +1,8 @@
-/*
- * File: fs/loader.c
- *     Rotinas para carregar o Kernel, os programas do sistema e os 
- * arquivos de inicializaçao.
- * In this file:
- *     + elfLoadKernelImage: Carrega o KERNEL.BIN.
- * History:
- *     2015 - Created by Fred Nora.
- */
+// loader.c
+// Routines to load images.
+// In this file:
+//   + elfLoadKernelImage: Carrega o KERNEL.BIN.
+// 2015 - Created by Fred Nora.
 
 #include <bootloader.h>
 
@@ -15,7 +11,6 @@
 //#define IMAGE_FILE_MACHINE_IA64   0x0200  // Intel Itanium
 //#define IMAGE_FILE_MACHINE_AMD64  0x8664  // x64
 //Continua...
-
 
 /*
 // Progress bar support.

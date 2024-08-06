@@ -1,6 +1,8 @@
+// fs.c
+// Filesystem support for the bootloader.
+// 2015 - Created by Fred Nora.
+
 /*
- * File: fs/fs.c
- * Descri��o:
  * Arquivo principal do sistema de arquivos usado no Boot Loader.
  * Sobre o sistema de arquivos:
  *    + HD IDE.
@@ -16,9 +18,8 @@
  * Observa��o: 
  *     Os valores das estruturas podem ser salvos em um registro. No registro 
  * pode ter um registro das opera��es efetuadas no sistema de arquivo.
- * History:
- *     2015 - Created by Fred Nora.
  */
+
 
 #include <bootloader.h>
 

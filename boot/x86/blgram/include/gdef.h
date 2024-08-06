@@ -1,10 +1,7 @@
-/*
- * File: gdef.h
- * Global definitions for the boot loader.
- * Put this in the top of the includes.
- * History:
- *     2016 - Created by Fred Nora.
- */
+// gdef.h
+// Global definitions for the boot loader.
+// #ps Put this in the top of the includes.
+// 2016 - Created by Fred Nora.
 
 //
 // The boot block structure.
@@ -54,12 +51,12 @@ extern int gdefShowProgressBar;
 // ...
 
 
-// Essa flag será lida pela rotina de falta de página.
-// para ignorar e não parar o sistema.
+// Essa flag serï¿½ lida pela rotina de falta de pï¿½gina.
+// para ignorar e nï¿½o parar o sistema.
 //int ____testing_memory_size_flag;
 extern int ____testing_memory_size_flag;
 
-//salvando o úlltimo endereço válido
+//salvando o ï¿½lltimo endereï¿½o vï¿½lido
 //unsigned long __last_valid_address; 
 extern unsigned long __last_valid_address;
 

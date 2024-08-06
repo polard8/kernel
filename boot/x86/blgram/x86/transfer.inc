@@ -2,8 +2,16 @@
 ; Transfer the execution to the kernel.
 ; 2023 - Created by Fred Nora.
 
+;
+; Bootblock
+;
+
 BOOTBLOCK_ADDRESS EQU  0x00090000
 BOOTBLOCK_SIGNATURE EQU  1234
+
+;
+; Kernel image
+;
 
 ;KERNEL_BASE        EQU  0x30000000
 KERNEL_ENTRY_POINT EQU  0x30001000

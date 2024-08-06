@@ -1,12 +1,9 @@
-/*
- * File: pages.c
- *     Pre-mapping the some memory regions.
- *     The is gonna be changed by the base kernel.
- *     We need this to compile the base kernel 
- * against the 0xC0000000 address.
- * History:
- *     2015 - Created by Fred Nora.
- */
+// pages.c
+// Pre-mapping the some memory regions.
+// This is gonna be changed by the base kernel.
+// We need this to compile the base kernel 
+// against the 0x30000000 virtual address address.
+// 2015 - Created by Fred Nora.
 
 #include <bootloader.h>
 
@@ -42,31 +39,31 @@ void page_enable()
  * SetUpPaging:
  *     Mapping.
  * In this function:
- *     (Phase 1) Endereços da memória físicas acessíveis em Kernel Mode. 
- *     (Phase 2) Inicializando o diretório.
- *     (Phase 3) Cria tabelas de páginas e coloca o ponteiro de cada uma 
- * delas na sua respectiva entrada de diretório.
- *     (Phase 4) CRIANDO OUTROS DIRETÓRIOS
+ *     (Phase 1) Endereï¿½os da memï¿½ria fï¿½sicas acessï¿½veis em Kernel Mode. 
+ *     (Phase 2) Inicializando o diretï¿½rio.
+ *     (Phase 3) Cria tabelas de pï¿½ginas e coloca o ponteiro de cada uma 
+ * delas na sua respectiva entrada de diretï¿½rio.
+ *     (Phase 4) CRIANDO OUTROS DIRETï¿½RIOS
  * @diretorio:
  *   boot_pd0 = 0x9C000.
  *   Page directory do kernel.
- * Obs: Esse diretório criado será usado pelas primeiros processos durante
- * essa fase de construção do sistema. O ideal é um diretório por processo.
- *      Toda vez que o Kernel inicia a execução de um processo, ele deve 
- * carregar o endereço do diretório do processo em CR3. Por enquanto só tem 
- * um diretório criado e todos os processos estão definindo o diretório do
- * Kernel como sendo seu próprio. Ou seja, eles podem usar as mesmas tabelas
- * de páginas que o processo kernel usa. O problema é que com isso os 
- * processos precisam ter endereço virtual diferentes. Quando cada processo
- * tiver seu próprio diretório então eles poderão ter o mesmo endereço virtual.
- * @todo: Esses endereços precisam ser registrados em variáveis globais ou
+ * Obs: Esse diretï¿½rio criado serï¿½ usado pelas primeiros processos durante
+ * essa fase de construï¿½ï¿½o do sistema. O ideal ï¿½ um diretï¿½rio por processo.
+ *      Toda vez que o Kernel inicia a execuï¿½ï¿½o de um processo, ele deve 
+ * carregar o endereï¿½o do diretï¿½rio do processo em CR3. Por enquanto sï¿½ tem 
+ * um diretï¿½rio criado e todos os processos estï¿½o definindo o diretï¿½rio do
+ * Kernel como sendo seu prï¿½prio. Ou seja, eles podem usar as mesmas tabelas
+ * de pï¿½ginas que o processo kernel usa. O problema ï¿½ que com isso os 
+ * processos precisam ter endereï¿½o virtual diferentes. Quando cada processo
+ * tiver seu prï¿½prio diretï¿½rio entï¿½o eles poderï¿½o ter o mesmo endereï¿½o virtual.
+ * @todo: Esses endereï¿½os precisam ser registrados em variï¿½veis globais ou
  * dentro de uma estrutura para serem passados para o Kernel.
- * Obs: Essa deve ser uma interface que chama as rotinas de configuração de 
- * paginação. (Mapeamento). 
+ * Obs: Essa deve ser uma interface que chama as rotinas de configuraï¿½ï¿½o de 
+ * paginaï¿½ï¿½o. (Mapeamento). 
  * Obs: 
- * Essa configuração inicial feita no Boot Loader, não impede o Kernel de 
- * refazer as configurações básicas de paginação. O fato é que o kernel será o 
- * gerenciador de páginas de memória. O que não impede de haver 
+ * Essa configuraï¿½ï¿½o inicial feita no Boot Loader, nï¿½o impede o Kernel de 
+ * refazer as configuraï¿½ï¿½es bï¿½sicas de paginaï¿½ï¿½o. O fato ï¿½ que o kernel serï¿½ o 
+ * gerenciador de pï¿½ginas de memï¿½ria. O que nï¿½o impede de haver 
  * gerenciamento um user mode.
  * History:
  *     2015 - Created by Fred Nora.
@@ -84,57 +81,57 @@ void SetUpPaging(void)
 
 // 9 9 9 9 12
 // Agora as tabelas possuem 512 entradas,
-// pois é isso o que dá pra ter com apenas 9 bits.
-// Agora o addr de cada tabela é de 52 bits, os outros 12 bits são reservados.
-// Antes cada entrada era de 4 bytes, agora é de 8 bytes.
+// pois ï¿½ isso o que dï¿½ pra ter com apenas 9 bits.
+// Agora o addr de cada tabela ï¿½ de 52 bits, os outros 12 bits sï¿½o reservados.
+// Antes cada entrada era de 4 bytes, agora ï¿½ de 8 bytes.
 // Nesse caso a tabela continua do mesmo tamanho, mas agora com 512 entradas de 8
 
 // (Phase 1) 
-// Endereços da memória físicas acessíveis em Kernel Mode.
+// Endereï¿½os da memï¿½ria fï¿½sicas acessï¿½veis em Kernel Mode.
 
 //
 // Kernel.
 //
 
-// Address. para os 2 primeiros mega da memória fisica.
-// Base, 0x100000, para o kernel que começa no primeiro mega.
-    unsigned long kernel_address = 0;           //Início da memória RAM.                
-    unsigned long kernel_base = KERNEL_BASE;    //Início da imagem do kernel.    
+// Address. para os 2 primeiros mega da memï¿½ria fisica.
+// Base, 0x100000, para o kernel que comeï¿½a no primeiro mega.
+    unsigned long kernel_address = 0;           //Inï¿½cio da memï¿½ria RAM.                
+    unsigned long kernel_base = KERNEL_BASE;    //Inï¿½cio da imagem do kernel.    
 
 //
 // (Phase 2) 
-// Endereços da memória físicas acessíveis em User Mode.
+// Endereï¿½os da memï¿½ria fï¿½sicas acessï¿½veis em User Mode.
 //
 
 // User, 0x00400000.
     unsigned long user_address = USER_BASE;
-// VGA, Físico=0x000B8000.
+// VGA, Fï¿½sico=0x000B8000.
     unsigned long vga_address = VM_BASE;   
 // VESA LFB, foi passado pelo Boot Manager.
     unsigned long lfb_address  = (unsigned long) g_lbf_pa;
-// backbuffer: endereço físico provisório para o backbuffer
-// BUFFER, provisório. @todo: Mudar. 
-// (para sistemas com pouca memória.)
+// backbuffer: endereï¿½o fï¿½sico provisï¿½rio para o backbuffer
+// BUFFER, provisï¿½rio. @todo: Mudar. 
+// (para sistemas com pouca memï¿½ria.)
 // 16mb. (16*1024*1024) = 0x01000000.
     unsigned long buff_address  = (unsigned long) 0x01000000; 
 
 // DIRECTORY:
-// Diretórios de páginas.
-// Esse valor é salvo em cr3. Cada diretório tem seu endereço.
-// Esse diretório, configurado aqui no Boot Loader é o mesmo usado 
+// Diretï¿½rios de pï¿½ginas.
+// Esse valor ï¿½ salvo em cr3. Cada diretï¿½rio tem seu endereï¿½o.
+// Esse diretï¿½rio, configurado aqui no Boot Loader ï¿½ o mesmo usado 
 // pelo Kernel.
 // Obs: 
-// A idéia é que os diretório sejam criados em ordem decrescente.
-// Os espaços entre os diretório serão preenchidos com páginas 
-// avulsas. Depois, no kernel, haverá área de alocação para 
-// diretórios e páginas.
+// A idï¿½ia ï¿½ que os diretï¿½rio sejam criados em ordem decrescente.
+// Os espaï¿½os entre os diretï¿½rio serï¿½o preenchidos com pï¿½ginas 
+// avulsas. Depois, no kernel, haverï¿½ ï¿½rea de alocaï¿½ï¿½o para 
+// diretï¿½rios e pï¿½ginas.
 // Teste:
-// Criando diretórios para os primeiros processos do sistema. 
+// Criando diretï¿½rios para os primeiros processos do sistema. 
 // (antes de 32MB).
-// Obs: Essa área onde estão os diretórios é uma área desprotegiada ainda.
-// Obs: O kernel está reconfigurando e usando outro endereço para o 
-// diretório de páginas.
-// @todo: Alertar o kernel sobre esses endereços de diretórios.
+// Obs: Essa ï¿½rea onde estï¿½o os diretï¿½rios ï¿½ uma ï¿½rea desprotegiada ainda.
+// Obs: O kernel estï¿½ reconfigurando e usando outro endereï¿½o para o 
+// diretï¿½rio de pï¿½ginas.
+// @todo: Alertar o kernel sobre esses endereï¿½os de diretï¿½rios.
 
 
 // =====================================
@@ -154,9 +151,9 @@ void SetUpPaging(void)
     // a lot of page tables in the level 1.
 
 // TABLES: 
-// Tabelas de páginas.
-// Uma tabela para cada área de memória que se deseja usar.
-// Usando endereços decrescentes.
+// Tabelas de pï¿½ginas.
+// Uma tabela para cada ï¿½rea de memï¿½ria que se deseja usar.
+// Usando endereï¿½os decrescentes.
 // ptKM  - First 2MB.
 // ptKM2 - The kernel image.
 // ptUM  - User mode area for application. (Not used yet)
@@ -225,8 +222,8 @@ void SetUpPaging(void)
 // PAGE TABLES.
 //
 
-// Vamos criar algumas pagetables e apontá-las
-// como entradas no diretório 'boot_pd0'.
+// Vamos criar algumas pagetables e apontï¿½-las
+// como entradas no diretï¿½rio 'boot_pd0'.
 
 // =======================================
 // Primeiros 2MB.
@@ -237,14 +234,14 @@ Entry_0:
  kernel mode pages 
  =================
  (kernel mode)(0fis = 0virt).
- Configurando o início da memória RAM
- como área em kernel mode.
- + Mapeando os primeiros 2MB da memória.  
+ Configurando o inï¿½cio da memï¿½ria RAM
+ como ï¿½rea em kernel mode.
+ + Mapeando os primeiros 2MB da memï¿½ria.  
  + Preenchendo a tabela km_page_table.
- + A entrada '0' do diretório aponta para
+ + A entrada '0' do diretï¿½rio aponta para
    uma tabela que mapeia os primeiros 4 mega 
-   de endereço virtual.
- 'kernel_address' é o início da memória RAM.
+   de endereï¿½o virtual.
+ 'kernel_address' ï¿½ o inï¿½cio da memï¿½ria RAM.
   Cada pagina tem 4KB.
  */
 
@@ -259,35 +256,35 @@ Entry_0:
         ptKM[i*2+1] = 0;
         kernel_address = kernel_address + 4096;
     };
-    // Criando a primeira entrada do diretório.
-    // Isso mapeia os primeiros 2MB da memória RAM.
+    // Criando a primeira entrada do diretï¿½rio.
+    // Isso mapeia os primeiros 2MB da memï¿½ria RAM.
     boot_pd0[0*2] = (unsigned long) &ptKM[0];
     boot_pd0[0*2] = boot_pd0[0*2] | 3;    //Configurando atributos.
     boot_pd0[0*2+1] = 0;
 
 // =======================================
-// Uma área em user mode.
-// 0x00200000vir - Começa na marca de 32mb.
+// Uma ï¿½rea em user mode.
+// 0x00200000vir - Comeï¿½a na marca de 32mb.
 Entry_1:
 
 /*
  user mode pages 
  ===============
  (400000fis = 400000virt).
- Configurando uma área de memória em user mode,
+ Configurando uma ï¿½rea de memï¿½ria em user mode,
  usada por processos em user mode.
- Mapear 2MB da memória começando em 400000fis. 
+ Mapear 2MB da memï¿½ria comeï¿½ando em 400000fis. 
  (user mode).
  user_address = (400000fis = 400000virt).
  */
 
     for (i=0; i < 512; i++)
     {
-        ptUM[i*2]   = user_address | 7;    //0111 em binário.
+        ptUM[i*2]   = user_address | 7;    //0111 em binï¿½rio.
         ptUM[i*2+1] = 0;
         user_address = user_address + 4096;     //4096 = 4KB.
     };
-    //Criando a entrada número 1 do diretório.
+    //Criando a entrada nï¿½mero 1 do diretï¿½rio.
     boot_pd0[1*2]   = (unsigned long) &ptUM[0];
     boot_pd0[1*2]   = (unsigned long) boot_pd0[1*2] | 7;  //Configurando atributos.
     boot_pd0[1*2+1] = 0; 
@@ -300,22 +297,22 @@ Entry_2:
  User Mode VGA pages: 
  ===================
  (0xB8000fis = 800000virt).
- Mapeando a área de memória usada pela memória
- de vídeo em modo texto, 0xB8000.
- Mapear 2MB da memória começando em B8000fis.
+ Mapeando a ï¿½rea de memï¿½ria usada pela memï¿½ria
+ de vï¿½deo em modo texto, 0xB8000.
+ Mapear 2MB da memï¿½ria comeï¿½ando em B8000fis.
  Obs:
-     Aqui, na verdade não precisaria configurar 4 megas, 
-     apenas o tamanho da memória de vídeo presente em 0xb8000.
+     Aqui, na verdade nï¿½o precisaria configurar 4 megas, 
+     apenas o tamanho da memï¿½ria de vï¿½deo presente em 0xb8000.
  vga_address = 0xB8000.
  */
 
     for ( i=0; i < 512; i++ )
     {
-        ptVGA[i*2]   = vga_address | 7;    //0111 em binário.
+        ptVGA[i*2]   = vga_address | 7;    //0111 em binï¿½rio.
         ptVGA[i*2+1] = 0;
         vga_address  = vga_address + 4096;       //4KB.
     };
-    //Criando a entrada número 2 no diretório.
+    //Criando a entrada nï¿½mero 2 no diretï¿½rio.
     boot_pd0[2*2] = (unsigned long) &ptVGA[0];
     boot_pd0[2*2] = boot_pd0[2*2] | 7;    //Configurando atributos.
     boot_pd0[2*2+1] = 0; 
@@ -323,33 +320,33 @@ Entry_2:
 
 // =====================================
 // A imagem do kernel.
-// 0x30000000virt - Começa na marca de 1MB da memória física.
+// 0x30000000virt - Comeï¿½a na marca de 1MB da memï¿½ria fï¿½sica.
 Entry_384:
 
 // #bugbug
-// Essa não é possivel pois temos o limite de 512 entradas.
+// Essa nï¿½o ï¿½ possivel pois temos o limite de 512 entradas.
 
 /*
  kernel mode pages 
  =================
  (0x100000fis = 0xc0000000virt).
       possivelmente 0x30000000
-      mas precisamos checar, pois isso não esta funcionando.
-      precisamos encontrar esse endereço virtual.
- Configurando a área de memória onde ficará a imagem do kernel.
- Isso mapeia 2MB começando do primeiro mega. 
+      mas precisamos checar, pois isso nï¿½o esta funcionando.
+      precisamos encontrar esse endereï¿½o virtual.
+ Configurando a ï¿½rea de memï¿½ria onde ficarï¿½ a imagem do kernel.
+ Isso mapeia 2MB comeï¿½ando do primeiro mega. 
  (kernel mode).
  Preenchendo a tabela km_page_table.
- 'kernel_base' é o endereço físico da imagem do kernel.
+ 'kernel_base' ï¿½ o endereï¿½o fï¿½sico da imagem do kernel.
  */
 
     for ( i=0; i < 512; i++ )
     {
-        ptKM2[i*2]   = kernel_base | 3;    //0011 binário.
+        ptKM2[i*2]   = kernel_base | 3;    //0011 binï¿½rio.
         ptKM2[i*2+1] = 0;
         kernel_base  = kernel_base + 4096;       //4KB.
     };
-//Criando a entrada de número 768 do diretório.
+//Criando a entrada de nï¿½mero 768 do diretï¿½rio.
     boot_pd0[384*2] = (unsigned long) &ptKM2[0];
     boot_pd0[384*2] = (unsigned long) boot_pd0[384*2] | 3;    //Configurando atributos.
     boot_pd0[384*2+1] = 0;
@@ -358,7 +355,7 @@ Entry_384:
     // | 0 0000 0 000 | 0 0000   0000  | 0000 0000 0000
     //   00|000 0|000   0 0000 | 0000    0000 0000 0000
     //   30000000
-    // então a entrada 384 aponta para 0x30000000      
+    // entï¿½o a entrada 384 aponta para 0x30000000      
 
 
 //===========================================
@@ -370,24 +367,24 @@ Entry_385:
  user mode LFB pages 
  ===================
  (0X??fis = 0xC0400000virt).
- O endereço linear do lfb é  agora. ?? 0x30200000
- Mapear 2MB à partir do endereço configurado
- como início do LFB.
- O Boot Manager configurou VESA e obteve o endereço do LFB.
- O Boot Manager passou para o Boot Loader esse endereço.
- Mapeando 2MB da memória fisica começando no 
- endereço passado pelo Boot Manager.
- O endereço de memória virtual utilizada é 0xC0400000.
- lfb_address = Endereço do LFB, passado pelo Boot Manager.
+ O endereï¿½o linear do lfb ï¿½  agora. ?? 0x30200000
+ Mapear 2MB ï¿½ partir do endereï¿½o configurado
+ como inï¿½cio do LFB.
+ O Boot Manager configurou VESA e obteve o endereï¿½o do LFB.
+ O Boot Manager passou para o Boot Loader esse endereï¿½o.
+ Mapeando 2MB da memï¿½ria fisica comeï¿½ando no 
+ endereï¿½o passado pelo Boot Manager.
+ O endereï¿½o de memï¿½ria virtual utilizada ï¿½ 0xC0400000.
+ lfb_address = Endereï¿½o do LFB, passado pelo Boot Manager.
  */
 
     for ( i=0; i < 512; i++ )
     {
-        ptLFB[i*2]   = lfb_address | 7;    //0111 em binário.
+        ptLFB[i*2]   = lfb_address | 7;    //0111 em binï¿½rio.
         ptLFB[i*2+1] = 0;
         lfb_address  = lfb_address + 4096;       //4KB.
     };
-    //Criando a entrada número 769 do diretório.
+    //Criando a entrada nï¿½mero 769 do diretï¿½rio.
     boot_pd0[385*2] = (unsigned long) &ptLFB[0];
     boot_pd0[385*2] = boot_pd0[385*2] | 7;    //Configurando atributos.	
     boot_pd0[385*2+1] = 0; 
@@ -402,20 +399,20 @@ Entry_386:
  user mode BUFFER1 pages 
  =======================
  (0X??fis = 0xC0800000virt) (BackBuffer). 0x30800000
- Esse é o backbuffer para a memória de vídeo.
- O conteúdo desse buffer é transferido para o LFB. 
- O endereço de memória virtual utilizada é 0xC0800000.
- buff_address = 0x01000000. (16MB), provisório.
+ Esse ï¿½ o backbuffer para a memï¿½ria de vï¿½deo.
+ O conteï¿½do desse buffer ï¿½ transferido para o LFB. 
+ O endereï¿½o de memï¿½ria virtual utilizada ï¿½ 0xC0800000.
+ buff_address = 0x01000000. (16MB), provisï¿½rio.
  //16mb. (16*1024*1024) = 0x01000000.
  */
 
     for ( i=0; i < 512; i++ )
     {
-        ptBACKBUFFER[i*2] = buff_address | 7;    //0111 em binário.
+        ptBACKBUFFER[i*2] = buff_address | 7;    //0111 em binï¿½rio.
         ptBACKBUFFER[i*2+1] = 0;
         buff_address    = buff_address + 4096;       //4KB.
     };
-    //Criando a entrada número 770 do diretório.
+    //Criando a entrada nï¿½mero 770 do diretï¿½rio.
     boot_pd0[386*2] = (unsigned long) &ptBACKBUFFER[0];
     boot_pd0[386*2] = (unsigned long) boot_pd0[386*2] | 7;    //Configurando atributos.
     boot_pd0[386*2+1] = 0;
@@ -466,7 +463,7 @@ Entry_386:
     //refresh_screen();
 
 // #todo
-// long mode exige uma configuração usando msr.
+// long mode exige uma configuraï¿½ï¿½o usando msr.
 
     //int msrStatus = FALSE;
     //msrStatus = cpuHasMSR();
@@ -488,11 +485,11 @@ Entry_386:
 // #important:
 // Adiamos isso, o assembly vai fazer isso.
 // Pois no momento em que configurarmos isso, o long mode
-// estará habilitado.
+// estarï¿½ habilitado.
     // page_enable();
 
 // #bugbug
-// Não podemos chamar rotina alguma antes de configurarmos
+// Nï¿½o podemos chamar rotina alguma antes de configurarmos
 // os registradores.
 
 // vamos tentar fazer isso quando saltarmos para o kernel
@@ -501,7 +498,7 @@ Entry_386:
 
 // nao podemos chamar rotina alguma aqui,
 // somente retornar.
-// os registradores estao bagunçados.
+// os registradores estao bagunï¿½ados.
 
     //#debug
     //printf ("SetUpPaging: [breakpoint] DONE \n");

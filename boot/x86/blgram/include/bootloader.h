@@ -1,17 +1,17 @@
+// bootloader.h
+// This is the master header for the bootloader.
+// 2013 - Created by Fred Nora.
+
+//#todo: Change the name to 'bl.h'
+
 /*
- * File: bootloader.h 
- *     #todo: Change the name to 'bl.h'
- * Descri��o:
  *     Header principal do Boot Loader de 32 bits, BL.BIN.
  *     Feito em 32bit C/Assembly.
  *     Declara��es e prot�tipos para as fun��es principais do Boot Loader.
  *     Oferecer o suporte necess�rio nessa fase de inicializa��o.
- *     ...
- * History:
- *     2013 - Created by Fred Nora.
  */
 
-// Modes.
+// OS modes
 // #important
 #define GRAMADO_JAIL        0x00
 #define GRAMADO_P1          0x01
@@ -539,15 +539,6 @@ cpuSetMSR (
 //=============
 
 //
-// Initialization support.
-//
-
-void bl_main(void);
-int init(void);
-void init_globals(void);
-void boot(); 
-
-//
 // Text support.
 //
 
@@ -556,7 +547,6 @@ void set_up_text_color(unsigned char forecolor, unsigned char backcolor);
 unsigned long get_cursor_x();
 unsigned long get_cursor_y();
 unsigned long input(unsigned long ch);
-void panic(const char *msg); 
 
 //
 // Timer support.
@@ -601,9 +591,35 @@ pciConfigReadWord (
 
 void system_services();
 
+
+void init_globals(void);
+void boot(); 
+
+
 void reboot(void);
+
+// abort.c
 void abort(void);
-void die(void);
+// main.c
+void bl_abort();
+
+
+// main.c
+void bl_die(void);
+
+// main.c
+void panic(const char *msg); 
+
+//
+// $
+// INITIALIZATION
+//
+
+// init.c
+int init(void);
+
+// main.c
+void bl_main(void);
 
 //
 // End

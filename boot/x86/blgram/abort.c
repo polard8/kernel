@@ -1,8 +1,6 @@
-/*
- * File: abort.c
- * Abort the boot loader.
- * 2015 - Created by Fred Nora.
- */
+// abort.c
+// Abort the boot loader.
+// 2015 - Created by Fred Nora.
 
 #include <stdio.h>
 

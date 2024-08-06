@@ -1,32 +1,31 @@
+// memmap.h
+// Memory map for Gramado Boot Loader.
+// #ps: This is a work in progress.
+//      Do not trust in these values yet.
+// 2015 - Created by Fred Nora.
+
 /*
- * File: memmap.h
  *
- * Descrição:
- *     Header para informações sobre a memória. 
- *     Referência para localização de VBR, FAT, ROOT, DATAAREA e outros.
+ *     Header para informaï¿½ï¿½es sobre a memï¿½ria. 
+ *     Referï¿½ncia para localizaï¿½ï¿½o de VBR, FAT, ROOT, DATAAREA e outros.
  *
- * ATENÇÃO: 
  *     Kernel base = 0x00100000.
  *     vbr  =  
  *     fat  =  ;
  *     root =  ;
  *
- *     Cuidado na escolha dos endereços para fat, root.
- *     @todo Deixar espaço o bastante para um kernel grande. 
- *           Começando em 0x00100000
- *
- * Versão 1.0, 2015 - Created.
- * Versão 1.0, Oct 2016 - Revision. 
- */
+ *     Cuidado na escolha dos endereï¿½os para fat, root.
+ *     @todo Deixar espaï¿½o o bastante para um kernel grande. 
+ *           Comeï¿½ando em 0x00100000
+  */
  
-
 /*
     Memory map.
 	Para o processo do kernel.
-	Obs: Algumas áreas serão comuns entre processos
+	Obs: Algumas ï¿½reas serï¿½o comuns entre processos
 	     Como o LFB, o BackBuffer, o Kernel. 
 	
-    Mapeamento padrão de memória virtual para todos os processos:
+    Mapeamento padrï¿½o de memï¿½ria virtual para todos os processos:
     ============================================================	
 
 
@@ -37,11 +36,11 @@
 		     +------------------------------------+ 
 		     +------------------------------------+
 	         |         User Mode access           | @todo: Mudar de lugar.  
-		     |                                    |        Seder espaço para lfb.  
+		     |                                    |        Seder espaï¿½o para lfb.  
 		     |                                    |
     C0800000 |           Back Buffer              |  			 
 		     +------------------------------------+	
-	         |        User Mode access            |	 Memória da placa de vídeo.
+	         |        User Mode access            |	 Memï¿½ria da placa de vï¿½deo.
 		     |             (4MB)                  |  @todo Ampliar (PRECISA SER MAIOR)
 			 |             ...                    |  obs: Tamanho do monitor.
 	C0400000 |             LFB                    |
@@ -53,14 +52,14 @@
 	         |  Heap  =     |	Obs: O Heap do kernel precisa ser maior.
              |                                    | 			 
 			 |  Kernel Entry point = 0xC0001000   |      Entry point do kernel.
-	         |  Kernel Base = 0xC0000000          |	     Início da imágem do processo kernel. 
+	         |  Kernel Base = 0xC0000000          |	     Inï¿½cio da imï¿½gem do processo kernel. 
 	C0000000 |         Kernel Mode access         |	 	   
 	         +------------------------------------+
              |           User Land                |	 
 	         |                                    |
-             |      | @todo  Início da pilha em user mode do proesso.
-	         |      | @todo: Início do heap em user mode do processo.
-             |                                    | ### Por enquando cada processo tem sua própria
+             |      | @todo  Inï¿½cio da pilha em user mode do proesso.
+	         |      | @todo: Inï¿½cio do heap em user mode do processo.
+             |                                    | ### Por enquando cada processo tem sua prï¿½pria
              |                                    |     pilha e heap no fim da imagem do processo.   			 
              |  .           | ??
 			 |                                    |
@@ -82,7 +81,7 @@
 // 
 // Bug Bug !! 
 // @todo: 
-//     Endereços não implementados, usando VBR ?? por enquanto.
+//     Endereï¿½os nï¿½o implementados, usando VBR ?? por enquanto.
 //
 //
 
@@ -113,7 +112,7 @@
 
 
 /*
- * Referências para memória de vídeo.
+ * Referï¿½ncias para memï¿½ria de vï¿½deo.
  */
 #define BL_TEXT_MODE_BASE    0x000B8000
 #define BL_GRAPHIC_MODE_BASE 0x000A0000

@@ -129,10 +129,9 @@ try_again:
 // Obs: Temos um limite para a quantidade de índices 
 // na lista de blocos.
 
-    if (mmblockCount >= MMBLOCK_COUNT_MAX)
-    {
-        printf("heapAllocateMemory: MMBLOCK_COUNT_MAX");
-        die();
+    if (mmblockCount >= MMBLOCK_COUNT_MAX){
+        printf("heapAllocateMemory: MMBLOCK_COUNT_MAX\n");
+        bl_die();
     }
 
 // #importante
@@ -164,7 +163,7 @@ try_again:
              last_valid >= BL_HEAP_END )
         {
             printf("heapAllocateMemory: last_valid\n");
-            die();
+            bl_die();
         }
 
         // #todo: Checar a disponibilidade desse último válido.

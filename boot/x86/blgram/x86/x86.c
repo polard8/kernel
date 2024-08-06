@@ -1,13 +1,9 @@
-/*
- * File: x86.c 
- *     Acesso ao hardware na arquitetura x86.
- *    Boot Loader. BL.BIN. Ring 0.
- * Revision history:
- *     2005 - Created by Fred Nora.
- *     2019 - Revision.
- */
+// x86.c
+// Low level routines for x86 boot loader.
+// 2005 - Created by Fred Nora.
 
 #include <bootloader.h>
+
 
 // Enable interrupts
 void enable()

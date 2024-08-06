@@ -1,25 +1,21 @@
 ; headlib.s 
 ; Support for head.s
-;
-; Descrição:
-;     Biblioteca que complementa o arquivo head.s.
-;     (tss, ldt, stacks).
-; OBS: O boot loader não trabalha com tss. Está aqui só por simetria.
-; 2015~2016.
-;
+; tss, ldt, stacks.
+; 2015 - Created by Fred Nora.
+
  
 ;
-; Funções importadas.
+; Imported functions
 ;
  
 extern _task0 
 
 ;
-; Variáveis internas.
+; Internal variables.
 ;
 
 current:       dd 0 ;current.
-scr_loc:       dd 0 ;Coisa da memória de video.
+scr_loc:       dd 0 ;Coisa da memï¿½ria de video.
 bl_video_mode: db 0 
 bl_lfb:        db 0  
 
@@ -166,8 +162,8 @@ _task2_stack:
 
 
 ; Tasks: 
-; Obs: Boot Loader não usa tasks.
-;      Acho que isso é usado apenas para configurar tss.
+; Obs: Boot Loader nï¿½o usa tasks.
+;      Acho que isso ï¿½ usado apenas para configurar tss.
 
 
 ;#
@@ -195,7 +191,7 @@ setup_idt:
     mov edx, unhandled_int 
 
 	mov eax, dword 0x00080000    ;Selector = 0x0008 = cs.
-	mov ax, dx                   ;Uma parte do endereço.
+	mov ax, dx                   ;Uma parte do endereï¿½o.
 	mov dx, word 0x8E00          ;Interrupt gate - dpl=0, present.
 	mov edi, dword idt
     ;Nothing.
@@ -215,7 +211,7 @@ rp_sidt:
 ; _setup_idt_vector:
 ;     Configura um vetor da idt.
 ; IN:
-; eax = ;endereço.
+; eax = ;endereï¿½o.
 ; ebx = ;numero do vetor.
 
 global _setup_idt_vector
@@ -224,8 +220,8 @@ _setup_idt_vector:
     cli
     pushad
 
-    mov dword [.address], eax    ;Endereço.
-    mov dword [.number], ebx     ;Número do vetor.
+    mov dword [.address], eax    ;Endereï¿½o.
+    mov dword [.number], ebx     ;Nï¿½mero do vetor.
 
 	;calcula o deslocamaneto
 	mov eax, dword 8
@@ -233,14 +229,14 @@ _setup_idt_vector:
 	mul ebx
 	;resuldado em eax
 	
-	;adiciona o deslocamento à base.
+	;adiciona o deslocamento ï¿½ base.
 	mov edi, idt               ;lea edi, idt
 	add edi, eax
 	
 	mov edx, dword [.address] ;unhandled_int ;ignore_int       ;lea edx, ignore_int
 	
 	mov eax, dword 0x00080000  ;/* selector = 0x0008 = cs */
-	mov ax, dx                 ;uma parte do endereço
+	mov ax, dx                 ;uma parte do endereï¿½o
 	mov dx, word 0x8E00        ;/* interrupt gate - dpl=0, present */
 	
 	;coloca o vetor na idt
@@ -291,7 +287,7 @@ setup_faults:
 	mov eax, dword _fault_N5
 	mov ebx, dword 5
 	call _setup_idt_vector	
-	;#6 - Instrução inválida.
+	;#6 - Instruï¿½ï¿½o invï¿½lida.
 	mov eax, dword _fault_INTRUCAO_INVALIDA
 	mov ebx, dword 6
 	call _setup_idt_vector
@@ -427,10 +423,10 @@ setup_vectors:
 
 ;
 ; timer - 
-; iniciamos um timer provisório, depois o Kemain() inicia o definitivo.
+; iniciamos um timer provisï¿½rio, depois o Kemain() inicia o definitivo.
 ;
-	;mov eax,  dword _irq0         ;será inicializado em c. 
-	mov eax,  dword _timer_test    ;provisório.
+	;mov eax,  dword _irq0         ;serï¿½ inicializado em c. 
+	mov eax,  dword _timer_test    ;provisï¿½rio.
 	mov ebx, dword 32
 	call _setup_idt_vector
 	

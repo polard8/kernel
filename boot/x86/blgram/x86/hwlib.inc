@@ -1,11 +1,6 @@
 ; hwlib.inc
 ; Support for hw.inc
-;
-; Descrição:
-;     Rotinas de apoio às rotinas em hardware.inc.
-; Histórico:
-; 2015~2016.
- 
+; 2015 - Created by Fred Nora.
 
 ; IDE ports:
 ; =========
@@ -24,7 +19,6 @@
 
 
 [BITS 32]  
-
 
 ;
 ; HDD support.
@@ -53,9 +47,9 @@ _test_write:
 
 ;-----------------------------------------
 ; _os_read_sector:
-;    Lê um setor do HD IDE.
+;    Lï¿½ um setor do HD IDE.
 ;    bugbug: limpando a tela.
-;    +a função reset nao apresenta o bug. 
+;    +a funï¿½ï¿½o reset nao apresenta o bug. 
 ;    +testando hd0_read_sector.
 
 global _os_read_sector
@@ -70,7 +64,7 @@ _os_read_sector:
 	;call hd0_read_sector
 	
 	
-	; Uma nova rotina, bem mais rápida.
+	; Uma nova rotina, bem mais rï¿½pida.
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to read
     ; @param RDI The address of buffer to put data 
@@ -111,7 +105,7 @@ _os_write_sector:
     ;mov byte [0xb8005], byte 9
 	
 	
-    ; Uma nova rotina, bem mais rápida. 
+    ; Uma nova rotina, bem mais rï¿½pida. 
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to write
     ; @param RDI The address of data to write to the disk 
@@ -265,15 +259,15 @@ ata_lba_write:
 
 ;------------------------------------------
 ; hd0_read_sector:
-;    Lê um setor do HD, IDE.
+;    Lï¿½ um setor do HD, IDE.
 ;    BUG BUG: limpando a tela quando usa 
-;             máquina virtual da oracle.
-; eax - endereço
+;             mï¿½quina virtual da oracle.
+; eax - endereï¿½o
 ; ebx - lba
 ; ecx - null
 ; edx - null
 ;
-;Variáveis.
+;Variï¿½veis.
 HD_BUFFER: DD 0 ;A
 HD_L: DB 0      ;B
 HD_B: DB 0      ;C
@@ -290,10 +284,10 @@ hd0_read_sector:
 	
 	;CLI
 	
-    ;Salva em 'HD_BUFFER' o endereço do buffer passado por 'eax'. 	
+    ;Salva em 'HD_BUFFER' o endereï¿½o do buffer passado por 'eax'. 	
 	;MOV DWORD [HD_BUFFER], EAX
 	
-    ;lba está em ebx
+    ;lba estï¿½ em ebx
 	
 	;;LOW
 	;MOV AL, bl
@@ -361,7 +355,7 @@ hd0_read_sector:
     ;STI
 	
 	;
-	;@todo: o função hd_wait funciona. usá-la
+	;@todo: o funï¿½ï¿½o hd_wait funciona. usï¿½-la
 	;
 	
     ;call hd_wait 	
@@ -380,7 +374,7 @@ hd0_read_sector:
 ;----------------------------------------
 ; hd0_write_sector:
 ;     Escreve no hd.
-; eax - endereço
+; eax - endereï¿½o
 ; ebx - lba
 ; ecx - null
 ; edx - null

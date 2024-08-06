@@ -1,20 +1,11 @@
 ; hw.inc
-; Routines for hardware interrupts support.
-;
-; Descrição:
-;     Rotinas de hardware para o boot loader.
-;     Handlers para interrupções. (De hardware).
-;     Irqs e interrupções reservadas (faults, etc).
-; Ordem:   Primeiro as irqs depois as outras.
-; In this file:
-; ============
-; +ISR para interrupções de hardware. (IRQs).
-; +Handlers para as faults. Ints (0~31).
-; Histórico:
-;     2015 - Esse arquivo foi criado por Fred Nora.
+; Handlers for hw interrupts.
+; Handlers for faults and exceptions.
+; 2015 - Created b Fred Nora.
+
 
 ;
-; Funções importadas.
+; Imported functions.
 ;
 
 extern _keyboardHandler
@@ -23,7 +14,7 @@ extern _cpu_faults
 
 ;-------------------------------------
 ; unhandled_irq:
-;    Interrupção de hardware genérica.
+; Generic hardware interrupt handler.
 ;   
 unhandled_irq:
     pushad  
@@ -48,8 +39,8 @@ unhandled_irq:
 extern _timer
 global _irq0
 _irq0:
-    ;Obs: Aqui será implementado algum tipo de contagem.
-    ;Mas a troca de contexto não será implementada.
+    ;Obs: Aqui serï¿½ implementado algum tipo de contagem.
+    ;Mas a troca de contexto nï¿½o serï¿½ implementada.
     ;cli
     mov al, 20h
     out 20h, al
@@ -59,7 +50,7 @@ _irq0:
 ;------------------------------------------------------------------
 ; _timer_test:
 ;     Timer sem multitarefas. Usado para teste.
-;     Obs: A troca de contexto não será implementada no Boot Loader.
+;     Obs: A troca de contexto nï¿½o serï¿½ implementada no Boot Loader.
 
 global _timer_test
 _timer_test:
@@ -68,7 +59,7 @@ _timer_test:
 
 ;------------------------------------
 ; timer_interrupt:
-;     Outra interrupção de timer.
+;     Outra interrupï¿½ï¿½o de timer.
 
 timer_interrupt:
     jmp _irq0
@@ -90,7 +81,7 @@ _irq1:
 
 ;------------------------
 ; _irq14:
-;     Tratador de interrupções para unidade master.
+;     Tratador de interrupï¿½ï¿½es para unidade master.
 ;@input: -
 ;@output: -
 
@@ -106,7 +97,7 @@ _irq14:
 
 ;------------------------------
 ; _irq15:
-;    Tratador de interrupções para unidade slave.
+;    Tratador de interrupï¿½ï¿½es para unidade slave.
 ;@input: -
 ;@output: -
 
@@ -122,7 +113,7 @@ _irq15:
 
 ;--------------------------------------
 ; ## FAULTS ## 
-; Tratamento das faltas e excessões.
+; Tratamento das faltas e excessï¿½es.
 
 ;int 0. 
 global _fault_N0
@@ -172,7 +163,7 @@ _fault_N5:
     hlt
     jmp $
 
-;int 6 - Instrução inválida.
+;int 6 - Instruï¿½ï¿½o invï¿½lida.
 global _fault_INTRUCAO_INVALIDA
 _fault_INTRUCAO_INVALIDA:
     push dword 6
@@ -220,7 +211,7 @@ _fault_N11:
     hlt
     jmp $
 
-;int 12 - Falha de pilha (interrupção 12).
+;int 12 - Falha de pilha (interrupï¿½ï¿½o 12).
 global _fault_STACK
 _fault_STACK:
     push dword 12

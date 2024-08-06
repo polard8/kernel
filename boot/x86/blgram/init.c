@@ -1,18 +1,13 @@
-/*
- * File: init.c
- * Descrição:
- *     Rotinas de inicialização do Boot Loader.
- * History:
- *     2015 - Created by Fred Nora.
- */
+// init.c
+// Bootloader initialization support.
+// 2015 - Created by Fred Nora.
 
 #include <bootloader.h>
-
 
 // Variaveis herdadas do boot manager
 // O modo de boot. gui or cli.
 extern unsigned long SavedBootMode;
-// Endereço do boot block
+// Endereï¿½o do boot block
 extern unsigned long SavedBootBlock;   
 // device info
 //extern unsigned long SavedLFB;
@@ -34,7 +29,7 @@ static void __fill_the_bootblock_for_32bit_mode(void)
 // == boot block ===========================
 //
 
-// Vamos pegar as informaçoes no boot block passado pelo
+// Vamos pegar as informaï¿½oes no boot block passado pelo
 // BM e salvarmos na estrutura no BL.
 // Eh melhor copiar do que simplesmente fazer referencia.
 // Vamos copiar em ordem.
@@ -63,13 +58,13 @@ static void __fill_the_bootblock_for_32bit_mode(void)
     BootBlock.gramado_mode       = (unsigned long) base[11]; // 44
 
 // #debug
-// vamos mostrar as informaçoes do boot block
+// vamos mostrar as informaï¿½oes do boot block
 
 }
 
 
 // set_up_color:
-// Configura cor padrão para o sistema.
+// Configura cor padrï¿½o para o sistema.
 void set_up_color(unsigned long color)
 {   
     g_system_color = (unsigned long) color;
@@ -87,14 +82,14 @@ set_up_text_color (
 
 /*
  * init_globals:
- *     Inicia variáveis globais.
+ *     Inicia variï¿½veis globais.
  *     @Mudar para BlInitGlobals();
  *     o retorno por ser int.
  */
 //void BlInitGlobals() 
 void init_globals(void)
 {
-// Próximo procedimento, status and file system type.
+// Prï¿½ximo procedimento, status and file system type.
 // 1=fat16.
     g_next_proc = (unsigned long) bl_procedure;
     g_proc_status = 0;
@@ -110,7 +105,7 @@ void init_globals(void)
 
 /*
  * init:
- *     Função principal do arquivo init.c.
+ *     Funï¿½ï¿½o principal do arquivo init.c.
  */
 // Called by OS_Loader_Main in main.c
 //int init (int ?){ 
@@ -119,10 +114,10 @@ int init(void)
     g_cursor_x = 0;
     g_cursor_y = 0;
 
-// Inicializando o vídeo.
+// Inicializando o vï¿½deo.
 // #todo: 
-// Inicializar estruturas de vídeo.
-// Selecionando modo de vídeo.
+// Inicializar estruturas de vï¿½deo.
+// Selecionando modo de vï¿½deo.
 
     if (SavedBootMode == 1){
         VideoBlock.useGui = TRUE;
@@ -132,16 +127,16 @@ int init(void)
 
 //#ifdef BL_VERBOSE
     //Debug Message.
-    //Se estivermos usando modo gráfico (GUI.)	
+    //Se estivermos usando modo grï¿½fico (GUI.)	
     if (VideoBlock.useGui == TRUE)
     {
         // #importante
-        // Essa é a primeira mensagem, ela aparece nos modos 0x115 e 0x118
+        // Essa ï¿½ a primeira mensagem, ela aparece nos modos 0x115 e 0x118
         //printf("init: Using GUI\n");
     }
 //#endif
 
-// Se não estivermos usando GUI.(text mode).
+// Se nï¿½o estivermos usando GUI.(text mode).
 // Limpa a tela.
 // Branco em preto.
 
@@ -161,7 +156,7 @@ int init(void)
 // Inicializando o Boot Loader.
 //
 
-//Título.
+//Tï¿½tulo.
 //#ifdef BL_VERBOSE
     printf ("BL.BIN: Initializing ...\n");
     // printf ("init: Boot Loader Version %s \n", BL_VERSION );	

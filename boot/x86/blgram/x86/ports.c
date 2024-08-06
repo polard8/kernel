@@ -1,10 +1,6 @@
-/*
- * File: ports.c 
- *     System ports routines.
- * History: 
- *     2005 - Created by Fred Nora.
- *     2020 - New standard.
- */
+// ports.c 
+// System ports support.
+// 2005 - Created by Fred Nora.
 
 #include <bootloader.h>
 

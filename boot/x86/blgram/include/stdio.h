@@ -1,11 +1,10 @@
-/*
- * File: stdio.h
- * Descrição:
- *     Parte da lib C, C99.
- */
+// stdio.h
+// i/o operations. (C99)
+// Created by Fred Nora.
 
 #ifndef __STDIO_H
 #define __STDIO_H    1
+
  
 #define SCREEN_START 0x000B8000
 #define ScreenStart SCREEN_START
@@ -54,7 +53,7 @@ void scroll(void);
 int bl_clear(int color);
 int kprintf(char *message, unsigned int line, int color);
 
-//@todo: Não faz parte da libc.
+//@todo: Nï¿½o faz parte da libc.
 void vsync();
 char gui_inb(int port);
 void my_buffer_put_pixel( unsigned long ax, unsigned long bx, unsigned long cx, unsigned long dx);

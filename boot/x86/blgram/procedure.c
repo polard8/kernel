@@ -1,26 +1,8 @@
-/*
- * File: procedure.c 
- * Descrição:
- *     Procedimento de janela do Boot Loader.
- *     Obs: O Boot Loader tem procedimento de janela, 
- * pois trata intervenções 
- * feitas pelo usuário na hora da inicialização.
- * 2015 - Created by Fred Nora.
- */
-
+// procedure.c
+// Created by Fred Nora.
  
 #include <bootloader.h>
 
-
-/*
- * system_procedure: 
- *    Procedimento default do bootloader.
- *    (Trata mensagens de sistema como WIN KEY, F1, F2 ... ).
- * ATENÇÃO:
- *    O bootloader aceita poucos comandos na hora da inicialização.
- *    Principalmente de F1 à F4.
- *    @todo: Mudar para BlProcedure(...).
- */
 
 unsigned long 
 bl_procedure ( 

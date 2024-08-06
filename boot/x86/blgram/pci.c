@@ -1,12 +1,7 @@
-/*
- * File: pci.c
- * Descrição:
- *     Rotinas de suporte à PCI.
- *     Isso será necessário para o driver de controlador de disco.
- * #todo: Copiar rotinas do pci do kernel.
- * History:
- *     2016 - Created by Fred Nora.
- */
+// pci.c
+// PCI interface support.
+// 2016 - Created by Fred Nora.
+
 
 #include <bootloader.h> 
 
@@ -15,9 +10,9 @@
  *    Envia o comando para a porta 0xCF8, e 
  *    retorna o status na porta 0xCFC.
  * Argumentos:
- *    bus    = Número do BUS.           total 256.
- *    slot   = Número do slot. (device) total 32.
- *    func   = Número da função.        total 8. 
+ *    bus    = Nï¿½mero do BUS.           total 256.
+ *    slot   = Nï¿½mero do slot. (device) total 32.
+ *    func   = Nï¿½mero da funï¿½ï¿½o.        total 8. 
  *    offset = Offset.
  *  Ex: 0x80000000 | bus << 16 | device << 11 | function <<  8 | offset.
  */
@@ -123,7 +118,7 @@ pciGetClassCode (
 
 /*
  * pciInfo:
- *    Pega e mostra informações sobre PCI.
+ *    Pega e mostra informaï¿½ï¿½es sobre PCI.
  */
 int pciInfo(void)
 {
@@ -172,7 +167,7 @@ int pciInfo(void)
 
 
 	/*
-	// Checa vários slots no bus 0. 
+	// Checa vï¿½rios slots no bus 0. 
 	i = 0;
 	do
 	{
@@ -191,7 +186,7 @@ int pciInfo(void)
 	}while(i < PCI_MAX_DEVICES);
 	
 	
-	//Checa vários slots no bus 1.
+	//Checa vï¿½rios slots no bus 1.
 	i = 0;
 	do
 	{
@@ -210,7 +205,7 @@ int pciInfo(void)
 	}while(i < PCI_MAX_DEVICES);
 
 
-	//Checa vários slots no bus 2.
+	//Checa vï¿½rios slots no bus 2.
 	i = 0;
 	do
 	{
@@ -267,14 +262,14 @@ int pciInit(void)
 	
 	/*
 	 * @todo:
-	 *    Alocar memória para a estrutura PCI criada.
-	 *    Inicializar algumas variáveis da estrutura PCI.
+	 *    Alocar memï¿½ria para a estrutura PCI criada.
+	 *    Inicializar algumas variï¿½veis da estrutura PCI.
 	 *
 	 */
     
 	/*
 	int Status;
-	Status = pci_info();    //@todo: Talvez essa função ja foi chamada outra hora. Checar. 
+	Status = pci_info();    //@todo: Talvez essa funï¿½ï¿½o ja foi chamada outra hora. Checar. 
 	
 	if( Status == 0 ){
 	    goto done;	

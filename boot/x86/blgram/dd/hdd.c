@@ -1,5 +1,8 @@
+// hdd.c
+// IDE controller support.
+// 2013 - Created by Fred Nora.
+
 /*
- * File: hdd.c 
  * Low level routines to read and write a sector into/from the disk.
  * Environment:
  *     32bit bootloader.
@@ -7,10 +10,7 @@
  * >> my_read_hd_sector() is called by read_lba().
  * >> my_write_hd_sector() is called by write_lba().
  * read_lba() and write_lba are called by fs.c.
- * History:
- *    2013 - Created by Fred Nora.
  */
-
 
 /*
  hd info:
@@ -299,8 +299,8 @@ again:
 
         // fail
         default:
-            printf ("pio_rw_sector: fail *hang");
-            die();
+            printf ("pio_rw_sector: default\n");
+            bl_die();
             break;
     };
 

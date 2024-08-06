@@ -106,24 +106,105 @@ int bliTesting=0;
 // == Private functions: Prototypes =======================
 //
 
-static unsigned long init_testing_memory_size(int mb);
-static unsigned long __setup_physical_memory(void);
-static void 
-__clean_memory( 
-    unsigned long start_address, 
-    unsigned long end_address );
-static int blLoadKernelImage(void);
-static void blShowMenu(void);
-static void blMenu(void);
+
+
+
 
 static void __no_x86_64_was_found(void);
+
+
+// Memory
+static unsigned long bl_test_memory_size(int mb);
+static unsigned long bl_setup_physical_memory(void);
+static void 
+bl_clean_memory( 
+    unsigned long start_address, 
+    unsigned long end_address );
+
+// Kernel image
+static int bl_load_kernel_image(void);
+
+// Menu
+static void bl_show_menu(void);
+static void bl_menu_loop(void);
+
+
 // =========================================
+
+// bl_abort:
+// Rotina para abortar o bootloader em caso de erro grave.
+void bl_abort()
+{
+//@todo: 
+//Talvez poderia ter uma interface antes de chamar a rotina abort().
+//ex:
+    //checks()
+    abort(); 
+}
+
+// bl_die:
+// CLI HLT routine.
+// No return!
+// See: bootloader.h
+void bl_die(void)
+{
+    printf("BLGRAM.BIN: [DIE] System Halted\n");
+    refresh_screen();
+    while (1){
+        asm ("cli");
+        asm ("hlt");
+    };
+}
+
+// panic:
+// Message support for fatal error.
+void panic(const char *msg)
+{
+    if ((void*) msg != NULL)
+    {
+        if (*msg != 0){
+            printf("BL.BIN: [PANIC] %s\n", msg );
+        }
+    }
+    bl_die();
+}
+
+static void __no_x86_64_was_found(void)
+{
+// We probe the info and detected that the x86)64 instructions
+// are not supported.
+// We can hang, or load some 32bit funny stuff.
+
+    printf("__no_x86_64_was_found: Sorry!\n");
+    printf("It seems that the processor\n");
+    printf("does not support x86_64 instructions.\n");
+
+// #todo
+// Maybe, in this case, we can load a 32bit dialog,
+// asking to shutdown the system.
+
+    printf("The boot loader will not execute the kernel.\n");
+
+done:
+    //refresh_screen();
+    bl_die();
+    while (1){
+        asm ("cli");
+        asm ("hlt");
+    };
+}
+
+
+//
+// $
+// MEMORY
+//
 
 //================================================================
 // begin - Testing memory size
 //================================================================
 
-static unsigned long init_testing_memory_size(int mb)
+static unsigned long bl_test_memory_size(int mb)
 {
     unsigned char *BASE = (unsigned char *) 0;
     int offset=0; 
@@ -140,7 +221,7 @@ static unsigned long init_testing_memory_size(int mb)
 //#debug
 /*
     printf ("=========================================\n");
-    printf ("init_testing_memory_size: Looking for %d MB base...\n", mb);
+    printf ("bl_test_memory_size: Looking for %d MB base...\n", mb);
     refresh_screen();
 */
 
@@ -214,7 +295,7 @@ static unsigned long init_testing_memory_size(int mb)
 //================================================================
 
 // OUT: Return last valid address.
-static unsigned long __setup_physical_memory(void)
+static unsigned long bl_setup_physical_memory(void)
 {
 //++
 // == Memory size ===============================
@@ -229,16 +310,16 @@ static unsigned long __setup_physical_memory(void)
     unsigned long __address = 0;
 
     // ok
-    //__address = (unsigned long) init_testing_memory_size (4);
+    //__address = (unsigned long) bl_test_memory_size (4);
     // ok
-    //__address = (unsigned long) init_testing_memory_size (64);
+    //__address = (unsigned long) bl_test_memory_size (64);
     // ok
-    //__address = (unsigned long) init_testing_memory_size (127);  
+    //__address = (unsigned long) bl_test_memory_size (127);  
     // 511
-    //__address = (unsigned long) init_testing_memory_size (1024);   
+    //__address = (unsigned long) bl_test_memory_size (1024);   
 
     //para testar na maquina real com 2048 mb instalado.
-    __address = (unsigned long) init_testing_memory_size(2048);   
+    __address = (unsigned long) bl_test_memory_size(2048);   
     
 // #todo
 // Temos que passar esses valores para o kernel,
@@ -283,7 +364,7 @@ static unsigned long __setup_physical_memory(void)
 // 32 mb, começando de 1mb.
 // Is it slow?
 static void 
-__clean_memory( 
+bl_clean_memory( 
     unsigned long start_address, 
     unsigned long end_address )
 {
@@ -306,8 +387,14 @@ __clean_memory(
     };
 }
 
+
+//
+// $
+// LOAD KERNEL IMAGE
+//
+
 /*
- * blLoadKernelImage: 
+ * bl_load_kernel_image: 
  *     It loads the kernel image at 0x00100000.
  *     The entry point is at 0x00101000.
  */ 
@@ -318,7 +405,7 @@ __clean_memory(
 // if the provide name fail.
 // This routine will build the pathname
 // to search in the default folder.
-static int blLoadKernelImage(void)
+static int bl_load_kernel_image(void)
 {
 // Called by bl_main().
 
@@ -336,7 +423,7 @@ static int blLoadKernelImage(void)
 
     Status = (int) elfLoadKernelImage(image_name);
     if (Status < 0){
-        printf ("blLoadKernelImage: elfLoadKernelImage fail\n");
+        printf ("bl_load_kernel_image: elfLoadKernelImage fail\n");
         goto fail;
     }
 
@@ -348,8 +435,13 @@ fail:
     return (int) (-1);
 }
 
-// Show menu.
-static void blShowMenu(void)
+//
+// $
+// MENU - (Emergency menu)
+//
+
+// Show emergency menu
+static void bl_show_menu(void)
 {
     register int i=0;
 
@@ -376,8 +468,7 @@ static void blShowMenu(void)
     refresh_screen(); 
 }
 
-
-static void blMenu(void)
+static void bl_menu_loop(void)
 {
     char Key=0;
 
@@ -398,10 +489,10 @@ static void blMenu(void)
     sprintf( MENU[1].string, "menu item 1");    
 
     //mostra o menu.
-    //blShowMenu(); 
+    //bl_show_menu(); 
 
     while (1){
-        blShowMenu();
+        bl_show_menu();
         Key = keyboard_wait_key();
         switch (Key)
         {
@@ -433,57 +524,10 @@ ____go:
     return;
 }
 
-
-// blAbort:
-// Rotina para abortar o bootloader em caso de erro grave.
-void blAbort()
-{
-//@todo: 
-//Talvez poderia ter uma interface antes de chamar a rotina abort().
-//ex:
-    //checks()
-    abort(); 
-}
-
-// die:
-// CLI HLT routine.
-// No return!
-// See: bootloader.h
-void die(void)
-{
-    printf("BL.BIN: [DIE] System Halted\n");
-    refresh_screen();
-    while (1){
-        asm ("cli");
-        asm ("hlt");
-    };
-}
-
-
-static void __no_x86_64_was_found(void)
-{
-// We probe the info and detected that the x86)64 instructions
-// are not supported.
-// We can hang, or load some 32bit funny stuff.
-
-    printf("__no_x86_64_was_found: Sorry!\n");
-    printf("It seems that the processor\n");
-    printf("does not support x86_64 instructions.\n");
-
-// #todo
-// Maybe, in this case, we can load a 32bit dialog,
-// asking to shutdown the system.
-
-    printf("The boot loader will not execute the kernel.\n");
-
-done:
-    refresh_screen();
-    die();
-    while (1){
-        asm ("cli");
-        asm ("hlt");
-    };
-}
+//
+// $
+// MAIN
+//
 
 // --------------------------------
 // bl_main:
@@ -553,7 +597,7 @@ void bl_main(void)
 // Get last valid address.
     unsigned long first_address = 0x100000;  // 1MB mark
     unsigned long last_address=0;
-    last_address = (unsigned long) __setup_physical_memory();
+    last_address = (unsigned long) bl_setup_physical_memory();
 
 // Clean up memory.
 // IN: start address, end address.
@@ -566,7 +610,7 @@ void bl_main(void)
     refresh_screen();
 #endif  
 
-    __clean_memory(
+    bl_clean_memory(
         (unsigned long) first_address,
         (unsigned long) last_address );
 // -------------------------------------------------------
@@ -591,7 +635,7 @@ void bl_main(void)
 // debug
     if (g_initialized != TRUE){
         printf("bl_main: g_initialized\n");
-        die();
+        bl_die();
     }
 
 #if defined(BAREMETAL_VERBOSE)
@@ -621,9 +665,9 @@ void bl_main(void)
     refresh_screen();
 #endif  
 
-    Status = blLoadKernelImage();
+    Status = bl_load_kernel_image();
     if (Status<0){
-        printf("bl_main: blLoadKernelImage fail\n");
+        printf("bl_main: bl_load_kernel_image fail\n");
         refresh_screen();
         while (1){
             asm("cli");

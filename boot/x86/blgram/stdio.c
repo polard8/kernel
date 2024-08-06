@@ -1,11 +1,8 @@
-/*
- * File: stdio.c 
- *     Rotinas de input/output.
- *     Biblioteca C do Boot Loader.
- *     Inclui rotinas graficas no fim do arquivo.
- *     Inclui vsync.
- * 2015 - Created by Fred Nora.
- */
+// stdio.c
+// i/o routines.
+// graphics routines.
+// vsync
+// 2015 - Created by Fred Nora.
 
 #include <bootloader.h>
 
@@ -169,20 +166,6 @@ static void outbyte(int c)
 
 // Atualisa o prev.
     prev = Ch;
-}
-
-// panic:
-// Message support for fatal error.
-// #todo: Move this routine to another file.
-void panic(const char *msg)
-{
-    if ((void*) msg != NULL)
-    {
-        if (*msg != 0){
-            printf("BL.BIN: [PANIC] %s\n", msg );
-        }
-    }
-    die();
 }
 
 // scroll:
