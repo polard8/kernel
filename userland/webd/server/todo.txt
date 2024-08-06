@@ -1,4 +1,0 @@
-
-    Here we're gonna create a Web Server, that is gonna serve files to the
-clients.
-

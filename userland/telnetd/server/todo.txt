@@ -1,6 +1,0 @@
-
-    Here we're gonna create a Telnet Server, that is gonna serve files to the
-clients following the Telnet protocol.
-
-
-

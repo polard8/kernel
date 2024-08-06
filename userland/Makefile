@@ -18,19 +18,23 @@ all:
 
 # FTP server
 #	make -C ftpd/client/
-	make -C ftpd/server/
+#	make -C ftpd/server/
+
 # Network server
-	make -C netd/client/ 
-	make -C netd/server/
+#	make -C netd/client/ 
+#	make -C netd/server/
+
 # Telnet server
 #	make -C telnetd/client/
-	make -C telnetd/server/
+#	make -C telnetd/server/
+
 # VGA driver
 #	make -C vgad/client/
 	make -C vgad/server/
+
 # Web server
 #	make -C webd/client/
-	make -C webd/server/
+#	make -C webd/server/
 # ...
 
 clean:
@@ -50,19 +54,19 @@ clean-all:
 
 #	-rm -f core03/*.o
 
-	-rm -f ftpd/server/*.o
-	-rm -f ftpd/client/*.o
+#	-rm -f ftpd/server/*.o
+#	-rm -f ftpd/client/*.o
 
-	-rm -f netd/server/*.o
-	-rm -f netd/client/*.o
+#	-rm -f netd/server/*.o
+#	-rm -f netd/client/*.o
 
-	-rm -f telnetd/server/*.o
-	-rm -f telnetd/client/*.o
+#	-rm -f telnetd/server/*.o
+#	-rm -f telnetd/client/*.o
 
 	-rm -f vgad/server/*.o
 	-rm -f vgad/client/*.o
 
-	-rm -f webd/server/*.o
-	-rm -f webd/client/*.o
+#	-rm -f webd/server/*.o
+#	-rm -f webd/client/*.o
 
 # ...
