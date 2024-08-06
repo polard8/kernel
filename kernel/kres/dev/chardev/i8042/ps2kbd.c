@@ -177,10 +177,10 @@ void DeviceInterface_PS2Keyboard(void)
         return;
 
 // =============================================
-// Não precisamos perguntar para o controlador se
-// podemos ler, porque foi uma interrupção que nos trouxe aqui.
+// We don't need to control if we can read
+// because was an interruption that brought us here.
 // #obs:
-// O byte pode ser uma resposta à um comando ou um scancode.
+// The byte may be a response to a command or a scancode.
 
 //sc_again:
 
@@ -213,16 +213,17 @@ void DeviceInterface_PS2Keyboard(void)
 //++
 // ===========================================
 // #todo
-// Temos que checar se o primeiro byte é um ack ou um resend.
-// isso acontece logo apos a inicialização.
+// We have to check if the first byte is an ack or a resend.
+// This all happen right after the initialization.
 // #todo
-// me parece que o primeiro byte pode ser um ack ou resend.
+// for me looks like that the first byte can be an ack or resend.
 // #define ACKNOWLEDGE         0xFA
 // #define RESEND              0xFE
 
 // ??
 // Assim como no mouse, talvez o ack so seja enviado
-// quando estivermos em modo streaming.
+// Like a mouse, maybe the ack just be sent
+// when we're in the streaming mode.
 
     switch (__raw){
 

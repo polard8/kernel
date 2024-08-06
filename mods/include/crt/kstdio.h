@@ -12,7 +12,7 @@ struct module_initialization_d
 };
 extern struct module_initialization_d  ModuleInitialization;
 
-void newm0_print_string (char *s);
+void newm0_print_string (char *ptr_string);
 int newm0_1001(void);
 int newm0_initialize(void);
 

@@ -30,7 +30,7 @@ static void __kstdio_puts(const char* str)
 {
     register int i=0;
     ssize_t StringLen=0;
-    int _char=0;
+    int character=0;
 
     if (ModuleInitialization.initialized != TRUE){
         return;
@@ -47,10 +47,10 @@ static void __kstdio_puts(const char* str)
 // Print chars. 
     for (i=0; i<StringLen; i++)
     {
-        _char = (int) ( str[i] & 0xFF );
+        character = (int) ( str[i] & 0xFF );
         caller1( 
             kfunctions[PUTCHAR_FGCONSOLE], 
-            _char ); 
+            character ); 
     };
 }
 
@@ -110,7 +110,7 @@ int newm0_initialize(void)
 // The kernel static entry point.
 // #bugbug: It's not safe.
 // We need a random address.
-    unsigned char *k = (unsigned char *) 0x30001000;
+    unsigned char *kernel = (unsigned char *) 0x30001000;
 
 // #test
 // Lookup for "__GRAMADO__"
@@ -123,21 +123,21 @@ int newm0_initialize(void)
 
     for (i=0; i<100; i++)
     {
-        if (k[i+0]  == '_' &&
-            k[i+1]  == '_' &&
-            k[i+2]  == 'G' &&
-            k[i+3]  == 'R' &&
-            k[i+4]  == 'A' &&
-            k[i+5]  == 'M' &&
-            k[i+6]  == 'A' &&
-            k[i+7]  == 'D' &&
-            k[i+8]  == 'O' &&
-            k[i+9]  == '_' &&
-            k[i+10] == '_')
+        if (kernel[i+0]  == '_' &&
+            kernel[i+1]  == '_' &&
+            kernel[i+2]  == 'G' &&
+            kernel[i+3]  == 'R' &&
+            kernel[i+4]  == 'A' &&
+            kernel[i+5]  == 'M' &&
+            kernel[i+6]  == 'A' &&
+            kernel[i+7]  == 'D' &&
+            kernel[i+8]  == 'O' &&
+            kernel[i+9]  == '_' &&
+            kernel[i+10] == '_')
         {
             Found = 1;
             // The function table starts here.
-            __function_table = (unsigned long) &k[i+11];
+            __function_table = (unsigned long) &kernel[i+11];
         }
     };
 
@@ -162,18 +162,18 @@ fail:
     return FALSE;
 }
 
-void newm0_print_string (char *s)
+void newm0_print_string (char *ptr_string)
 {
     register int i=0;
     int size=0;
-    size = module_strlen(s);
+    size = module_strlen(ptr_string);
     if (size <= 0)
         return;
     for (i=0; i<size; i++)
     {
         caller1( 
             kfunctions[PUTCHAR_FGCONSOLE], 
-            s[i] );
+            ptr_string[i] );
     };
 }
 
@@ -186,7 +186,7 @@ char *kinguio_itoa (int val, char *str)
     char *valuestring = (char *) str;
     int min_flag=0;
     char swap=0; 
-    char *p;
+    char *ptr;
 
     if (0 > value)
     {
@@ -194,10 +194,10 @@ char *kinguio_itoa (int val, char *str)
         value = -____INT_MAX> value ? min_flag = ____INT_MAX : -value;
     }
 
-    p = valuestring;
+    ptr = valuestring;
 
     do {
-         *p++ = (char) (value % 10) + '0';
+         *ptr++ = (char) (value % 10) + '0';
          value /= 10;
     } while (value);
 
@@ -206,13 +206,13 @@ char *kinguio_itoa (int val, char *str)
         ++*valuestring;
     }
 
-    *p-- = '\0';
+    *ptr-- = '\0';
 
-    while (p > valuestring)
+    while (ptr > valuestring)
     {
         swap = *valuestring;
-        *valuestring++ = *p;
-        *p-- = swap;
+        *valuestring++ = *ptr;
+        *ptr-- = swap;
     };
 
     return str;
@@ -224,47 +224,47 @@ kinguio_i2hex(
     char *dest, 
     int len )
 {
-    char *cp;
+    char *ptr_character;
     register int i=0;
     int x=0;
     unsigned n=0;  //??
 
     if (val == 0)
     {
-        cp = &dest[0];
-        *cp++ = '0';
-        *cp = '\0';
+        ptr_character = &dest[0];
+        *ptr_character++ = '0';
+        *ptr_character = '\0';
         return;
     }
 
     n = val;
-    cp = &dest[len];
+    ptr_character = &dest[len];
 
-    while (cp > dest)
+    while (ptr_character > dest)
     {
         x = (n & 0xF);
         n >>= 4;
         
         // #
-        *--cp = x + ((x > (HEX_LEN+1)) ? 'A' - 10 : '0');
+        *--ptr_character = x + ((x > (HEX_LEN+1)) ? 'A' - 10 : '0');
     };
 
     dest[len] = '\0';
 
-    cp = &dest[0];
+    ptr_character = &dest[0];
 
     for (i=0; i<len; i++)
     {
-        if (*cp == '0'){
-            cp++;
+        if (*ptr_character == '0'){
+            ptr_character++;
         }else{
-            strcpy (dest,cp);
+            strcpy (dest,ptr_character);
             break;
         };
     }
 
-    cp = &dest[0];
-    n = module_strlen(cp);
+    ptr_character = &dest[0];
+    n = module_strlen(ptr_character);
 
     memset( (dest+n), 0, (8-n) );
 }
