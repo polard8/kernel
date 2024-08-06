@@ -6,14 +6,10 @@
 BASE = your/base
 
 
-#todo
-#DEP_GAME01  = ../game01 
-#DEP_GAME00  = ../game00 
-
-# Levels
-DEP_L4  = ../aurora
-DEP_L3  = ../browser
-DEP_L2  = ../commands
+# Desktop environment
+DEP_L4  = ../de/aurora
+DEP_L3  = ../de/browser
+DEP_L2  = ../de/commands
 DEP_L1  = ../de
 
 # Make variables (CC, etc...)
