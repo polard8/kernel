@@ -16,12 +16,7 @@
   * fs    - Filesystems
   * gramk - This is where the kernel controls the user interactions
             with keyboard, mouse and display.
-  * ke    - CPU management.
-          - Process and thread management. It handles the dispatcher
-            and the scheduler.
-          - This is also a place for global components of the system.
   * mm    - Memory management.
   * net   - Network management.
           - Network initialization, socket, domains and protocols.
 ```
-

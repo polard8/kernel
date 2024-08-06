@@ -9,7 +9,6 @@ This is code for the base kernel. It builds the image KERNEL.BIN.
  * include - Main header files for the kernel.
  * kctl    - Control resources layer.
  * kres    - Kernel resources layer.
- * lib     - libc in ring0.
 ```
 
 ## Why these layers?
