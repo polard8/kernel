@@ -63,7 +63,7 @@ extern struct initialization_d  Initialization;
 
 // See: kmain.c
 // See: ke/x86_64/x64init.c
-void init_globals(void);
+void keInitGlobals(void);
 
 #endif    
 

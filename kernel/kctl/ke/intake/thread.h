@@ -795,7 +795,7 @@ extern unsigned long threadList[THREAD_COUNT_MAX];
 int init_threads(void);
 
 // See: main.c
-void early_ring0_IdleThread(void);
+void keEarlyRing0IdleThread(void);
 
 // Create the init thread.
 // This is the first thread ever.

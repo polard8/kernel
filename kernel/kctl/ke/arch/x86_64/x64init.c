@@ -1147,7 +1147,9 @@ static int I_initKernelComponents(void)
 
 // ===============================
 // Globals
-    init_globals();
+// See: kmain.c
+
+    keInitGlobals();
     //PROGRESS("init_globals ok\n"); 
 
 // ===============================

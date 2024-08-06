@@ -327,33 +327,28 @@ START:
     xor rax, rax
     mov rdi, rax    ; First argument.
     ; ...
-    call _I_kmain
 
-; Not reached.
+; Call kmain() function in kmain.c
+    call _I_kmain
 dieLoop:
     cli
     hlt
     jmp dieLoop
 
 ; =======================================================
+; _x86_64_initialize_machine
+;    Called by kmain() to make the early initialization.
 align 8
-
-; =======================================================
-; _x64_64_initialize_machine
-;    Called by main() to make the early initialization.
-
-global _x84_64_initialize_machine
-_x84_64_initialize_machine:
+global _x86_64_initialize_machine
+_x86_64_initialize_machine:
     ret
-
-align 8
 
 ;; GDT
 ;; See:
 ;; https://wiki.osdev.org/Setting_Up_Long_Mode
 ;; Entry size ?
 ;; o dpl são os bits 5 e 6 do access byte.
-
+align 8
 EARLY_GDT64:            ; Global Descriptor Table (64-bit).
 .Null: equ $ - EARLY_GDT64    ; The null descriptor.
     dw 0xFFFF           ; Limit (low).

@@ -128,9 +128,11 @@ unsigned long saved_bootblock_base=0;
 #define bb_idePortNumber  6  // offset 48.
 // ...
 
+// #test
 // See:
-// xxxhead.asm
-extern void x84_64_initialize_machine(void);
+// head_64.asm
+extern void x86_64_initialize_machine(void);
+
 
 // ================================
 
@@ -138,19 +140,20 @@ extern void x84_64_initialize_machine(void);
 // == Private functions: Prototypes ========
 //
 
-// Preinit routines.
-static int preinit(void);
+// Internal
+static void __enter_debug_mode(void);
+static void __print_final_messages(void);
+
+// Preinit routines
 static int preinit_SetupBootblock(void);
 static void preinit_Globals(int arch_type);
-static void preinit_OutputSupport(void);
 static void preinit_Serial(void);
+static void preinit_OutputSupport(void);
+static int preinit(void);
 
-static void kernel_final_messages(void);
-
-// System initialization routines.
-
-static void __enter_debug_mode(void);
-
+//
+// =======================================================
+//
 
 static void __enter_debug_mode(void)
 {
@@ -182,110 +185,9 @@ static void __enter_debug_mode(void)
     die();
 }
 
-// ==========================
-static void preinit_Globals(int arch_type)
-{
-// We don't have any print support for now.
-
-// Scheduler policies
-// Early initialization.
-// See: 
-// sched.h, sched.c.
-    SchedulerInfo.policy = SCHED_POLICY_RR;
-    SchedulerInfo.flags  = (unsigned long) 0;
-
-    InitProcess = NULL;
-    InitThread = NULL;
-
-    // Invalidate.
-    set_current_process(-1);
-    SetCurrentTID(-1);
-
-// Initializing the global spinlock.
-    __spinlock_ipc = TRUE;
-
-// IO Control
-    IOControl.useTTY = FALSE;        // Model not implemented yet.
-    IOControl.useEventQueue = TRUE;  // The current model.
-    IOControl.initialized = TRUE;    // IO system initialized.
-    // ...
-
-//
-// Presence level
-//
-
-// See:
-// sched.h, sched.c
-
-    // (timer ticks / fps) = level
-
-    //presence_level = (1000/1000);  //level 1;    // 1000   fps
-    //presence_level = (1000/500);   //level 2;    // 500    fps
-    //presence_level = (1000/250);   //level 4;    // 250    fps
-    //presence_level = (1000/125);   //level 8;    // 125    fps
-    //presence_level = (1000/62);    //level 16;   // 62,20  fps
-    //presence_level = (1000/25);    //level 32;   // 31,25  fps
-    //presence_level = (1000/15);    //level 64;   // 15,625 fps 
-    //presence_level = (1000/10);    //level 100;   // 10 fps
-    //presence_level = (1000/5);     //level 200;   // 5  fps
-    // presence_level = (1000/4);     //level 250;  // 4  fps
-    //presence_level = (1000/2);     //level 500;   // 2  fps
-    //presence_level = (1000/1);     //level 1000;  // 1  fps
-
-    //set_update_screen_frequency(30);
-    set_update_screen_frequency(60);
-    //set_update_screen_frequency(120);
-}
-
-// =========================
-// see: serial.c
-static void preinit_Serial(void)
-{
-// We still don't have any print support yet.
-// But at the end of this routine we can use the serial debug.
-
-// Driver initialization
-// see: serial.c
-
-    int Status=FALSE;
-    Status = DDINIT_serial();
-    if (Status!=TRUE){
-        //#bugbug
-        //Oh boy!, We can't use the serial debug.
-    }
-    //PROGRESS("::(2)(1)(3):\n");
-    PROGRESS("preinit_Serial: Serial debug initialized\n");
-}
-
-// ======================
-static void preinit_OutputSupport(void)
-{
-// #important: 
-// We do not have all the runtime support yet.
-// We can't use printk yet.
-// We only initialized some console structures,
-// not the full support for printk functions.
-
-    //PROGRESS("::(2)(1)(4)\n");
-    //PROGRESS("preinit_OutputSupport:\n");
-
-// O refresh ainda não funciona, 
-// precisamos calcular se a quantidade mapeada é suficiente.
-    refresh_screen_enabled = FALSE;
-
-    //PROGRESS("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
-    zero_initialize_virtual_consoles();
-
-    //debug_print("preinit_OutputSupport: preinit_OutputSupport\n");
-
-// #important: 
-// We do not have all the runtime support yet.
-// We can't use printk yet.
-}
-
 // ===================
 // ::(2)(3)
-static void kernel_final_messages(void)
+static void __print_final_messages(void)
 {
 // Final messages
     if ( Initialization.is_serial_log_initialized == TRUE ){
@@ -297,7 +199,40 @@ static void kernel_final_messages(void)
     }
 }
 
-void init_globals(void)
+// == Idle thread in ring 0  ===============
+// #suspended
+// #test
+// #bugbug
+// This thread will start to run at the moment when
+// the init process enable the interrupts.
+void keEarlyRing0IdleThread (void)
+{
+// #danger: Do NOT change this function.
+// #bugbug: This thread can't execute complex routine for now.
+    //printk("");  //fail
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print ("keEarlyRing0IdleThread: w h\n");
+        panic       ("keEarlyRing0IdleThread: w h\n");
+    }
+Loop:
+// acende
+    //backbuffer_draw_rectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
+    //keDrawString(8,8,COLOR_YELLOW," Gramado Operating System ");
+    //refresh_screen();
+// relax
+    asm ("sti");
+    asm ("hlt");
+// apaga
+    //backbuffer_draw_rectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
+    //backbuffer_draw_rectangle( 0, 0, deviceWidth, deviceHeight, COLOR_KERNEL_BACKGROUND );  //#bug
+    //refresh_screen();
+    goto Loop;
+}
+
+void keInitGlobals(void)
 {
 // Called by I_initKernelComponents() in x64init.c
 // Architecture independent?
@@ -362,7 +297,7 @@ void init_globals(void)
 // It also makes the early initialization of the consoles.
     Status = (int) kstdio_initialize();
     if (Status != TRUE){
-        panic("init_globals: kstdio_initialize fail\n");
+        panic("keInitGlobals: kstdio_initialize fail\n");
     }
 
 // Screen
@@ -370,8 +305,8 @@ void init_globals(void)
 // Reinitializing ... we already printed the banner.
     screenInit();
 
-    //debug_print("init_globals: [printk] WE HAVE MESSAGES NOW!\n");
-    //printk     ("init_globals: [printk] WE HAVE MESSAGES NOW!\n");
+    //debug_print("keInitGlobals: [printk] WE HAVE MESSAGES NOW!\n");
+    //printk     ("keInitGlobals: [printk] WE HAVE MESSAGES NOW!\n");
 
 // ===================
 
@@ -379,6 +314,12 @@ void init_globals(void)
 // See: request.c
     clearDeferredKernelRequest();
 }
+
+
+//
+// $
+// PREINIT
+//
 
 // ==============================
 // #limitation: No serial debug yet.
@@ -502,8 +443,108 @@ static int preinit_SetupBootblock(void)
 
 // Validation
     xBootBlock.initialized = TRUE;
-
     return 0;
+}
+
+// ==========================
+static void preinit_Globals(int arch_type)
+{
+// We don't have any print support for now.
+
+// Scheduler policies
+// Early initialization.
+// See: 
+// sched.h, sched.c.
+    SchedulerInfo.policy = SCHED_POLICY_RR;
+    SchedulerInfo.flags  = (unsigned long) 0;
+
+    InitProcess = NULL;
+    InitThread = NULL;
+
+    // Invalidate.
+    set_current_process(-1);
+    SetCurrentTID(-1);
+
+// Initializing the global spinlock.
+    __spinlock_ipc = TRUE;
+
+// IO Control
+    IOControl.useTTY = FALSE;        // Model not implemented yet.
+    IOControl.useEventQueue = TRUE;  // The current model.
+    IOControl.initialized = TRUE;    // IO system initialized.
+    // ...
+
+//
+// Presence level
+//
+
+// See:
+// sched.h, sched.c
+
+    // (timer ticks / fps) = level
+
+    //presence_level = (1000/1000);  //level 1;    // 1000   fps
+    //presence_level = (1000/500);   //level 2;    // 500    fps
+    //presence_level = (1000/250);   //level 4;    // 250    fps
+    //presence_level = (1000/125);   //level 8;    // 125    fps
+    //presence_level = (1000/62);    //level 16;   // 62,20  fps
+    //presence_level = (1000/25);    //level 32;   // 31,25  fps
+    //presence_level = (1000/15);    //level 64;   // 15,625 fps 
+    //presence_level = (1000/10);    //level 100;   // 10 fps
+    //presence_level = (1000/5);     //level 200;   // 5  fps
+    // presence_level = (1000/4);     //level 250;  // 4  fps
+    //presence_level = (1000/2);     //level 500;   // 2  fps
+    //presence_level = (1000/1);     //level 1000;  // 1  fps
+
+    //set_update_screen_frequency(30);
+    set_update_screen_frequency(60);
+    //set_update_screen_frequency(120);
+}
+
+// =========================
+// see: serial.c
+static void preinit_Serial(void)
+{
+// We still don't have any print support yet.
+// But at the end of this routine we can use the serial debug.
+
+// Driver initialization
+// see: serial.c
+
+    int Status=FALSE;
+    Status = DDINIT_serial();
+    if (Status!=TRUE){
+        //#bugbug
+        //Oh boy!, We can't use the serial debug.
+    }
+    //PROGRESS("::(2)(1)(3):\n");
+    PROGRESS("preinit_Serial: Serial debug initialized\n");
+}
+
+// ======================
+static void preinit_OutputSupport(void)
+{
+// #important: 
+// We do not have all the runtime support yet.
+// We can't use printk yet.
+// We only initialized some console structures,
+// not the full support for printk functions.
+
+    //PROGRESS("::(2)(1)(4)\n");
+    //PROGRESS("preinit_OutputSupport:\n");
+
+// O refresh ainda não funciona, 
+// precisamos calcular se a quantidade mapeada é suficiente.
+    refresh_screen_enabled = FALSE;
+
+    //PROGRESS("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
+    zero_initialize_virtual_consoles();
+
+    //debug_print("preinit_OutputSupport: preinit_OutputSupport\n");
+
+// #important: 
+// We do not have all the runtime support yet.
+// We can't use printk yet.
 }
 
 // ==========================
@@ -570,49 +611,11 @@ static int preinit(void)
     return 0;
 }
 
-// == Idle thread in ring 0  ===============
-// #test
 
-// #bugbug
-// This thread will start to run at the moment when
-// the init process enable the interrupts.
-
-// #suspended
-void early_ring0_IdleThread (void)
-{
-
-// #danger: Do NOT change this function.
-// #bugbug: This thread can't execute complex routine for now.
-
-    //printk("");  //fail
-
-    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
-    unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
-        debug_print ("early_ring0_IdleThread: w h\n");
-        panic       ("early_ring0_IdleThread: w h\n");
-    }
-
-Loop:
-
-// acende
-    //backbuffer_draw_rectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
-    //keDrawString(8,8,COLOR_YELLOW," Gramado Operating System ");
-    //refresh_screen();
-
-// relax
-    asm ("sti");
-    asm ("hlt");
-
-// apaga
-    //backbuffer_draw_rectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
-    //backbuffer_draw_rectangle( 0, 0, deviceWidth, deviceHeight, COLOR_KERNEL_BACKGROUND );  //#bug
-    //refresh_screen();
-
-    goto Loop;
-}
+//
+// $
+// MAIN
+//
 
 // --------------------------------
 // ::(2)
@@ -882,7 +885,7 @@ StartSystemEnd:
 // The initialization failed.
     if (Status != TRUE)
     {
-        kernel_final_messages();
+        __print_final_messages();
         system_state = SYSTEM_DEAD;
         while (1){
             asm ("cli");
