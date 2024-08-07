@@ -37,10 +37,10 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 # Libraries
-LIBC     = ../../core00/libs/rtl/include/
-LIBCOBJ  = ../../core00/libs/rtl/obj
-LIBIO    = ../../core00/libs/libio01/include/
-LIBIOOBJ = ../../core00/libs/libio01/obj
+LIBC     = ../../libs/rtl/include/
+LIBCOBJ  = ../../libs/rtl/obj
+LIBIO    = ../../libs/libio01/include/
+LIBIOOBJ = ../../libs/libio01/obj
 
 #Objects
 myObjects = crt0.o main.o rtl.o \

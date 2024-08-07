@@ -6,15 +6,11 @@
 BASE = your/base
 
 
-
 # Desktop environment
-DEP_L4  = ../gramde/aurora
-DEP_L3  = ../gramde/browser
-DEP_L2  = ../gramde/commands
-DEP_L1  = ../gramde
-
-# Server environment
-DEP_SE  = ../gramse
+DEP_L4  = ../de/aurora
+DEP_L3  = ../de/browser
+DEP_L2  = ../de/commands
+DEP_L1  = ../de
 
 # Make variables (CC, etc...)
 AS      = as
@@ -169,6 +165,8 @@ build-gramado-os:
 	-cp userland/bin/SH7.BIN      $(BASE)/
 	-cp userland/bin/SHELL.BIN    $(BASE)/
 #	-cp userland/bin/SHELL00.BIN  $(BASE)/
+	-cp userland/bin/NETD.BIN     $(BASE)/
+	-cp userland/bin/NET.BIN      $(BASE)/
 	-cp userland/bin/TASCII.BIN   $(BASE)/GRAMADO/
 	-cp userland/bin/TPRINTF.BIN  $(BASE)/GRAMADO/
 
@@ -230,11 +228,6 @@ copy-extras:
 # Use '#' prefix.
 	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
 	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/GRAMADO/
-
-# GRAMSE
-# Server environment
-	-cp $(DEP_SE)/userland/bin/NETD.BIN  $(BASE)/
-	-cp $(DEP_SE)/userland/bin/NET.BIN   $(BASE)/
 
 	@echo "~ copy-extras"
 
