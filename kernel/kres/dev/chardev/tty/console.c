@@ -927,18 +927,18 @@ void console_outbyte (int c, int console_number)
     }
 
 
+//
+// Draw
+//
 
-//draw:
 // Draw in x*8 | y*8.
 // Only if the echo mode is enabled.
 // Nesse momento imprimiremos os caracteres.
 // Imprime os caracteres normais.
 // Atualisa o prev.
-
 // local modes
-    tcflag_t c_lflag = 
-        (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
 
+    tcflag_t c_lflag = (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
     if (c_lflag & ECHO){
         __ConsoleOutbyte(Ch,n);
     }
@@ -1243,6 +1243,7 @@ void console_echo(int c, int console_number)
 
 static void __ConsoleOutbyte (int c, int console_number)
 {
+// Draw
 // Low level.
 // This routine is gonna call the function d_draw_char()
 // to draw into the screen. this function belongs to the 
@@ -1316,8 +1317,13 @@ static void __ConsoleOutbyte (int c, int console_number)
     bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color; 
     fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
 
+//
+// Draw
+//
+
 // Sempre pinte o bg e o fg.
-// see:
+// see: gre/char.c
+
     d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
 
 /*
@@ -1370,7 +1376,6 @@ void console_putchar(int c, int console_number)
 
     cWidth  = (unsigned long) (cWidth  & 0xFFFF);
     cHeight = (unsigned long) (cHeight & 0xFFFF);
-
     if (cWidth == 0 || cHeight == 0){
         panic ("console_putchar: char\n");
     }
@@ -1782,8 +1787,7 @@ console_write (
 
 // Get the tty pointer
     tty = (struct tty_d *) CONSOLE_GET_TTY_ADDRESS(console_number);
-// Validation again
-    if ( (void*) tty == NULL )
+    if ((void*) tty == NULL)
         panic("console_write: tty\n");
     if (tty->magic != 1234)
         panic("console_write: tty validation\n");
@@ -1794,7 +1798,6 @@ console_write (
 
     if (tty->termios.c_lflag & ECHO)
         DoEcho = TRUE;
-
 
 //
 // Write string
@@ -1807,7 +1810,6 @@ console_write (
         buf,
         count );
 */
-
 
 // Isso eh o contador de estagios do escape sequence.
 // Vamos percorret todos os bytes da sequencia quando
@@ -1837,9 +1839,9 @@ console_write (
                 //console_putchar ( '0',console_number);
                 //console_putchar ( '\n',console_number);
                
-               // Is printable?
-               // ascii, not abnt2
-               if (ch >= 32 && ch <= 127){
+                // Is printable?
+                // regular ascii printable. Not abnt2.
+                if (ch >= 32 && ch <= 127){
 
                     // Draw and refresh.
                     if (DoEcho == TRUE){
@@ -1847,29 +1849,38 @@ console_write (
                         //console_outbyte2(ch,console_number);
                     }
 
-               // >>>> [ Escape ]
-               // Entramos em uma escape sequence,
-               // entao o proximo case inicia o tratamento da escape sequence.
-               } else if (ch == 27){
-                   __EscapeSequenceStage=1;
+                //#test
+                // Extended ascii table for fancy chars
+                //}else if (ch >=128 && ch < 256){
+
+                    // Draw and refresh.
+                    //if (DoEcho == TRUE){
+                        //console_echo(ch,console_number);
+                        //console_outbyte2(ch,console_number);
+                    //}
+
+                // >>>> [ Escape ]
+                // Entramos em uma escape sequence,
+                // entao o proximo case inicia o tratamento da escape sequence.
+                } else if (ch == 27){
+                    __EscapeSequenceStage=1;
                
-               // ?? \n
-               //}else if (ch==10 || ch==11 || ch==12){
-               } else if (ch == '\n'){
+                // ?? \n
+                //}else if (ch==10 || ch==11 || ch==12){
+                } else if (ch == '\n'){
+                    console_putchar(ch,console_number);
+                // Enter ? cr \n
+                } else if (ch == '\r'){ 
+                    console_putchar(ch,console_number); 
+                // Backspace
+                } else if (ch=='\b') {
+                    console_putchar(ch,console_number);
+                // Tab.
+                } else if (ch=='\t') {
+                    console_putchar(ch,console_number); 
+                };
                
-                   console_putchar(ch,console_number);
-               // Enter ? cr \n
-               } else if (ch == '\r'){ 
-                   console_putchar(ch,console_number); 
-               // Backspace
-               } else if (ch=='\b') {
-                   console_putchar(ch,console_number);
-               // Tab.
-               } else if (ch=='\t') {
-                   console_putchar(ch,console_number); 
-               };
-               
-               break;
+                break;
             
             //================================================
             // Stage 1

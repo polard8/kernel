@@ -1,6 +1,6 @@
-
 // stdlib.c
 // Standard library.
+// 2016 - Created by Fred Nora.
 
 #include <types.h>
 #include <errno.h>
@@ -55,19 +55,23 @@ void *Heap;
 
 // Heap list.
 // obs:. heapList[0] = The Kernel Heap!
-unsigned long heapList[HEAP_COUNT_MAX];
 
+static unsigned long heapList[HEAP_COUNT_MAX];
 
 //
 // == Private functions: Prototypes ================================
 //
 
 static int stdlib_strncmp( char *s1, char *s2, int len );
-static int __init_mm(void);
-static int __init_heap(void);
 static char *__findenv( const char *name, int *offset );
 
+// Library initialization
+static int __init_mm(void);
+static int __init_heap(void);
+
+//
 // ================================================
+//
 
 // #local
 // stdlib_strncmp:
@@ -93,241 +97,6 @@ static int stdlib_strncmp ( char *s1, char *s2, int len )
     }
 // Return 0.
     return 0;
-}
-
-// __init_heap:
-// Iniciar a gerência de Heap na libC. 
-// See: heap.h
-static int __init_heap(void)
-{
-    int i=0;
-
-    //Globals.
-    //...@todo:
-
-    unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
-
-	//HEAP_START = (unsigned long) &HeapBuffer[0];
-	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
-	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
-
-	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
-
-	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
-	//unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
-
-//
-// Current process
-//
-
-// #important
-// O kernel tem uma thread em ring0.
-// Usada pelo window server.
-// Se essa libc for usada por ela, então o pid pode ser
-// o pid 0, do kernel.
-
-    int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
-    //if (thisprocess_id <= 0 ){
-    if (thisprocess_id < 0 ){
-        debug_print ("__init_heap: [FAIL] thisprocess_id  ~~>  :) \n");
-        goto fail;
-    }
-
-//
-// Heap test
-//
-
-// Pegamos o endereço do heap do processo.
-// Isso precisa ser um ponteiro em uma região em ring3
-// compartilhada com esse processo.
-
-    unsigned char *heaptest = 
-        (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
-    if ( (void*) heaptest == NULL )
-    {
-        debug_print ("__init_heap: [FAIL] heaptest \n");
-        goto fail;
-    }
-
-// #bugbug
-// #todo
-// Temos que usar uma chamada que pegue o tamanho do heap do processo.
-// Pois somente o processo init tem 2mb de heap, usando o extra heap 1.
-// Os outros processo possuem apenas 128 KB de heap.
-// Precisamos de uma chamada que pega o 'heap size'
-// e o heap size deve estar na estrutura do processo.
-
-// See: 
-// #define G_DEFAULT_PROCESSHEAP_SIZE (1024*128)
-
-//0x0000000030A00000 para init process
-    HEAP_START = 
-        (unsigned long) &heaptest[0];
-
-//(1024*1024*2) ); //(HEAP_START + (1024*128) );  //128KB
-    HEAP_END = 
-        (unsigned long) (HEAP_START + (1024*128) ); 
-
-    HEAP_SIZE = 
-        (unsigned long) (HEAP_END - HEAP_START); 
-
-//------
-
-    heap_start  = (unsigned long) HEAP_START;
-    heap_end    = (unsigned long) HEAP_END;
-
-// Heap Pointer.
-    g_heap_pointer = 
-        (unsigned long) heap_start;
-// Available heap.
-    g_available_heap = 
-        (unsigned long) (heap_end - heap_start);
-
-// Counter. '1'?
-    heapCount=0;
-
-// ================================
-
-//
-// #bugbug: No permission
-//
-    //#testing heaps permission
-    debug_print ("__init_heap: Testing heaps permission \n");    
-    
-    //Endereço valido somente para processo init
-    //if ( heap_start != 0x0000000030A00000 ){
-    //    debug_print ("__init_heap: [ERROR] wrong address  \n");
-    //    while(1){}
-    //}
-
-// ================================
-
-//Test. (Cria e inicializa uma estrutura)
-    //heapSetLibcHeap(HEAP_START,HEAP_SIZE);
-
-// #important:
-// Último heap pointer válido.
-
-    last_valid = (unsigned long) g_heap_pointer;
-    last_size = 0;
-
-// Check Heap Pointer.
-    if ( g_heap_pointer == 0 ){
-        printf ("__init_heap fail: Heap pointer!\n");
-        goto fail;
-    }
-
-// Check Heap Pointer overflow.
-    if ( g_heap_pointer > heap_end ){
-        printf("__init_heap fail: Heap Pointer Overflow!\n");
-        goto fail;
-    }
-
-// Heap Start.
-    if ( heap_start == 0 ){
-        printf ("__init_heap fail: HeapStart={%x}\n",heap_start);
-        goto fail;
-    }
-
-// Heap End.
-    if ( heap_end == 0 ){
-        printf ("__init_heap fail: HeapEnd={%x}\n",heap_end);
-        goto fail;
-    }
-
-// Check available heap.
-    if ( g_available_heap == 0 )
-    {
-        //@todo: Tentar crescer o heap.
-        printf("__init_heap fail: Available heap\n");
-        goto fail;
-    }
-
-// Heap list ~ Inicializa a lista de heaps.
-    while ( i < HEAP_COUNT_MAX ){
-        heapList[i] = (unsigned long) 0;
-        i++;
-    };
-
-    //KernelHeap = (void*) x??;
-
-// More?
-
-done:
-    debug_print("__init_heap: done\n");
-    //printf("Done.\n");
-    return 0;
-
-// Fail. 
-// Falha ao iniciar o heap do kernel.
-fail:
-    printf("__init_heap: Fail\n");
-
-/*
-    printf("Debug: %x %x %x %x \n", 
-        kernel_heap_start, 
-        kernel_heap_end,
-        kernel_stack_start,
-        kernel_stack_end);
-
-    refresh_screen(); 
-    while(1){}
-*/
-
-    return (int) 1;
-}
-
-
-// #local
-// __init_mm:
-// Inicializa o memory manager.
-
-static int __init_mm(void)
-{
-    register int i=0;
-    int Status = 0;
-
-    //#debug
-    debug_print ("__init_mm:\n");
-
-// @todo: 
-// Inicializar algumas variáveis globais.
-// Chamar os construtores para inicializar o básico.
-// @todo: 
-// Clear BSS.
-// Criar mmClearBSS()
-
-// Heap
-    Status = (int) __init_heap();
-    if (Status != 0){
-        debug_print ("__init_mm: [FAIL] __init_heap\n");
-        //printf      ("__init_mm: [FAIL] __init_heap\n");
-        return (int) 1;
-    }
-
-// Lista de blocos de memória dentro do heap.
-    i=0;
-    while (i<MMBLOCK_COUNT_MAX){
-        mmblockList[i] = (unsigned long) 0;
-        i++;
-    };
-
-//Primeiro Bloco.
-    //current_mmblock = (void *) NULL;
-
-// #importante:
-// #inicializando o índice la lista de ponteiros 
-// par estruturas de alocação.
-// #bugbug: temos que inicializar isso no kernel também.
-    mmblockCount = 0;
-
-// Continua...
-
-    //#debug
-    debug_print ("__init_mm: done\n");
-    //printf      ("__init_mm: done\n");
-
-    return (int) Status;
 }
 
 // __findenv:
@@ -440,13 +209,12 @@ heapSetLibcHeap (
 {
     struct heap_d *h; 
 
+// Parameters:
 // Check limits.
-
     if (HeapStart == 0){
         debug_print("heapSetLibcHeap: HeapStart\n");
         return;
     }
-
     if (HeapSize == 0){
         debug_print("heapSetLibcHeap: HeapSize\n");
         return;
@@ -755,7 +523,6 @@ fail:
     return (unsigned long) 0;
 }
 
-
 /*
  * FreeHeap:
  * @todo: Implementar essa função.
@@ -775,33 +542,6 @@ unsigned long FreeHeap (unsigned long size)
     return (unsigned long) g_heap_pointer;
 }
 
-/*
- * ---------------------------------------------------------
- * libcInitRT:
- *     Inicializa o gerenciamento em user mode de memória virtual
- * para a biblioteca libC99.
- * Obs: 
- * IMPORTANTE: Essa rotina deve ser chamada entes que a biblioteca
- * C seja usada. 
- */
-// This routine ws called by crt0() in crt0.c
-
-int libcInitRT (void)
-{
-    int Status = -1;
-
-    debug_print ("libcInitRT:\n");
-
-    Status = (int) __init_mm();
-    if (Status != 0){
-        debug_print ("libcInitRT: [FAIL] __init_mm\n");
-        return (int) 1; 
-    }
-    //...
-    //#debug
-    debug_print ("libcInitRT: done\n");
-    return 0;
-}
 
 //
 // -----------------
@@ -815,6 +555,12 @@ char *mktemp(char *template)
     debug_print ("mktemp: [TODO]\n");
     return (char *) 0;
 }
+
+
+//
+// $
+// RAND 
+//
 
 // Seed rand.
 void srand(unsigned int seed)
@@ -868,11 +614,11 @@ void stdlib_die(char *str)
 {
     debug_print("stdlib_die:\n");
 
-    if ( (void*) str != NULL )
+    if ((void*) str != NULL)
     {
-        printf ("stdlib_die: %s \n", str);
+        printf ("stdlib_die: %s\n", str);
 
-        if ( (void*) stderr != NULL ){
+        if ((void*) stderr != NULL){
             fprintf(stderr,"%s\n",str);
         }
     }
@@ -929,6 +675,7 @@ void *malloc(size_t size)
 
     //debug_print ("malloc:\n");
 
+// Parameter:
     if (size < 0){
         debug_print ("malloc: size\n");
         return NULL; 
@@ -938,11 +685,11 @@ void *malloc(size_t size)
     }
 
     if ( UseLocalAllocator == TRUE ){
-         ptr = (void *) heapAllocateMemory(new_size);
+        ptr = (void *) heapAllocateMemory(new_size);
     }
 
     if ( UseLocalAllocator == FALSE ){
-         ptr = (void *) shAlloc(new_size);
+        ptr = (void *) shAlloc(new_size);
     }
 
     if ( (void *) ptr == NULL )
@@ -969,9 +716,11 @@ void *xmalloc (size_t size)
 {
     void *ptr;
 
+// Parameter:
     if (size<=0){
         stdlib_die ("xmalloc: [FAIL] size\n");
     }
+
     ptr = (void*) malloc(size);
     if( (void*) ptr == NULL ){
         stdlib_die ("xmalloc: [FAIL] ptr\n");
@@ -980,28 +729,25 @@ void *xmalloc (size_t size)
     return (void *) ptr;
 }
 
-
 void *xmemdup (void const *p, size_t s)
 {
     void *ptr;
 
-    if( (void*) p == NULL ){
+// Parameters:
+    if ((void*) p == NULL){
         stdlib_die ("xmemdup: [FAIL] p\n");
     }
-
     if (s<=0){
         stdlib_die ("xmemdup: [FAIL] s\n");
     }
 
     ptr = (void*) xmalloc(s);
-
-    if( (void*) ptr == NULL ){
+    if ((void*) ptr == NULL){
         stdlib_die ("xmemdup: [FAIL] ptr\n");
     }
 
     return (void *) memcpy(ptr,p,s);
 }
-
 
 char *xstrdup(char const *string)
 {
@@ -1010,21 +756,20 @@ char *xstrdup(char const *string)
     // #Atenção
     // strlen já teria problemas de o ponteiro fosse inválido.
 
-    if( (void*) string == NULL ){
+// Parameter:
+    if ((void*) string == NULL){
         stdlib_die ("xstrdup: [FAIL] string\n");
     }
 
+// String size
     Size = strlen (string);
-
-    if (Size<=0){
+    if (Size <= 0){
         stdlib_die ("xstrdup: [FAIL] Size\n");
     }
-
     Size = (Size + 1);
     
-    return (char *) xmemdup (string,Size);
+    return (char *) xmemdup(string,Size);
 }
-
 
 void *realloc ( void *start, size_t newsize )
 {
@@ -1160,11 +905,13 @@ void *calloc (size_t count, size_t size)
     void *ptr;
     size_t new_size = (size_t) (count * size);
 
+// Parameter:
     if (count <= 0){
         new_size = (1*size);
     }
+
     ptr = (void*) malloc(new_size);
-    if ( (void*) ptr != NULL ){
+    if ((void*) ptr != NULL){
         memset(ptr, 0, new_size);
     }
 
@@ -1175,19 +922,20 @@ void *xcalloc (size_t count, size_t size)
 {
     void *ptr;
 
+// Parameter:
     if (size <= 0)
     {
         count = 1;
         size  = 8;
     }
+
     ptr = (void*) calloc(count,size);
-    if ( (void*) ptr == NULL ){
+    if ((void*) ptr == NULL){
         stdlib_die ("xcalloc: [FAIL] ptr\n");
     }
 
     return (void *) ptr;
 }
-
 
 void *xzalloc (size_t n)
 {
@@ -1203,12 +951,12 @@ void *zmalloc (size_t size)
 {
     void *ptr;
 
-    if(size<=0){
+// Parameter:
+    if (size <= 0){
         size=1;
     }
 
     ptr = (void*) malloc(size);
-
     if ( (void *) ptr == NULL ){
         //free (ptr);
         return NULL;
@@ -1228,218 +976,18 @@ void *zmalloc (size_t size)
 // #todo
 // Call the shell application?
 
-int system (const char *command)
+int system(const char *command)
 {
-
-// #todo: 
-// Checar se comando é válido, se os primeiros caracteres
-// são espaço. Ou talvez somente compare, sem tratar o argumento.
-// #todo:
-// Criar rotina para pular os caracteres em branco no início do comando.
-// #todo: version, ...
-// OBS: 
-// ESSES SÃO OS COMANDOS DO SISTEMA, USADOS POR TODOS OS PROGRAMAS
-// QUE INCLUIREM A LIBC. 
-
-// test - Exibe uma string somente para teste.
-    if ( stdlib_strncmp ( (char *) command, "test", 4 ) == 0 )
-    {
-        printf("system: Testing commands ...\n");
-        goto exit;
-    }
-  
-// ls - List files in a folder.
-    if ( stdlib_strncmp ( (char *) command, "ls", 2 ) == 0 )
-    {
-        printf("system: @todo: ls ...\n");
-        goto exit;
-    }
-
-// makeboot - Cria arquivos e diretórios principais.
-    if ( stdlib_strncmp ( (char *) command, "makeboot", 8 ) == 0 )
-    {
-        printf("system: @todo: makeboot ...\n");
-        //ret_value = fs_makeboot();
-        //if(ret_value != 0){
-        //    printf("shell: makeboot fail!");
-        //};
-        goto exit;
-    }
-
-// format.
-    if ( stdlib_strncmp ( (char *) command, "format", 6 ) == 0 )
-    {
-        printf("system: @todo: format ...\n");
-        //fs_format(); 
-        goto exit;
-    }
-
-// debug.
-    if ( stdlib_strncmp ( (char *) command, "debug", 5 ) == 0 )
-    {
-        printf("system: @todo: debug ...\n");
-        goto exit;
-    }
-
-// dir.
-    if ( stdlib_strncmp ( (char *) command, "dir", 3 ) == 0 )
-    {
-        printf("system: @todo: dir ...\n");
-        //fs_show_dir(0); 
-        goto exit;
-    }
-
-// newfile.
-    if ( stdlib_strncmp ( (char *) command, "newfile", 7 ) == 0 )
-    {
-        printf("system: ~newfile - Create empty file.\n");
-        //fs_create_file( "novo    txt", 0);
-        goto exit;
-    }
-
-// newdir.
-    if ( stdlib_strncmp ( (char *) command, "newdir", 7 ) == 0 )
-    {
-        printf("system: ~newdir - Create empty folder.\n");
-        //fs_create_dir( "novo    dir", 0);
-        goto exit;
-    }
-
-// mbr - Testa mbr.
-    if ( stdlib_strncmp ( (char *) command, "mbr", 3 ) == 0 )
-    {
-        printf("system: ~mbr\n");
-        //testa_mbr();
-        goto exit;
-    }
-
-// root - Testa diretório /root.
-    if ( stdlib_strncmp ( (char *) command, "root", 4 ) == 0 )
-    {
-        printf("system: ~/root\n");
-        //testa_root();
-        goto exit;
-    }
-
-// start.
-    if ( stdlib_strncmp ( (char *) command, "start", 5 ) == 0 )
-    {
-        printf("~start\n");
-        goto exit;
-    }
-
-// help.
-    if ( stdlib_strncmp ( (char *) command, "help", 4 ) == 0 )
-    {
-        //printf(help_string);
-        //print_help();
-        goto exit;
-    }
-
-// cls.
-    if ( stdlib_strncmp ( (char *) command, "cls", 3 ) == 0 )
-    {
-        //black
-        //api_clear_screen(0);
-        goto exit;
-    }
-
-// save.
-    if ( stdlib_strncmp ( (char *) command, "save", 4 ) == 0 )
-    {
-        printf("system: ~save root\n");
-        goto exit;
-    }
-
-// install.
-// muda um arquivo da area de transferencia para 
-// o sistema de arquivos...
-    if ( stdlib_strncmp ( (char *) command, "install", 7 ) == 0 )
-    {
-        printf("system: ~install\n");
-        //fs_install();
-        goto exit;
-    }
-
-// boot - Inicia o sistema.
-    if ( stdlib_strncmp ( (char *) command, "boot", 4 ) == 0 )
-    {
-        printf("system: ~boot\n");
-        //boot();
-        goto exit;
-    }
-
-// service
-    if ( stdlib_strncmp ( (char *) command, "service", 7 ) == 0 )
-    {
-        printf("system: ~service\n");
-        //test_services();
-        goto exit;
-    }
-
-// slots - slots de processos ou threads.
-    if ( stdlib_strncmp ( (char *) command, "slots", 5 ) == 0 )
-    {
-        printf("system: ~slots - mostra slots \n");
-        //mostra_slots();
-        goto exit;
-    }
-
-// Continua ...
-
-// exit - Exit the current program
-    if ( stdlib_strncmp ( (char *) command, "exit", 4 ) == 0 )
-    {
-        //exit(exit_code);
-        //exit(0);
-        printf ("#todo: ~exit");
+    if ((void*) command == NULL)
         goto fail;
-    }
-
-// reboot.
-    if ( stdlib_strncmp ( (char *) command, "reboot", 6 ) == 0 )
-    {
-        //stdlib_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
-        //    (unsigned long) 0 );
-
-        gramado_system_call ( 
-            110, 
-            (unsigned long) 0, 
-            (unsigned long) 0, 
-            (unsigned long) 0 );
-
-        //apiReboot(); 
+    if (*command == 0)
         goto fail;
-    }
 
-// shutdown.
-    if ( stdlib_strncmp ( (char *) command, "shutdown", 8 ) == 0 )
-    {
-        //apiShutDown();
-        goto fail;
-    }
+// Clone
+    return (int) rtl_clone_and_execute(command);
 
-// #todo
-// Call the shell application?
-// #todo: exec
-//:default
-    printf("system: Unknown command!\n");
-
-// o que devemos fazer aqui é pegar o nome digitado e comparar
-// com o nome dos arquivos do diretório do sistema. se encontrado,
-// devemos carregar e executar.
-
-// Fail. Palavra não reservada.	
 fail:
-	printf("system: FAIL!\n");
-    return (int) 1;
-
-// #todo: 
-// Esse exit como variavel local precisa mudar de nome
-// para não confundir com a função exit de sair do processo.
-// uma opção é usar 'done:'. 
-exit:    
-    return (int) 0;
+    return (int) -1;
 }
 
 /*
@@ -2314,6 +1862,280 @@ int putenv(char *string)
 
     return (int) rval;
 }
+
+
+//
+// $
+// LIBRARY INITIALIZATION
+//
+
+// __init_heap:
+// Iniciar a gerência de Heap na libC. 
+// See: heap.h
+static int __init_heap(void)
+{
+    int i=0;
+
+    //Globals.
+    //...@todo:
+
+    unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
+
+	//HEAP_START = (unsigned long) &HeapBuffer[0];
+	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
+	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
+
+	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
+
+	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
+	//unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
+
+//
+// Current process
+//
+
+// #important
+// O kernel tem uma thread em ring0.
+// Usada pelo window server.
+// Se essa libc for usada por ela, então o pid pode ser
+// o pid 0, do kernel.
+
+    int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
+    //if (thisprocess_id <= 0 ){
+    if (thisprocess_id < 0 ){
+        debug_print ("__init_heap: [FAIL] thisprocess_id  ~~>  :) \n");
+        goto fail;
+    }
+
+//
+// Heap test
+//
+
+// Pegamos o endereço do heap do processo.
+// Isso precisa ser um ponteiro em uma região em ring3
+// compartilhada com esse processo.
+
+    unsigned char *heaptest = 
+        (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
+    if ( (void*) heaptest == NULL )
+    {
+        debug_print ("__init_heap: [FAIL] heaptest \n");
+        goto fail;
+    }
+
+// #bugbug
+// #todo
+// Temos que usar uma chamada que pegue o tamanho do heap do processo.
+// Pois somente o processo init tem 2mb de heap, usando o extra heap 1.
+// Os outros processo possuem apenas 128 KB de heap.
+// Precisamos de uma chamada que pega o 'heap size'
+// e o heap size deve estar na estrutura do processo.
+
+// See: 
+// #define G_DEFAULT_PROCESSHEAP_SIZE (1024*128)
+
+//0x0000000030A00000 para init process
+    HEAP_START = 
+        (unsigned long) &heaptest[0];
+
+//(1024*1024*2) ); //(HEAP_START + (1024*128) );  //128KB
+    HEAP_END = 
+        (unsigned long) (HEAP_START + (1024*128) ); 
+
+    HEAP_SIZE = 
+        (unsigned long) (HEAP_END - HEAP_START); 
+
+//------
+
+    heap_start  = (unsigned long) HEAP_START;
+    heap_end    = (unsigned long) HEAP_END;
+
+// Heap Pointer.
+    g_heap_pointer = 
+        (unsigned long) heap_start;
+// Available heap.
+    g_available_heap = 
+        (unsigned long) (heap_end - heap_start);
+
+// Counter. '1'?
+    heapCount=0;
+
+// ================================
+
+//
+// #bugbug: No permission
+//
+    //#testing heaps permission
+    debug_print ("__init_heap: Testing heaps permission \n");    
+    
+    //Endereço valido somente para processo init
+    //if ( heap_start != 0x0000000030A00000 ){
+    //    debug_print ("__init_heap: [ERROR] wrong address  \n");
+    //    while(1){}
+    //}
+
+// ================================
+
+//Test. (Cria e inicializa uma estrutura)
+    //heapSetLibcHeap(HEAP_START,HEAP_SIZE);
+
+// #important:
+// Último heap pointer válido.
+
+    last_valid = (unsigned long) g_heap_pointer;
+    last_size = 0;
+
+// Check Heap Pointer.
+    if ( g_heap_pointer == 0 ){
+        printf ("__init_heap fail: Heap pointer!\n");
+        goto fail;
+    }
+
+// Check Heap Pointer overflow.
+    if ( g_heap_pointer > heap_end ){
+        printf("__init_heap fail: Heap Pointer Overflow!\n");
+        goto fail;
+    }
+
+// Heap Start.
+    if ( heap_start == 0 ){
+        printf ("__init_heap fail: HeapStart={%x}\n",heap_start);
+        goto fail;
+    }
+
+// Heap End.
+    if ( heap_end == 0 ){
+        printf ("__init_heap fail: HeapEnd={%x}\n",heap_end);
+        goto fail;
+    }
+
+// Check available heap.
+    if ( g_available_heap == 0 )
+    {
+        //@todo: Tentar crescer o heap.
+        printf("__init_heap fail: Available heap\n");
+        goto fail;
+    }
+
+// Heap list ~ Inicializa a lista de heaps.
+    while ( i < HEAP_COUNT_MAX ){
+        heapList[i] = (unsigned long) 0;
+        i++;
+    };
+
+    //KernelHeap = (void*) x??;
+
+// More?
+
+done:
+    debug_print("__init_heap: done\n");
+    //printf("Done.\n");
+    return 0;
+
+// Fail. 
+// Falha ao iniciar o heap do kernel.
+fail:
+    printf("__init_heap: Fail\n");
+
+/*
+    printf("Debug: %x %x %x %x \n", 
+        kernel_heap_start, 
+        kernel_heap_end,
+        kernel_stack_start,
+        kernel_stack_end);
+
+    refresh_screen(); 
+    while(1){}
+*/
+
+    return (int) 1;
+}
+
+
+// #local
+// __init_mm:
+// Inicializa o memory manager.
+
+static int __init_mm(void)
+{
+    register int i=0;
+    int Status = 0;
+
+    //#debug
+    debug_print ("__init_mm:\n");
+
+// @todo: 
+// Inicializar algumas variáveis globais.
+// Chamar os construtores para inicializar o básico.
+// @todo: 
+// Clear BSS.
+// Criar mmClearBSS()
+
+// Heap
+    Status = (int) __init_heap();
+    if (Status != 0){
+        debug_print ("__init_mm: [FAIL] __init_heap\n");
+        //printf      ("__init_mm: [FAIL] __init_heap\n");
+        return (int) 1;
+    }
+
+// Lista de blocos de memória dentro do heap.
+    i=0;
+    while (i<MMBLOCK_COUNT_MAX){
+        mmblockList[i] = (unsigned long) 0;
+        i++;
+    };
+
+//Primeiro Bloco.
+    //current_mmblock = (void *) NULL;
+
+// #importante:
+// #inicializando o índice la lista de ponteiros 
+// par estruturas de alocação.
+// #bugbug: temos que inicializar isso no kernel também.
+    mmblockCount = 0;
+
+// Continua...
+
+    //#debug
+    debug_print ("__init_mm: done\n");
+    //printf      ("__init_mm: done\n");
+
+    return (int) Status;
+}
+
+/*
+ * stdlibInitializeRT:
+ *     Inicializa o gerenciamento em user mode de memória virtual
+ * para a biblioteca libC99.
+ * Obs: 
+ * IMPORTANTE: Essa rotina deve ser chamada entes que a biblioteca
+ * C seja usada. 
+ */
+// This routine ws called by crt0() in crt0.c
+// see:
+// crt0.c, heap.h and stdlib.h
+int stdlibInitializeRT (void)
+{
+// Called by crt0() in crt0.c
+
+    int Status = -1;
+
+    debug_print ("stdlibInitializeRT:\n");
+
+    Status = (int) __init_mm();
+    if (Status != 0){
+        debug_print ("stdlibInitializeRT: [FAIL] __init_mm\n");
+        goto fail; 
+    }
+    //...
+    //#debug
+    debug_print ("stdlibInitializeRT: done\n");
+    return 0;
+fail:
+    return (int) -1;
+}
+
 
 //
 // End

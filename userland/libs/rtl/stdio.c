@@ -8,7 +8,6 @@
  *     stdio_fntos: Luiz Felipe
  *     Serenity OS. (bsd)
  *     2015 - Created by Fred Nora.
- *     2020 - New functions.
  */
 // See:
 // http://kirste.userpage.fu-berlin.de/chemnet/use/info/libc/libc_7.html 
@@ -91,6 +90,49 @@ const char *errno_list[32] = {
     // ...
 };
 */
+
+//
+// =========================================================
+//
+
+// #todo
+// We don't need these definitions here.
+
+//typedef unsigned long size_t;
+//typedef long ssize_t;
+//#ifdef __64BIT__
+//typedef unsigned long long uintmax_t;
+//typedef long long intmax_t;
+//#else
+typedef unsigned int uintmax_t;
+typedef int          intmax_t;
+//#endif
+typedef unsigned char  u_char;
+typedef unsigned int   u_int;
+typedef unsigned long  u_long;
+typedef unsigned short u_short;
+
+typedef unsigned long long u_quad_t;  //#bugbug
+typedef long long quad_t;             //#bugbug
+typedef unsigned long uintptr_t;
+
+//typedef long ptrdiff_t;
+//#define NULL ((void*)0)
+#define NBBY    8               /* number of bits in a byte */
+char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+#define hex2ascii(hex)  (hex2ascii_data[hex])
+//#define va_list __builtin_va_list
+//#define va_start __builtin_va_start
+//#define va_arg __builtin_va_arg
+//#define va_end __builtin_va_end
+
+//#obs:
+//vamos usar o que está em ctype.h
+//#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
+
+/* we use this so that we can do without the ctype library */
+#define __is_digit(c)	((c) >= '0' && (c) <= '9')
+
 
 //
 // =========================================================
@@ -2221,56 +2263,6 @@ char *kinguio_itoa (int val, char *str)
     return str;
 }
 
-
-// printf
-// Credits: Nelson Cole. Project Sirius/Kinguio.
-int kinguio_printf(const char *fmt, ...)
-{
-    int ret=0;
-    char buf[256];
-
-    memset(buf,0,256); 
-
-    va_list ap;
-    va_start (ap, fmt);
-    ret = kinguio_vsprintf(buf, fmt, ap);
-    va_end (ap);
-
-// Print
-    kinguio_puts(buf);
-
-    return (int) ret;
-}
-
-
-int printf(const char *fmt, ...)
-{
-    static char print_buffer[1024];
-    int ret=0;
-
-    va_list ap;
-    va_start (ap, fmt);
-    memset(print_buffer, 0, 1024); 
-    ret = (int) kinguio_vsprintf(print_buffer, fmt, ap);
-    va_end (ap);
-
-// Print and return.
-    kinguio_puts(print_buffer);
-    return (int) ret;
-}
-
-void kinguio_puts(const char* str)
-{
-    register int i=0;
-    if (!str){
-        return;
-    }
-    size_t StringLen = (size_t) strlen(str);
-    for (i=0; i<StringLen; i++){
-        putchar( str[i] );
-    };
-}
-
 // #local
 static char *_vsputs_r(char *dest, char *src)
 {
@@ -2294,7 +2286,8 @@ kinguio_vsprintf(
     char *s;   //s
     char *str_tmp = str;
     char _c_r[] = "\0\0";
-    char buffer[256];
+    char buffer[256];  // Number in ascii format.
+
 // d|i|x
     int   d=0;
     long ld=0;  //signed long
@@ -2304,6 +2297,9 @@ kinguio_vsprintf(
     unsigned long lu=0;
 // 64bit Format Specifier
     int type64bit = FALSE;
+
+// Clear buffer
+    memset(buffer,0,256);
 
 // loop
     while ( fmt[index] )
@@ -2408,6 +2404,65 @@ kinguio_vsprintf(
     return (int) ((long)str_tmp - (long)str);
 }
 //=============================================================
+
+void printchar ( char **str, int c )
+{
+    if (str) 
+    {
+        **str = c;
+        ++(*str);
+    } else (void) putchar(c);
+}
+
+void kinguio_puts(const char* str)
+{
+    register int i=0;
+    if (!str){
+        return;
+    }
+    size_t StringLen = (size_t) strlen(str);
+    for (i=0; i<StringLen; i++){
+        putchar( str[i] );
+    };
+}
+
+int printf(const char *fmt, ...)
+{
+    static char print_buffer[1024];
+    int ret=0;
+
+    va_list ap;
+    va_start (ap, fmt);
+    memset(print_buffer, 0, 1024); 
+    ret = (int) kinguio_vsprintf(print_buffer, fmt, ap);
+    va_end (ap);
+
+// Print and return.
+    kinguio_puts(print_buffer);
+    return (int) ret;
+}
+
+
+// printf
+// Credits: Nelson Cole. Project Sirius/Kinguio.
+int kinguio_printf(const char *fmt, ...)
+{
+    int ret=0;
+    char buf[256];
+
+    memset(buf,0,256); 
+
+    va_list ap;
+    va_start (ap, fmt);
+    ret = kinguio_vsprintf(buf, fmt, ap);
+    va_end (ap);
+
+// Print
+    kinguio_puts(buf);
+
+    return (int) ret;
+}
+
 
 //
 // =============================================================
@@ -2625,17 +2680,6 @@ int sprintf ( char *out, const char *format, ... )
     return (int) print( &out, varg );
 }
 
-
-void printchar ( char **str, int c )
-{
-    if (str) 
-    {
-        **str = c;
-        ++(*str);
-    } else (void) putchar(c);
-}
-
-
 // Setup libc mode.
 void libc_set_output_mode(int mode)
 {
@@ -2654,7 +2698,46 @@ void libc_set_output_mode(int mode)
 }
 
 /*
- **********
+ * _outbyte:
+ * Just output a byte on the screen.
+ * Obs: 
+ * A função não se preocupa com o cursor.
+ * Essa rotina está preparada somente par ao modo gráfico.
+ * Talvez usaremos um selecionador de modo.   
+ * #obs: 
+ * #importante: 
+ * Não me lebro se o kernel efetua o refresh do char 
+ * nesse caso.
+ */
+// #obs: 
+// Tamanho do char constante = 8. 
+// O que queremos é usar uma variável.
+
+void _outbyte (int c)
+{
+
+// #bugbug
+// Essa funçao nao 'e usada ... NAO funciona.
+// printf usa outra coisa (65).
+// #bugbug: size = 8
+
+    //if (c<0)
+        //return;
+
+    gramado_system_call ( 
+        7, 
+        (8 * g_cursor_x), 
+        (8 * g_cursor_y), 
+        (unsigned long) c ); 
+
+    //if ( (void *) stdout == NULL )
+       //return;
+
+    //#todo
+    //putc ( ch, stdout );
+}
+
+/*
  * outbyte:
  * @todo: Colocar no buffer de arquivo.
  * #obs: essa função chamará _outbyte.
@@ -2667,6 +2750,9 @@ void outbyte (int c)
 // Copy.
     register int Ch=c;
     static char prev = 0;
+
+    //if (Ch<0)
+        //return;
 
 // spaces
     if ( Ch <  ' '  && 
@@ -2791,45 +2877,6 @@ void outbyte (int c)
 //Atualisa o prev.
     prev = Ch; 
 }
-
-
-/*
- * _outbyte:
- * Just output a byte on the screen.
- * Obs: 
- * A função não se preocupa com o cursor.
- * Essa rotina está preparada somente par ao modo gráfico.
- * Talvez usaremos um selecionador de modo.   
- * #obs: 
- * #importante: 
- * Não me lebro se o kernel efetua o refresh do char 
- * nesse caso.
- */
-// #obs: 
-// Tamanho do char constante = 8. 
-// O que queremos é usar uma variável.
-
-void _outbyte (int c)
-{
-
-// #bugbug
-// Essa funçao nao 'e usada ... NAO funciona.
-// printf usa outra coisa (65).
-// #bugbug: size = 8
-
-    gramado_system_call ( 
-        7, 
-        (8 * g_cursor_x), 
-        (8 * g_cursor_y), 
-        (unsigned long) c ); 
-
-    //if ( (void *) stdout == NULL )
-       //return;
-
-    //#todo
-    //putc ( ch, stdout );
-}
-
 
 /*
 int gramado_input ( const char *string, va_list arglist );
@@ -3955,70 +4002,6 @@ int sscanf ( const char *str, const char *format, ... )
 //=============================================================
 // printf (start)
 //=============================================================
-/*-
- * Copyright (c) 1986, 1988, 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
- * (c) UNIX System Laboratories, Inc.
- * All or some portions of this file are derived from material licensed
- * to the University of California by American Telephone and Telegraph
- * Co. or Unix System Laboratories, Inc. and are reproduced herein with
- * the permission of UNIX System Laboratories, Inc.
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *	@(#)subr_prf.c	8.3 (Berkeley) 1/21/94
- */
-
-//typedef unsigned long size_t;
-//typedef long ssize_t;
-//#ifdef __64BIT__
-//typedef unsigned long long uintmax_t;
-//typedef long long intmax_t;
-//#else
-typedef unsigned int uintmax_t;
-typedef int          intmax_t;
-//#endif
-typedef unsigned char  u_char;
-typedef unsigned int   u_int;
-typedef unsigned long  u_long;
-typedef unsigned short u_short;
-
-typedef unsigned long long u_quad_t;  //#bugbug
-typedef long long quad_t;             //#bugbug
-typedef unsigned long uintptr_t;
-
-//typedef long ptrdiff_t;
-//#define NULL ((void*)0)
-#define NBBY    8               /* number of bits in a byte */
-char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
-#define hex2ascii(hex)  (hex2ascii_data[hex])
-//#define va_list __builtin_va_list
-//#define va_start __builtin_va_start
-//#define va_arg __builtin_va_arg
-//#define va_end __builtin_va_end
-
-//#obs:
-//vamos usar o que está em ctype.h
-//#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
 
 static size_t stdio_strlen (const char *s)
 {
@@ -4519,15 +4502,13 @@ kvprintf (
 #undef PCHAR
 }
 
-
 static void xxxputchar ( int c, void *arg )
 {
 	/* add your putchar here */
 
 	//printf("%c",c);
-    putchar( (int) c );
+    putchar ((int) c);
 }
-
 
 /*
  *===========================================
@@ -5370,9 +5351,6 @@ int vdprintf (int fd, const char *format, va_list ap)
 //==================================================================
 //
 
-/* we use this so that we can do without the ctype library */
-#define __is_digit(c)	((c) >= '0' && (c) <= '9')
-
 static int skip_atoi(const char **s)
 {
     int i=0;
@@ -6065,210 +6043,6 @@ char *ctermid (char *s)
     return NULL; 
 }
 
-
-/*
- * stdioInitialize:
- *     Inicializa stdio para usar o fluxo padrão.
- *     O retorno deve ser (int) e falhar caso dê algo errado.
- */
-// This routine ws called by crt0() in crt0.c
-// #bugbug
-// Essa estrutura lida com elementos de estrutura em ring3.
-// #atenção: Algumas rotinas importantes estão usando esses elementos.
-// #bugbug
-// Precisamos usar os arquivos herdados do processo pai.
-// Eles estão na estrutura de processo desse processo.
-// #bugbug
-// Talvez não seria o caso de apenas abrirmos os arquivos herdados.
-// E o heap ??
-// Em que momento foi inicializado o heap do processo? 
-// crt0 chamou libcInitRT antes de chamar essa função.
-// See: stdlib/stdlib.c
-// See: crts/crt0.c
-
-void stdioInitialize(void)
-{
-    int status = 0;
-    int i=0;
-
-// #bugbug
-// Isso deve estar errado.
-// provavelmente deveríamos apenas abrir os
-// três arquivos herdados do processo pai.
-// ?? Não sei se o processo init também terá um fluxo herdado.
-
-    // Buffers para as estruturas.
-    //unsigned char buffer0[BUFSIZ];
-    //unsigned char buffer1[BUFSIZ];
-    //unsigned char buffer2[BUFSIZ];
-
-    // Buffers usados pelos arquivos.
-    //unsigned char buffer0_data[BUFSIZ];
-    //unsigned char buffer1_data[BUFSIZ];
-    //unsigned char buffer2_data[BUFSIZ];
-
-    debug_print ("stdioInitialize:\n");
-
-//
-// Pointers
-//
-
-    //stdin  = (FILE *) &buffer0[0];
-    //stdout = (FILE *) &buffer1[0];
-    //stderr = (FILE *) &buffer2[0];
-
-// #bugbug
-// Se essa inicializaçao falhar, nao temos como mostrar
-// mensagens de erro.
-
-// Os aplicativos precisam de uma estrutura clinet-side
-// para gerenciarem o fluxo de dados dos arquivos,
-// mesmo tendo os arquivos uma estrutura kernel-side.
-
-// ===============
-// stdin
-    debug_print ("stdioInitialize: [1] stdin\n");  
-    stdin = (FILE *) malloc( sizeof(FILE) );
-    if ((void*) stdin == NULL)
-    {
-        debug_print ("stdioInitialize: stdin fail\n");
-        //printf      ("stdioInitialize: stdin fail\n");
-        exit(1);
-    }
-    memset( stdin, 0, sizeof(struct _iobuf) );
-
-// ===============
-// stdout
-    debug_print ("stdioInitialize: [2] stdout\n");  
-    stdout = (FILE *) malloc( sizeof(FILE) );
-    if ((void*) stdout == NULL)
-    {
-        debug_print ("stdioInitialize: stdout fail\n");
-        //printf ("stdioInitialize: stdout fail\n");
-        exit(1);
-    }
-    memset( stdout, 0, sizeof(struct _iobuf) );
-
-// ===============
-// stderr
-    debug_print ("stdioInitialize: [3] stderr\n");  
-    stderr = (FILE *) malloc( sizeof(FILE) );
-    if ((void*) stderr == NULL)
-    {
-        debug_print ("stdioInitialize: stderr fail\n");
-        //printf ("stdioInitialize: stderr fail\n");
-        exit(1);
-    }
-    memset( stderr, 0, sizeof(struct _iobuf) );
-
-//
-// Buffers
-//
-
-    // Buffers.
-    // Buffers dos arquivos.
-    //stdin->_base  = &buffer0_data[0];
-    //stdout->_base = &buffer1_data[0];
-    //stderr->_base = &buffer2_data[0];
-
-// ========
-// stdin
-    stdin->_base = (char *) malloc(BUFSIZ);
-    if ( (void*) stdin->_base == NULL ){
-        debug_print ("stdioInitialize: stdin->_base fail\n");
-        //printf ("stdioInitialize: stdin->_base fail\n");
-        exit(1);
-    }
-    stdin->_lbfsize = BUFSIZ;
-    stdin->_p  = stdin->_base;
-    stdin->_cnt  = 0;  //BUFSIZ-1;
-    stdin->_w  = 0;
-    stdin->_r  = 0;  
-    stdin->_file  = 0;
-
-// ========
-// stdout
-    stdout->_base = (char *) malloc(BUFSIZ);
-    if ( (void*) stdout->_base == NULL ){
-        debug_print ("stdioInitialize: stdout->_base fail\n");
-        //printf ("stdioInitialize: stdout->_base fail\n");
-        exit(1);
-    }
-    stdout->_lbfsize = BUFSIZ;
-    stdout->_p = stdout->_base;
-    stdout->_cnt = 0; //BUFSIZ-1; 
-    stdout->_w = 0;
-    stdout->_r = 0;
-    stdout->_file = 1;
-        
-// ========
-// stderr   
-    stderr->_base = (char *) malloc(BUFSIZ);
-    if ( (void*) stderr->_base == NULL ){
-        debug_print ("stdioInitialize: stderr->_base fail\n");
-        //printf ("stdioInitialize: stderr->_base fail\n");
-        exit(1);
-    }
-    stderr->_lbfsize = BUFSIZ;    
-    stderr->_p = stderr->_base;
-    stderr->_cnt = 0; //BUFSIZ-1;    
-    stderr->_w = 0; 
-    stderr->_r = 0;
-    stderr->_file = 2;
-
-//
-// # libc mode #
-//
-
-// #bugbug:
-// Vamos usar o modo draw até implementarmos o modo normal.
-
-// Normal mode:
-// Os caracteres são colocados em stdout.
-    //__libc_output_mode = LIBC_NORMAL_MODE;
-
-// Draw mode:
-// Os caracteres são pintados na tela em full screen.
-// usando um dos consoles virtuais do kernel.
-    __libc_output_mode = LIBC_DRAW_MODE;
-
-// #importante:
-// Vamos conectar o processo filho ao processo pai
-// atraves das ttys privadas dos processos.
-// o processo pai é o terminal. (às vezes)
-// #bugbug:
-// Esse metodo não funcionara no caso
-// do processo filho do shell
-
-// #bugbug
-// Deveria ser o contrário.
-// O pai ser master e o filho slave.
-
-// #fixme
-// Something is not working.
-// Suspended for now.
-// I don't wanna see error messages everytime we launch a command.
-
-    /*
-      gramado_system_call ( 
-          267,
-          getpid(),    //master
-          getppid(),   //slave pai(terminal)
-          0 );
-    */
-
-//
-// tty
-//
-
-// ok
-// This is the tty of this process.
-    __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 ); 
-// Clear prompt[] buffer.
-    prompt_clean();
-    //debug_print ("stdioInitialize: done\n");
-}
-
 // #test
 /*
  *******************************
@@ -6487,8 +6261,217 @@ void data_putc (int ch,FILE *_stream)
 }
 */
 
+
+//
+// $
+// LIBRARY INITIALIZATION
+//
+
+/*
+ * stdioInitialize:
+ *     Inicializa stdio para usar o fluxo padrão.
+ *     O retorno deve ser (int) e falhar caso dê algo errado.
+ */
+// This routine ws called by crt0() in crt0.c
+// #bugbug
+// Essa estrutura lida com elementos de estrutura em ring3.
+// #atenção: Algumas rotinas importantes estão usando esses elementos.
+// #bugbug
+// Precisamos usar os arquivos herdados do processo pai.
+// Eles estão na estrutura de processo desse processo.
+// #bugbug
+// Talvez não seria o caso de apenas abrirmos os arquivos herdados.
+// E o heap ??
+// Em que momento foi inicializado o heap do processo? 
+// crt0 chamou libcInitRT antes de chamar essa função.
+// See: stdlib/stdlib.c
+// See: crts/crt0.c
+
+void stdioInitialize(void)
+{
+// Called by crt0() in crt0.c
+
+    int status = 0;
+    int i=0;
+
+// #bugbug
+// Isso deve estar errado.
+// provavelmente deveríamos apenas abrir os
+// três arquivos herdados do processo pai.
+// ?? Não sei se o processo init também terá um fluxo herdado.
+
+    // Buffers para as estruturas.
+    //unsigned char buffer0[BUFSIZ];
+    //unsigned char buffer1[BUFSIZ];
+    //unsigned char buffer2[BUFSIZ];
+
+    // Buffers usados pelos arquivos.
+    //unsigned char buffer0_data[BUFSIZ];
+    //unsigned char buffer1_data[BUFSIZ];
+    //unsigned char buffer2_data[BUFSIZ];
+
+    debug_print ("stdioInitialize:\n");
+
+//
+// Pointers
+//
+
+    //stdin  = (FILE *) &buffer0[0];
+    //stdout = (FILE *) &buffer1[0];
+    //stderr = (FILE *) &buffer2[0];
+
+// #bugbug
+// Se essa inicializaçao falhar, nao temos como mostrar
+// mensagens de erro.
+
+// Os aplicativos precisam de uma estrutura clinet-side
+// para gerenciarem o fluxo de dados dos arquivos,
+// mesmo tendo os arquivos uma estrutura kernel-side.
+
+// ===============
+// stdin
+    debug_print ("stdioInitialize: [1] stdin\n");  
+    stdin = (FILE *) malloc( sizeof(FILE) );
+    if ((void*) stdin == NULL)
+    {
+        debug_print ("stdioInitialize: stdin fail\n");
+        //printf      ("stdioInitialize: stdin fail\n");
+        exit(1);
+    }
+    memset( stdin, 0, sizeof(struct _iobuf) );
+
+// ===============
+// stdout
+    debug_print ("stdioInitialize: [2] stdout\n");  
+    stdout = (FILE *) malloc( sizeof(FILE) );
+    if ((void*) stdout == NULL)
+    {
+        debug_print ("stdioInitialize: stdout fail\n");
+        //printf ("stdioInitialize: stdout fail\n");
+        exit(1);
+    }
+    memset( stdout, 0, sizeof(struct _iobuf) );
+
+// ===============
+// stderr
+    debug_print ("stdioInitialize: [3] stderr\n");  
+    stderr = (FILE *) malloc( sizeof(FILE) );
+    if ((void*) stderr == NULL)
+    {
+        debug_print ("stdioInitialize: stderr fail\n");
+        //printf ("stdioInitialize: stderr fail\n");
+        exit(1);
+    }
+    memset( stderr, 0, sizeof(struct _iobuf) );
+
+//
+// Buffers
+//
+
+    // Buffers.
+    // Buffers dos arquivos.
+    //stdin->_base  = &buffer0_data[0];
+    //stdout->_base = &buffer1_data[0];
+    //stderr->_base = &buffer2_data[0];
+
+// ========
+// stdin
+    stdin->_base = (char *) malloc(BUFSIZ);
+    if ( (void*) stdin->_base == NULL ){
+        debug_print ("stdioInitialize: stdin->_base fail\n");
+        //printf ("stdioInitialize: stdin->_base fail\n");
+        exit(1);
+    }
+    stdin->_lbfsize = BUFSIZ;
+    stdin->_p  = stdin->_base;
+    stdin->_cnt  = 0;  //BUFSIZ-1;
+    stdin->_w  = 0;
+    stdin->_r  = 0;  
+    stdin->_file  = 0;
+
+// ========
+// stdout
+    stdout->_base = (char *) malloc(BUFSIZ);
+    if ( (void*) stdout->_base == NULL ){
+        debug_print ("stdioInitialize: stdout->_base fail\n");
+        //printf ("stdioInitialize: stdout->_base fail\n");
+        exit(1);
+    }
+    stdout->_lbfsize = BUFSIZ;
+    stdout->_p = stdout->_base;
+    stdout->_cnt = 0; //BUFSIZ-1; 
+    stdout->_w = 0;
+    stdout->_r = 0;
+    stdout->_file = 1;
+        
+// ========
+// stderr   
+    stderr->_base = (char *) malloc(BUFSIZ);
+    if ( (void*) stderr->_base == NULL ){
+        debug_print ("stdioInitialize: stderr->_base fail\n");
+        //printf ("stdioInitialize: stderr->_base fail\n");
+        exit(1);
+    }
+    stderr->_lbfsize = BUFSIZ;    
+    stderr->_p = stderr->_base;
+    stderr->_cnt = 0; //BUFSIZ-1;    
+    stderr->_w = 0; 
+    stderr->_r = 0;
+    stderr->_file = 2;
+
+//
+// # libc mode #
+//
+
+// #bugbug:
+// Vamos usar o modo draw até implementarmos o modo normal.
+
+// Normal mode:
+// Os caracteres são colocados em stdout.
+    //__libc_output_mode = LIBC_NORMAL_MODE;
+
+// Draw mode:
+// Os caracteres são pintados na tela em full screen.
+// usando um dos consoles virtuais do kernel.
+    __libc_output_mode = LIBC_DRAW_MODE;
+
+// #importante:
+// Vamos conectar o processo filho ao processo pai
+// atraves das ttys privadas dos processos.
+// o processo pai é o terminal. (às vezes)
+// #bugbug:
+// Esse metodo não funcionara no caso
+// do processo filho do shell
+
+// #bugbug
+// Deveria ser o contrário.
+// O pai ser master e o filho slave.
+
+// #fixme
+// Something is not working.
+// Suspended for now.
+// I don't wanna see error messages everytime we launch a command.
+
+    /*
+      gramado_system_call ( 
+          267,
+          getpid(),    //master
+          getppid(),   //slave pai(terminal)
+          0 );
+    */
+
+//
+// tty
+//
+
+// ok
+// This is the tty of this process.
+    __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 ); 
+// Clear prompt[] buffer.
+    prompt_clean();
+    //debug_print ("stdioInitialize: done\n");
+}
+
 //
 // End
 //
-
-

@@ -248,6 +248,8 @@ static int __CompareStrings(void)
 // see: storage.c
     if ( kstrncmp(prompt,"mbr",3) == 0 )
     {
+        // #test: It is working
+        //d_draw_char ( 8, 8, 219, COLOR_RED, COLOR_YELLOW );
         disk_show_mbr_info();
         goto exit_cmp;
     }

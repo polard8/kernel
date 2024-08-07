@@ -777,9 +777,6 @@ int unix_get (int ifile);
 
 int libcStartTerminal (void);
 
-/*Inicializa��o da biblioteca*/
-void stdioInitialize(void);
-
 // #test
 size_t gets_00(char *buf, size_t buffer_size);
 
@@ -788,6 +785,13 @@ int rtl_are_you_sure(void);
 
 int stdio_atoi (char *s);
 void stdio_fntos (char *name);
+
+
+// 
+// Library initialization
+//
+
+void stdioInitialize(void);
 
 #endif    //__STDIO_H__
 

@@ -526,17 +526,22 @@ void disk_show_mbr_info(void)
 {
 
 // partition table 0
-    if ( (void*) system_disk_pt0 == NULL )
+    if ((void*) system_disk_pt0 == NULL)
         return;
 
     //#debug
     //printk("Partition %d:\n",index);
-    printk("active %x\n", 
+    printk("Active? %x\n", 
         system_disk_pt0->active );
-    printk("start lba %d\n", 
+    printk("Start LBA: %d\n", 
         system_disk_pt0->start_lba );
-    printk("size %x\n", 
+    printk("Size in sectors: %d\n", 
         system_disk_pt0->size );
+
+    // #test: For sectors with 512 bytes each.
+    unsigned int SizeInKB = (system_disk_pt0->size/2);
+    printk("Size in KB: %d\n", SizeInKB);
+
     // ...
 }
 

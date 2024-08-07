@@ -1,6 +1,6 @@
-
 // crt0.c
 // Standard crt0 for Gramado OS ring 3 applications.
+// Created by Fred Nora.
 
 #include <types.h>
 #include <stddef.h>
@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <rtl/gramado.h>
+
 
 #define LSH_TOK_DELIM  " \t\r\n\a" 
 #define SPACE  " "
@@ -59,14 +60,12 @@ const char *my_environ[] = {
     NULL 
 };
 
-
 // ==============================
 
 // Import from the ring3 application.
-extern int main ( int argc, char *argv[] );
+extern int main(int argc, char *argv[]);
 
 // ==============================
-
 
 // # importante
 // Esses aplicativos rodam no terminal.
@@ -76,6 +75,7 @@ extern int main ( int argc, char *argv[] );
 // #todo
 // Explain this argument better.
 
+// Application entrypoint
 void crt0(unsigned long rdi)
 {
 // This function never returns.
@@ -184,7 +184,7 @@ void crt0(unsigned long rdi)
 // stdlib/stdlib.c
 
     int rt_status = -1;  //fail
-    rt_status = (int) libcInitRT();
+    rt_status = (int) stdlibInitializeRT();
     if (rt_status != 0){
         // #debug: put char
         gramado_system_call(65,'e',0,0);
@@ -219,7 +219,7 @@ void crt0(unsigned long rdi)
 // Reading command line from a file.
 
     char buffer[4096];
-    memset(buffer, 0, 512);
+    memset(buffer, 0, 4096);
 
 // Copy
     int n=0;

@@ -68,7 +68,7 @@ d_draw_char (
 // if we do not have loadable one.
 
     // default: BIOS font.
-    if ( gws_currentfont_address == 0 ){
+    if (gws_currentfont_address == 0){
         gws_currentfont_address = (unsigned long) BIOSFONT8X8;
     }
 
@@ -85,17 +85,12 @@ d_draw_char (
 
         case FONT8X8:
             //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
-            //gcharWidth = 8;
-            //gcharHeight = 8;
             set_char_width (8);
             set_char_height (8);
             break;
 
-
         case FONT8X16:
             //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
-            //gcharWidth = 8;
-            //gcharHeight = 16;
             set_char_width (8);
             set_char_height (16);
             break;
@@ -125,8 +120,7 @@ d_draw_char (
 // O caractere sendo trabalhado.
 // Offset da tabela de chars de altura 8 na ROM.
 
-    work_char = 
-        (void *) gws_currentfont_address + (c * gcharHeight);
+    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
 // Draw
     
@@ -218,16 +212,12 @@ d_drawchar_transparent (
 
         case FONT8X8:
             //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
-            //gcharWidth = 8;
-            //gcharHeight = 8;
             set_char_width (8);
             set_char_height (8);
             break;
 
         case FONT8X16:
             //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
-            //gcharWidth = 8;
-            //gcharHeight = 16;
             set_char_width (8);
             set_char_height (16);
             break;
@@ -249,15 +239,14 @@ d_drawchar_transparent (
 // O caractere sendo trabalhado.
 // Offset da tabela de chars de altura 8 na ROM.
 
-    if ( gws_currentfont_address == 0 ){
+    if (gws_currentfont_address == 0){
         debug_print ("d_drawchar_transparent: [FAIL]gws_currentfont_address\n");
         return;
     }
 
 // Work char:
 
-    work_char = 
-        (void *) gws_currentfont_address + (c * gcharHeight);
+    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
 // Draw
 // See:  pixel.c

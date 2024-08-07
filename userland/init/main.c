@@ -819,6 +819,9 @@ int main( int argc, char **argv)
         goto fail;
     }
 
+    //#test extebded ascii table in the kernel console.
+    //printf("%c",219); fflush(stdout); while(1){}
+
 // ------------------------------
 // Parameters
 // These parameters are created by the kernel
