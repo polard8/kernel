@@ -1103,15 +1103,16 @@ ssize_t __write_imp (int fd, char *ubuf, size_t count)
 // stdout
 // + Write on console.
 // + Write on regular file.
+// see: console.c
     if (fp->_file == STDOUT_FILENO)
     {
         // If the file is a console.
         if (fp->____object == ObjectTypeVirtualConsole)
         {
             return (int) console_write ( 
-                             (int) fg_console, 
-                             (const void *) ubuf, 
-                             (size_t) count );
+                            (int) fg_console, 
+                            (const void *) ubuf, 
+                            (size_t) count );
         }
         // If the file is a regular file.
         if (fp->____object == ObjectTypeFile){

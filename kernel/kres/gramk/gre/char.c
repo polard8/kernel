@@ -245,7 +245,6 @@ d_drawchar_transparent (
     }
 
 // Work char:
-
     work_char = (void *) gws_currentfont_address + (c * gcharHeight);
 
 // Draw

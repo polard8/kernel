@@ -78,7 +78,8 @@ static unsigned long console_interrupt_counter=0;
 // == Private functions: Prototypes ======================
 //
 
-static void __ConsoleOutbyte (int c, int console_number);
+static void __ConsoleDraw_Outbyte (int c, int console_number);
+
 static void __test_path(void);
 static void __test_tty(void);
 // #todo: Use static modifier.
@@ -650,8 +651,8 @@ void console_scroll(int console_number)
              i < (CONSOLE_TTYS[console_number].cursor_right-1);
              i++ )
        {
-           __ConsoleOutbyte(' ',console_number);
-           //__ConsoleOutbyte('.',console_number); 
+           __ConsoleDraw_Outbyte(' ',console_number);
+           //__ConsoleDraw_Outbyte('.',console_number); 
        };
     }
 */
@@ -680,6 +681,118 @@ void console_scroll(int console_number)
 }
 
 
+// worker
+// __ConsoleDraw_Outbyte:
+// Outputs a char on the console device;
+// Low level function to draw the char into the screen.
+// it calls the embedded window server.
+// #test
+// Tentando pegar as dimensões do char.
+// #importante: 
+// Não pode ser 0, pois poderíamos ter divisão por zero.
+// Called by console_outbyte().
+
+static void __ConsoleDraw_Outbyte (int c, int console_number)
+{
+// Draw
+// Low level.
+// This routine is gonna call the function d_draw_char()
+// to draw into the screen. this function belongs to the 
+// display device driver.
+// #todo: We need to change the name of this function
+// this way we will know that the function belongs
+// to the device driver.  Maybe display_draw_char().
+
+    register int Ch = c;
+    //unsigned long Ch = (unsigned long) (c & 0xFF);
+
+// Target console
+    int n = (int) console_number;
+
+    int cWidth = get_char_width();
+    int cHeight = get_char_height();
+
+    unsigned long screenx=0;
+    unsigned long screeny=0;
+    unsigned int bg_color=0;
+    unsigned int fg_color=0;
+
+
+// Parameter:
+    if ( n < 0 || n >= CONSOLETTYS_COUNT_MAX  )
+    {
+        debug_print ("__ConsoleDraw_Outbyte: [FAIL] n\n");
+        x_panic     ("__ConsoleDraw_Outbyte: [FAIL] n");
+    }
+
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        debug_print ("__ConsoleDraw_Outbyte: char w h\n");
+        x_panic     ("__ConsoleDraw_Outbyte: fail w h");
+    }
+
+// #bugbug
+// Caso estejamos em modo texto.
+// Isso ainda não é suportado.
+
+    if (VideoBlock.useGui != TRUE){
+        debug_print ("__ConsoleDraw_Outbyte: kernel in text mode\n");
+        x_panic     ("__ConsoleDraw_Outbyte: kernel in text mode");
+    }
+
+// #Importante: 
+// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
+// um todo. Só está considerando as dimensões do 'char'.
+// Caso estivermos em modo gráfico.
+// #importante: 
+// Essa rotina de pintura deveria ser exclusiva 
+// para dentro do terminal.
+// Então essa flag não faz sentido.
+// See: char.c
+
+    if (VideoBlock.useGui != TRUE)
+        return;
+
+// Screen position.
+    screenx = (unsigned long) (cWidth  * CONSOLE_TTYS[n].cursor_x);
+    screeny = (unsigned long) (cHeight * CONSOLE_TTYS[n].cursor_y);
+
+// Get the colors for this console.
+    bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color; 
+    fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
+
+//
+// Draw
+//
+
+// Sempre pinte o bg e o fg.
+// see: gre/char.c
+
+    d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
+
+/*
+// ## NÃO TRANPARENTE ##
+// Se estamos no modo terminal então usaremos as cores 
+// configuradas na estrutura do terminal atual.
+// Branco no preto é um padrão para terminal.
+
+    if (stdio_terminalmode_flag == 1){
+        // Pinta bg e fg.
+        d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
+        return;
+    }
+
+// ## TRANSPARENTE ##
+// Se não estamos no modo terminal então usaremos
+// char transparente.
+// Não sabemos o fundo. Vamos selecionar o foreground.     
+
+    // Pinta apenas o fg.
+    d_drawchar_transparent ( screenx, screeny, fg_color, Ch );
+*/
+
+}
+
 /*
  * console_outbyte:
  *     Trata o caractere a ser imprimido e chama a rotina /_outbyte/
@@ -687,7 +800,7 @@ void console_scroll(int console_number)
  * Essa rotina é chamada pelas funções: /putchar/scroll/.
  * @todo: Colocar no buffer de arquivo.
  */
-// This functions calls __ConsoleOutbyte to draw
+// This functions calls __ConsoleDraw_Outbyte to draw
 // the char into the screen.
 
 void console_outbyte (int c, int console_number)
@@ -896,7 +1009,7 @@ void console_outbyte (int c, int console_number)
     }
 
 
-    //__ConsoleOutbyte(Ch,n);
+    //__ConsoleDraw_Outbyte(Ch,n);
     //prev = Ch;
 
 // Fim da linha.
@@ -940,12 +1053,11 @@ void console_outbyte (int c, int console_number)
 
     tcflag_t c_lflag = (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
     if (c_lflag & ECHO){
-        __ConsoleOutbyte(Ch,n);
+        __ConsoleDraw_Outbyte(Ch,n);
     }
 
     prev = Ch;
 }
-
 
 void console_outbyte2 (int c, int console_number)
 {
@@ -998,8 +1110,10 @@ void console_outbyte2 (int c, int console_number)
     //switch ?? 
 
     // type: 'int'.
-    if (Ch<0)
-        return;
+    // #ps: We don't need this.
+    // We need the mask at the low part os the integer.
+    //if (Ch<0)
+        //return;
 
     // form feed - Nova tela.
     if (Ch == '\f')
@@ -1205,7 +1319,7 @@ void console_outbyte2 (int c, int console_number)
         (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
     
     if (c_lflag & ECHO){
-        __ConsoleOutbyte(Ch,n);
+        __ConsoleDraw_Outbyte(Ch,n);
     }
 
 // Atualisa o prev.
@@ -1229,126 +1343,6 @@ void console_echo(int c, int console_number)
         return;
     console_outbyte2(c,console_number);
 }
-
-// worker
-// __ConsoleOutbyte:
-// Outputs a char on the console device;
-// Low level function to draw the char into the screen.
-// it calls the embedded window server.
-// #test
-// Tentando pegar as dimensões do char.
-// #importante: 
-// Não pode ser 0, pois poderíamos ter divisão por zero.
-// Called by console_outbyte().
-
-static void __ConsoleOutbyte (int c, int console_number)
-{
-// Draw
-// Low level.
-// This routine is gonna call the function d_draw_char()
-// to draw into the screen. this function belongs to the 
-// display device driver.
-// #todo: We need to change the name of this function
-// this way we will know that the function belongs
-// to the device driver.  Maybe display_draw_char().
-
-    register int Ch = c;
-
-// Target console
-    int n = (int) console_number;
-
-    int cWidth = get_char_width();
-    int cHeight = get_char_height();
-
-    unsigned long screenx=0;
-    unsigned long screeny=0;
-    unsigned int bg_color=0;
-    unsigned int fg_color=0;
-
-    // #debug
-    // debug_print ("__ConsoleOutbyte:\n");
-
-    // #todo: Check verflow
-    //if (n < 0)
-    //{
-    //    debug_print ("console_outbyte: n\n");
-    //    return;
-    //}
-
-    if ( n < 0 || n >= CONSOLETTYS_COUNT_MAX  )
-    {
-        debug_print ("__ConsoleOutbyte: [FAIL] n\n");
-        x_panic     ("__ConsoleOutbyte: [FAIL] n\n");
-    }
-
-    if ( cWidth == 0 || cHeight == 0 )
-    {
-        debug_print ("__ConsoleOutbyte: char w h\n");
-        x_panic     ("__ConsoleOutbyte: fail w h");
-    }
-
-// #bugbug
-// Caso estejamos em modo texto.
-// Isso ainda não é suportado.
-
-    if (VideoBlock.useGui != TRUE){
-        debug_print ("__ConsoleOutbyte: kernel in text mode\n");
-        x_panic     ("__ConsoleOutbyte: kernel in text mode\n");
-    }
-
-// #Importante: 
-// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
-// um todo. Só está considerando as dimensões do 'char'.
-// Caso estivermos em modo gráfico.
-// #importante: 
-// Essa rotina de pintura deveria ser exclusiva 
-// para dentro do terminal.
-// Então essa flag não faz sentido.
-// See: char.c
-
-    if (VideoBlock.useGui != TRUE)
-        return;
-
-// Screen position.
-    screenx = (unsigned long) (cWidth  * CONSOLE_TTYS[n].cursor_x);
-    screeny = (unsigned long) (cHeight * CONSOLE_TTYS[n].cursor_y);
-
-// Get the colors for this console.
-    bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color; 
-    fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
-
-//
-// Draw
-//
-
-// Sempre pinte o bg e o fg.
-// see: gre/char.c
-
-    d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
-
-/*
-// ## NÃO TRANPARENTE ##
-// Se estamos no modo terminal então usaremos as cores 
-// configuradas na estrutura do terminal atual.
-// Branco no preto é um padrão para terminal.
-
-    if (stdio_terminalmode_flag == 1){
-        // Pinta bg e fg.
-        d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
-        return;
-    }
-
-// ## TRANSPARENTE ##
-// Se não estamos no modo terminal então usaremos
-// char transparente.
-// Não sabemos o fundo. Vamos selecionar o foreground.     
-
-    // Pinta apenas o fg.
-    d_drawchar_transparent ( screenx, screeny, fg_color, Ch );
-*/
-
-}
-
 
 /*
  * console_putchar:
@@ -1749,12 +1743,13 @@ console_write (
 {
 // Write n bytes of a string into a given console.
 // Called by sys_write.
-// Called by sys_write on fflush().
 
 // loop
     register int i=0;
-    char ch=0; 
+
     char *data = (char *) buf;
+    unsigned char ch=0; 
+
     size_t StringSize=0;
     int ivalue=0;
     int ivalue2=0;
@@ -1825,7 +1820,7 @@ console_write (
     for (i=0; i<StringSize; i++)
     {
         // Get next char from the string.
-        ch = data[i];
+        ch = (unsigned char) data[i];
 
         // Select the stage in the escape sequence.
         switch (__EscapeSequenceStage){
@@ -1841,23 +1836,27 @@ console_write (
                
                 // Is printable?
                 // regular ascii printable. Not abnt2.
-                if (ch >= 32 && ch <= 127){
+                //if (ch >= 32 && ch <= 127){
+                // #test: Let's print also the extended ascii chars.
+                if (ch >= 32 && ch <= 256 && ch != 127){
 
                     // Draw and refresh.
-                    if (DoEcho == TRUE){
-                        console_echo(ch,console_number);
-                        //console_outbyte2(ch,console_number);
+                    if (DoEcho == TRUE)
+                    {
+
+                        // Regular printable
+                        if (ch >= 32 && ch <= 127){
+                            console_echo(ch,console_number);
+                        
+                        // Extended printable
+                        } else if (ch >= 128 && ch < 256){
+                            
+                            // #test: 
+                            // Testing extended ascii chars. (Not working)
+                            // Maybe there is no BIOS font for this.
+                            // console_echo(ch,console_number);
+                        };
                     }
-
-                //#test
-                // Extended ascii table for fancy chars
-                //}else if (ch >=128 && ch < 256){
-
-                    // Draw and refresh.
-                    //if (DoEcho == TRUE){
-                        //console_echo(ch,console_number);
-                        //console_outbyte2(ch,console_number);
-                    //}
 
                 // >>>> [ Escape ]
                 // Entramos em uma escape sequence,

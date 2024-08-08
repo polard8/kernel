@@ -796,7 +796,7 @@ static int loopMenu_ExitGramadoOS(void)
 // ====
 // Small command line interpreter.
 // We need to hang here because 
-// maybe there is no window server installed.
+// maybe there is no display server installed.
 
     printf("\n");
     printf(":: Exit Gramado OS ::\n");

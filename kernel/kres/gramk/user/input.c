@@ -248,8 +248,12 @@ static int __CompareStrings(void)
 // see: storage.c
     if ( kstrncmp(prompt,"mbr",3) == 0 )
     {
-        // #test: It is working
-        //d_draw_char ( 8, 8, 219, COLOR_RED, COLOR_YELLOW );
+        // #test: Testing extended ascii chars. (Not working)
+        //d_draw_char ( 8, 1*8, 176, COLOR_BLUE, COLOR_YELLOW );
+        //d_draw_char ( 8, 2*8, 177, COLOR_BLUE, COLOR_YELLOW );
+        //d_draw_char ( 8, 3*8, 233, COLOR_BLUE, COLOR_WHITE );
+        //d_draw_char ( 8, 4*8, 234, COLOR_BLUE, COLOR_WHITE );
+
         disk_show_mbr_info();
         goto exit_cmp;
     }

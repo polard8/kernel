@@ -459,8 +459,8 @@ int __fflush (FILE *stream)
 // Have an invalid ring3 buffer.
     if ((void *) stream->_base == NULL){
         debug_print( "__fflush: [ERROR] Invalid ring3 buffer\n");
-        return (int) (-1);
-    } 
+        goto fail;
+    }
 
 // The 'write offset' is the number of bytes to write.
 // So, it can't be '0' or negative.
@@ -537,6 +537,8 @@ int __fflush (FILE *stream)
 
 // done
     return 0;
+fail:
+    return (int) -1;
 }
 
 // #todo:
@@ -994,7 +996,7 @@ int getchar (void){
 
 // Don't change it.
 int putchar (int ch){
-    return (int) putc ( (int) ch, stdout );
+    return (int) putc((int) ch, stdout);
 }
 
 //
@@ -2417,12 +2419,15 @@ void printchar ( char **str, int c )
 void kinguio_puts(const char* str)
 {
     register int i=0;
+
+// Parameter:
     if (!str){
         return;
     }
+
     size_t StringLen = (size_t) strlen(str);
     for (i=0; i<StringLen; i++){
-        putchar( str[i] );
+        putchar (str[i]);
     };
 }
 
