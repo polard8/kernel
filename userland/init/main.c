@@ -81,6 +81,8 @@ static int input_process_control_char(int ch);
 // Loops
 static int loopSTDIN(void);
 static int loopMenu(void);
+static int loopMenu_ExitGramadoOS(void);
+
 
 //
 // ==============================================================
@@ -312,6 +314,16 @@ static int input_compare_string(void)
         goto exit_cmp;
     }
 
+    if (strncmp(prompt,"exit",4) == 0){
+        loopMenu_ExitGramadoOS();
+        goto exit_cmp;
+    }
+
+    if ( strncmp(prompt,"quit",4) == 0 ){
+        isTimeToQuitCmdLine=TRUE;
+        goto exit_cmp;
+    }
+
     //#test
     if ( strncmp(prompt,"list",4) == 0 ){
         do_launch_list();
@@ -357,11 +369,6 @@ static int input_compare_string(void)
 // gp fault
     if ( strncmp(prompt,"hlt",3) == 0 ){
         do_hlt();
-        goto exit_cmp;
-    }
-
-    if ( strncmp(prompt,"quit",4) == 0 ){
-        isTimeToQuitCmdLine=TRUE;
         goto exit_cmp;
     }
 
@@ -707,6 +714,7 @@ static int loopSTDIN(void)
 //================================
 }
 
+// Coolmenu
 static int loopMenu(void)
 {
 // Get input from sdtin.
@@ -765,6 +773,59 @@ static int loopMenu(void)
         }
         // Poweroff the system.
         if (C =='s')
+        {
+            printf ("Shutdown the system? (yn)\n");
+            yn_result = (int) rtl_y_or_n();
+            if (yn_result == TRUE){
+                rtl_clone_and_execute("shutdown.bin");
+            }
+        }
+    };
+}
+
+// menu: Exit Gramado OS.
+static int loopMenu_ExitGramadoOS(void)
+{
+// Get input from sdtin.
+
+    register int C=0;
+
+// Clear the console and set cursor position to 0,0.
+    do_clear_console();
+
+// ====
+// Small command line interpreter.
+// We need to hang here because 
+// maybe there is no window server installed.
+
+    printf("\n");
+    printf(":: Exit Gramado OS ::\n");
+
+    printf("\n");
+    printf("  + (s) - Shutdown the system\n");  
+    printf("\n");
+    printf("  + (c) - Cancel\n");  
+
+    do_init_prompt();
+
+    static int yn_result = FALSE;
+
+    while (1)
+    {
+        if (isTimeToQuitCmdLine == TRUE){
+            break;
+        }
+
+        C = (int) fgetc(stdin);
+
+        // c - Cancel the oeration and leave the dialog.
+        if (C == 'c' || C == 'C')
+        {
+            break;
+        }
+
+        // Poweroff the system.
+        if (C =='s' || C =='S')
         {
             printf ("Shutdown the system? (yn)\n");
             yn_result = (int) rtl_y_or_n();
