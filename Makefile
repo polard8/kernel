@@ -101,65 +101,48 @@ build-gramado-os:
 # O BL.BIN procura o kernel no diretorio GRAMADO/
 # See: fs/loader.c
 
-#----------------------------------
-# (1) boot/
+#===================================
+# (1) boot/ 
 
-# Create the virtual disk 0.
-	$(Q)$(NASM) boot/x86/vd/fat/main.asm \
-	-I boot/x86/vd/fat/ \
-	-o GRAMHV.VHD 
+# ::Build stuuf in boot/
+	$(Q)$(MAKE) -C boot/
 
-# Create backup for MBR 0.
-	$(Q)$(NASM) boot/x86/vd/fat/stage1.asm \
-	-I boot/x86/vd/fat/ \
-	-o MBR0.BIN
-	cp MBR0.BIN  $(BASE)/
+# Copy stuff created in boot/
+	cp boot/GRAMHV.VHD  .
+	cp boot/MBR0.BIN                $(BASE)/
+	cp boot/x86/bsp/bin/BM.BIN      $(BASE)/
+	cp boot/x86/bsp/bin/BM2.BIN     $(BASE)/
+	cp boot/x86/bsp/bin/BLGRAM.BIN  $(BASE)/
 
-# ::Build BM.BIN. (legacy, no dialog)
-	$(Q)$(MAKE) -C boot/x86/bm/ 
-# Copy to the target folder.
-	cp boot/x86/bin/BM.BIN  $(BASE)/
 
-# #BUGBUG 
-# Suspended!
-# Something is affecting the window server,
-# if we enter in the graphics mode without entering
-# the shell first. There are two routines 
-# to initialize the gui mode. Only one is good.
-# ::Build BM2.BIN. (Interface with dialog)
-	$(Q)$(MAKE) -C boot/x86/bm2/ 
-# Copy to the target folder.
-	cp boot/x86/bin/BM2.BIN  $(BASE)/
-
-# ::Build BLGRAM.BIN
-	$(Q)$(MAKE) -C boot/x86/blgram/ 
-# Copy to the target folder.
-	cp boot/x86/bin/BLGRAM.BIN  $(BASE)/
-
-#----------------------------------
-# (3) /
+#===================================
+# (2) kernel/
 
 # ::Build kernel image.
 	$(Q)$(MAKE) -C kernel/
+
 # Copy to the target folder.
+# We need a backup
 	cp kernel/KERNEL.BIN  $(BASE)/GRAMADO
 
-#----------------------------------
-# (4) mods/
+#===================================
+# (3) mods/
 
-#----------------------------------
 # ::Build the ring0 module image.
 	$(Q)$(MAKE) -C mods/
+
 # Copy the ring0 module image.
 	cp mods/HVMOD0.BIN  $(BASE)/
 
-#----------------------------------
-# () userland/ in kernel project
+#===================================
+# (4) userland/ in kernel project
 # Build the init process.
 # Build the network server and the first client.
 # Copy the init process.
 # We can't survive without this one. (Only this one).
-	make -C userland/
+	$(Q)$(MAKE) -C userland/
+
+# Copy
 	cp userland/bin/INIT.BIN      $(BASE)/
 	-cp userland/bin/PUBSH.BIN    $(BASE)/
 	-cp userland/bin/SH7.BIN      $(BASE)/
