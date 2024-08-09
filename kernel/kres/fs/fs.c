@@ -921,6 +921,16 @@ ssize_t sys_read(int fd, char *ubuf, size_t count)
     if (fd<0){
         return (ssize_t) -EINVAL;
     }
+
+// #test
+// Usermode buffer validation
+    if (ubuf < CONTROLTHREAD_BASE)
+    {
+        panic ("sys_read: Invalid ubuf\n");
+        //return (ssize_t) -EFAULT;  // bad address
+    }
+
+    // #todo: count
     return (ssize_t) __read_imp(fd, ubuf, count);
 }
 
@@ -1389,6 +1399,16 @@ ssize_t sys_write(int fd, char *ubuf, size_t count)
     if (fd<0){
         return (ssize_t) -EINVAL;
     }
+
+// #test
+// Usermode buffer validation
+    if (ubuf < CONTROLTHREAD_BASE)
+    {
+        panic ("sys_write: Invalid ubuf\n");
+        //return (ssize_t) -EFAULT;  // bad address
+    }
+
+// #todo: count
     return (ssize_t) __write_imp(fd, ubuf, count);
 }
 
