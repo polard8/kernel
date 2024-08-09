@@ -74,6 +74,8 @@ post_message_to_tid2 (
     {
         //if (MessageCode == MSG_KEYDOWN)
         //{
+            // #test: Selecting the timeout thread, that will have priority in the round.
+            // Cutting the round and selecting it as next.
             timeout_thread = (struct thread_d *) t;
             timeout_thread->waiting_for_timeout = TRUE;
         //}
@@ -292,24 +294,41 @@ sys_post_message_to_tid(
         return 0;
     }
 // Message buffer
+// Buffer in ring3.
     if (message_buffer == 0){
         return 0;
     }
-    unsigned long *buf = (unsigned long *) message_buffer;
+    unsigned long *ubuf = (unsigned long *) message_buffer;
 // Message code
-    int MessageCode = (int) ( buf[1] & 0xFFFFFFFF );
+    int MessageCode = (int) ( ubuf[1] & 0xFFFFFFFF );
 
 // Post message.
 // Asynchronous.
 // IN: target tid, opaque struct pointer, msg code, data1, data2.
 // #todo: get the return value?
 
+    // #ps: Old implementation
+    /*
     post_message_to_tid(
         (tid_t) src_tid,    // sender tid
         (tid_t) dst_tid,    // receiver tid
         (int) MessageCode,
-        (unsigned long) buf[2],
-        (unsigned long) buf[3] );
+        (unsigned long) ubuf[2],
+        (unsigned long) ubuf[3] );
+    */
+
+    // #ps: Newm implementation. Sending more data.
+    post_message_to_tid2(
+        (tid_t) src_tid,    // sender tid
+        (tid_t) dst_tid,    // receiver tid
+        (int) MessageCode,
+        (unsigned long) ubuf[2],
+        (unsigned long) ubuf[3],
+        (unsigned long) ubuf[4],
+        (unsigned long) ubuf[5] );
+
+// Let's notify the scheduler
+// that we need some priority for the receiver in this case.
 
     return 0;
 }
@@ -479,12 +498,12 @@ void *sys_get_message(unsigned long ubuf)
         //return NULL;
     }
 
+// ===========================================================
 // Thread
-// Essa é a thread que chamou esse serviço.
-    if (current_thread<0 || current_thread>=THREAD_COUNT_MAX){
+// This is the thread that called this service.
+    if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX){
         return NULL;
     }
-// structure
     t = (void *) threadList[current_thread];
     if ((void *) t == NULL){
         panic ("sys_get_message: t\n");

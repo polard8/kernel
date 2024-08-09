@@ -2374,6 +2374,11 @@ void *sci2 (
         do_credits(foreground_thread);
         do_credits(foreground_thread);
 
+        // #test: Selecting the timeout thread, that will have priority in the round.
+        // Cutting the round and selecting it as next.
+        //timeout_thread = (struct thread_d *) t;
+        //timeout_thread->waiting_for_timeout = TRUE;
+
         return NULL;
     }
 
