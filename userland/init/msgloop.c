@@ -299,9 +299,10 @@ xxxProcessEvent (
     // ...
 
     default:
+        //return (int) rtl_default_procedure(msg,long1,long2);
         break;
     };
-    
+
     return 0;
 fail:
     return (int) -1;

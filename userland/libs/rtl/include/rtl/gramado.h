@@ -1,4 +1,3 @@
-
 // gramado.h
 // gramado system calls.
 // #bugbug: It is not properly stub routines,
@@ -325,9 +324,14 @@ int rtl_swap64(long *x, long *y);
 
 long rtl_round_up(long num_to_round, long multiple);
 
-
 int rtl_send_raw_packet(const char *frame_address, size_t frame_lenght);
 
-#endif
+// Default handler for processing system events.
+int 
+rtl_default_procedure(
+    int msg_code, 
+    unsigned long long1, 
+    unsigned long long2 );
 
+#endif
 

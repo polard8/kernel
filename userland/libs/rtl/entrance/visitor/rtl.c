@@ -2393,3 +2393,26 @@ int rtl_send_raw_packet(const char *frame_address, size_t frame_lenght)
     return (int) (RetVal & 0xFFFFFFFF);
 }
 
+// Default handler for processing system events.
+int 
+rtl_default_procedure(
+    int msg_code, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+
+// #todo
+// Just some few msg codes
+
+    switch (msg_code)
+    {
+        case 0:
+            break;
+        
+        // ...
+    };
+
+// OK
+    return (int) 0;
+}
+
