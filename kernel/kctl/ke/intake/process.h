@@ -825,12 +825,17 @@ struct process_d
 // IPC - Inter-Process Communication.
 //
 
-// Signal
-// See: include/lib/signal.h
+// ---------------------------------
 
-    unsigned long signal;
-    unsigned long umask;
-    //struct sigaction sigaction[32];
+// #test
+// Signal
+// See: ksignal.h
+    unsigned int signal;
+    unsigned int umask;
+    struct sigaction_d sigaction[32];   // 32 structures.
+    unsigned long restorer_address;     // The restorer address.
+
+// ---------------------------------
 
 // ??
 // Tempo para o proximo alarme, dado em ticks.

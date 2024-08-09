@@ -7,12 +7,29 @@
 //...
 
 
-#ifndef _SIGNAL_H_
-#define _SIGNAL_H_
+#ifndef  __SIGNAL_H
+#define  __SIGNAL_H    1
+
 
 #include <sys/types.h>
 
 
+// Definitions
+typedef          int  sig_atomic_t;
+typedef unsigned int  sigset_t;
+// ...
+
+
+/* Type of a signal handler.  */
+typedef void (*sighandler_t)(int);
+
+typedef sighandler_t __sighandler_t;
+typedef sighandler_t sig_t;
+//...
+
+#define SIG_DFL ((__sighandler_t) 0)
+#define SIG_ERR ((__sighandler_t)-1)
+#define SIG_IGN ((__sighandler_t) 1)
 
 
 //credits: serenity os
@@ -50,45 +67,6 @@
 #define SIGSYS     31
 #define NSIG       32
 
-//int	(*signal())();
-//#define	SIG_DFL	(int (*)())0
-//#define	SIG_IGN	(int (*)())1
-
-#define SIG_DFL ((__sighandler_t)0)
-#define SIG_ERR ((__sighandler_t)-1)
-#define SIG_IGN ((__sighandler_t)1)
-
-
-//se precisar!!
-/*
-typedef void (*__sighandler_t)(int);
-typedef __sighandler_t sighandler_t;
-typedef uint32_t sigset_t;
-typedef void siginfo_t;
-typedef uint32_t sig_atomic_t;
-*/
-
-
-
-//#test
-//coloquei aqui pra compilar o lua.
-typedef int sig_atomic_t;
-
-/* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
-//#ifndef __CYGWIN__
-//typedef unsigned long sigset_t;
-//#endif
-
-typedef unsigned int sigset_t;
-
-/* Type of a signal handler.  */
-typedef void (*sighandler_t)(int);
-
-typedef sighandler_t __sighandler_t;
-typedef sighandler_t sig_t;
-//...
-
-
 
 //============
 
@@ -100,7 +78,7 @@ typedef union sigval {
      void   *sival_ptr;         /* Pointer value */
 }sigval_t;
 
-typedef sigval_t __sigval_t;
+typedef sigval_t  __sigval_t;
 //...
 
 struct sigevent 
@@ -159,13 +137,28 @@ typedef struct siginfo {
 
 
 typedef struct sigaction {
-	
     void  (*sa_handler)(int);
     void  (*sa_sigaction)(int, siginfo_t *, void *);
     sigset_t  sa_mask;
     int  sa_flags;
     void  (*sa_restorer)(void);
 }sigaction_t;
+
+/*
+// Gramado version defined in ring0.
+struct sigaction_d 
+{
+    //void (*sa_handler)(int);    // #suspended
+
+    unsigned long sa_handler;  // ring3 address.
+    unsigned long sa_msgcode;  // msg code
+    unsigned long sa_long1;    // data1
+    unsigned long sa_long2;    // data2
+
+    sigset_t sa_mask;
+    int sa_flags;
+};
+*/
 
 
 #ifndef _POSIX_SOURCE

@@ -1,5 +1,5 @@
 
-# lib/
+# clibs/
 # Compile all the files and create ar_crt.o
 # Makefile for the libc support.
 

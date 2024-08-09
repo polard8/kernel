@@ -1,3 +1,7 @@
+// sys/types.h
+// BSD-LIKE posix types.
+// #ps: We also have a file calle types.h
+
 /*-
  * Copyright (c) 1982, 1986, 1991 The Regents of the University of California.
  * All rights reserved.
@@ -35,8 +39,8 @@
 
 
 
-#ifndef  _TYPES_H_
-#define  _TYPES_H_
+#ifndef __SYS_TYPES_H
+#define __SYS_TYPES_H    1
 
 
 //#test

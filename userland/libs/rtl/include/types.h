@@ -1,17 +1,16 @@
-/*
- * File: types.h 
- * Descrição:
- *     Define tipos de variáveis.
- *     Tipos usados na biblioteca C99 32bit em user mode.
- * History:
- *     2015 - Created by Fred Nora.
- */
+// types.h
+// GRAMADO-LIKE posix types.
+// #ps: We also have a file calle sys/types.h
+// Created by Fred Nora.
+
 
 #ifndef __TYPES_H
 #define __TYPES_H    1
 
 #define TRUE 1
 #define FALSE 0
+
+// NULL for C language.
 #define NULL ((void*)0)
 
 // HANDLE
@@ -44,8 +43,7 @@ typedef unsigned short  uint16_t;
 typedef unsigned int    uint32_t;
 typedef unsigned long   uint64_t;
 
-
-// bsd stuff
+// BSD stuff
 // 7.18.1.1 Exact-width integer types.
 // see _types.h
 typedef signed char    __int8_t;
@@ -72,10 +70,9 @@ typedef unsigned long   u64;
 #define __aligned(x)    __attribute__((aligned(x)))
 #define __optional      __attribute__((weak))
 
-
 #endif   
 
 //
-//End.
+// End
 //
 

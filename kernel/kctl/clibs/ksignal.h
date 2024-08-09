@@ -4,6 +4,24 @@
 #ifndef  __SIGNAL_H
 #define  __SIGNAL_H    1
 
+// Definitions
+typedef          int  sig_atomic_t;
+typedef unsigned int  sigset_t;
+// ...
+
+
+/* Type of a signal handler.  */
+typedef void (*sighandler_t)(int);
+
+typedef sighandler_t __sighandler_t;
+typedef sighandler_t sig_t;
+//...
+
+#define SIG_DFL ((__sighandler_t) 0)
+#define SIG_ERR ((__sighandler_t)-1)
+#define SIG_IGN ((__sighandler_t) 1)
+
+
 /*
 The C standard defines only 6 signals. 
 They are all defined in signal.h header (csignal header in C++):[1]
@@ -220,38 +238,30 @@ Um tipo de retorno de um sinal que indica um erro ocorreu
 #define NSIG       32
 
 
-// #bugbug
-// where is thing was defined?
-//#define SIG_DFL ((__sighandler_t)0)
-//#define SIG_ERR ((__sighandler_t)-1)
-//#define SIG_IGN ((__sighandler_t)1)
 
-// Se precisar!!
+struct sigaction_d 
+{
+    //void (*sa_handler)(int);    // #suspended
+
+    unsigned long sa_handler;  // ring3 address.
+    unsigned long sa_msgcode;  // msg code
+    unsigned long sa_long1;    // data1
+    unsigned long sa_long2;    // data2
+
+    sigset_t sa_mask;
+    int sa_flags;
+};
+
 /*
-typedef void (*__sighandler_t)(int);
-typedef __sighandler_t sighandler_t;
-typedef uint32_t sigset_t;
-typedef void siginfo_t;
-typedef uint32_t sig_atomic_t;
+// #ps: Defined this way in user land.
+typedef struct sigaction {
+    void  (*sa_handler)(int);
+    void  (*sa_sigaction)(int, siginfo_t *, void *);
+    sigset_t  sa_mask;
+    int  sa_flags;
+    void  (*sa_restorer)(void);
+}sigaction_t;
 */
-
-//#test
-//coloquei aqui pra compilar o lua.
-typedef int  sig_atomic_t;
-
-/* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
-//#ifndef __CYGWIN__
-//typedef unsigned long sigset_t;
-//#endif
-
-typedef unsigned int  sigset_t;
-
-/* Type of a signal handler.  */
-//typedef void (*sighandler_t)(int);
-
-//typedef sighandler_t __sighandler_t;
-//typedef sighandler_t sig_t;
-//...
 
 //
 //==============================
@@ -279,6 +289,7 @@ typedef sigval_t  __sigval_t;
 #define SA_ONSTACK  0x0001  /* take signal on signal stack */
 #define SA_RESTART  0x0002  /* do not restart system on signal return */
 #endif
+
 #define SA_NOCLDSTOP  0x0004	/* do not generate SIGCHLD on child stop */
 
 //se precisar!
@@ -388,6 +399,12 @@ struct sigcontext
 #endif /* _POSIX_SOURCE */
 
 
-#endif    
+//
+// == Prototypes ===================================
+//
 
+
+
+
+#endif    
 
