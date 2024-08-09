@@ -1,11 +1,11 @@
-
 // display.c
+// Display support for ring0 lodable module.
 // Created by Fred Nora.
 
 #include <kernel.h>
 
+// See:
 struct display_info_d  DisplayInfo;
-
 
 // :: Step1
 // Initialize display information

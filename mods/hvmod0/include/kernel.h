@@ -1,8 +1,11 @@
-
 // kernel.h
+// Main header for the kernel module.
 
 #ifndef __KERNEL_H
 #define __KERNEL_H  1
+
+
+#include "config.h"
 
 #include "arch/head.h"
 
@@ -15,14 +18,13 @@
 #include "crt/kstring.h"
 #include "crt/kstdio.h"
 
-#include "ke/globals.h"
+#include "globals.h"
 
 #include "ke/ports64.h"
 #include "ke/hal.h"
 #include "ke/kal.h"
 
-#include "dev/display.h"
-
+#include "../dev/display.h"
 
 #endif  
 

@@ -17,13 +17,17 @@ int PUTCHAR_FGCONSOLE=4;  //(1arg)
 // read messages
 // ...
 
+// #todo: Move this to another place.
 struct module_initialization_d  ModuleInitialization;
+
+
+// ================================
 
 // printk support.
 static void __kstdio_puts(const char* str);
 static char *_vsputs_r(char *dest, char *src);
 
-//-------------------
+// ================================
 
 // Print a string.
 static void __kstdio_puts(const char* str)

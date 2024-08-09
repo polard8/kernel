@@ -1,3 +1,7 @@
+// kstring.c
+// String support.
+// Created by Fred Nora.
+
 
 #include <kernel.h>
 

@@ -132,7 +132,10 @@ build-gramado-os:
 	$(Q)$(MAKE) -C mods/
 
 # Copy the ring0 module image.
-	cp mods/HVMOD0.BIN  $(BASE)/
+# Not dynlinked modules.
+	cp mods/bin/HVMOD0.BIN  $(BASE)/
+#	cp mods/bin/HVMOD1.BIN  $(BASE)/
+# ...
 
 #===================================
 # (4) userland/ in kernel project
@@ -301,6 +304,7 @@ clean-all: clean
 # Clear the ring0 module images
 	-rm -rf mods/*.o
 	-rm -rf mods/*.BIN
+	-rm -rf mods/bin/*.BIN
 
 # ==================
 # (4) userland/
