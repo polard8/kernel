@@ -6,11 +6,12 @@
 BASE = your/base
 
 
-# Desktop environment
-DEP_L4  = ../de/aurora
-DEP_L3  = ../de/browser
-DEP_L2  = ../de/commands
+# Display server, libraries and client-side GUI applications.
 DEP_L1  = ../de
+# Extra stuff. No time for this.
+DEP_L2  = ../de/t00/commands
+DEP_L3  = ../de/t00/browser
+DEP_L4  = ../de/t00/aurora
 
 # Make variables (CC, etc...)
 AS      = as
@@ -171,14 +172,19 @@ copy-extras:
 	@echo "copy-extras"
 
 # ------------------------
-# LEVEL 4: (aurora/) 3D demos.
-	-cp $(DEP_L4)/bin/DEMO00.BIN  $(BASE)/
-	-cp $(DEP_L4)/bin/DEMO01.BIN  $(BASE)/
-
-# ------------------------
-# LEVEL 3: (browser/) browser.
-# Teabox web browser
-	-cp $(DEP_L3)/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
+# LEVEL 1: (de/) Display servers and applications.
+	-cp $(DEP_L1)/core/ds00/bin/DS00.BIN   $(BASE)/
+	#-cp $(DEP_L1)/core/ds01/bin/DS01.BIN  $(BASE)/
+	-cp $(DEP_L1)/shell/bin/TASKBAR.BIN    $(BASE)/
+	-cp $(DEP_L1)/shell/bin/TERMINAL.BIN   $(BASE)/
+	-cp $(DEP_L1)/shell/bin/GDM.BIN        $(BASE)/
+	-cp $(DEP_L1)/shell/bin/EDITOR.BIN     $(BASE)/
+	-cp $(DEP_L1)/shell/bin/XTB.BIN        $(BASE)/
+# use '@' prefix.
+	#-cp $(DEP_L1)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
+# Use '#' prefix.
+	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/GRAMADO/
 
 # ------------------------
 # LEVEL 2: (commands/)  Posix comands.
@@ -200,20 +206,16 @@ copy-extras:
 	#-cp $(DEP_L2)/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
 
 # ------------------------
-# LEVEL 1: (de/) Display servers and applications.
-	-cp $(DEP_L1)/core/ds00/bin/DS00.BIN   $(BASE)/
-	#-cp $(DEP_L1)/core/ds01/bin/DS01.BIN  $(BASE)/
-	-cp $(DEP_L1)/core/dsx/bin/DSX.BIN     $(BASE)/
-	-cp $(DEP_L1)/shell/bin/TASKBAR.BIN    $(BASE)/
-	-cp $(DEP_L1)/shell/bin/TERMINAL.BIN   $(BASE)/
-	-cp $(DEP_L1)/shell/bin/GDM.BIN        $(BASE)/
-	-cp $(DEP_L1)/shell/bin/EDITOR.BIN     $(BASE)/
-	-cp $(DEP_L1)/shell/bin/XTB.BIN        $(BASE)/
-# use '@' prefix.
-	#-cp $(DEP_L1)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
-# Use '#' prefix.
-	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
-	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/GRAMADO/
+# LEVEL 3: (browser/) browser.
+# Teabox web browser
+	-cp $(DEP_L3)/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
+
+
+# ------------------------
+# LEVEL 4: (aurora/) 3D demos.
+	-cp $(DEP_L4)/bin/DEMO00.BIN  $(BASE)/
+	-cp $(DEP_L4)/bin/DEMO01.BIN  $(BASE)/
+
 
 	@echo "~ copy-extras"
 

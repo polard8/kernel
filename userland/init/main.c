@@ -31,12 +31,10 @@
 
 static int isTimeToQuitCmdLine = FALSE;
 
-
-static const char *xapp1_name = "dsx.bin";   // #c1
-static const char *app1_name = "ds00.bin";   // #c1
-//static const char *app1_name = "nicctld.bin";  // #c2
-//static const char *app2_name = "nicctl.bin";
-static const char *app3_name = "netd.bin";    // #c3
+static const char *app1_name = "ds00.bin";
+//static const char *app1_name = "???.bin";
+//static const char *app2_name = "???.bin";
+static const char *app3_name = "netd.bin"; 
 static const char *app4_name = "net.bin";
 static const char *app5_name = "shell.bin";
 
@@ -49,7 +47,6 @@ static const char *app5_name = "shell.bin";
 //static const char *cmdline1 = "ds00 -1 -2 -3";
 //static const char *cmdline1 = "ds00 -1 -2 -3 --dm";
 static const char *cmdline1 = "ds00 -1 -2 -3 --tb";
-static const char *xcmdline1 = "dsx -1 -2 -3 --tb";
 // ...
 
 struct init_d  Init;
@@ -227,44 +224,10 @@ static void do_launch_de2(void)
     isTimeToQuitCmdLine = TRUE;
 }
 
-// the gramado x display server.
+// #suspended
 static void do_launch_de3(void)
 {
-    int ret_val=-1;
-
-    char filename[16];
-    size_t string_size=0;
-    memset(filename,0,16);
-
-    do_clear_console();
-    printf ("Launching GUI\n");
-
-// Sending cmdline via stdin
-    rewind(stdin);
-    write( fileno(stdin), xcmdline1, strlen(xcmdline1) );
-
-// Launch new process.
-    sprintf(filename,xapp1_name);
-    string_size = strlen(xapp1_name);
-    filename[string_size] = 0;
-
-// Launch
-    ret_val = (int) rtl_clone_and_execute(filename);
-    if (ret_val <= 0){
-        printf("Couldn't clone\n");
-        return;
-    }
-// Sleep (Good!)
-    //sc82( 266, 8000, 8000, 8000 );
-    //rtl_sleep_until(2000);
-
-    //printf("pid=%d\n",ret_val);
-
-// Quit the command line.
-// #warning: 
-// Quit the command line. Not the process.
-// #todo: This name is not good.
-    isTimeToQuitCmdLine = TRUE;
+    return;
 }
 
 static void do_launch_list(void)
@@ -445,13 +408,6 @@ static int input_compare_string(void)
     if ( strncmp(prompt,"gramado",7) == 0 ){
         printf ("~GRAMADO\n");
         do_launch_de();
-        goto exit_cmp;
-    }
-
-// Initialize the display server and quit the command line.
-    if ( strncmp(prompt,"dsx",3) == 0 ){
-        printf ("~DSX\n");
-        do_launch_de3();
         goto exit_cmp;
     }
 
