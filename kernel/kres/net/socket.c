@@ -353,8 +353,17 @@ sys_accept (
 // Ainda não estamos usando isso.
 
     if ((void *) addr == NULL){
-        debug_print("sys_accept: [FAIL] addr\n");
+        printk("sys_accept: addr\n");
         return (int) (-EINVAL);
+    }
+
+// #test
+// Address validation.
+// It needs to be a ring3 address.
+// #todo: Check agains more limits.
+    if (addr < CONTROLTHREAD_BASE){
+        panic("sys_accept: addr is not ring3\n");
+        //return (int) (-EINVAL);
     }
 
 // Current process. (The server)
@@ -687,6 +696,15 @@ sys_bind (
         debug_print("sys_bind: addr\n");
         printk     ("sys_bind: addr\n");
         goto fail;
+    }
+
+// #test
+// Address validation.
+// It needs to be a ring3 address.
+// #todo: Check agains more limits.
+    if (addr < CONTROLTHREAD_BASE){
+        panic("sys_bind: addr is not ring3\n");
+        //return (int) (-EINVAL);
     }
 
 // Process
@@ -1927,6 +1945,16 @@ sys_connect (
         printk ("sys_connect: addr\n");
         return (int) (-EINVAL);
     }
+
+// #test
+// Address validation.
+// It needs to be a ring3 address.
+// #todo: Check agains more limits.
+    if (addr < CONTROLTHREAD_BASE){
+        panic("sys_connect: addr is not ring3\n");
+        //return (int) (-EINVAL);
+    }
+
 
 // -----------------------------
 // Testing for local domains.

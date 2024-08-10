@@ -924,6 +924,7 @@ ssize_t sys_read(int fd, char *ubuf, size_t count)
 
 // #test
 // Usermode buffer validation
+// #todo: Check agains more limits.
     if (ubuf < CONTROLTHREAD_BASE)
     {
         panic ("sys_read: Invalid ubuf\n");
@@ -1402,6 +1403,7 @@ ssize_t sys_write(int fd, char *ubuf, size_t count)
 
 // #test
 // Usermode buffer validation
+// #todo: Check agains more limits.
     if (ubuf < CONTROLTHREAD_BASE)
     {
         panic ("sys_write: Invalid ubuf\n");
@@ -1534,9 +1536,9 @@ sys_open(
     mode_t mode )
 {
     if ((void*) pathname == NULL)
-        return (int) -EFAULT;
-    if ( *pathname == 0)
-        return (int) -EFAULT;
+        return (int) -EFAULT;  // Bad address. Is it the right error code?
+    if (*pathname == 0)
+        return (int) -EFAULT;  // Bad address. Is it the right error code?
     return (int) __open_imp( pathname, flags, mode );
 }
 
