@@ -227,7 +227,8 @@ fail:
 // 72 - Create thread.
 // #todo: 
 // Enviar os argumentos via buffer.
-
+// #todo: We can create threads not just in the current process,
+// but also in some other process. Privilegies are necessary.
 void *sys_create_thread ( 
     struct cgroup_d *cg,
     unsigned long init_rip, 
@@ -243,7 +244,15 @@ void *sys_create_thread (
 // Filtros, para ponteiros NULL.
     
     if (init_rip == 0){
-        debug_print ("sys_create_thread: [FAIL] init_rip\n");
+        printk ("sys_create_thread: [FAIL] init_rip\n");
+        return NULL;
+    }
+
+// #test
+// Usermode buffer validation
+// #todo: Check against more limits.
+    if (init_rip < CONTROLTHREAD_BASE){
+        panic ("sys_create_thread: init_rip\n");
         return NULL;
     }
 
@@ -295,23 +304,26 @@ int sys_exit_thread (tid_t tid)
 {
     if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
+        goto fail;
         //#todo: return (int) -EINVAL;
-        return -1;
     }
     exit_thread(tid);
     return 0;
-}
 
+fail:
+    return (int) -1;
+}
 
 // #todo:
 // We're working in a helper function for clonning processes.
 // See: clone.c
+// #todo: Maybe the return type is pid_t.
 int sys_fork(void)
 {
     debug_print ("sys_fork: \n");
     // #todo
     // Call copy_process(...)
-    return -1;
+    return (int) -1;
 }
 
 // 85 
@@ -326,12 +338,13 @@ pid_t sys_getpid (void)
 pid_t sys_getppid(void)
 {
     struct process_d *p;
+
     pid_t current_pid = (pid_t) get_current_pid();
     if (current_pid < 0 || current_pid >= PROCESS_COUNT_MAX){
         goto fail;
     }
     p = (void *) processList[current_pid];
-    if ( (void *) p == NULL ){
+    if ((void *) p == NULL){
         goto fail;
     }
     if ( p->used != TRUE || p->magic != 1234 ){
@@ -416,9 +429,22 @@ int sys_reboot(unsigned long flags)
 // See: debug.c
 int sys_serial_debug_printk(char *s)
 {
+
+// Validate the parameter.
+// This is a ring3 address.
     if ((void *) s == NULL){
         return (int) (-EFAULT);  // Bad address
     }
+
+// #test
+// Usermode buffer validation
+// #todo: Check against more limits.
+    if (s < CONTROLTHREAD_BASE)
+    {
+        panic ("sys_read: Invalid s\n");
+        //return (ssize_t) -EFAULT;  // bad address
+    }
+
     if (*s == 0){
         return (int) (-EINVAL);
     }	
@@ -478,9 +504,14 @@ void sys_show_system_info(int n)
 // IN: Imported pointe to utsname structure.
 int sys_uname(struct utsname *ubuf)
 {
-    // Bad address
+
+// Bad address
     if ((void *) ubuf == NULL){
         return (int) -EFAULT;
+    }
+// #todo: validate it against more limits.
+    if (ubuf < CONTROLTHREAD_BASE){
+        panic ("sys_uname: Invalid ubuf\n");
     }
 
     memcpy( 

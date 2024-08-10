@@ -924,7 +924,7 @@ ssize_t sys_read(int fd, char *ubuf, size_t count)
 
 // #test
 // Usermode buffer validation
-// #todo: Check agains more limits.
+// #todo: Check against more limits.
     if (ubuf < CONTROLTHREAD_BASE)
     {
         panic ("sys_read: Invalid ubuf\n");

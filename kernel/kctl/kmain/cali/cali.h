@@ -223,6 +223,9 @@ void panic( const char *format, ... );
 void soft_die(void);
 void die(void);
 
+#define PANIC  panic
+#define DIE    die 
+
 // ------------------------
 void cali_reboot(void);
 void cali_shutdown(int how);
