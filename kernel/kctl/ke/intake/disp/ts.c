@@ -8,10 +8,12 @@
 //Status do mecanismo de task switch. 
 unsigned long task_switch_status=0; // locked
 
+//
+// =============================================
+//
 
-static void tsOnFinishedExecuting(struct thread_d *t);
-static void tsCry(unsigned long flags);
-
+static void __tsOnFinishedExecuting(struct thread_d *t);
+static void __tsCry(unsigned long flags);
 // Task switching implementation.
 static void __task_switch (void);
 
@@ -75,7 +77,7 @@ void tsCallExtraRoutines(void)
 }
 
 // :(
-static void tsCry(unsigned long flags)
+static void __tsCry(unsigned long flags)
 {
     if (flags & 0x8000)
         cali_shutdown(0);
@@ -98,12 +100,12 @@ static void tsCry(unsigned long flags)
 // ->preempted permitisse. 
 // talvez o certo seja ->preenptable.
 
-static void tsOnFinishedExecuting(struct thread_d *t)
+static void __tsOnFinishedExecuting(struct thread_d *t)
 {
     if ( (void*) t == NULL )
-        panic("tsOnFinishedExecuting: t\n");
+        panic("__tsOnFinishedExecuting: t\n");
     if (t->magic!=1234)
-        panic("tsOnFinishedExecuting: t magic\n");
+        panic("__tsOnFinishedExecuting: t magic\n");
 
 // #bugbug
 //  Isso está acontecendo.
@@ -149,7 +151,7 @@ static void tsOnFinishedExecuting(struct thread_d *t)
         //    printk("SIGKILL\n");
 
         //refresh_screen();    
-        //panic("tsOnFinishedExecuting: t->signal\n");
+        //panic("__tsOnFinishedExecuting: t->signal\n");
     }
 
 // ---------------------------------------------------------
@@ -223,7 +225,7 @@ static void tsOnFinishedExecuting(struct thread_d *t)
     if(t->tid == INIT_TID)
     {
         if (t->_its_my_party_and_ill_cry_if_i_want_to == TRUE)
-            tsCry(0);
+            __tsCry(0);
     }
 }
 
@@ -462,7 +464,7 @@ The remainder ??
 // Agora esgotou o tempo de processamento.
 // Preempt: >> MOVEMENT 3 (Running --> Ready).
     } else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
-        tsOnFinishedExecuting(CurrentThread);
+        __tsOnFinishedExecuting(CurrentThread);
         // Jumping to this label for the first time.
         goto ZeroGravity;
 

@@ -8,6 +8,11 @@
 // See: dispatch.h
 struct dispatch_count_d  *DispatchCountBlock;
 
+
+//
+// =====================================
+//
+
 /*
  * IncrementDispatcherCount:
  *     Mensura os critérios de escolha.
@@ -24,6 +29,7 @@ struct dispatch_count_d  *DispatchCountBlock;
 void IncrementDispatcherCount(int type)
 {
 
+// Parameter:
 // #todo: max limit.
     if (type < 0){
         debug_print("IncrementDispatcherCount: [FAIL] type\n");
@@ -34,7 +40,7 @@ void IncrementDispatcherCount(int type)
         panic ("IncrementDispatcherCount:\n");
     }
     
-    if (DispatchCountBlock->magic!=1234){
+    if (DispatchCountBlock->magic != 1234){
         panic ("IncrementDispatcherCount: validation\n");
     }
 
@@ -73,7 +79,6 @@ void IncrementDispatcherCount(int type)
     // ??
 }
 
-
 /*
  * dispatcher:
  *     Despacha a thread atual que foi escolhida pelo scheduler. 
@@ -110,7 +115,7 @@ void dispatcher(int type)
 // ...
 
     //#hack
-    if ( type != DISPATCHER_CURRENT ){
+    if (type != DISPATCHER_CURRENT){
         type = DISPATCHER_CURRENT;
     }
 
@@ -196,22 +201,4 @@ dispatch_current:
     return;
     //return 0;
 }
-
-/*
-// if this thread has a sognal for this tick
-// so we need to restore a flat context
-// and iret to the signal handler, waiting for
-// a restorer.
-// After the restorer the thread will run the old saved context.
-void dispatch_signal(void);
-void dispatch_signal(void)
-{
-}
-*/
-
-
-
-
-
-
 

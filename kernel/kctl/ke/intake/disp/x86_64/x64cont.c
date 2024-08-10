@@ -1,6 +1,7 @@
 
 // x64cont.c
 // Context support for x86_64 arch.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -42,6 +43,10 @@ unsigned long contextR12=0;
 unsigned long contextR13=0;
 unsigned long contextR14=0;
 unsigned long contextR15=0;
+
+
+// #todo
+// Debug registers
 
 // The cpl of the thread.
 // Updated by irq0.
@@ -106,8 +111,7 @@ void save_current_context (void)
 
 // Structure ~ Colocando o contexto na estrutura.
 
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
         printk("save_current_context: TID=%d\n", current_thread );
         goto fail0;
@@ -164,12 +168,13 @@ void save_current_context (void)
     t->context.r15 = (unsigned long) contextr15[0];
 
 // Save fpu stuff.
+// #ps 
+// Byte by byte. We can do that in a better way.
     register int i=0;
-    for (i=0; i<512; i++)
-    {
-        t->context.fpu_buffer[i] = 
-            (unsigned char) context_fpu_buffer[i];
+    for (i=0; i<512; i++){
+        t->context.fpu_buffer[i] = (unsigned char) context_fpu_buffer[i];
     };
+
 
 // 
 // -- cpl --------
@@ -333,13 +338,12 @@ void restore_current_context (void)
     contextr15[0] = (unsigned long) t->context.r15; 
 
 // Restore
+// #ps 
+// Byte by byte. We can do that in a better way.
     register int i=0;
-    for (i=0; i<512; i++)
-    {
-        context_fpu_buffer[i] = 
-            (unsigned char) t->context.fpu_buffer[i];
+    for (i=0; i<512; i++){
+        context_fpu_buffer[i] = (unsigned char) t->context.fpu_buffer[i];
     };
-
 
 // Is ring3?
     if (t->cpl != 3){

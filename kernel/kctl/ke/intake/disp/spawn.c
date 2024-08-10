@@ -9,37 +9,24 @@ static int __spawn_eoi_is_necessary = FALSE;
 // == Private functions: Prototypes =======
 //
 
-static int __spawn_is_eoi_needed(void);
-static void __spawn_load_pml4_table(unsigned long phy_addr);
-
-static void __spawn_thread_by_tid_imp(tid_t tid);
-
 void 
-spawn_enter_usermode( 
+__spawn_enter_usermode( 
     int eoi, 
     unsigned long entry_va, 
     unsigned long rsp3_va );
 
 void 
-spawn_enter_kernelmode( 
+__spawn_enter_kernelmode( 
     int eoi, 
     unsigned long entry_va,
     unsigned long rsp0_va );
 
+static int __spawn_is_eoi_needed(void);
+
+static void __spawn_load_pml4_table(unsigned long phy_addr);
+static void __spawn_thread_by_tid_imp(tid_t tid);
 
 //=====================
-
-// local
-static int __spawn_is_eoi_needed(void)
-{
-    return (int) __spawn_eoi_is_necessary;
-}
-
-// local
-static void __spawn_load_pml4_table(unsigned long phy_addr)
-{
-    asm volatile ("movq %0,%%cr3"::"r"(phy_addr));
-}
 
 // global
 // used by the taskswitching
@@ -54,6 +41,121 @@ void spawn_reset_eoi_state(void)
 {
     __spawn_eoi_is_necessary = FALSE;
 }
+
+// local
+static void __spawn_load_pml4_table(unsigned long phy_addr)
+{
+    asm volatile ("movq %0,%%cr3"::"r"(phy_addr));
+}
+
+// local
+static int __spawn_is_eoi_needed(void)
+{
+    return (int) __spawn_eoi_is_necessary;
+}
+
+// ------------------------
+// RING 0:
+// Do not check parameters.
+void 
+__spawn_enter_kernelmode( 
+    int eoi,                 // do we need eoi ? TRUE or FALSE. 
+    unsigned long entry_va,  // Entry point
+    unsigned long rsp0_va )  // Stack pointer.
+{
+// #todo: This feature is suspended.
+
+// This is the entry point of the new thread
+    unsigned long entry = (unsigned long) entry_va;
+    unsigned long rsp0  = (unsigned long) rsp0_va;
+
+    // #debug
+    //printk("rsp0: %x \n",rsp0);
+    //refresh_screen();
+    //while(1){}
+
+    if (eoi == TRUE){
+        asm volatile ("movb $0x20, %al \n");
+        asm volatile ("outb %al, $0x20 \n");
+    }
+
+// #todo
+// We need to review the stack frame for ring0
+// only for ring 0 threads with iopl 0.
+
+    asm volatile ( 
+        " movq $0, %%rax  \n" 
+        " mov %%ax, %%ds  \n" 
+        " mov %%ax, %%es  \n" 
+        " mov %%ax, %%fs  \n" 
+        " mov %%ax, %%gs  \n"
+        " movq %0, %%rax  \n" 
+        " movq %1, %%rsp  \n" 
+        " movq $0, %%rbp  \n" 
+        " pushq $0x10     \n"  
+        " pushq %%rsp     \n" 
+        " pushq $0x0202   \n"  // Interrupts enabled for the thread that is not the first.
+        " pushq $0x8      \n" 
+        " pushq %%rax     \n" 
+        " iretq           \n" :: "D"(entry), "S"(rsp0) );
+
+// Paranoia
+    PROGRESS("__spawn_enter_kernelmode: -- iretq fail ----\n");
+    panic ("__spawn_enter_kernelmode: [ERROR] iretq fail\n");
+}
+
+// ------------------------
+// RING 3:
+// Do not check parameters.
+void 
+__spawn_enter_usermode( 
+    int eoi,                 // do we need eoi ? TRUE or FALSE. 
+    unsigned long entry_va,  // Entry point
+    unsigned long rsp3_va )  // Stack pointer.
+{
+// Flying high!
+
+// This is the entry point of the new thread
+// Probably created by a ring 3 process.
+    unsigned long entry = (unsigned long) entry_va;
+
+// This is the stack pointer for the ring 3 thread.
+// Probably given by a ring 3 process.
+    unsigned long rsp3  = (unsigned long) rsp3_va;
+
+    if (eoi == TRUE){
+        asm ("movb $0x20, %al \n");
+        asm ("outb %al, $0x20 \n");
+    }
+
+// #bugbug
+// Only for ring 3 with iopl 3. weak protection.
+
+    asm volatile ( 
+        " movq $0, %%rax  \n" 
+        " mov %%ax, %%ds  \n" 
+        " mov %%ax, %%es  \n" 
+        " mov %%ax, %%fs  \n" 
+        " mov %%ax, %%gs  \n" 
+        " movq %0, %%rax  \n" 
+        " movq %1, %%rsp  \n" 
+        " movq $0, %%rbp  \n" 
+        " pushq $0x23     \n"  
+        " pushq %%rsp     \n" 
+        " pushq $0x3202   \n"  // Interrupts enabled for the thread that is not the first.
+        " pushq $0x1B     \n" 
+        " pushq %%rax     \n" 
+        " iretq           \n" :: "D"(entry), "S"(rsp3) );
+
+// Paranoia
+    PROGRESS("__spawn_enter_usermode: -- iretq fail ----\n");
+    panic ("__spawn_enter_usermode: [ERROR] iretq fail\n");
+}
+
+//
+// $
+// SPAWN
+//
 
 //-------------------------------------
 // __spawn_thread_by_tid_imp:
@@ -290,7 +392,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
         panic      ("__spawn_thread_by_tid_imp: RING0 not supported yet\n");
 
         // #suspended
-        //spawn_enter_kernelmode( 
+        //__spawn_enter_kernelmode( 
         //    TRUE,  // EOI
         //    (unsigned long) target_thread->context.rip,
         //    (unsigned long) target_thread->context.rsp );
@@ -326,7 +428,7 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
     if (target_thread->cpl == RING3)
     {
         target_thread->transition_counter.to_user++;
-        spawn_enter_usermode( 
+        __spawn_enter_usermode( 
             TRUE,  // EOI
             (unsigned long) target_thread->context.rip,
             (unsigned long) target_thread->context.rsp );
@@ -335,100 +437,6 @@ static void __spawn_thread_by_tid_imp(tid_t tid)
 // The party is over!
     PROGRESS("-- iretq fail --------\n");
     panic("__spawn_thread_by_tid_imp: iretq fail\n");
-}
-
-// do not check parameters.
-void 
-spawn_enter_usermode( 
-    int eoi,                 // do we need eoi ? TRUE or FALSE. 
-    unsigned long entry_va,  // Entry point
-    unsigned long rsp3_va )  // Stack pointer.
-{
-// Flying high!
-
-// This is the entry point of the new thread
-// Probably created by a ring 3 process.
-    unsigned long entry = (unsigned long) entry_va;
-
-// This is the stack pointer for the ring 3 thread.
-// Probably given by a ring 3 process.
-    unsigned long rsp3  = (unsigned long) rsp3_va;
-
-    if (eoi == TRUE){
-        asm ("movb $0x20, %al \n");
-        asm ("outb %al, $0x20 \n");
-    }
-
-// #bugbug
-// Only for ring 3 with iopl 3. weak protection.
-
-    asm volatile ( 
-        " movq $0, %%rax  \n" 
-        " mov %%ax, %%ds  \n" 
-        " mov %%ax, %%es  \n" 
-        " mov %%ax, %%fs  \n" 
-        " mov %%ax, %%gs  \n" 
-        " movq %0, %%rax  \n" 
-        " movq %1, %%rsp  \n" 
-        " movq $0, %%rbp  \n" 
-        " pushq $0x23     \n"  
-        " pushq %%rsp     \n" 
-        " pushq $0x3202   \n"  // Interrupts enabled for the thread that is not the first.
-        " pushq $0x1B     \n" 
-        " pushq %%rax     \n" 
-        " iretq           \n" :: "D"(entry), "S"(rsp3) );
-
-// Paranoia
-    PROGRESS("spawn_enter_usermode: -- iretq fail ----\n");
-    panic ("spawn_enter_usermode: [ERROR] iretq fail\n");
-}
-
-// do not check parameters.
-void 
-spawn_enter_kernelmode( 
-    int eoi,                 // do we need eoi ? TRUE or FALSE. 
-    unsigned long entry_va,  // Entry point
-    unsigned long rsp0_va )  // Stack pointer.
-{
-// #todo: This feature is suspended.
-
-// This is the entry point of the new thread
-    unsigned long entry = (unsigned long) entry_va;
-    unsigned long rsp0  = (unsigned long) rsp0_va;
-
-    // #debug
-    //printk("rsp0: %x \n",rsp0);
-    //refresh_screen();
-    //while(1){}
-
-    if (eoi == TRUE){
-        asm volatile ("movb $0x20, %al \n");
-        asm volatile ("outb %al, $0x20 \n");
-    }
-
-// #todo
-// We need to review the stack frame for ring0
-// only for ring 0 threads with iopl 0.
-
-    asm volatile ( 
-        " movq $0, %%rax  \n" 
-        " mov %%ax, %%ds  \n" 
-        " mov %%ax, %%es  \n" 
-        " mov %%ax, %%fs  \n" 
-        " mov %%ax, %%gs  \n"
-        " movq %0, %%rax  \n" 
-        " movq %1, %%rsp  \n" 
-        " movq $0, %%rbp  \n" 
-        " pushq $0x10     \n"  
-        " pushq %%rsp     \n" 
-        " pushq $0x0202   \n"  // Interrupts enabled for the thread that is not the first.
-        " pushq $0x8      \n" 
-        " pushq %%rax     \n" 
-        " iretq           \n" :: "D"(entry), "S"(rsp0) );
-
-// Paranoia
-    PROGRESS("spawn_enter_kernelmode: -- iretq fail ----\n");
-    panic ("spawn_enter_kernelmode: [ERROR] iretq fail\n");
 }
 
 // psSpawnThread:
