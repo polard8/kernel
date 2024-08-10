@@ -19,14 +19,16 @@ int qlist_set_element(int index, struct thread_d *head_thread)
 {
 
 // Parameters:
-    if ( index < 0 || 
-         index >= SCHEQ_QUEUE_COUNT_MAX )
+    if ( index < 0 || index >= SCHEQ_QUEUE_COUNT_MAX )
     {
         goto fail;
     }
     if ((void*) head_thread == NULL){
         goto fail;
     }
+    // #todo: Check 'magic' element
+    //if (head_thread->magic != 1234)
+        //goto fail;
 
 // The current queue
     if (index == SCHED_CURRENT_QUEUE){
@@ -47,9 +49,8 @@ fail:
 struct thread_d *qlist_get_element(int index)
 {
 
-// Parameters
-    if ( index < 0 || 
-         index >= SCHEQ_QUEUE_COUNT_MAX )
+// Parameter:
+    if ( index < 0 || index >= SCHEQ_QUEUE_COUNT_MAX )
     {
         goto fail;
     }
@@ -67,6 +68,11 @@ struct thread_d *qlist_get_element(int index)
 fail:
     return NULL;
 }
+
+//
+// $
+// INITIALIZATION
+//
 
 int qlist_initialize(void)
 {

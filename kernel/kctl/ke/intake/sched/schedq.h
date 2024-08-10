@@ -32,7 +32,9 @@ extern unsigned long qList[SCHEQ_QUEUE_COUNT_MAX];
 // This one is used by the taskswitching to peek the next thread.
 extern struct thread_d  *currentq;
 
-// ===================================
+//
+// == Prototypes =================================
+//
 
 int qlist_set_element(int index, struct thread_d *head_thread);
 struct thread_d *qlist_get_element(int index);
