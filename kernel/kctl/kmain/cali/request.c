@@ -1,5 +1,9 @@
-
 // request.c
+// Kernel request.
+// A kind of defered dialog with the kernel.
+// The kernel will respond it right after the context
+// been saved, for safety.
+// Created by Fred Nora.
 
 #include <kernel.h>    
 
@@ -225,7 +229,7 @@ int processDeferredKernelRequest(void)
         // Sem problemas.
         case KR_CHECK_INITIALIZED:
             //debug_print ("processDeferredKernelRequest: Check for standby\n");
-            //check_for_standby ();
+            //schedi_check_for_standby ();
             break;
 
 

@@ -51,15 +51,24 @@ unsigned long scheduler_get_status (void)
     return (unsigned long) g_scheduler_status;
 }
 
+// #test: (Not in use yet)
 // Lets end this round putting a given thread at the end
 // of this round.
-void cut_round(struct thread_d *last_thread)
+void sched_cut_round(struct thread_d *last_thread)
 {
     struct thread_d *Current;
 
+// Parameter:
+    if ((void *) last_thread == NULL){
+        return;
+    }
+    if ( last_thread->used != TRUE || last_thread->magic != 1234 )
+    {
+        return;
+    }
+
 // The current thread.
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
         return;
     }
@@ -68,17 +77,6 @@ void cut_round(struct thread_d *last_thread)
         return;
     }
     if ( Current->used != TRUE || Current->magic != 1234 )
-    {
-        return;
-    }
-
-// ==========================
-// Last thread.
-
-    if ((void *) last_thread == NULL){
-        return;
-    }
-    if ( last_thread->used != TRUE || last_thread->magic != 1234 )
     {
         return;
     }

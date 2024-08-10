@@ -128,7 +128,7 @@ static void tsOnFinishedExecuting(struct thread_d *t)
 // Check for a thread in standby.
 // In this case, this routine will not return.
 // See: schedi.c
-    check_for_standby();
+    schedi_check_for_standby();
 
 // ---------------------------------------------------------
 

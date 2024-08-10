@@ -42,8 +42,10 @@ extern struct scheduler_info_d  SchedulerInfo;
 // == prototypes ============
 //
 
+//
+// In schedi.c
+//
 
-// See: schedi.c
 void do_credits(struct thread_d *thread);
 void do_credits_by_tid(tid_t tid);
 void do_thread_blocked(tid_t tid);
@@ -56,14 +58,8 @@ void do_thread_waiting(tid_t tid, unsigned long ms);
 void do_thread_zombie(tid_t tid);
 int do_waitpid (pid_t pid, int *status, int options);
 
-
-void scheduler_lock(void);
-void scheduler_unlock(void);
-unsigned long scheduler_get_status(void);
-
-void cut_round(struct thread_d *last_thread);
-
-void drop_quantum(struct thread_d *thread);
+void schedi_drop_quantum(struct thread_d *thread);
+void schedi_check_for_standby(void);
 
 int get_current_thread (void);
 void set_current_thread(tid_t tid);
@@ -81,7 +77,13 @@ void yield(tid_t tid);
 void sleep_until(tid_t tid, unsigned long ms);
 void sleep(tid_t tid, unsigned long ms);
 
-void check_for_standby(void);
+
+void sched_cut_round(struct thread_d *last_thread);
+
+void scheduler_lock(void);
+void scheduler_unlock(void);
+unsigned long scheduler_get_status(void);
+
 
 //
 // $

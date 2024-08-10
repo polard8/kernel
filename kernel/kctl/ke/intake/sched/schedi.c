@@ -347,17 +347,6 @@ int do_waitpid (pid_t pid, int *status, int options)
     return (int) (-1);
 }
 
-void drop_quantum(struct thread_d *thread)
-{
-    if ((void*) thread == NULL){
-        return;
-    }
-    if (thread->magic != 1234){
-        return;
-    }
-    thread->quantum = QUANTUM_MIN;
-}
-
 // Obtendo o TID da thread atual.
 int get_current_thread (void)
 {
@@ -759,8 +748,21 @@ void sleep(tid_t tid, unsigned long ms)
     t->desired_sleep_ms = ms;
 }
 
+
+// #test: (Not in used yet)
+void schedi_drop_quantum(struct thread_d *thread)
+{
+    if ((void*) thread == NULL){
+        return;
+    }
+    if (thread->magic != 1234){
+        return;
+    }
+    thread->quantum = QUANTUM_MIN;
+}
+
 /*
- * check_for_standby:
+ * schedi_check_for_standby:
  * Check for a thread in standby.
  * In this case, this routine will not return.
  * Procura na lista de threads no estado StandyBy.
@@ -770,7 +772,7 @@ void sleep(tid_t tid, unsigned long ms)
  */
 // Called by __on_finished_executing() in ts.c.
 
-void check_for_standby(void)
+void schedi_check_for_standby(void)
 {
     struct thread_d *t;
     tid_t target_tid = -1;
@@ -805,23 +807,23 @@ void check_for_standby(void)
 // See: spawn.c
 do_spawn:
 // tid validation?
-    if ( target_tid < 0 || 
-         target_tid >= THREAD_COUNT_MAX ){
+    if ( target_tid < 0 || target_tid >= THREAD_COUNT_MAX )
+    {
         goto fail;
     }
 // Can't spawn the INIT_TID.
 // It was the first launched thread.
     if (target_tid == INIT_TID){
-        panic("check_for_standby: Can't spawn INIT_TID\n");
+        panic("schedi_check_for_standby: Can't spawn INIT_TID\n");
     }
 
 // Set the current thread and spawn it.
     set_current_thread(target_tid);
     psSpawnThreadByTID(target_tid);
 
-// Not reached.
+// Not reached
 fail:
-    panic("check_for_standby: ERROR\n");
+    panic("schedi_check_for_standby: fail\n");
 }
 
 /*
