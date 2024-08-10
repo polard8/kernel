@@ -23,6 +23,7 @@ extern unsigned long g_scheduler_status;
 #define SCHED_POLICY_QUEUES  1
 // ...
 
+// Scheduler information
 struct scheduler_info_d
 {
     int initialized;
@@ -30,7 +31,6 @@ struct scheduler_info_d
     unsigned long rr_round_counter;
     unsigned long flags;
 };
-
 extern struct scheduler_info_d  SchedulerInfo;
 
 

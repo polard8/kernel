@@ -98,6 +98,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
         panic("__scheduler_rr: Scheduler policy\n");
     }
 
+// --------------------------------------------------------
+// Idle
 // O processador atual precisa ter uma idle configurada.
 // #todo: Por enquanto estamos usando o UP, mas usaremos
 // um dado processador para escalonar para ele.
@@ -267,17 +269,14 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // How many times it was scheduled.
                 TmpThread->scheduledCount++;
 
-                // Checa se temos problemas com a prioridade base.
-                // Estabiliza.
+                // Balance priority levels.
                 if (TmpThread->base_priority < PRIORITY_MIN){
                     TmpThread->base_priority=PRIORITY_MIN;
                 }
                 if (TmpThread->base_priority > PRIORITY_MAX){
                     TmpThread->base_priority=PRIORITY_MAX;
                 }
-                // Voltamos para a base depois de checada a base.
-                // Caso tenha havido algum problema na 
-                // prioridade base, então ela foi para o equilíbrio.
+                // Update the current priority based on the base priority.
                 TmpThread->priority = TmpThread->base_priority;
 
                 // Balance
@@ -286,31 +285,26 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 //    TmpThread->quantum = QUANTUM_MIN;
                 //}
 
-                // Balance?
+                // Quantum
+                // #ps: 
+                // Display server and forground thread needs to be
+                // the most reponsive threads.
 
-                // Balance all.
-                // Priority normal. balance.
+                // Threshold for everyone.
                 TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD;
-                // Init thread: low
+
+                // Idle: (Threshold)
                 if (TmpThread == Idle){
                     TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD;
                 }
-                // Foreground thread: high
-                if (TmpThread->tid == foreground_thread)
-                {
-                    //TmpThread->quantum = QUANTUM_NORMAL_TIME_CRITICAL;
-                    TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +1;
+                // Foreground thread: (High)(Most responsive)
+                if (TmpThread->tid == foreground_thread){
+                    TmpThread->quantum = QUANTUM_NORMAL_TIME_CRITICAL;
                 }
-
-                // Window server: Very high
-                // needs to be responsive.
-                // Because this threads receives all the input events.
-                if (WindowServerInfo.initialized == TRUE)
-                {
-                    if (TmpThread->tid == WindowServerInfo.tid)
-                    {
-                        TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +2;
-                        //TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +1;
+                // Display server: (High)(Most responsive)
+                if (WindowServerInfo.initialized == TRUE){
+                    if (TmpThread->tid == WindowServerInfo.tid){
+                        TmpThread->quantum = QUANTUM_SYSTEM_TIME_CRITICAL;
                     }
                 }
             }
