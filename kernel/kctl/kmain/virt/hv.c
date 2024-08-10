@@ -1,24 +1,29 @@
 // hv.c
 // Hypervisor support.
-// see: virt/hv.h
+// The main goal here is ahndle the tables and 
+// provide communication between the root partition and
+// baremetal hv.
+// Provide information about the hv if we're running on top of one,
+// even if it is a type 1 or type 2 hv.
 // see:
+// virt/hv.h
 // https://nixhacker.com/developing-hypervisior-from-scratch-part-1
 // https://www.codeproject.com/Articles/215458/Virtualization-for-System-Programmers
 
 /*
 Common Instructions
 
-VMXON - Enable VMX
-VMXOFF - Disable VMX
+VMXON    - Enable VMX
+VMXOFF   - Disable VMX
 VMLAUNCH - Start/enter VM
 VMRESUME - Re-enter VM
-VMCLEAR - Null out/reinitialize VMCS
-VMPTRLD - Load the current VMCS
-VMPTRST - Store the current VMCS
-VMREAD - Read values from VMCS
-VMWRITE - Write values to VMCS
-VMCALL - Exit virtual machine to VMM
-VMFUNC - Invoke a VM function in VMM without exiting guest operation
+VMCLEAR  - Null out/reinitialize VMCS
+VMPTRLD  - Load the current VMCS
+VMPTRST  - Store the current VMCS
+VMREAD   - Read values from VMCS
+VMWRITE  - Write values to VMCS
+VMCALL   - Exit virtual machine to VMM
+VMFUNC   - Invoke a VM function in VMM without exiting guest operation
 */
 
 #include <kernel.h>
@@ -27,9 +32,10 @@ VMFUNC - Invoke a VM function in VMM without exiting guest operation
 // see: virt/hv.h
 struct hv_d  HVInfo;
 
-static int __detect_hv(void);
 
-// ---------------------------
+// ===================================
+
+static int __detect_hv(void);
 
 // ===================================
 

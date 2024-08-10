@@ -52,6 +52,17 @@ typedef enum {
 static kernel_subsystem_t __failing_kernel_subsystem = 
     KERNEL_SUBSYSTEM_INVALID;
 
+
+// Not so important
+int gSystemEdition=0;
+int gSystemStatus=0;
+
+// See: system.h
+struct version_d  *Version;
+struct version_info_d  *VersionInfo;
+struct system_d  *System;
+
+
 //
 // Initialization :)
 //

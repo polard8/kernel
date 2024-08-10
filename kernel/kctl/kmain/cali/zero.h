@@ -1,5 +1,7 @@
 // zero.h
-// see: zero.c
+// Project Zero.
+// Top level wrapper fo some base kernel components.
+// Created by Fred Nora.
 
 #ifndef __ZERO_H
 #define __ZERO_H    1

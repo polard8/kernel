@@ -5,9 +5,6 @@
 #define __SYSTEM_H    1
 
 
-//#todo: Move this to another place.
-int current_taskman_server; 
-
 // getpid_t:
 //     Índices usados pela função gde_get_pid(x)
 //     Usada para obter o pid de alguns drivers e servidores
@@ -25,10 +22,6 @@ typedef enum {
 // ## sys storage support ##
 //
 
-//#todo: Move this to another place.
-int system_disk;
-int system_volume; 
-
 //======================================== 
 //Esses são os principais arquivos usandos na 
 //inicialização do sistema. 
@@ -43,36 +36,6 @@ int system_volume;
 //...
 //========================================
  
-
-#define SYSTEMMODE_EDITBOX  0
-#define SYSTEMMODE_TERMINAL 1
-//#todo: Move this to another place.
-int g_system_mode;  //terminal ou edibox. 
-
-// Identificação do processo que está efetuando logon e 
-// identificação do processo que está efetuando logoff.
-// Precisamos registrar o processo que efetuou logon.
-// ?? Porque eu ainda não sei.
-// Uma rotina de registro de processo de logon 
-// será oferecida para processos em user mode,
-// é necessario enviar uma flag de segurança,
-// pode ser um magic number ...
-// então esse proecesso terá direito de efetuar o logon 
-// se tiver privilégios válidos em sua estrutura.
-// logo em seguida registraremos qual foi o processo 
-// que efetuou logon. Outro processo não poderá 
-// efetuar logon durante aquela sessão.
-// Caso semelhante é o logoff. O processo deverá 
-// enviar uma flag de segurança e ter atributos válidos 
-// para efetuar o logoff.
-
-// #todo
-// Isso pode ir pra outro arquivo,
-// tem um só pra pids.
-//#todo: Move this to another place.
-int gLogonPID;
-int gLogoffPID;
-
 
 /*
  * Abaixo temos uma lista de variaveis de ambiente usadas
@@ -220,86 +183,48 @@ int gLogoffPID;
 // Globals.
 // 
 
-// ??
-typedef enum {
-    systemsizeNull,
-    systemsize1,     //#  1 O sistema tem pelo menos 32 MB
-    systemsize2,     //#E 2 O sistema tem pelo menos 64 MB
-    systemsize3,     //#F 3 O sistema tem pelo menos 96 MB
-    systemsize4,     //#G 4 O sistema tem pelo menos 128 MB 
-    systemsize5,     //#A 5 O sistema tem pelo menos 160 MB 
-    systemsize6,     //#B 6 O sistema tem pelo menos 192 MB 	
-    systemsize7,     //#C 7 O sistema tem pelo menos 224 MB
-    systemsize8,     //#D 8 O sistema tem pelo menos 256 MB
-    systemsizeFull,  //     O sistema tem pelo menos 288 MB	
-}system_size_t;
 
-//?? rever esse comentário.
-// Aqui salvaremos o número que identifica o tipo de sistema dado o tamanho.
-// Se o sistema tiver 288 MB ou mais então ele será do tipo Full
-// e conterá 8 bancos de memória de 32Mb mais uma user session de tamnaho variado.
-int systemSize;
-
-//Flag para habilitar as opções para o desenvolvedor.
-int gDeveloperOptions;
-
-// ??
-int gSystemEdition;
-
-int gSystemStatus; //?? Usado pelo construtor.
-
-//
-// Shutdown support 
-//
-
-//Salvar aqui o endereço da rotina do BM que desliga a máquina via APM.
-//O endereço e a rotina são de 32bit.
-unsigned long shutdown_address;
-
+// Not so important
+// See: kmain.c
+extern int gSystemEdition;
+extern int gSystemStatus;
 
 
 /*
  * version_d:
  *     Estrutura para versão do sistema.    
  *     O que determina a versão do sistema é a versão do Kernel.
- *
  * @todo: 
  *     Usar apenas esses 4 elementos.
  *     Dados complementares sobre a versão devem ficar 
  *     na estrutura versioninfo.
- *
  * Obs: Talvez usar um header. version.h.
  * #bugbug: 
  * Já tem version_t tefinida em algum lugar.
  *         Aparentemente não deu mais problema. 
  */
-
 struct version_d
 {
     unsigned long Major;
     unsigned long Minor;
     unsigned long Build;
 };
-
-struct version_d  *Version;
+extern struct version_d  *Version;
 //...
 
 /*
  * version_info_d:
  *     Dados complemetares sobre a versão.
  */
-
 struct version_info_d
 {
     struct version_d *version;
-
     char *string;             //String para o nome da versão "VERSION..."
     char *copyright_string;   //"ex: (c) Copyright Nora Code"
     // ...
 };
-
-struct version_info_d *VersionInfo;
-
+extern struct version_info_d  *VersionInfo;
+//...
 
 /*
  * system_d:
@@ -307,9 +232,7 @@ struct version_info_d *VersionInfo;
  *     Essa estrutura guarda as informações gerais sobre o sistema.
  *     Guarda ponteiros para as principais estruturas do sistema, 
  * desde informações de boot, até informações seções de usuários.
- * 
  */
-
 struct system_d
 {
     int used;
@@ -318,7 +241,6 @@ struct system_d
     // Version
     struct version_d *version;
     struct version_info_d *version_info;
-
 
     // storage 
     int disk;
@@ -334,9 +256,7 @@ struct system_d
 
     //...
 };
-
-struct system_d  *System;
-
+extern struct system_d  *System;
 
 //
 // == Prototypes =====================
@@ -350,6 +270,4 @@ int do_reboot(unsigned long flags);
 int zeroInitializeSystemComponents(void);
 
 #endif    
-
-
 

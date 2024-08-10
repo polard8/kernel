@@ -1,11 +1,10 @@
-
 // cali.h
 // Project California.
+// Top level wrappers for some base kernel components.
+// Created by Fred Nora.
 
 #ifndef __CALI_CALI_H
 #define __CALI_CALI_H    1
-
-
 
 
 extern unsigned int g_processor_count;
@@ -240,6 +239,6 @@ int cali_get_current_runlevel(void);
 unsigned long cali_get_memory_size_mb(void);
 void *cali_alloc_shared_ring3_pages(pid_t pid, int number_of_bytes);
 void cali_set_cursor( unsigned long x, unsigned long y );
-#endif   
 
+#endif   
 
