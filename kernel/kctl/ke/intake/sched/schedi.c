@@ -31,207 +31,6 @@ void do_credits_by_tid(tid_t tid)
     }
 }
 
-
-/*
- * psScheduler:
- *    Interface para chamar a rotina de scheduler.
- *    Troca as threads que estão em user mode, 
- * usando o método cooperativo. 
- * Round Robing. 
- *    As tarefas tem a mesma prioridade.
- *    + Quando encontrada uma tarefa de maior prioridade, 
- * escolhe ela imediatamente.
- *    + Quando encontrar uma tarefa de menor prioridade, 
- * apenas eleva a prioridade dela em até dois valores 
- * acima da prioridade base, pegando a próxima tarefa. 
- *    + Quando uma tarefa está rodando à dois valores 
- * acima da sua prioridade, volta a prioridade para a 
- * sua prioridade básica e executa.
- */
-// OUT: next tid.
-tid_t psScheduler(void)
-{
-
-// #bugbug
-// Quem está chamando? 
-// Filtros?
-// #todo: 
-// Talvez haja mais casos onde não se deva trocar a tarefa.
-
-//#bugbug 
-//Porque retornamos 0 ???
-//Scheduler Status. (LOCKED, UNLOCKED).
-
-    if (g_scheduler_status == LOCKED)
-    {
-        debug_print ("psScheduler: Locked $\n");
-        // #bugbug
-        // Why are we returning tid 0?
-        //return 0;
-        return -1;  //error
-    }
-
-// Não existem threads nesse processador.
-    if (UPProcessorBlock.threads_counter == 0){
-        panic("psScheduler: UPProcessorBlock.threads_counter == 0\n");
-    }
-
-// So existe uma thread nesse processador.
-// Então ela precisa ser a idle.
-// Ela será a current_thread.
-    if (UPProcessorBlock.threads_counter == 1)
-    {
-        currentq = 
-            (struct thread_d *) UPProcessorBlock.IdleThread;
-        current_thread = (tid_t) currentq->tid;
-        debug_print("psScheduler: Idle $\n");
-        // Return tid.
-        return (tid_t) current_thread;
-    }
-
-// Scheduler
-// Return tid.
-    return (tid_t) scheduler();
-}
-
-// 0, 11
-void do_thread_initialized(tid_t tid)
-{
-    struct thread_d *t;
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-// Structure
-    t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
-        return;
-    }
-    if (t->used != TRUE){
-        return;
-    }
-    if (t->magic != 1234){
-        return;
-    }
-//  Change state.
-    t->state = INITIALIZED;
-}
-
-// 1
-void do_thread_standby(tid_t tid)
-{
-    struct thread_d *t; 
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-
-// structure
-    t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
-        return;
-    }
-    if (t->used != TRUE){
-        return;
-    }
-    if (t->magic != 1234){
-        return;
-    }
-
-    t->state = STANDBY;
-}
-
-// 2,4
-void do_thread_running(tid_t tid)
-{
-    struct thread_d *t; 
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-
-    t = (void *) threadList[tid];
-// Valid?
-    if ( (void *) t != NULL ){
-        if ( t->used == TRUE && t->magic == 1234 ){
-            t->state = RUNNING;
-        }
-    }
-}
-
-// 3,6
-void do_thread_ready(tid_t tid)
-{
-    struct thread_d  *t;
-
-    if ( tid<0 || tid >= THREAD_COUNT_MAX ){
-        return;
-    }
-
-// structure
-    t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
-        return;
-    }
-    if (t->used != TRUE){
-        return;
-    }
-    if (t->magic != 1234){
-        return;
-    }
-
-// #todo
-// Se a thread estiver rodando no momento
-// e ela mesmo ou uma thread de outro núcleo
-// chamou essa rotina, então precisamos reescalonar ?
-
-/*
-    if (t->state == RUNNING){
-        // Set the 'Need to reeschedule' flag.
-    }
-*/
-
-    t->state = READY;
-    t->ready_jiffy = (unsigned long) jiffies;
-}
-
-// 5, 13
-void do_thread_waiting(tid_t tid, unsigned long ms)
-{
-    struct thread_d *t;
-    unsigned long JiffiesToWait = ms;
-
-    printk("do_thread_waiting: %dms\n", ms);
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-
-// structure
-    t = (void *) threadList[tid];
-    if ((void*) t == NULL){
-        return;
-    }
-    if (t->used != TRUE){
-        return;
-    }
-    if (t->magic != 1234){
-        return;
-    }
-
-    t->state = WAITING;
-// Start
-    t->waiting_jiffy = (unsigned long) jiffies;
-// End
-    if (JiffiesToWait == 0){
-        JiffiesToWait = 1;
-    }
-    t->wake_jiffy = (unsigned long) (jiffies + JiffiesToWait);
-
-    printk ("do_thread_waiting: j1=%d | j2=%d |\n", jiffies, t->wake_jiffy);
-    printk("do_thread_waiting: done\n");
-}
-
 // 12, 7
 // do_thread_sleeping:
 // Muda o state de uma thread pra blocked.
@@ -272,6 +71,168 @@ void do_thread_blocked(tid_t tid)
     t->blocked_jiffy = (unsigned long) jiffies;
 }
 
+// 10
+void do_thread_dead(tid_t tid)
+{
+    struct thread_d *t;
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+
+// structure
+    t = (void *) threadList[tid];
+    if ( (void*) t == NULL ){
+        return;
+    }
+    if (t->used != TRUE){
+        return;
+    }
+    if(t->magic != 1234){
+        return;
+    }
+
+    t->state = DEAD;
+}
+
+// 0, 11
+void do_thread_initialized(tid_t tid)
+{
+    struct thread_d *t;
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+// Structure
+    t = (void *) threadList[tid];
+    if ( (void*) t == NULL ){
+        return;
+    }
+    if (t->used != TRUE){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
+//  Change state.
+    t->state = INITIALIZED;
+}
+
+// 3,6
+void do_thread_ready(tid_t tid)
+{
+    struct thread_d  *t;
+
+    if ( tid<0 || tid >= THREAD_COUNT_MAX ){
+        return;
+    }
+
+// structure
+    t = (void *) threadList[tid];
+    if ( (void*) t == NULL ){
+        return;
+    }
+    if (t->used != TRUE){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
+
+// #todo
+// Se a thread estiver rodando no momento
+// e ela mesmo ou uma thread de outro núcleo
+// chamou essa rotina, então precisamos reescalonar ?
+
+/*
+    if (t->state == RUNNING){
+        // Set the 'Need to reeschedule' flag.
+    }
+*/
+
+    t->state = READY;
+    t->ready_jiffy = (unsigned long) jiffies;
+}
+
+// 2,4
+void do_thread_running(tid_t tid)
+{
+    struct thread_d *t; 
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+
+    t = (void *) threadList[tid];
+// Valid?
+    if ( (void *) t != NULL ){
+        if ( t->used == TRUE && t->magic == 1234 ){
+            t->state = RUNNING;
+        }
+    }
+}
+
+// 1
+void do_thread_standby(tid_t tid)
+{
+    struct thread_d *t; 
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+
+// structure
+    t = (void *) threadList[tid];
+    if ( (void*) t == NULL ){
+        return;
+    }
+    if (t->used != TRUE){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
+
+    t->state = STANDBY;
+}
+
+// 5, 13
+void do_thread_waiting(tid_t tid, unsigned long ms)
+{
+    struct thread_d *t;
+    unsigned long JiffiesToWait = ms;
+
+    printk("do_thread_waiting: %dms\n", ms);
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+
+// structure
+    t = (void *) threadList[tid];
+    if ((void*) t == NULL){
+        return;
+    }
+    if (t->used != TRUE){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
+
+    t->state = WAITING;
+// Start
+    t->waiting_jiffy = (unsigned long) jiffies;
+// End
+    if (JiffiesToWait == 0){
+        JiffiesToWait = 1;
+    }
+    t->wake_jiffy = (unsigned long) (jiffies + JiffiesToWait);
+
+    printk ("do_thread_waiting: j1=%d | j2=%d |\n", jiffies, t->wake_jiffy);
+    printk("do_thread_waiting: done\n");
+}
+
 // 9
 void do_thread_zombie(tid_t tid)
 {
@@ -304,42 +265,6 @@ void do_thread_zombie(tid_t tid)
     t->state = ZOMBIE;
     t->zombie_jiffy = (unsigned long) jiffies;
 }
-
-// 10
-void do_thread_dead(tid_t tid)
-{
-    struct thread_d *t;
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-
-// structure
-    t = (void *) threadList[tid];
-    if ( (void*) t == NULL ){
-        return;
-    }
-    if (t->used != TRUE){
-        return;
-    }
-    if(t->magic != 1234){
-        return;
-    }
-
-    t->state = DEAD;
-}
-
-void drop_quantum(struct thread_d *thread)
-{
-    if ((void*) thread == NULL){
-        return;
-    }
-    if (thread->magic != 1234){
-        return;
-    }
-    thread->quantum = QUANTUM_MIN;
-}
-
 
 /*
  * do_waitpid:
@@ -420,6 +345,17 @@ int do_waitpid (pid_t pid, int *status, int options)
     //refresh_screen();
 
     return (int) (-1);
+}
+
+void drop_quantum(struct thread_d *thread)
+{
+    if ((void*) thread == NULL){
+        return;
+    }
+    if (thread->magic != 1234){
+        return;
+    }
+    thread->quantum = QUANTUM_MIN;
 }
 
 // Obtendo o TID da thread atual.
@@ -764,14 +700,6 @@ void yield (tid_t tid)
     t->yield_in_progress = TRUE;
 }
 
-void sys_yield(tid_t tid)
-{
-    debug_print("sys_yield:\n");
-    if (tid<0 || tid >= THREAD_COUNT_MAX)
-        return;
-    yield(tid);
-}
-
 // Called by __task_switch() in ts.c
 void sleep_until (tid_t tid, unsigned long ms)
 {
@@ -830,90 +758,6 @@ void sleep(tid_t tid, unsigned long ms)
     t->sleep_in_progress = TRUE;
     t->desired_sleep_ms = ms;
 }
-
-void sys_sleep(tid_t tid, unsigned long ms)
-{
-    // #debug
-    printk("sci2: [266] Sleep until\n");
-// tid
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-// ms
-    if (ms == 0){
-        return;
-    }
-    sleep(tid, ms);
-}
-
-// #test
-// #todo: Explain it better.
-// 777 - kinda nice() 
-void sys_broken_vessels(tid_t tid)
-{
-    struct thread_d  *t;
-
-    // #todo
-    // Privilegies
-
-
-// tid
-    if (tid < 0 || tid >= THREAD_COUNT_MAX){
-        return;
-    }
-
-// structure
-    t = (void *) threadList[tid];
-    if ( (void *) t == NULL ){
-        return;
-    }
-    if ( t->used != TRUE || t->magic != 1234 ){
-        return;
-    }
-
-// Grace
-    if ( (t->quantum +1) <= t->quantum_limit_max )
-    {
-        t->quantum = (t->quantum +1);
-    }
-    if ( t->quantum > QUANTUM_MAX )
-    {
-        t->quantum = QUANTUM_MAX;
-    }
-}
-
-/*
-int 
-sched_thread (
-    struct thread_d *t, 
-    unsigned long quantum,
-    unsigned long priority );
-int 
-sched_thread (
-    struct thread_d *t, 
-    unsigned long quantum,
-    unsigned long priority )
-{
-    if ( (void*) t == NULL )
-        return -1;
-    if (t->magic != 1234)
-        return -1;
-
-// quantum
-    if (quantum>QUANTUM_MAX){
-        return -1;
-    }
-    t->quantum = (unsigned long) quantum;
-
-// priority
-    if (priority>PRIORITY_MAX){
-        return -1;
-    }
-    t->priority = (unsigned long) priority;
-
-    return 0;
-}
-*/
 
 /*
  * check_for_standby:
@@ -980,62 +824,40 @@ fail:
     panic("check_for_standby: ERROR\n");
 }
 
+/*
+int 
+sched_thread (
+    struct thread_d *t, 
+    unsigned long quantum,
+    unsigned long priority );
+int 
+sched_thread (
+    struct thread_d *t, 
+    unsigned long quantum,
+    unsigned long priority )
+{
+    if ( (void*) t == NULL )
+        return -1;
+    if (t->magic != 1234)
+        return -1;
+
+// quantum
+    if (quantum>QUANTUM_MAX){
+        return -1;
+    }
+    t->quantum = (unsigned long) quantum;
+
+// priority
+    if (priority>PRIORITY_MAX){
+        return -1;
+    }
+    t->priority = (unsigned long) priority;
+
+    return 0;
+}
+*/
+
 //
 // End
 //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

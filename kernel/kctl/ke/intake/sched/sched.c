@@ -30,6 +30,73 @@ static tid_t __scheduler_rr(unsigned long sched_flags);
 
 // =======================================
 
+//----------------
+
+// Lock scheduler
+void scheduler_lock (void){
+    g_scheduler_status = (unsigned long) LOCKED;
+}
+
+// Unlock scheduler
+void scheduler_unlock (void){
+    g_scheduler_status = (unsigned long) UNLOCKED;
+}
+
+/*
+ * scheduler_get_status:
+ *     Pega o status do scheduler, se ele está travado ou não.
+ */
+unsigned long scheduler_get_status (void)
+{
+    return (unsigned long) g_scheduler_status;
+}
+
+// Lets end this round putting a given thread at the end
+// of this round.
+void cut_round(struct thread_d *last_thread)
+{
+    struct thread_d *Current;
+
+// The current thread.
+    if ( current_thread < 0 || 
+         current_thread >= THREAD_COUNT_MAX )
+    {
+        return;
+    }
+    Current = (struct thread_d *) threadList[current_thread];
+    if ((void *) Current == NULL){
+        return;
+    }
+    if ( Current->used != TRUE || Current->magic != 1234 )
+    {
+        return;
+    }
+
+// ==========================
+// Last thread.
+
+    if ((void *) last_thread == NULL){
+        return;
+    }
+    if ( last_thread->used != TRUE || last_thread->magic != 1234 )
+    {
+        return;
+    }
+
+// ==========================
+// Cut round
+// Set the last thread for this round.
+
+    Current->next = (struct thread_d *) last_thread;
+    last_thread->next = NULL; 
+}
+
+
+//
+// $
+// SCHEDULER
+//
+
 /*
  * __scheduler_rr:
  *    Troca a thread atual, escolhe uma nova thread atual 
@@ -370,7 +437,6 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     return (tid_t) FirstTID;
 }
 
-
 // Wrapper for __scheduler_rr() or other type.
 // Esperamos que o worker construa um round e
 // que a primeira tid seja a idle.
@@ -439,26 +505,134 @@ tid_t scheduler(void)
     return (tid_t) first_tid;
 }
 
-//----------------
-
-// Lock scheduler
-void scheduler_lock (void){
-    g_scheduler_status = (unsigned long) LOCKED;
-}
-
-// Unlock scheduler
-void scheduler_unlock (void){
-    g_scheduler_status = (unsigned long) UNLOCKED;
-}
-
 /*
- * scheduler_get_status:
- *     Pega o status do scheduler, se ele está travado ou não.
+ * psScheduler:
+ *    Interface para chamar a rotina de scheduler.
+ *    Troca as threads que estão em user mode, 
+ * usando o método cooperativo. 
+ * Round Robing. 
+ *    As tarefas tem a mesma prioridade.
+ *    + Quando encontrada uma tarefa de maior prioridade, 
+ * escolhe ela imediatamente.
+ *    + Quando encontrar uma tarefa de menor prioridade, 
+ * apenas eleva a prioridade dela em até dois valores 
+ * acima da prioridade base, pegando a próxima tarefa. 
+ *    + Quando uma tarefa está rodando à dois valores 
+ * acima da sua prioridade, volta a prioridade para a 
+ * sua prioridade básica e executa.
  */
-unsigned long scheduler_get_status (void)
+// OUT: next tid.
+tid_t psScheduler(void)
 {
-    return (unsigned long) g_scheduler_status;
+
+// #bugbug
+// Quem está chamando? 
+// Filtros?
+// #todo: 
+// Talvez haja mais casos onde não se deva trocar a tarefa.
+
+//#bugbug 
+//Porque retornamos 0 ???
+//Scheduler Status. (LOCKED, UNLOCKED).
+
+    if (g_scheduler_status == LOCKED)
+    {
+        debug_print ("psScheduler: Locked $\n");
+        // #bugbug
+        // Why are we returning tid 0?
+        //return 0;
+        return -1;  //error
+    }
+
+// Não existem threads nesse processador.
+    if (UPProcessorBlock.threads_counter == 0){
+        panic("psScheduler: UPProcessorBlock.threads_counter == 0\n");
+    }
+
+// So existe uma thread nesse processador.
+// Então ela precisa ser a idle.
+// Ela será a current_thread.
+    if (UPProcessorBlock.threads_counter == 1)
+    {
+        currentq = 
+            (struct thread_d *) UPProcessorBlock.IdleThread;
+        current_thread = (tid_t) currentq->tid;
+        debug_print("psScheduler: Idle $\n");
+        // Return tid.
+        return (tid_t) current_thread;
+    }
+
+// Scheduler
+// Return tid.
+    return (tid_t) scheduler();
 }
+
+//
+// $
+// SYSCALL HANDLERS
+//
+
+// #test
+// #todo: Explain it better.
+// 777 - kinda nice() 
+void sys_broken_vessels(tid_t tid)
+{
+    struct thread_d  *t;
+
+    // #todo
+    // Privilegies
+
+// tid
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+// structure
+    t = (void *) threadList[tid];
+    if ( (void *) t == NULL ){
+        return;
+    }
+    if ( t->used != TRUE || t->magic != 1234 ){
+        return;
+    }
+
+// Grace
+    if ( (t->quantum +1) <= t->quantum_limit_max )
+    {
+        t->quantum = (t->quantum +1);
+    }
+    if ( t->quantum > QUANTUM_MAX )
+    {
+        t->quantum = QUANTUM_MAX;
+    }
+}
+
+void sys_sleep(tid_t tid, unsigned long ms)
+{
+    // #debug
+    printk("sci2: [266] Sleep until\n");
+// tid
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+// ms
+    if (ms == 0){
+        return;
+    }
+    sleep(tid, ms);
+}
+
+void sys_yield(tid_t tid)
+{
+    debug_print("sys_yield:\n");
+    if (tid<0 || tid >= THREAD_COUNT_MAX)
+        return;
+    yield(tid);
+}
+
+//
+// $
+// INITIALIZATION
+//
 
 /*
  * init_scheduler:
@@ -494,45 +668,6 @@ int init_scheduler(unsigned long sched_flags)
     return 0;
 }
 
-// Lets end this round putting a given thread at the end
-// of this round.
-void cut_round(struct thread_d *last_thread)
-{
-    struct thread_d *Current;
-
-// The current thread.
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
-        return;
-    }
-    Current = (struct thread_d *) threadList[current_thread];
-    if ((void *) Current == NULL){
-        return;
-    }
-    if ( Current->used != TRUE || Current->magic != 1234 )
-    {
-        return;
-    }
-
-// ==========================
-// Last thread.
-
-    if ((void *) last_thread == NULL){
-        return;
-    }
-    if ( last_thread->used != TRUE || last_thread->magic != 1234 )
-    {
-        return;
-    }
-
-// ==========================
-// Cut round
-// Set the last thread for this round.
-
-    Current->next = (struct thread_d *) last_thread;
-    last_thread->next = NULL; 
-}
 
 //
 // End
