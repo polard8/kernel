@@ -1,5 +1,5 @@
+// libata.h
 
-// hdd.h
 
 #ifndef __DD_HDD_H
 #define __DD_HDD_H    1
@@ -43,8 +43,6 @@ pio_rw_sector (
     int rw, 
     int port,
     int slave ); 
-
-int init_hdd(void);
 
 #endif   
 

@@ -290,15 +290,18 @@ extern void refresh_screen();
 #include "dd/r_render.h"  // Graphics
 #include "dd/keyboard.h"  // irq 1.
 
+//
 // Storage support
-#include "dd/ata.h"
-#include "dd/ide.h"
-#include "dd/hdd.h"
+//
+
+// ATA
+
+#include "dd/ata/libata.h"
+#include "dd/ata/ata.h"
+
 #include "dd/storage.h"
 
-
 //#include "timer.h"  // irq 0.
-
 
 // Embedded mini-shell
 #include "shell.h"

@@ -629,8 +629,11 @@ void bl_main(void)
     refresh_screen();
 #endif  
 
-// Initialize IDE support.
-    init_hdd();
+// Initialize ATA support.
+// ATA/PATA is the main term here.
+// IDE is an alias for ATA
+// SATA is the evolution of ATA.
+    ata_initialize();
 
 // debug
     if (g_initialized != TRUE){

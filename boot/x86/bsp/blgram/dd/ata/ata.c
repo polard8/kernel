@@ -1,5 +1,6 @@
+// ata.c
+
 /*
- * File: ide.c
  * IDE/AHCI support.
  * Environment:
  *     32bit bootloader.
@@ -24,7 +25,8 @@ IDE can connect up to 4 drives. Each drive can be one of the following:
   ATAPI (Parallel): Commonly used for optical drives.
 */
 
-#include "../bl.h"
+#include "../../bl.h"
+
 
 
 // pci support
@@ -121,7 +123,166 @@ static _u32 ATA_BAR4=0;    // Legacy Bus Master Base Address
 static _u32 ATA_BAR5=0;    // AHCI Base Address / SATA Index Data Pair Base Address
 
 
+//
+// PCI support.
+//
+
+// Read
+uint32_t 
+__ataReadPCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset );
+
+// Write
+void 
+__ataWritePCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset, 
+    int data );
+
+static int 
+__ataPCIConfigurationSpace ( 
+    char bus, 
+    char dev, 
+    char fun );
+
+static uint32_t __ataPCIScanDevice(int class);
+
+
+// Inicializa o IDE e mostra informações sobre o disco.
+static int __ata_initialize_controller(int ataflag);
+
+
+// Rotina de diálogo com o driver ATA.
+static int 
+__ata_initialization_dialog ( 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+
+
 //=======================
+
+/*
+ * diskATAIRQHandler1
+ *     irq 14 handler
+ */
+void diskATAIRQHandler1 ()
+{
+    ata_irq_invoked = 1;  
+}
+
+/*
+ * diskATAIRQHandler2
+ *     irq 15 handler
+ */ 
+void diskATAIRQHandler2 ()
+{
+    ata_irq_invoked = 1;   
+}
+
+/*
+ * disk_ata_wait_irq:
+ *     Esperando pela interrup��o.
+ * OUT:
+ *     0    = ok por status da interrup��o. 
+ *     -1   = ok por status do controlador.
+ *     0x80 = ok por tempo esperado.
+ */
+int disk_ata_wait_irq()
+{
+   _u32 tmp = 0x10000;
+   _u8 data=0;
+
+// #bugbug
+// Em nenhum momento a flag ata_irq_invoked vira TRUE.
+
+    while (!ata_irq_invoked)
+    {
+        data = ata_status_read();
+
+        // #bugbug: Review this code.
+        if ( (data &ATA_SR_ERR) )
+        {
+            ata_irq_invoked = 0;
+            return (int) -1;
+        }
+
+        //ns
+        if (tmp--){
+            ata_wait (100);
+        }else{
+            //ok por tempo esperado.
+            ata_irq_invoked = 0;
+            return (int) 0x80;
+        };
+    };
+ 
+// ok por status da interrup��o.
+    ata_irq_invoked = 0;
+// ok 
+    return 0;
+}
+
+
+/*
+ * show_ide_info:
+ *     Mostrar as informa��es obtidas na 
+ * inicializa��es do controlador.
+ */
+void show_ide_info()
+{
+    register int i=0;
+
+    printf ("show_ide_info:\n");
+
+    // four ports.
+    for ( i=0; i<4; i++ ){
+        printf ("\n");
+        printf ("id        = %d \n", ide_ports[i].id );
+        printf ("used      = %d \n", ide_ports[i].used );
+        printf ("magic     = %d \n", ide_ports[i].magic );
+        printf ("type      = %d \n", ide_ports[i].type );
+        printf ("name      = %s \n", ide_ports[i].name );
+        printf ("base_port = %x \n", ide_ports[i].base_port );
+    };
+
+	/*
+	// Estrutura 'ata'
+	// Qual lista ??
+	
+	//pegar a estrutura de uma lista.
+	
+	//if( ata != NULL )
+	//{
+		printf("ata:\n");
+ 	    printf("type={%d}\n", (int) ata.chip_control_type);
+	    printf("channel={%d}\n", (int) ata.channel);
+	    printf("devType={%d}\n", (int) ata.dev_type);
+	    printf("devNum={%d}\n", (int) ata.dev_num);
+	    printf("accessType={%d}\n", (int) ata.access_type);
+	    printf("cmdReadMode={%d}\n", (int) ata.cmd_read_modo);
+	    printf("cmdBlockBaseAddress={%d}\n", (int) ata.cmd_block_base_address);
+	    printf("controlBlockBaseAddress={%d}\n", (int) ata.ctrl_block_base_address);
+		printf("busMasterBaseAddress={%d}\n", (int) ata.bus_master_base_address);
+		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
+	//};
+	*/
+
+
+	// Estrutura 'atapi'
+	// Qual lista ??
+
+	// Estrutura 'st_dev'
+	// Est�o na lista 'ready_queue_dev'
+
+    //...
+}
 
 // low level worker
 void __ata_pio_read ( void *buffer, _i32 bytes )
@@ -1060,11 +1221,11 @@ const char *pci_classes[] = {
 
 
 /*
- * read_pci_config_addr:
+ * __ataReadPCIConfigAddr:
  *     READ
  */
 uint32_t 
-diskReadPCIConfigAddr ( 
+__ataReadPCIConfigAddr ( 
     int bus, 
     int dev,
     int fun, 
@@ -1083,11 +1244,11 @@ diskReadPCIConfigAddr (
 }
 
 /*
- * write_pci_config_addr:
+ * __ataWritePCIConfigAddr:
  *     WRITE
  */
 void 
-diskWritePCIConfigAddr ( 
+__ataWritePCIConfigAddr ( 
     int bus, 
     int dev,
     int fun, 
@@ -1106,12 +1267,12 @@ diskWritePCIConfigAddr (
 }
 
 /*
- * diskATAPCIConfigurationSpace:
+ * __ataPCIConfigurationSpace:
  *     Espa�o de configura�ao PCI Mass Storage
  *     Aqui vamos analisar o tipo de dispositivo.
  */
-int 
-diskATAPCIConfigurationSpace ( 
+static int 
+__ataPCIConfigurationSpace ( 
     char bus, 
     char dev, 
     char fun )
@@ -1119,14 +1280,14 @@ diskATAPCIConfigurationSpace (
     uint32_t data=0;
 
 //#ifdef KERNEL_VERBOSE	
-    //printf ("diskATAPCIConfigurationSpace:\n");
+    //printf ("__ataPCIConfigurationSpace:\n");
     printf ("Initializing PCI Mass Storage support..\n");
 //#endif
 
 // Indentification Device e
 // Salvando configura��es.
 
-    data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
+    data = (uint32_t) __ataReadPCIConfigAddr( bus, dev, fun, 0 );
 
     ata_pci.vendor_id = data       & 0xffff;
     ata_pci.device_id = data >> 16 & 0xffff;
@@ -1143,7 +1304,7 @@ diskATAPCIConfigurationSpace (
 // Salvando informa��es.
 // Classe, sub-classe, prog if and revision.
 
-    data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 8 );
+    data = (uint32_t) __ataReadPCIConfigAddr( bus, dev, fun, 8 );
 
     ata_pci.classe      = data >> 24 & 0xff;
     ata_pci.subclasse   = data >> 16 & 0xff;
@@ -1171,43 +1332,43 @@ diskATAPCIConfigurationSpace (
         ata.chip_control_type = ATA_IDE_CONTROLLER; 
 
         // Compatibilidade e nativo, primary.
-        data  = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        data  = __ataReadPCIConfigAddr( bus, dev, fun, 8 );
         if (data & 0x200)
         {
-            diskWritePCIConfigAddr ( 
+            __ataWritePCIConfigAddr ( 
                 bus, dev, fun, 
                 8, (data | 0x100) ); 
         }
 
         // Compatibilidade e nativo, secundary.
-        data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        data = __ataReadPCIConfigAddr( bus, dev, fun, 8 );
         if (data & 0x800)
         { 
-            diskWritePCIConfigAddr ( 
+            __ataWritePCIConfigAddr ( 
                 bus, dev, fun, 
                 8, (data | 0x400) ); 
         }
 
-        data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        data = __ataReadPCIConfigAddr( bus, dev, fun, 8 );
         if (data & 0x8000)
         {
             // Bus Master Enable
-            data = diskReadPCIConfigAddr(bus,dev,fun,4);
-            diskWritePCIConfigAddr(bus,dev,fun,4,data | 0x4);
+            data = __ataReadPCIConfigAddr(bus,dev,fun,4);
+            __ataWritePCIConfigAddr(bus,dev,fun,4,data | 0x4);
         } 
 
         // Habilitar interrupcao (INTx#)
-        data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
-        diskWritePCIConfigAddr( bus, dev, fun, 4, data & ~0x400);
+        data = __ataReadPCIConfigAddr( bus, dev, fun, 4 );
+        __ataWritePCIConfigAddr( bus, dev, fun, 4, data & ~0x400);
 
         // IDE Decode Enable
-        data = diskReadPCIConfigAddr( bus, dev, fun, 0x40 );
-        diskWritePCIConfigAddr( bus, dev, fun, 0x40, data | 0x80008000 );
+        data = __ataReadPCIConfigAddr( bus, dev, fun, 0x40 );
+        __ataWritePCIConfigAddr( bus, dev, fun, 0x40, data | 0x80008000 );
 
         // Synchronous DMA Control Register
         // Enable UDMA
-        data = diskReadPCIConfigAddr( bus, dev, fun, 0x48 );
-        diskWritePCIConfigAddr( bus, dev, fun, 0x48, data | 0xf);
+        data = __ataReadPCIConfigAddr( bus, dev, fun, 0x48 );
+        __ataWritePCIConfigAddr( bus, dev, fun, 0x48, data | 0xf);
 
         printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
             ata_sub_class_code_register_strings[ata.chip_control_type],
@@ -1254,39 +1415,39 @@ diskATAPCIConfigurationSpace (
         ata.chip_control_type = ATA_AHCI_CONTROLLER;
 
         // Compatibilidade e nativo, primary.
-        data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        data = __ataReadPCIConfigAddr ( bus, dev, fun, 8 );
         if (data & 0x200)
         {
-            diskWritePCIConfigAddr ( 
+            __ataWritePCIConfigAddr ( 
                 bus, dev, fun, 
                 8, data | 0x100 ); 
         }
 
         // Compatibilidade e nativo, secundary.
-        data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        data = __ataReadPCIConfigAddr ( bus, dev, fun, 8 );
         if (data & 0x800)
         {
-            diskWritePCIConfigAddr ( 
+            __ataWritePCIConfigAddr ( 
                 bus, dev, fun, 
                 8, data | 0x400 ); 
         }
 
         // ??
-        data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        data = __ataReadPCIConfigAddr ( bus, dev, fun, 8 );
         if (data & 0x8000) 
         {
             // Bus Master Enable.
-            data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
-            diskWritePCIConfigAddr ( bus, dev, fun, 4, data | 0x4 );
+            data = __ataReadPCIConfigAddr ( bus, dev, fun, 4 );
+            __ataWritePCIConfigAddr ( bus, dev, fun, 4, data | 0x4 );
         } 
 
         // IDE Decode Enable
-        data = diskReadPCIConfigAddr ( bus, dev, fun, 0x40 );
-        diskWritePCIConfigAddr ( bus, dev, fun, 0x40, data | 0x80008000 );
+        data = __ataReadPCIConfigAddr ( bus, dev, fun, 0x40 );
+        __ataWritePCIConfigAddr ( bus, dev, fun, 0x40, data | 0x80008000 );
 
         // Habilitar interrupcao (INTx#)
-        data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
-        diskWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
+        data = __ataReadPCIConfigAddr ( bus, dev, fun, 4 );
+        __ataWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
 
         printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
             ata_sub_class_code_register_strings[ata.chip_control_type], 
@@ -1297,7 +1458,7 @@ diskATAPCIConfigurationSpace (
     // ?:? = Class/subclass not supported.
     } else {
         // #panic
-        printf ("diskATAPCIConfigurationSpace: [bl/dd/ide.c]\n");
+        printf ("__ataPCIConfigurationSpace: [bl/dd/ide.c]\n");
         printf ("class/subclass not supported\n\n");
         bl_die();
     };
@@ -1308,7 +1469,7 @@ diskATAPCIConfigurationSpace (
 // Salvaremos as informa��es na estrutura.
 // PCI cacheline, Latancy, Headr type, end BIST
 
-    data = diskReadPCIConfigAddr ( bus, dev, fun, 0xC );
+    data = __ataReadPCIConfigAddr ( bus, dev, fun, 0xC );
 
     ata_pci.primary_master_latency_timer = data >>  8 & 0xff;
     ata_pci.header_type                  = data >> 16 & 0xff;
@@ -1316,21 +1477,21 @@ diskATAPCIConfigurationSpace (
 
 // ========================
 // BARs
-    ata_pci.bar0 = diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
-    ata_pci.bar1 = diskReadPCIConfigAddr( bus, dev, fun, 0x14 );
-    ata_pci.bar2 = diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
-    ata_pci.bar3 = diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
-    ata_pci.bar4 = diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
-    ata_pci.bar5 = diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
+    ata_pci.bar0 = __ataReadPCIConfigAddr( bus, dev, fun, 0x10 );
+    ata_pci.bar1 = __ataReadPCIConfigAddr( bus, dev, fun, 0x14 );
+    ata_pci.bar2 = __ataReadPCIConfigAddr( bus, dev, fun, 0x18 );
+    ata_pci.bar3 = __ataReadPCIConfigAddr( bus, dev, fun, 0x1C );
+    ata_pci.bar4 = __ataReadPCIConfigAddr( bus, dev, fun, 0x20 );
+    ata_pci.bar5 = __ataReadPCIConfigAddr( bus, dev, fun, 0x24 );
 // ========================
 // Interrupt
-    data = diskReadPCIConfigAddr( bus, dev, fun, 0x3C );
+    data = __ataReadPCIConfigAddr( bus, dev, fun, 0x3C );
     ata_pci.interrupt_line = data      & 0xff;
     ata_pci.interrupt_pin  = data >> 8 & 0xff;
 
 // ========================
 // PCI command and status.
-    data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+    data = __ataReadPCIConfigAddr( bus, dev, fun, 4 );
     ata_pci.command = data       & 0xffff; 
     ata_pci.status  = data >> 16 & 0xffff;
 
@@ -1352,7 +1513,7 @@ diskATAPCIConfigurationSpace (
 // ================
 // Get Synchronous DMA Control Register.
 
-    data = diskReadPCIConfigAddr(bus,dev,fun,0x48);
+    data = __ataReadPCIConfigAddr(bus,dev,fun,0x48);
 
 #ifdef KERNEL_VERBOSE
     printf ("[ Synchronous DMA Control Register %X ]\n", data );
@@ -1368,12 +1529,12 @@ done:
 }
 
 /*
- * diskPCIScanDevice:
+ * __ataPCIScanDevice:
  *     Esta fun��o deve retornar o n�mero de barramento, 
  *     o dispositivo e a fun��o do dispositivo conectado 
  *     ao barramento PCI de acordo a classe.
  */
-uint32_t diskPCIScanDevice(int class)
+static uint32_t __ataPCIScanDevice(int class)
 {
     uint32_t data = -1;
     int bus=0; 
@@ -1399,7 +1560,8 @@ uint32_t diskPCIScanDevice(int class)
                 
                 if ( ( data >> 24 & 0xff ) == class )
                 {
-                    printf( "[ Detected PCI device: %s ]\n", 
+                    // #todo: Save this information.
+                    printf ("[ Detected PCI device: %s ]\n", 
                         pci_classes[class] );
 
                     // Done
@@ -1416,21 +1578,27 @@ uint32_t diskPCIScanDevice(int class)
         };
     };
 
-
 // Fail
     printf ("[ PCI device NOT detected ]\n");
     refresh_screen ();
     return (uint32_t) (-1);
 }
 
+
+
+//
+// $
+// INITIALIZATION
+//
+
 /*
- * diskATAInitialize:
+ * __ata_initialize_controller:
  *     Initialize the IDE controller e show some information about the disk.
  *     #bugbug: It uses some predefined values for port and device.
  *              see: config.h
  * Credits: Nelson Cole.
  */
-int diskATAInitialize(int ataflag)
+static int __ata_initialize_controller(int ataflag)
 {
 // Sondando a interface PCI para encontrarmos um dispositivo
 // que seja de armazenamento de dados.
@@ -1544,7 +1712,7 @@ int diskATAInitialize(int ataflag)
 // Messages
 
 //#ifdef KERNEL_VERBOSE
-    //printf ("sm-disk-disk-diskATAInitialize:\n");
+    //printf ("sm-disk-disk-__ata_initialize_controller:\n");
     //printf ("Initializing IDE/AHCI support ...\n");
     //refresh_screen();
 //#endif
@@ -1557,12 +1725,12 @@ int diskATAInitialize(int ataflag)
 
     //PCI_CLASSCODE_MASS
 
-    data = (_u32) diskPCIScanDevice(PCI_CLASSE_MASS);
+    data = (_u32) __ataPCIScanDevice(PCI_CLASSE_MASS);
 
 // Error.
     if ( data == -1 )
     {
-        printf ("diskATAInitialize: pci_scan_device fail. ret={%d} \n", 
+        printf ("__ata_initialize_controller: pci_scan_device fail. ret={%d} \n", 
             (_u32) data );
 
         // Abortar.
@@ -1576,12 +1744,12 @@ int diskATAInitialize(int ataflag)
     fun = ( data      & 7 );
 
 // Vamos saber mais sobre o dispositivo enconrtado.
-    data = (_u32) diskATAPCIConfigurationSpace( bus, dev, fun );
+    data = (_u32) __ataPCIConfigurationSpace( bus, dev, fun );
 
     // Error.
     if( data == PCI_MSG_ERROR ){
 
-        printf ("diskATAInitialize: Error Driver [%x]\n", data );
+        printf ("__ata_initialize_controller: Error Driver [%x]\n", data );
         Status = (int) 1;
         goto fail;  
 
@@ -1589,7 +1757,7 @@ int diskATAInitialize(int ataflag)
     // RAID not supported?
     }else if( data == PCI_MSG_AVALIABLE )
           {
-              printf ("diskATAInitialize: RAID Controller Not supported.\n");
+              printf ("__ata_initialize_controller: RAID Controller Not supported.\n");
               Status = (int) 1;
               goto fail;  
           };
@@ -1673,7 +1841,7 @@ int diskATAInitialize(int ataflag)
         // Iniciando a lista.
         ready_queue_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
         if ((void *) ready_queue_dev == NULL){
-            printf("diskATAInitialize: ready_queue_dev struct fail\n");
+            printf("__ata_initialize_controller: ready_queue_dev struct fail\n");
             bl_die();
         }
 
@@ -1693,7 +1861,7 @@ int diskATAInitialize(int ataflag)
         // ??
         ata_identify_dev_buf = (_u16 *) malloc(4096);
         if ((void *) ata_identify_dev_buf == NULL){
-            printf("diskATAInitialize: ata_identify_dev_buf fail\n");
+            printf("__ata_initialize_controller: ata_identify_dev_buf fail\n");
             bl_die();
         }
 
@@ -1730,12 +1898,12 @@ int diskATAInitialize(int ataflag)
               //kputs("[ AHCI Mass Storage initialize ]\n");
               //ahci_mass_storage_init();
 
-              printf ("diskATAInitialize: AHCI not supported\n");
+              printf ("__ata_initialize_controller: AHCI not supported\n");
               bl_die();
 
           // Panic!
           }else{
-              printf ("diskATAInitialize: IDE and AHCI not found\n");
+              printf ("__ata_initialize_controller: IDE and AHCI not found\n");
               bl_die();
           };
 // Ok
@@ -1753,19 +1921,18 @@ int diskATAInitialize(int ataflag)
     Status = 0;
     goto done;
 fail:
-    printf ("diskATAInitialize: fail\n");
+    printf ("__ata_initialize_controller: fail\n");
     refresh_screen();
 done:
     return (int) Status;
 }
 
 /*
- * diskATADialog:
+ * __ata_initialization_dialog:
  *     Rotina de di�logo com o driver ATA.
  */
-// Called by init_hdd in hdd.c
 int 
-diskATADialog ( 
+__ata_initialization_dialog ( 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -1777,7 +1944,7 @@ diskATADialog (
     //ATAMSG_INITIALIZE
     //Initialize driver.
     case 1:
-        diskATAInitialize((int) long1);
+        __ata_initialize_controller((int) long1);
         Status = 0;
         goto done;
         break;
@@ -1793,126 +1960,36 @@ diskATADialog (
     };
 
 fail:
-    printf ("diskATADialog: fail\n");
+    printf ("__ata_initialization_dialog: fail\n");
     refresh_screen();
 done:
     return (int) Status;
 }
 
+
+//
+// $
+// INITIALIZATION
+//
+
 /*
- * diskATAIRQHandler1
- *     irq 14 handler
+ * ata_initialize:
+ *     Inicializa o driver de hd.
  */
-void diskATAIRQHandler1 ()
+// Called by OS_Loader_Main in main.c.
+int ata_initialize(void)
 {
-    ata_irq_invoked = 1;  
-}
 
-/*
- * diskATAIRQHandler2
- *     irq 15 handler
- */ 
-void diskATAIRQHandler2 ()
-{
-    ata_irq_invoked = 1;   
-}
+// #todo: 
+// We need to do something here. haha
 
-/*
- * show_ide_info:
- *     Mostrar as informa��es obtidas na 
- * inicializa��es do controlador.
- */
-void show_ide_info()
-{
-    register int i=0;
+// See: ide.c
+    __ata_initialization_dialog( 1, FORCEPIO, FORCEPIO );
+    g_driver_hdd_initialized = (int) TRUE;
 
-    printf ("show_ide_info:\n");
-
-    // four ports.
-    for ( i=0; i<4; i++ ){
-        printf ("\n");
-        printf ("id        = %d \n", ide_ports[i].id );
-        printf ("used      = %d \n", ide_ports[i].used );
-        printf ("magic     = %d \n", ide_ports[i].magic );
-        printf ("type      = %d \n", ide_ports[i].type );
-        printf ("name      = %s \n", ide_ports[i].name );
-        printf ("base_port = %x \n", ide_ports[i].base_port );
-    };
-
-	/*
-	// Estrutura 'ata'
-	// Qual lista ??
-	
-	//pegar a estrutura de uma lista.
-	
-	//if( ata != NULL )
-	//{
-		printf("ata:\n");
- 	    printf("type={%d}\n", (int) ata.chip_control_type);
-	    printf("channel={%d}\n", (int) ata.channel);
-	    printf("devType={%d}\n", (int) ata.dev_type);
-	    printf("devNum={%d}\n", (int) ata.dev_num);
-	    printf("accessType={%d}\n", (int) ata.access_type);
-	    printf("cmdReadMode={%d}\n", (int) ata.cmd_read_modo);
-	    printf("cmdBlockBaseAddress={%d}\n", (int) ata.cmd_block_base_address);
-	    printf("controlBlockBaseAddress={%d}\n", (int) ata.ctrl_block_base_address);
-		printf("busMasterBaseAddress={%d}\n", (int) ata.bus_master_base_address);
-		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
-	//};
-	*/
-
-
-	// Estrutura 'atapi'
-	// Qual lista ??
-
-	// Estrutura 'st_dev'
-	// Est�o na lista 'ready_queue_dev'
-
-    //...
-}
-
-/*
- * disk_ata_wait_irq:
- *     Esperando pela interrup��o.
- * OUT:
- *     0    = ok por status da interrup��o. 
- *     -1   = ok por status do controlador.
- *     0x80 = ok por tempo esperado.
- */
-int disk_ata_wait_irq()
-{
-   _u32 tmp = 0x10000;
-   _u8 data=0;
-
-// #bugbug
-// Em nenhum momento a flag ata_irq_invoked vira TRUE.
-
-    while (!ata_irq_invoked)
-    {
-        data = ata_status_read();
-
-        // #bugbug: Review this code.
-        if ( (data &ATA_SR_ERR) )
-        {
-            ata_irq_invoked = 0;
-            return (int) -1;
-        }
-
-        //ns
-        if (tmp--){
-            ata_wait (100);
-        }else{
-            //ok por tempo esperado.
-            ata_irq_invoked = 0;
-            return (int) 0x80;
-        };
-    };
- 
-// ok por status da interrup��o.
-    ata_irq_invoked = 0;
-// ok 
     return 0;
 }
+
 
 //
 // End

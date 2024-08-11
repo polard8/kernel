@@ -2,6 +2,9 @@
 // PCI interface support.
 // Created by Fred Nora.
 
+#ifndef __DD_PCI_H
+#define __DD_PCI_H    1
+
 #define PCI_ADDRESS_PORT      0x0CF8
 #define PCI_DATA_PORT         0x0CFC
  
@@ -237,6 +240,5 @@
 
 //...
 
-
-
+#endif   
 

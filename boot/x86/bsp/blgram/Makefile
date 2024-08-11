@@ -55,13 +55,12 @@ myIncludes = -I ./
 myObjects = head.o main.o globals.o \
 loader.o init.o ports.o x86.o \
 stdio.o stdlib.o string.o \
-keyboard.o pci.o hdd.o ide.o storage.o timer.o \
-pages.o \
-heap.o \
-proced.o \
+pages.o heap.o \
+keyboard.o pci.o libata.o ata.o storage.o timer.o \
 fs.o \
 shell.o \
 r_render.o \
+proced.o \
 abort.o \
 faults.o    
 
@@ -72,41 +71,43 @@ bl-x86:
 
 # Head
 	$(NASM)  -I x86/  x86/head.s -f elf -o head.o
-# main
 	$(CC) -c main.c    $(myIncludes) $(CFLAGS) -o main.o 
+
+	$(CC) -c abort.c   $(myIncludes) $(CFLAGS) -o abort.o
 	$(CC) -c globals.c $(myIncludes) $(CFLAGS) -o globals.o 
-# init
-	$(CC) -c init.c $(myIncludes) $(CFLAGS) -o init.o 
+	$(CC) -c init.c    $(myIncludes) $(CFLAGS) -o init.o 
+	$(CC) -c proced.c  $(myIncludes) $(CFLAGS) -o proced.o
+	$(CC) -c shell.c   $(myIncludes) $(CFLAGS) -o shell.o
+
+# dd
+	$(CC) -c dd/pci.c         $(myIncludes) $(CFLAGS)  -o pci.o
+	$(CC) -c dd/keyboard.c    $(myIncludes) $(CFLAGS)  -o keyboard.o
+	$(CC) -c dd/timer.c       $(myIncludes) $(CFLAGS)  -o timer.o
+	$(CC) -c dd/ata/libata.c  $(myIncludes) $(CFLAGS)  -o libata.o
+	$(CC) -c dd/ata/ata.c     $(myIncludes) $(CFLAGS)  -o ata.o
+	$(CC) -c dd/storage.c     $(myIncludes) $(CFLAGS)  -o storage.o
+
+# fs
+	$(CC) -c fs/fs.c      $(myIncludes) $(CFLAGS) -o fs.o
+	$(CC) -c fs/loader.c  $(myIncludes) $(CFLAGS) -o loader.o
+
 # libc
 	$(CC) -c libs/stdio.c  $(myIncludes) $(CFLAGS) -o stdio.o
 	$(CC) -c libs/string.c $(myIncludes) $(CFLAGS) -o string.o
 	$(CC) -c libs/stdlib.c $(myIncludes) $(CFLAGS) -o stdlib.o
-#x86
-	$(CC) -c x86/faults.c $(myIncludes) $(CFLAGS)  -o faults.o
-	$(CC) -c x86/x86.c    $(myIncludes) $(CFLAGS)  -o x86.o
-	$(CC) -c x86/ports.c  $(myIncludes) $(CFLAGS)  -o ports.o 
+
 # mm
 	$(CC) -c mm/pages.c $(myIncludes) $(CFLAGS) -o pages.o
 	$(CC) -c mm/heap.c  $(myIncludes) $(CFLAGS) -o heap.o
-#Sys
-	$(CC) -c proced.c $(myIncludes) $(CFLAGS) -o proced.o
-	$(CC) -c abort.c  $(myIncludes) $(CFLAGS) -o abort.o
-#Shell
-	$(CC) -c shell.c $(myIncludes) $(CFLAGS) -o shell.o
-#fs
-	$(CC) -c fs/fs.c     $(myIncludes) $(CFLAGS) -o fs.o
-	$(CC) -c fs/loader.c $(myIncludes) $(CFLAGS) -o loader.o
 
+# render
 	$(CC) -c render/r_render.c $(myIncludes) $(CFLAGS) -o r_render.o
 
-# dd
+# x86
+	$(CC) -c x86/faults.c $(myIncludes) $(CFLAGS)  -o faults.o
+	$(CC) -c x86/x86.c    $(myIncludes) $(CFLAGS)  -o x86.o
+	$(CC) -c x86/ports.c  $(myIncludes) $(CFLAGS)  -o ports.o 
 
-	$(CC) -c dd/pci.c $(myIncludes) $(CFLAGS)  -o pci.o
-	$(CC) -c dd/keyboard.c $(myIncludes) $(CFLAGS)  -o keyboard.o
-	$(CC) -c dd/timer.c    $(myIncludes) $(CFLAGS)  -o timer.o
-	$(CC) -c dd/hdd.c      $(myIncludes) $(CFLAGS)  -o hdd.o
-	$(CC) -c dd/ide.c      $(myIncludes) $(CFLAGS)  -o ide.o
-	$(CC) -c dd/storage.c  $(myIncludes) $(CFLAGS)  -o storage.o
 
 #todo:
 # Change to 32bit ELF. Maybe.

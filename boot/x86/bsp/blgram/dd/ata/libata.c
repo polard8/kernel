@@ -1,4 +1,6 @@
-// hdd.c
+// libata.c
+
+
 // IDE controller support.
 // 2013 - Created by Fred Nora.
 
@@ -28,7 +30,7 @@
  */ 
 
 
-#include "../bl.h"
+#include "../../bl.h"
 
 
 
@@ -450,23 +452,6 @@ void write_lba ( unsigned long address, unsigned long lba )
 }
 
 
-/*
- * init_hdd:
- *     Inicializa o driver de hd.
- */
-// Called by OS_Loader_Main in main.c.
-int init_hdd(void)
-{
-
-// #todo: 
-// We need to do something here. haha
-
-// See: ide.c
-    diskATADialog( 1, FORCEPIO, FORCEPIO );
-    g_driver_hdd_initialized = (int) TRUE;
-
-    return 0;
-}
 
 //
 // End

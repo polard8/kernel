@@ -1,20 +1,23 @@
-/*
- * File: ata.h
- * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
- * para suporte à IDE/AHCI.
- * 2018 - Created by Nelson Cole (Sirius OS)
- */
+// ata.h
 
-#ifndef __DD_ATA_H
-#define __DD_ATA_H    1
-
-// nelson cole
-// suporte a disco.
-// usado no kernel base
+// ATA interface.
+// IDE/AHCI
+// Credits:
+//   + Nelson Cole, (Sirius OS)
+//   + Fred Nora - A lot of changes.
 
 // =====================================================================
 //     IDE controller support by Nelson Cole
 // =====================================================================
+
+// Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
+// ICH5 - Integraçao do SATA e suporte total ACPI 2.0.
+// ICH6 - Implementaram os controladores AHCI SATA pela primeira vez.
+
+
+#ifndef __DD_IDE_H
+#define __DD_IDE_H    1
+
 
 //see: ide.c
 extern int ATAFlag;
@@ -23,35 +26,26 @@ extern int ATAFlag;
 //...
 
 
-
-/*
-//
-// Definições de tipos usados pelo Nelson el disk.h e disk.c
-//
-// See: types.h
-
-typedef char _i8;
-typedef short _i16;
-typedef int _i32;
-typedef long long _i64;
-
-typedef unsigned char _u8;
-typedef unsigned short _u16;
-typedef unsigned long _u32;
-typedef unsigned long long _u64;
-
-//typedef unsigned char uint8_t;
-//typedef unsigned short uint16_t;
-//typedef unsigned long uint32_t;
-typedef unsigned long long uint64_t;
-
-typedef void _void;
-
-*/
-
 // IO Delay.
-#define io_delay()  asm("out %%al,$0x80"::);
+#define io_delay() \
+    asm("out %%al,$0x80"::);
 
+
+//
+// PCI
+//
+
+// Device class
+#define PCI_CLASSE_MASS  1
+
+// Return value when initializing PCI bus.
+#define PCI_MSG_ERROR       -1
+#define PCI_MSG_AVALIABLE   0x80
+#define PCI_MSG_SUCCESSFUL  0
+
+//
+// DMA
+//
 
 // Atenção:
 // Esse endereço está na memória baixa.
@@ -60,38 +54,31 @@ typedef void _void;
 //#define DMA_PHYS_ADDR2 (DMA_PHYS_ADDR1 + 0x10000)
 //#define DMA_PHYS_ADDR3 (DMA_PHYS_ADDR2 + 0x10000)
 
-
-
-//
-// ## bug bug precisamos encontrar endereços válidos.
-//
-
-//#bugbug: precisa encontrar endereços válidos.
-//user mode 1:1
+// #bugbug: 
+// VGA MEMORY?
+// We need valid addresses
+// user mode 1:1
 #define DMA_PHYS_ADDR0  0xa0000
 #define DMA_PHYS_ADDR1  0xb0000
 #define DMA_PHYS_ADDR2  0xb0000
 #define DMA_PHYS_ADDR3  0xb0000 
 
-#define PCI_CLASSE_MASS 1
+//
+// Types of controller
+//
 
-// Controladores de unidades ATA.
-#define ATA_IDE_CONTROLLER  0x1
-#define ATA_RAID_CONTROLLER 0x4
-#define ATA_AHCI_CONTROLLER 0x6
+#define ATA_IDE_CONTROLLER   0x1
+#define ATA_RAID_CONTROLLER  0x4
+#define ATA_AHCI_CONTROLLER  0x6
 
-// Retorno da inicializacao PCI. 
-#define PCI_MSG_ERROR       -1
-#define PCI_MSG_AVALIABLE   0x80
-#define PCI_MSG_SUCCESSFUL  0
 
 // IO Space Legacy BARs IDE. 
-#define ATA_IDE_BAR0 0x1F0  // Primary Command Block Base Address.
-#define ATA_IDE_BAR1 0x3F6  // Primary Control Block Base Address.
-#define ATA_IDE_BAR2 0x170  // Secondary Command Block Base Address.
-#define ATA_IDE_BAR3 0x376  // Secondary Control Block Base Address.
-#define ATA_IDE_BAR4 0      // Bus Master Base Address.
-#define ATA_IDE_BAR5 0      // Usado pelo AHCI.
+#define ATA_IDE_BAR0  0x1F0  // Primary Command Block Base Address.
+#define ATA_IDE_BAR1  0x3F6  // Primary Control Block Base Address.
+#define ATA_IDE_BAR2  0x170  // Secondary Command Block Base Address.
+#define ATA_IDE_BAR3  0x376  // Secondary Control Block Base Address.
+#define ATA_IDE_BAR4  0      // Bus Master Base Address.
+#define ATA_IDE_BAR5  0      // Usado pelo AHCI.
 
 // ATA/ATAPI Command Set.
 #define ATA_CMD_CFA_ERASE_SECTORS               0xC0
@@ -175,11 +162,21 @@ typedef void _void;
 #define ATA_LBA28     28
 #define ATA_LBA48     48
 
-/*
- * dev_nport:
- *
- */
 
+//
+// variables
+//
+
+//see: ide.c
+extern _u16 *ata_identify_dev_buf;
+extern _u8 ata_record_dev;
+extern _u8 ata_record_channel;
+
+
+
+
+// ?
+// dev_nport structure.
 struct dev_nport 
 { 
     unsigned char dev0;
@@ -215,24 +212,13 @@ struct dev_nport
     unsigned char dev30;
     unsigned char dev31;
 };
-
 //see: ide.c
 extern struct dev_nport  dev_nport;
 
 
-
-// História:
-//     Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
-//     ICH5 integraçao do SATA e suporte total ACPI 2.0.
-//     ICH6 implementaram os controladores AHCI SATA pela primeira vez.
-
-
-/*
- * ata_pci:
- *     Suporta a IDE Controller.
- *     Essa é uma estrutura de superte a discos ata.
- */
-
+// ata_pci:
+// Suporta a IDE Controller.
+// Essa é uma estrutura de superte a discos ata.
 struct ata_pci
 {
     _u16 vendor_id;
@@ -259,18 +245,12 @@ struct ata_pci
     _u8  interrupt_pin;
 
     // AHCI
-
 };
-
 //see: ide.c
 extern struct ata_pci  ata_pci;
 
-
-/*
- * ata:
- *     Estrutura para o controle de execução do programa.
- */ 
-
+// ata:
+// Estrutura para o controle de execução do programa. 
 struct ata
 {
     //int used;
@@ -286,16 +266,11 @@ struct ata
     uint32_t bus_master_base_address;
     uint32_t ahci_base_address;
 };
-
 //see: ide.c
 extern struct ata  ata;
 
-
-/*
- * st_dev:
- *
- */
-
+// ??
+// st_dev:
 typedef struct st_dev 
 {
     _u32 dev_id;
@@ -312,23 +287,163 @@ typedef struct st_dev
        
     struct st_dev *next;
 }st_dev;
-
 typedef struct st_dev  st_dev_t;
 
 
+
+
 //
-// variables
+// IDE support 
 //
+
+// Channel and device number
+extern int g_current_ide_channel;
+extern int g_current_ide_device;
+// Port number.
+extern int g_current_ide_port;
+
+
+// 0 primary master 
+// 1 primary slave 
+// 2 secondary master 
+// 3 secondary slave.
+typedef enum {
+
+    ideportsPrimaryMaster,      // 0
+    ideportsPrimarySlave,       // 1
+    ideportsSecondaryMaster,    // 2
+    ideportsSecondarySlave      // 3
+
+}ide_ports_t;
+
+typedef enum {
+
+    idetypesPrimaryMaster,      // 0
+    idetypesPrimarySlave,       // 1
+    idetypesSecondaryMaster,    // 2
+    idetypesSecondarySlave      // 3
+
+}ide_types_t;
+
+typedef enum {
+
+    idedevicetypesPATA,    // 0
+    idedevicetypesSATA,    // 1
+    idedevicetypesPATAPI,  // 2
+    idedevicetypesSATAPI   // 3
+
+}ide_device_types_t;
+
+
+// IDE ports support
+struct ide_ports_d 
+{
+    uint8_t id;
+    int used;
+    int magic;
+    // PATA, SATA, PATAPI, SATAPI
+    int type;
+    unsigned short base_port;
+    char *name;
+    //...
+    // D� pra colocar aqui mais informa��es sobre 
+    // o dispositivo conectado a porta.
+    // podemos usar ponteiros para estruturas.
+};
 
 //see: ide.c
-extern _u16 *ata_identify_dev_buf;
-extern _u8 ata_record_dev;
-extern _u8 ata_record_channel;
+extern struct ide_ports_d  ide_ports[4];
 
 
+#define IDE_ATA    0
+#define IDE_ATAPI  1
+
+#define ATA_MASTER  0
+#define ATA_SLAVE   1 
+
+//#define HDD1_IRQ 14 
+//#define HDD2_IRQ 15 
+
+#define IDE_CMD_READ    0x20
+#define IDE_CMD_WRITE   0x30
+#define IDE_CMD_RDMUL   0xC4
+#define IDE_CMD_WRMUL   0xC5
+
+extern unsigned long ide_handler_address; 
+
+// Estrutura para canais da controladora IDE. 
+struct ide_channel_d
+{
+    int id;
+    int used;
+    int magic;
+    char name[8];
+
+    // Cada canal vai ter uma porta diferente.
+    // ex: canal 0, maste e canal 0 slave tem portas diferentes.	
+
+    unsigned short port_base;
+    unsigned char interrupt_number;
+
+	//@todo: lock stuff.
+	//@todo: semaphore
+	//...
+};
+typedef struct ide_channel_d ide_channel_t; 
+
+extern struct ide_channel_d  idechannelList[8];
+
+
+// Estrutura para discos controlados pela controladora ide.
+struct ide_disk_d
+{
+    int id;    // id do disco ide.
+    int used;
+    int magic;
+    char name[8];         // #todo: bigger.
+    unsigned short Type;  // 0: ATA | 1:ATAPI.
+
+// O canal usado pelo disco.
+// pode ser 0 ou 1, master ou slave ou outroscanais.
+    struct ide_channel_d *channel; 
+
+// #todo: estrutura para parti��es.
+// Podemos ter muitos elementos aqui.
+};
+typedef struct ide_disk_d  ide_disk_t;
+
+ 
+/*
+ * ide_d:
+ * #IMPORTANTE
+ * Estrutura para configurar a interface IDE. 
+ * Essa ser� a estrutura raiz para gerenciamento do controlador de IDE.
+ */
+
+struct ide_d
+{
+    // devemos colocar aqui um ponteiro para estrutura de informa��es 
+    // sobre o dispositivo controlador de ide.	
+
+    int current_port;
+    struct ide_ports_d *primary_master; 
+    struct ide_ports_d *primary_slave; 
+    struct ide_ports_d *secondary_master; 
+    struct ide_ports_d *secondary_slave; 
+};
+
+typedef struct ide_d ide_t;
+
+//see: ide.c
+extern struct ide_d  IDE;
+
+ 
+
 //
-// prototypes ============================================
+// Prototypes =================================
 //
+
+void show_ide_info();
 
 
 // ata_dev.c
@@ -349,6 +464,8 @@ _u8 ata_wait_drq();
 _u8 ata_wait_irq();
 _u8 ata_status_read();
 void ata_cmd_write(int cmd_val);
+
+int disk_ata_wait_irq();
 
 // worker
 _u8 __ata_assert_dever(char nport);
@@ -374,46 +491,18 @@ void ahci_mass_storage_init();
 
 
 //
-// PCI support.
+// $
+// INITIALIZATION
 //
 
-// Read
-uint32_t 
-diskReadPCIConfigAddr ( 
-    int bus, 
-    int dev,
-    int fun, 
-    int offset );
 
-// Write
-void 
-diskWritePCIConfigAddr ( 
-    int bus, 
-    int dev,
-    int fun, 
-    int offset, 
-    int data );
+int ata_initialize(void);
 
-uint32_t diskPCIScanDevice(int class);
 
-int 
-diskATAPCIConfigurationSpace ( 
-    char bus, 
-    char dev, 
-    char fun );
+#endif    
 
-// Inicializa o IDE e mostra informações sobre o disco.
-int diskATAInitialize( int ataflag );
+//
+// End
+//
 
-// Rotina de diálogo com o driver ATA.
-int 
-diskATADialog ( 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
-int disk_ata_wait_irq();
-void show_ide_info();
-
-#endif
 
