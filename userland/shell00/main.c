@@ -1294,7 +1294,6 @@ void shellWaitCmd (void)
  
 //#TEST 
 //#define LSH_TOK_DELIM " \t\r\n\a+!:=/.<>;|&" 
- 
 #define LSH_TOK_DELIM " \t\r\n\a" 
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
@@ -1494,7 +1493,7 @@ this_directory:
     // first call returns pointer
 	// to first part of user_input
 	// separated by delim
-	
+
     //isso pega a primeira palavra digitada
 	tokenList[0] = strtok( prompt, LSH_TOK_DELIM);
 
@@ -6501,8 +6500,7 @@ after_flags:
     top_level_arg_index = arg_index;
 	
     if ( !quiet && do_version )
-        show_shell_version ();	
-	
+        show_shell_version();	
 	
 	//
 	// setjmp - (abort support)

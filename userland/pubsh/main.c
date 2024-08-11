@@ -1,4 +1,5 @@
 // pubsh.bin
+// This program is called by pubterm.bin.
 // This is a shell application that send data to a 
 // virtual terminal via stdout (actually our stderr).
 // pubsh.bin sends data to pubterm.bin.
@@ -24,6 +25,8 @@ unsigned long device_width=0;
 unsigned long device_height=0;
 
 //======================================
+
+static int compare00(void);
 
 static void shellPrompt(void);
 static int shellCompare(void);  // Compare single word
@@ -361,6 +364,110 @@ static int shellProcessCommandLine(void)
     return 0;  //#todo
 }
 
+
+//#test
+//#define LSH_TOK_DELIM " \t\r\n\a+!:=/.<>;|&" 
+//#define LSH_TOK_DELIM "/;|&" 
+// Good one
+#define LSH_TOK_DELIM " \t\r\n\a" 
+
+#define SPACE " "
+#define TOKENLIST_MAX_DEFAULT 80
+
+static int compare00(void)
+{
+    char *tokenList[TOKENLIST_MAX_DEFAULT];
+    char *token;
+    int token_count;	
+    register int i = 0;
+
+    //unsigned long ret_value;
+    //int q;    //di�logo
+    char *c;
+
+    //?? � um pathname absoluto ou n�o. ??
+    //Ok. isso funcionou.
+    //int absolute; 
+
+
+    //#debug
+    //printf("Original:{%s}\n",prompt);
+
+// Get
+    c = prompt;
+
+    // Empty command line.
+    if (*c == '\0'){
+        goto exit_cmp;
+    }
+
+    // Isso pega a primeira palavra digitada
+	tokenList[0] = strtok( prompt, LSH_TOK_DELIM);
+
+    // Salva a primeira palavra digitada.
+    token = (char *) tokenList[0];
+    i=0;                                  
+
+    while ( token != NULL )
+    {
+        // Coloca na lista.
+        // Salva a primeira palavra digitada.
+        tokenList[i] = token;
+
+        //Mostra
+        //printf("shellCompare: %s \n", tokenList[i] );
+
+        token = strtok( NULL, LSH_TOK_DELIM );
+
+        // Incrementa o �ndice da lista
+        i++;
+
+        //salvando a contagem.
+        token_count = i;
+    };
+
+    //Finalizando a lista.
+    tokenList[i] = NULL;
+
+    // Zerando o índice do tokenList
+    i=0;
+
+// ------------------------
+// Compare
+
+    if ( strncmp( (char *) tokenList[0], "test", 4 ) == 0 ){
+        printf("~test\n");
+        goto exit_cmp;	
+    }
+
+    if ( strncmp( (char *) tokenList[0], "help", 4 ) == 0 )
+    {
+        printf("~help\n");
+        
+        i++;
+        token = (char *) tokenList[i];
+        if (token == NULL){
+            printf("token == NULL\n");
+            goto exit_cmp;
+        }
+
+        if ( strncmp( (char *) tokenList[i], "-a", 2 ) == 0 ){
+            printf("AAAA\n");
+        }
+        if ( strncmp( (char *) tokenList[i], "-b", 2 ) == 0 ){
+            printf("BBBB\n");
+        }
+        printf("help done\n");
+        goto exit_cmp;
+    }
+
+    // ...
+
+exit_cmp:
+    shellPrompt();
+    return 0;
+}
+
 //
 // Main
 //
@@ -455,10 +562,15 @@ int main(int argc, char *argv[])
                 //printf("%c",'$');
                 //fflush(stdout);
  
+                //#ps It's working
                 // Compare the first word in prompt[].
                 shellCompare();
+
                 // #todo: Process the command line.
                 //shellProcessCommandLine();
+
+                // #test
+                //compare00();
             }
 
             // Printable chars.
