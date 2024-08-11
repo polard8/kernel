@@ -92,7 +92,6 @@ extern int g_driver_ps2keyboard_initialized;   //ps2 keyboard
 extern int g_driver_ps2mouse_initialized;      //ps2 mouse
 extern int g_driver_video_initialized;
 extern int g_driver_apic_initialized;
-extern int g_driver_hdd_initialized;
 extern int g_driver_pci_initialized;
 extern int g_driver_rtc_initialized;
 extern int g_driver_timer_initialized;

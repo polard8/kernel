@@ -8,7 +8,7 @@
 // + Changed many times by Fred Nora.
 
 // A lot of changes by Fred Nora.
-// Suporte à controladora IDE.
+// Suporte à controladora ATA.
 
 #include <kernel.h>
 
@@ -37,8 +37,8 @@ int g_boottime_ide_port_index=0;
 // BAR1 is the start of the I/O ports which control the primary channel.
 // BAR2 is the start of the I/O ports used by secondary channel.
 // BAR3 is the start of the I/O ports which control secondary channel.
-// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master IDE.
-// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
+// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master ATA.
+// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master ATA.
 
 unsigned long ATA_BAR0_PRIMARY_COMMAND_PORT=0;    // Primary Command Block Base Address
 unsigned long ATA_BAR1_PRIMARY_CONTROL_PORT=0;    // Primary Control Block Base Address
@@ -1304,12 +1304,12 @@ static int ata_initialize_ide_device(char port)
 // #bugbug
 // Nao devemos confundir esses numeros com os numeros
 // gerados pelo BIOS, pois bios tambem considera
-// outras midias alem do ide.
+// outras midias alem do ATA.
 
 // #atenção
 // Essa estrutura é para 32 portas.
 // para listar as portas AHCI.
-// Mas aqui está apenas listando as 4 portas IDE.
+// Mas aqui está apenas listando as 4 portas ATA.
 
     switch (port){
     case 0:  dev_nport.dev0 = 0x81;  break;
@@ -1439,9 +1439,9 @@ ata_ioctl (
 //----------------------------------------------
 
 // __ata_initialize:
-// Inicializa o IDE e mostra informações sobre o disco.
+// Inicializa o ATA e mostra informações sobre o disco.
 // Sondando na lista de dispositivos encontrados 
-// pra ver se tem algum controlador de disco IDE.
+// pra ver se tem algum controlador de disco ATA.
 // IN: ?
 // Configurando flags do driver.
 // FORCEPIO = 1234
@@ -1451,9 +1451,9 @@ static int __ata_initialize(int ataflag)
 {
 // Called by init_ata().
 // Here we're gonna know some things about the ata controller.
-// + What is the type of ata controller we have: IDE, RAID or AHCI.
-// + For IDE controller we're gonna initialize the 'ports', or the
-//   IDE devices we have in this controller.
+// + What is the type of ata controller we have: ATA, RAID or AHCI.
+// + For ATA controller we're gonna initialize the 'ports', or the
+//   ATA devices we have in this controller.
 // + It's gonna fail for RAID and AHCI.
 
 /*
@@ -1506,8 +1506,8 @@ static int __ata_initialize(int ataflag)
 
 /*
     //#debug
-    printk ("kernel CONFIG:     IDE port: %d\n",boottime_ideport_index);   // from config.h
-    printk ("kernel xBootBlock: IDE port: %d\n",xBootBlock.ide_port_number);  // from bootblock, from bl.bin
+    printk ("kernel CONFIG:     ATA port: %d\n",boottime_ideport_index);   // from config.h
+    printk ("kernel xBootBlock: ATA port: %d\n",xBootBlock.ide_port_number);  // from bootblock, from bl.bin
     refresh_screen();
     while(1){}
 */
@@ -1528,11 +1528,11 @@ static int __ata_initialize(int ataflag)
 
 
     // #debug
-    // printk ("Initializing IDE/AHCI support ...\n");
+    // printk ("Initializing ATA/AHCI support ...\n");
 
 // #test
 // Sondando na lista de dispositivos encontrados 
-// pra ver se tem algum controlador de disco IDE.
+// pra ver se tem algum controlador de disco ATA.
 // #importante:
 // Estamos sondando uma lista que contruimos quando fizemos
 // uma sondagem no começo da inicializaçao do kernel.
@@ -1561,7 +1561,7 @@ static int __ata_initialize(int ataflag)
     }
 
 //#debug
-    // printk (": IDE device found\n");
+    // printk (": ATA device found\n");
     // printk ("[ Vendor=%x Device=%x ]\n", PCIDeviceATA->Vendor, PCIDeviceATA->Device );
 
 // Vamos saber mais sobre o dispositivo encontrado. 
@@ -1590,8 +1590,8 @@ static int __ata_initialize(int ataflag)
 // BAR1 is the start of the I/O ports which control the primary channel.
 // BAR2 is the start of the I/O ports used by secondary channel.
 // BAR3 is the start of the I/O ports which control secondary channel.
-// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master IDE.
-// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
+// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master ATA.
+// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master ATA.
 
     ATA_BAR0_PRIMARY_COMMAND_PORT   = ( PCIDeviceATA->BAR0 & ~7 ) + ATA_IDE_BAR0_PRIMARY_COMMAND   * ( !PCIDeviceATA->BAR0 );
     ATA_BAR1_PRIMARY_CONTROL_PORT   = ( PCIDeviceATA->BAR1 & ~3 ) + ATA_IDE_BAR1_PRIMARY_CONTROL   * ( !PCIDeviceATA->BAR1 );
@@ -1602,7 +1602,7 @@ static int __ata_initialize(int ataflag)
     ATA_BAR5 = ( PCIDeviceATA->BAR5 & ~0xf ) + ATA_IDE_BAR5            * ( !PCIDeviceATA->BAR5 );
 
 // Get the base i/o port for 
-// all the 4 ata ide ports.
+// all the 4 ATA ports.
 // Colocando nas estruturas.
     ide_ports[0].base_port = 
         (unsigned short) (ATA_BAR0_PRIMARY_COMMAND_PORT   & 0xFFFF);
@@ -1635,12 +1635,12 @@ static int __ata_initialize(int ataflag)
 // a estrutura 'ata' com o tipo de controlador encontrado.
 
 // ==============================================
-// IDE controller type.
+// ATA controller type.
 
     // Type
     if (AtaController.controller_type == ATA_IDE_CONTROLLER){
 
-        printk ("__ata_initialize: [IDE] Initialize ports\n");
+        printk ("__ata_initialize: [ATA] Initialize ports\n");
         //while(1){}
         
         // Soft Reset, defina IRQ.
@@ -1661,7 +1661,7 @@ static int __ata_initialize(int ataflag)
         ata_record_dev     = 0xff;
         ata_record_channel = 0xff;
 
-        //printk ("Initializing IDE Mass Storage device ...\n");
+        //printk ("Initializing ATA Mass Storage device ...\n");
         //refresh_screen ();
 
         // As estruturas de disco serão colocadas em uma lista encadeada.
@@ -1712,7 +1712,7 @@ static int __ata_initialize(int ataflag)
         memset (ata_identify_dev_buf, 0, 4096);
 
         // Sondando dispositivos e imprimindo na tela.
-        // As primeiras quatro portas do controlador IDE. 
+        // As primeiras quatro portas do controlador ATA. 
         // #todo
         // Create a constant for 'max'.
         // We're gonna create the structure for each 
@@ -1786,9 +1786,9 @@ static int __ata_initialize(int ataflag)
     }
 
 // ==============================================
-// Nem IDE, nem RAID, nem AHCI.
+// Nem ATA, nem RAID, nem AHCI.
     Status = (int) -1;
-    printk("__ata_initialize: IDE, RAID or AHCI were not found\n");
+    printk("__ata_initialize: ATA, RAID or AHCI were not found\n");
 fail:
     printk ("__ata_initialize: fail\n");
     return -1;

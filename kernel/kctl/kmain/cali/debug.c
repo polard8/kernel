@@ -97,10 +97,6 @@ static int __debug_check_drivers(void)
 	    //erro
 	}
 
-	if (g_driver_hdd_initialized != 1){
-	    //erro
-	}
-
     if (g_driver_pci_initialized != 1){
 	    //erro
 	}

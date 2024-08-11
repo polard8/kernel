@@ -568,8 +568,6 @@ ataWriteSector (
     unsigned long reserved1,
     unsigned long reserved2 );
 
-int init_hdd(void);
-
 void ide_dma_start(int p);
 void ide_dma_stop(int p);
 int ide_dma_read_status(int p);

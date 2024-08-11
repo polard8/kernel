@@ -81,7 +81,6 @@ int g_driver_ps2keyboard_initialized=FALSE;   //ps2 keyboard
 int g_driver_ps2mouse_initialized=FALSE;      //ps2 mouse
 int g_driver_video_initialized=FALSE;
 int g_driver_apic_initialized=FALSE;
-int g_driver_hdd_initialized=FALSE;
 int g_driver_pci_initialized=FALSE;
 int g_driver_rtc_initialized=FALSE;
 int g_driver_timer_initialized=FALSE;

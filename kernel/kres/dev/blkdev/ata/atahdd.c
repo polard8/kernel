@@ -656,20 +656,3 @@ ataWriteSector (
     return (int) Status;
 }
 
-
-/*
- * init_hdd:
- *     Inicializa o driver de hd.
- *     @todo: Mudar para hddInit().
- */
-
-int init_hdd (void)
-{
-
-// #todo: 
-// We need to do something here.
-
-    g_driver_hdd_initialized = (int) TRUE;
-    return 0;
-}
-
