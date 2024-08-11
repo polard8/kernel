@@ -2,7 +2,8 @@
 // System ports support.
 // 2005 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 unsigned char in8 (int port)
 {

@@ -10,7 +10,8 @@
  */
 
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 //
 // globals

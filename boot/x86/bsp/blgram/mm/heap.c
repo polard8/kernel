@@ -2,7 +2,8 @@
 // Heap support for OS loader in 32bit.
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"  
+
 
 // globals
 

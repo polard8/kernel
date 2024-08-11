@@ -1,8 +1,6 @@
-// bootloader.h
+// bl.h
 // This is the master header for the bootloader.
 // 2013 - Created by Fred Nora.
-
-//#todo: Change the name to 'bl.h'
 
 /*
  *     Header principal do Boot Loader de 32 bits, BL.BIN.
@@ -26,10 +24,13 @@
 extern int current_mode;
 
 //
-// Vari�veis para habilita��es de verbose pra debug.
+// Config
 //
 
 #include "config/config.h" 
+
+// Globals
+
 #include "gdef.h"
  
 extern unsigned long SavedX;
@@ -255,33 +256,35 @@ extern void refresh_screen();
  * Includes
  */
  
-#include "en/strings.h"
-#include "memmap.h"   // Memory Map - address.
-#include "diskmap.h"  // Disk Map   - sectors.
-#include "heap.h"
+#include "config/strings.h"
+
+#include "mm/memmap.h"   // Memory Map - address.
+#include "mm/heap.h"
+#include "dd/diskmap.h"  // Disk Map   - sectors.
 
 // Lib C.
-#include "types.h"
-#include "stddef.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
+#include "libs/types.h"
+#include "libs/stddef.h"
+#include "libs/stdlib.h"
+#include "libs/stdio.h"
+#include "libs/string.h"
 //...
 
-#include "cpuid.h"
+#include "x86/cpuid.h"
+#include "x86/bli386.h"
 
-//  Internal
-#include "bli386.h"
-
+// PE
 // ELF
-#include "sys/exec_elf.h"
-// File systems.
+#include "exec_elf.h"
+
+// File systems
 #include "fs/fs.h"
-#include "pci.h"
 
 //
 // Device drivers
 //
+
+#include "dd/pci.h"
 
 #include "dd/display.h"
 #include "dd/r_render.h"  // Graphics
@@ -292,6 +295,7 @@ extern void refresh_screen();
 #include "dd/ide.h"
 #include "dd/hdd.h"
 #include "dd/storage.h"
+
 
 //#include "timer.h"  // irq 0.
 

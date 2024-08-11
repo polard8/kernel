@@ -2,7 +2,8 @@
 // Storage support.
 // Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 int zzzzdung=0;
 

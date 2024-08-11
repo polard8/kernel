@@ -2,8 +2,7 @@
 // PCI interface support.
 // 2016 - Created by Fred Nora.
 
-
-#include <bootloader.h> 
+#include "../bl.h"  
 
 /*
  * pciConfigReadWord:

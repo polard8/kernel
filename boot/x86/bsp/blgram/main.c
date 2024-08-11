@@ -18,7 +18,7 @@
  * 0xC0001000 for the entry point.
  */
 
-#include <bootloader.h>
+#include "bl.h"  
 
 
 // This is for debug via verbose on baremetal.

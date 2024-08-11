@@ -11,7 +11,8 @@
  * O timer pode ser usado para contar tempo de inicializa��o.
  */
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 unsigned long timerTicks=0;
 

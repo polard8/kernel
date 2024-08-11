@@ -2,7 +2,7 @@
 // Low level routines for x86 boot loader.
 // 2005 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"
 
 
 // Enable interrupts

@@ -4,7 +4,8 @@
 //   + elfLoadKernelImage: Carrega o KERNEL.BIN.
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 // PE file header support.
 //#define IMAGE_FILE_MACHINE_I386   0x014C  // x86

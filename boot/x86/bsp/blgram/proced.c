@@ -1,7 +1,7 @@
-// procedure.c
+// proced.c
 // Created by Fred Nora.
  
-#include <bootloader.h>
+#include "bl.h"  
 
 
 unsigned long 
@@ -69,8 +69,7 @@ bl_procedure (
     return (unsigned long) 0;
 }
 
-
 //
-// End.
+// End
 //
 

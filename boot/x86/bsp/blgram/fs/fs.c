@@ -21,7 +21,8 @@
  */
 
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 // Globals
 int g_fat16_root_status=0;

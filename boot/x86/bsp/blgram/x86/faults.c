@@ -2,7 +2,8 @@
 // Faults and exceptions for the bootloader.
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 void faultsShowRegisters();
 

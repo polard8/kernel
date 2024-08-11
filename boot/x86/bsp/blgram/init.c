@@ -2,7 +2,8 @@
 // Bootloader initialization support.
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "bl.h"  
+
 
 // Variaveis herdadas do boot manager
 // O modo de boot. gui or cli.

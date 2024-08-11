@@ -2,7 +2,7 @@
 // Rendering support.
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"
 
 
 void r_refresh_screen(void)

@@ -1,5 +1,8 @@
 // gr.c
 
+#include "../bl.h"
+
+
 #define VGA_VRAM 0xA0000
 #define PITCH 320
 

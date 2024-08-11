@@ -4,7 +4,8 @@
 // vsync
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"  
+
 
 extern unsigned long SavedBootBlock;
 extern unsigned long SavedLFB;

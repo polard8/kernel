@@ -1,7 +1,12 @@
 // string.c
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"  
+
+//
+//
+//
+
 
 // Compare two strings.
 int strcmp(char *s1, char *s2)

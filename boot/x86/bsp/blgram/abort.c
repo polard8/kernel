@@ -2,7 +2,8 @@
 // Abort the boot loader.
 // 2015 - Created by Fred Nora.
 
-#include <stdio.h>
+#include "bl.h"  
+#include "libs/stdio.h"
 
 extern void refresh_screen(); 
 

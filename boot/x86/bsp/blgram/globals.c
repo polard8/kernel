@@ -1,6 +1,8 @@
 // global.c
 // Created by Fred Nora.
 
-#include <bootloader.h>
+#include "bl.h"  
 
-int globaasdfasdf;
+
+int globaasdfasdf=0;
+

@@ -5,7 +5,8 @@
 // against the 0x30000000 virtual address address.
 // 2015 - Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"  
+
 
 extern void BlTransferToKernel(void);
 

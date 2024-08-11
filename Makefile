@@ -288,6 +288,8 @@ clean-all: clean
 	-rm *.VHD
 	-rm *.ISO
 
+	-rm boot/*.VHD 
+
 # ==================
 # (1) boot/
 # Clear boot images

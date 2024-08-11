@@ -24,7 +24,8 @@ IDE can connect up to 4 drives. Each drive can be one of the following:
   ATAPI (Parallel): Commonly used for optical drives.
 */
 
-#include <bootloader.h>
+#include "../bl.h"
+
 
 // pci support
 // #bugbug

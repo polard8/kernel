@@ -1,7 +1,11 @@
 // stdlib.c
 // Created by Fred Nora.
 
-#include <bootloader.h>
+#include "../bl.h"  
+
+//
+//
+//
 
 void *malloc(size_t size)
 {
