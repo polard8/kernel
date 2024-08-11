@@ -21,8 +21,8 @@
 #include <bootloader.h>
 
 
-// This is for debug via verbose in baremetal.
-// #define BAREMETAL_VERBOSE    1
+// This is for debug via verbose on baremetal.
+//#define BAREMETAL_VERBOSE    1
 
 const char *image_name = "KERNEL.BIN";
 
@@ -732,6 +732,12 @@ void bl_main(void)
 //#breakpoint
     //refresh_screen();
     //while(1){}
+
+#if defined(BAREMETAL_VERBOSE)
+    printf("bl_main: Kernel image loaded :)\n");
+    refresh_screen();
+#endif  
+
 
 /*
     How do I enable Long Mode ?

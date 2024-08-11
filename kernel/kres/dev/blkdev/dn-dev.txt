@@ -1,0 +1,5 @@
+
+  Tested on baremetal:
+
+  Chipset: 8086:27C0
+
