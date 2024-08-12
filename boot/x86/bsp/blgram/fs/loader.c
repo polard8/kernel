@@ -26,13 +26,12 @@ void updateProgressBar();
 //...
 */
 
-
 // elfLoadKernelImage: 
-// Load KERNEL.BIN into the main memory.
+// Load /GRAMADO/KERNEL.BIN into the main memory.
 // Address.
 // pa = 0x00100000.
 // va = 0xC0000000.
-int elfLoadKernelImage(const char *file_name)
+int elfLoadKernelImage(const char *pathname, const char *default_pathname)
 {
 // Called by blLoadKernelImage() in main.c.
 
@@ -44,34 +43,46 @@ int elfLoadKernelImage(const char *file_name)
 // Path
     char Path[64];
     char DefaultPath[64];
+
 // Name
-    char *kernel_name;
-    kernel_name = file_name;
+
+    char *image_pathname;
+    image_pathname = pathname;
+
+    char *image_default_pathname;
+    image_default_pathname = default_pathname;
+
 
 // Validation
-    if ((void*) file_name == NULL )
+    if ((void*) pathname == NULL )
         goto fail;
-    if ( *file_name == 0 )
+    if ( *pathname == 0 )
+        goto fail; 
+
+// Validation
+    if ((void*) default_pathname == NULL )
+        goto fail;
+    if ( *default_pathname == 0 )
         goto fail; 
 
 // Message
 
 #ifdef BL_VERBOSE
     printf ("elfLoadKernelImage: Loading %s .. PA=%x | VA=%x \n", 
-        kernel_name, kernel_pa, kernel_va );
+        image_pathname, kernel_pa, kernel_va );
 #endif
 
 //
 // Load kernel image
 //
 
-// Building a pathname.
-// The name given by function parameter.
-    strcpy(Path, "/GRAMADO");
-    strcat(Path, "/");
-    strcat(Path, kernel_name );
+// Given pathname
+    bzero(Path,64);
+    strcat(Path, image_pathname);
+
 // Default pathname.
-    strcpy(DefaultPath, "/GRAMADO/KERNEL.BIN");
+    bzero(DefaultPath,64);
+    strcpy(DefaultPath,image_default_pathname);
 
 // ---------------------------------------
 // Load KERNEL.BIN on a physical address.
@@ -83,6 +94,9 @@ int elfLoadKernelImage(const char *file_name)
 // Try default pathname.
     if (Status != 0){
         // Try again.
+        printf("%s was not found\n",Path);
+        printf("Let's try %s\n",DefaultPath);
+        refresh_screen();
         Status = (int) load_path( DefaultPath,(unsigned long) kernel_pa );
     }
 // Fail again.
@@ -98,8 +112,7 @@ int elfLoadKernelImage(const char *file_name)
     if ( kernel[0] != 0x7F || 
          kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
     {
-        printf("elfLoadKernelImage: %s ELF image validation\n", 
-            kernel_name ); 
+        printf("elfLoadKernelImage: ELF image validation\n"); 
         goto fail;
     }
 
@@ -146,6 +159,10 @@ int elfLoadKernelImage(const char *file_name)
 fail:
     printf("elfLoadKernelImage: Fail\n");
     refresh_screen();
+
+    //#debug
+    //while(1){}
+
 // #test
 // Vamos retornar para dar a chace ao rescue shell.
     // abort();

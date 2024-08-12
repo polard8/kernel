@@ -24,7 +24,24 @@
 // This is for debug via verbose on baremetal.
 //#define BAREMETAL_VERBOSE    1
 
-const char *image_name = "KERNEL.BIN";
+
+//
+// GRAMADO (Normal system)
+//
+
+// Load this one
+const char *image_pathname = "/GRAMADO/KERNEL.BIN";
+// or try this one.
+const char *image_default_pathname = "/GRAMADO/KERNEL.BIN";
+
+//
+// GRAMRE (Recovering Environment)
+//
+
+// Load this one
+const char *image_pathname_re = "/GRAMRE/KERNEL.BIN";
+// or try this one.
+const char *image_default_pathname_re = "/GRAMRE/KERNEL.BIN";
 
 //
 // globals
@@ -123,6 +140,7 @@ bl_clean_memory(
 
 // Kernel image
 static int bl_load_kernel_image(void);
+static int bl_load_kernel_image_for_gramre(void);
 
 // Menu
 static void bl_show_menu(void);
@@ -394,6 +412,45 @@ bl_clean_memory(
 //
 
 /*
+ * bl_load_kernel_image_for_gramre: 
+ *     It loads the kernel image at 0x00100000.
+ *     The entry point is at 0x00101000.
+ */ 
+// #todo
+// This way can chose the filename from a
+// configuration file.
+// This routine will try to load the default filename
+// if the provide name fail.
+// This routine will build the pathname
+// to search in the default folder.
+static int bl_load_kernel_image_for_gramre(void)
+{
+// Called by bl_main().
+
+    int Status = -1;
+
+// #bugbug
+// Precisamos que essa rotina retorne
+// para termos a change de inicializarmos o
+// rescue shell. Mas acontece que por enquanto
+// essa função aborta ao primeiro sinal de perigo.
+// See: loader.c
+
+    Status = (int) elfLoadKernelImage(image_pathname_re,image_default_pathname_re);
+    if (Status < 0){
+        printf ("bl_load_kernel_image_for_gramre: elfLoadKernelImage fail\n");
+        goto fail;
+    }
+
+    // OK
+    return (int) Status;
+
+fail:
+    refresh_screen();
+    return (int) (-1);
+}
+
+/*
  * bl_load_kernel_image: 
  *     It loads the kernel image at 0x00100000.
  *     The entry point is at 0x00101000.
@@ -410,9 +467,6 @@ static int bl_load_kernel_image(void)
 // Called by bl_main().
 
     int Status = -1;
-// Standard name.
-// #todo: Maybe we need some options, some config file.
-    //char *image_name = "KERNEL.BIN";
 
 // #bugbug
 // Precisamos que essa rotina retorne
@@ -421,7 +475,7 @@ static int bl_load_kernel_image(void)
 // essa função aborta ao primeiro sinal de perigo.
 // See: loader.c
 
-    Status = (int) elfLoadKernelImage(image_name);
+    Status = (int) elfLoadKernelImage(image_pathname,image_default_pathname);
     if (Status < 0){
         printf ("bl_load_kernel_image: elfLoadKernelImage fail\n");
         goto fail;
@@ -449,15 +503,24 @@ static void bl_show_menu(void)
     g_cursor_x = 0;
     g_cursor_y = 0;
 
+// Clear the screen
     clear_backbuffer();
 
+// Header
+    printf ("\n");
+    printf ("Gramado Boot Loader: (Emergency menu)\n");
+    printf ("#todo: No imput support yet\n");
+    printf ("\n");
+    printf ("\n");
+
+// Print the menu itens.
     for (i=0; i<8; i++)
     {
         printf ("\n");
 
         if (MENU[i].used == TRUE)
         {
-            if ( i == menu_highlight ){
+            if (i == menu_highlight){
                 printf("* %s \n", MENU[i].string);
             }else{
                 printf("  %s \n", MENU[i].string);
@@ -465,6 +528,7 @@ static void bl_show_menu(void)
         }
     };
 
+// Flush the backbuffer into the video memory.
     refresh_screen(); 
 }
 
@@ -472,8 +536,14 @@ static void bl_menu_loop(void)
 {
     char Key=0;
 
-    // prepara o menu.
-    
+    g_cursor_x=0;
+    g_cursor_y=0;
+    clear_backbuffer();
+
+    printf("bl_menu_loop: Initializing\n");
+    refresh_screen();
+
+// prepara o menu.   
     MENU[0].used = 1;
     MENU[1].used = 1;
     MENU[2].used = 0;
@@ -540,6 +610,10 @@ void bl_main(void)
 {
     int Status = (-1);
     int fTest=FALSE;
+
+// Do we need to initialize the GRAMRE.
+    initialize_gramre = FALSE;
+    //initialize_gramre = TRUE;
 
 // root and fat not loaded yet.
     g_fat16_root_status = FALSE;
@@ -668,10 +742,26 @@ void bl_main(void)
     refresh_screen();
 #endif  
 
-    Status = bl_load_kernel_image();
-    if (Status<0){
-        printf("bl_main: bl_load_kernel_image fail\n");
+// Initialize the gramre kernel environment.
+// #todo:
+// At this moment we need to update the bootblock
+// to tell the kernel that we're loading him from
+// a new perpective.
+    if (initialize_gramre == TRUE){
+        printf("blgram: Initializing gramre kernel\n");
         refresh_screen();
+        Status = bl_load_kernel_image_for_gramre();
+
+// Initialize the normal kernel environment.
+    }else{
+        Status = bl_load_kernel_image();
+    }
+
+    if (Status<0)
+    {
+        // Calling the emergency shell.
+        bl_menu_loop();
+
         while (1){
             asm("cli");
             asm("hlt");

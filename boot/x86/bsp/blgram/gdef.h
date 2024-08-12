@@ -3,6 +3,13 @@
 // #ps Put this in the top of the includes.
 // 2016 - Created by Fred Nora.
 
+#ifndef __GDEF_H
+#define __GDEF_H    1
+
+// Do we need to initialize the GRAMRE.
+extern int initialize_gramre;
+
+
 //
 // The boot block structure.
 //
@@ -60,7 +67,9 @@ extern int ____testing_memory_size_flag;
 //unsigned long __last_valid_address; 
 extern unsigned long __last_valid_address;
 
+#endif   
+
 //
-// End.
+// End
 //
 

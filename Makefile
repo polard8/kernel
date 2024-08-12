@@ -125,6 +125,7 @@ build-gramado-os:
 # Copy to the target folder.
 # We need a backup
 	cp kernel/KERNEL.BIN  $(BASE)/GRAMADO
+	cp kernel/KERNEL.BIN  $(BASE)/GRAMRE
 
 #===================================
 # (3) mods/

@@ -100,7 +100,8 @@ fatLoadCluster (
 // Loading files.
 //
 
-int elfLoadKernelImage (const char *file_name);
+// See: loader.c
+int elfLoadKernelImage(const char *pathname, const char *default_pathname);
 
 //
 // File support.
