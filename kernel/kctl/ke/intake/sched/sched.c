@@ -391,6 +391,10 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                         // se ele estiver sinalizado como exit in progress
                         // e ela for a thread de controle dele.
                         TmpThread->state = ZOMBIE;
+
+                        // Invalidate the foreground thread variable.
+                        if (TmpThread->tid == foreground_thread)
+                            foreground_thread = -1;
                         
                         // Uma thread importante morreu?
                         // if (TmpThread->personality == PERSONALITY_GRAMADO )
