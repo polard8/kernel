@@ -1,5 +1,5 @@
-
 // mouse.h
+// Created by Fred Nora.
 
 #ifndef ____MOUSE_H
 #define ____MOUSE_H    1

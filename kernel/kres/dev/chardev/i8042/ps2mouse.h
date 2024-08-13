@@ -1,5 +1,5 @@
-
 // ps2mouse.h
+// Created by Fred Nora.
 
 #ifndef ____PS2MOUSE_H
 #define ____PS2MOUSE_H    1
@@ -101,8 +101,6 @@ struct ps2_mouse_d
 };
 // see: ps2mouse.c
 extern struct ps2_mouse_d  PS2Mouse;
-
-
 
 
 extern unsigned long g_mousepointer_width;

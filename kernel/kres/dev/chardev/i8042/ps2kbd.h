@@ -1,5 +1,5 @@
-
 // ps2kbd.h
+// Created by Fred Nora.
 
 #ifndef ____PS2KBD_H
 #define ____PS2KBD_H    1
@@ -83,15 +83,12 @@ enum KYBRD_CTRL_STATS_MASK {
 };
 */
 
-
-// Enumerando os tipos de teclados.
+// Enumerating the types of keyboard.
 typedef enum {
-
     KEYBOARD_VIRTUAL,
     KEYBOARD_PS2,
     KEYBOARD_USB,
     // ...
-
 }keyboard_type_t;
 
 // keyboardMessage

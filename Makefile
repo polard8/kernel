@@ -174,49 +174,53 @@ copy-extras:
 
 # ------------------------
 # LEVEL 1: (de/) Display servers and applications.
+
+    # Well consolidated applications
 	-cp $(DEP_L1)/core/ds00/bin/DS00.BIN   $(BASE)/
-	#-cp $(DEP_L1)/core/ds01/bin/DS01.BIN  $(BASE)/
 	-cp $(DEP_L1)/shell/bin/TASKBAR.BIN    $(BASE)/
-	-cp $(DEP_L1)/shell/bin/TERMINAL.BIN   $(BASE)/
-	-cp $(DEP_L1)/shell/bin/GDM.BIN        $(BASE)/
-	-cp $(DEP_L1)/shell/bin/EDITOR.BIN     $(BASE)/
 	-cp $(DEP_L1)/shell/bin/XTB.BIN        $(BASE)/
-# use '@' prefix.
-	#-cp $(DEP_L1)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
-# Use '#' prefix.
+	-cp $(DEP_L1)/shell/bin/TERMINAL.BIN   $(BASE)/
+	#-cp $(DEP_L1)/shell/bin/GWS.BIN       $(BASE)/
+    # Experimental applications
+    # These need the '@' prefix.
 	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
 	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/shell/bin/GDM.BIN      $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/shell/bin/EDITOR.BIN   $(BASE)/GRAMADO/
 
 # ------------------------
 # LEVEL 2: (commands/)  Posix comands.
+
+    # Well consolidated applications
 	-cp $(DEP_L2)/base/bin/CAT.BIN       $(BASE)/
-	-cp $(DEP_L2)/base/bin/FALSE.BIN     $(BASE)/
 	-cp $(DEP_L2)/base/bin/REBOOT.BIN    $(BASE)/
 	-cp $(DEP_L2)/base/bin/SHUTDOWN.BIN  $(BASE)/
-	-cp $(DEP_L2)/base/bin/TRUE.BIN      $(BASE)/
 	-cp $(DEP_L2)/base/bin/UNAME.BIN     $(BASE)/
-# use '@' prefix.
-	-cp $(DEP_L2)/sdk/bin/GRAMCNF.BIN  $(BASE)/GRAMADO/
-	#-cp $(DEP_L2)/sdk/bin/N9.BIN      $(BASE)/GRAMADO/
-	#-cp $(DEP_L2)/sdk/bin/N10.BIN     $(BASE)/GRAMADO/
-	#-cp $(DEP_L2)/sdk/bin/N11.BIN     $(BASE)/GRAMADO/
-# Use '#' prefix.
+	-cp $(DEP_L2)/sdk/bin/GRAMCNF.BIN    $(BASE)/
+    # Experimental applications
+    # These need the '@' prefix.
+	-cp $(DEP_L2)/base/bin/FALSE.BIN      $(BASE)/GRAMADO/
+	-cp $(DEP_L2)/base/bin/TRUE.BIN       $(BASE)/GRAMADO/
 	-cp $(DEP_L2)/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
 	-cp $(DEP_L2)/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
 	-cp $(DEP_L2)/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/sdk/bin/N9.BIN         $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/sdk/bin/N10.BIN        $(BASE)/GRAMADO/
+	#-cp $(DEP_L2)/sdk/bin/N11.BIN        $(BASE)/GRAMADO/
 	#-cp $(DEP_L2)/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
 
 # ------------------------
 # LEVEL 3: (browser/) browser.
 # Teabox web browser
+    # Experimental applications
+    # These need the '@' prefix.
 	-cp $(DEP_L3)/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
-
 
 # ------------------------
 # LEVEL 4: (aurora/) 3D demos.
+    # Well consolidated applications
 	-cp $(DEP_L4)/bin/DEMO00.BIN  $(BASE)/
 	-cp $(DEP_L4)/bin/DEMO01.BIN  $(BASE)/
-
 
 	@echo "~ copy-extras"
 

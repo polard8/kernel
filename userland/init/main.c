@@ -6,22 +6,10 @@
 // receving messages from the kernel.
 // Created by Fred Nora.
 
-/*
-#include <types.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <rtl/gramado.h>
-*/
 
 #include "inc/init.h"
-
 // Used when processing the control keys.
 #include "inc/ascii.h"
-
-//Used by creat()
-//#include <fcntl.h>
 
 #define __COLOR_BLUE   0x000000FF
 #define __COLOR_WHITE  0x00FFFFFF

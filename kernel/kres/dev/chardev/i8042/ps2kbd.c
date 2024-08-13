@@ -1,4 +1,3 @@
-
 // ps2kbd.c
 // ps/2 keyboard support.
 // ring0, kernel base.
@@ -47,7 +46,6 @@ static void keyboard_init_modifier_keys(void)
 	//...
 }
 
-
 // #todo: 
 // We need a file structure and the function ps2kbd_ioctl();
 void ps2kbd_initialize_device (void)
@@ -82,7 +80,7 @@ void ps2kbd_initialize_device (void)
 // Registrando o dispositivo.
     devmgr_register_device ( 
         (file *) fp, 
-        "PS2KBD",         // pathname 
+        "PS2KBD",            // pathname 
         DEVICE_CLASS_CHAR,   // class (char, block, network)
         DEVICE_TYPE_LEGACY,  // type (pci, legacy)
         NULL,                // Not a pci device.
@@ -103,7 +101,6 @@ void ps2kbd_initialize_device (void)
     PS2Keyboard.initialized = TRUE;
 }
 
-
 // #test
 // Poll keyboard
 void ps2kbd_poll(void)
@@ -116,7 +113,6 @@ void ps2kbd_poll(void)
         DeviceInterface_PS2Keyboard();
     }
 }
-
 
 /*
  * DeviceInterface_PS2Keyboard: 
@@ -312,24 +308,23 @@ done:
     return;
 }
 
-
 // i8042_keyboard_disable:
 // Disable keyboard.
 // Wait for bit 1 of status reg to be zero.
 // Send code for setting disable command.
-    
+   
 void i8042_keyboard_disable (void)
 {
-    while ( ( in8(0x64) & 2) != 0 )
+    while ( (in8(0x64) & 2) != 0 )
     {
-         // Nothing.
+        // Nothing
     };
     out8(0x60,0xF5);
     //sleep(100);
 }
 
-// keyboardEnable:
-//     Enable keyboard.
+// i8042_keyboard_enable:
+// Enable keyboard.
 void i8042_keyboard_enable(void)
 {
     // #bugbug
@@ -337,13 +332,14 @@ void i8042_keyboard_enable(void)
 
 // Wait for bit 1 of status reg to be zero.
 // Send code for setting Enable command.
-    while ( ( in8(0x64) & 2) != 0 )
+    while ( (in8(0x64) & 2) != 0 )
     {
     };
     out8 (0x60,0xF4);
     //sleep(100);
 }
 
+// Setup keyboard LEDs.
 // see: ps2kbd.h
 void keyboard_set_leds(unsigned char flags)
 {
@@ -351,6 +347,7 @@ void keyboard_set_leds(unsigned char flags)
 // Send code for setting the flag.
     while ( (in8(0x64) & 2) != 0 )
     {
+        // Nothing
     };
     out8(0x60,KEYBOARD_SET_LEDS); 
     pit_sleep(100);
@@ -359,6 +356,7 @@ void keyboard_set_leds(unsigned char flags)
 // Send flag. 
     while ( (in8(0x64) & 2) != 0 )
     {
+        // Nothing
     };
     out8(0x60,flags);
     pit_sleep(100);
@@ -439,10 +437,8 @@ void i8042_keyboard_write (uint8_t data)
     wait_ns(400);
 }
 
-/*
- * i8042_keyboard_read2:
- *     Pega um byte na porta 0x60.
- */
+// i8042_keyboard_read2:
+// Get byte in port 0x60.
 unsigned char i8042_keyboard_read2(void)
 {
     prepare_for_input();
@@ -451,12 +447,12 @@ unsigned char i8042_keyboard_read2(void)
 
 void i8042_keyboard_expect_ack (void)
 {
+    unsigned char ack_value=0;
+    int timeout=100;
+
     // #bugbug
     // ? loop infinito  
     // while ( xxx_mouse_read() != 0xFA );
-
-    unsigned char ack_value=0;
-    int timeout=100;
 
     while (1)
     {
@@ -465,6 +461,7 @@ void i8042_keyboard_expect_ack (void)
             break;
         }
 
+        // #todo: Use a worker like this?
         //ack_value = (unsigned char) i8042_keyboard_read2();
         
         prepare_for_input();
@@ -489,5 +486,4 @@ void i8042_keyboard_expect_ack (void)
     return;
     //return 0;
 }
-
 

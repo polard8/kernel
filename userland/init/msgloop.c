@@ -234,7 +234,9 @@ xxxProcessEvent (
                 //#debug
                 //printf("init.bin: 4002, from {%d}\n",caller_tid);
                 memset(__filename_local_buffer,0,64);
-                sprintf(__filename_local_buffer,"editor.bin");
+                sprintf(__filename_local_buffer,"terminal.bin");
+                //#suspended: The server is facing issues with editbox windows.
+                //sprintf(__filename_local_buffer,"editor.bin");
                 rtl_clone_and_execute(__filename_local_buffer);
                 break;
             case 4003:  //app3

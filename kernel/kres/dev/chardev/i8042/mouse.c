@@ -1,4 +1,3 @@
-
 // mouse.c
 // This is the ps2/mouse driver, embedded into the kernel base.
 // ps/2 mouse support.
@@ -32,8 +31,7 @@ irq12_MOUSE (void)
         return;
     }
     PS2Mouse.irq_is_working = TRUE;
-    PS2Mouse.last_jiffy = 
-        (unsigned long) get_systime_totalticks();
+    PS2Mouse.last_jiffy = (unsigned long) get_systime_totalticks();
 
 // Disable keyboard port.
 // Call the main routine.

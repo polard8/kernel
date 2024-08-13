@@ -1,4 +1,3 @@
-
 // ps2mouse.c
 // ps/2 mouse support.
 // ring0, kernel base.
@@ -155,9 +154,6 @@ void i8042_mouse_expect_ack (void)
     return;
     //return 0;
 }
-
-
-
 
 static void __initialize_mouse_position(void)
 {
@@ -478,6 +474,7 @@ void ps2mouse_initialize_device(void)
     file *fp;
 
     debug_print ("ps2mouse_initialize_device:\n");
+
     PS2Mouse.initialized = FALSE;
     PS2Mouse.irq_is_working = FALSE;
     PS2Mouse.use_polling = FALSE;
@@ -489,7 +486,7 @@ void ps2mouse_initialize_device(void)
 // create file.
     fp = (file *) kmalloc( sizeof(file) );
     if ((void *) fp == NULL){
-        panic("ps2-mouse: fp\n");
+        panic("ps2mouse.c: fp\n");
     }
     memset ( fp, 0, sizeof(file) );
     fp->used = TRUE;
@@ -507,17 +504,17 @@ void ps2mouse_initialize_device(void)
 // fp, pathname, class, type, pcidevice?, ttydevice?
 
 // #test
-// Registrando o dispositivo.
+// Register the device.
     devmgr_register_device ( 
         (file *) fp, 
-        "PS2-MOUSE",       // pathname 
+        "PS2-MOUSE",         // pathname 
         DEVICE_CLASS_CHAR,   // class (char, block, network)
         DEVICE_TYPE_LEGACY,  // type (pci, legacy)
         NULL,                // Not a pci device.
         NULL );              // Not a tty device. (not for now)
 //====================================
 
-// pointer.
+// Pointer
     __initialize_mouse_position();
 
 //++
@@ -546,7 +543,7 @@ void ps2mouse_initialize_device(void)
 // I8042_READ = 0x20
 
     wait_then_write(0x64,I8042_READ);
-    status = wait_then_read(0x60) | 2;
+    status = (wait_then_read(0x60) | 2);
 
 // Dizemos para o controlador entrar no modo escrita.
 // Esperamos para escrever e escrevemos.
@@ -557,7 +554,6 @@ void ps2mouse_initialize_device(void)
     wait_then_write (0x64,I8042_WRITE);   // I8042_WRITE = 0x60
     wait_then_write (0x60,status);   
     
-
 // ========================================
 // Activate mouse port. (2nd port)
 
@@ -576,7 +572,7 @@ void ps2mouse_initialize_device(void)
 // 0xA7 Disable Mouse
 // 0xA9 Check Mouse InterfaceReturns 0, if OK
 
-    // Enable mouse.
+// Enable mouse
     wait_then_write(0x64,0xA8);
     i8042_mouse_expect_ack();
 
@@ -589,54 +585,44 @@ void ps2mouse_initialize_device(void)
     i8042_mouse_write(0xFF); 
     i8042_mouse_expect_ack();
 
-// ========================================
-// Default
+// Default settings
 // 0xF6 Set default settings.
     i8042_mouse_write (__PS2MOUSE_SET_DEFAULTS);
     i8042_mouse_expect_ack();
 
-// ========================================
-// set sample rate
+// Set sample rate
 // Sampling Rate: Packets the mouse can send per second.
     i8042_mouse_write(0xF3);
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
     i8042_mouse_write(PS2MOUSE_DEFAULT_SAMPLERATE);  //200
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
     PS2Mouse.sample_rate = PS2MOUSE_DEFAULT_SAMPLERATE;
 
-// ========================================
-// set resolution
+// Set resolution
 // Resolution: DeltaX or DeltaY for each millimeter of mouse movement.
     i8042_mouse_write(__PS2MOUSE_SET_RESOLUTION);
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
     i8042_mouse_write(PS2MOUSE_RESULUTION);  //0~3
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
-// ========================================
-// set scaling 1:1
-// Scaling: 
-// Apply a simple non-linear distortion 
-// to mouse movement.
+// Set scaling 1:1
+// Apply a simple non-linear distortion to mouse movement.
     i8042_mouse_write(0xE6);
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
 
-// ========================================
 // Enable the mouse
     i8042_mouse_write(0xF4);
-    i8042_mouse_expect_ack(); // ACK
-
-// #test
+    i8042_mouse_expect_ack();
 
 //++
 //=================================================
 
-// wheel.
+// wheel
     PS2Mouse.has_wheel = FALSE;
     PS2Mouse.has_five_buttons = FALSE;
 
-// device id.
-// Not initialzied,
+// Device id. (Not initialized)
     PS2Mouse.device_id = -1;
 
 //=============
@@ -666,16 +652,21 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
 0xAB, 0x83	MF2 keyboard
 */
 
-// Pega o device id e faz configurações de wheel.
+//
+// Get the Device ID and setup wheel.
+//
 
 // Get the device id for the first time.
     device_id = (int) __get_device_id();
-    if( device_id == 0xFA ){ 
+    if (device_id == 0xFA){ 
         printk("ps2 mouse: device id fail\n");
     }
     PS2Mouse.device_id = device_id;
-    printk("ps2 mouse: [FIRST TIME] device id %d\n",PS2Mouse.device_id);
 
+    // #debug
+    // printk("ps2 mouse: Device id %d\n",PS2Mouse.device_id);
+
+// Intelligent?
 // Se ele não é inteligente,
 // vamos fazer a inicialização e ver se vira inteligente.
 
@@ -699,10 +690,12 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
 
         // Checando novamente pra ver se ficou inteligente.
         device_id = (int) __get_device_id();
-        if( device_id != 0xFA ){ 
+        if (device_id != 0xFA){ 
             PS2Mouse.device_id = device_id;
         }
-        printk("ps2 mouse: [SECOND TIME] device id %d\n",PS2Mouse.device_id);
+        
+        // #debug
+        // printk("ps2 mouse: Device id %d\n",PS2Mouse.device_id);
     }
 
     // Vamos ver se ficou inteligente depois
@@ -713,7 +706,9 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         PS2Mouse.device_id == PS2MOUSE_INTELLIMOUSE_EXPLORER_ID )
     {
         PS2Mouse.has_wheel = TRUE;
-        printk ("ps2mouse_initialize_device: Mouse wheel enabled!\n");
+        
+        // #debug
+        // printk ("ps2mouse_initialize_device: Mouse wheel enabled!\n");
     } 
 
     // NO, ele ainda é burro.
@@ -722,7 +717,9 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         PS2Mouse.device_id != PS2MOUSE_INTELLIMOUSE_EXPLORER_ID )
     {
         PS2Mouse.has_wheel = FALSE;
-        printk ("ps2mouse_initialize_device: No mouse wheel detected!\n");
+
+        // #debug
+        // printk ("ps2mouse_initialize_device: No mouse wheel detected!\n");
     }
 //=============
 
@@ -751,29 +748,34 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         // Pega novamente para sabermos se e' mouse de id 4
         // e tem 5 botoes.
         device_id = (int) __get_device_id();
-        if( device_id != 0xFA ){ 
+        if (device_id != 0xFA){ 
             PS2Mouse.device_id = device_id;
         }
-        printk("ps2 mouse: [THIRD TIME] device id %d\n",PS2Mouse.device_id);
+
+        // #debug
+        // printk("ps2 mouse: Device id %d\n",PS2Mouse.device_id);
     }
 
     // 4
     if (PS2Mouse.device_id == PS2MOUSE_INTELLIMOUSE_EXPLORER_ID)
     {
         PS2Mouse.has_five_buttons = TRUE;
-        printk("ps2mouse_initialize_device: Mouse has five buttons\n");
+        
+        // #debug
+        // printk("ps2mouse_initialize_device: Mouse has five buttons\n");
     }
 
 //=================================================
 //--
 
-// resolution again
+// Resolution again
     i8042_mouse_write(__PS2MOUSE_SET_RESOLUTION);
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
     i8042_mouse_write(PS2MOUSE_RESULUTION);  //0~3
-    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_expect_ack();
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
+// OK
     PS2Mouse.initialized = TRUE;
 }
 
@@ -862,8 +864,7 @@ void DeviceInterface_PS2Mouse(void)
         return;
 // =============================================
 
-    PS2Mouse.last_jiffy = 
-        (unsigned long) get_systime_totalticks();
+    PS2Mouse.last_jiffy = (unsigned long) get_systime_totalticks();
 
 // Get the byte
     _byte = (unsigned char) in8(0x60);

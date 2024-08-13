@@ -168,7 +168,8 @@ void hv_ps2_full_initialization(void)
     if (HVInfo.initialized != TRUE)
         return;
 
-    printk("hv type: %d\n", HVInfo.type);
+    //#debug
+    //printk("hv type: %d\n", HVInfo.type);
 
 // ---------------
 // TCG - qemu

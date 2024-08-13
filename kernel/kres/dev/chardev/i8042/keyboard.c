@@ -1,10 +1,11 @@
-
 // keyboard.c
 // This is the ps2/keyboard driver, embedded into the kernel base.
 // ps/2 keyboard support.
+// Created by Fred Nora.
+
 // See:
 // https://www.gnu.org/software/libc/manual/html_node/Canonical-or-Not.html
-// Created by Fred Nora.
+
 
 #include <kernel.h>
 
@@ -39,8 +40,7 @@ irq1_KEYBOARD (void)
         return;
     }
     PS2Keyboard.irq_is_working = TRUE;
-    PS2Keyboard.last_jiffy = 
-        (unsigned long) get_systime_totalticks();
+    PS2Keyboard.last_jiffy = (unsigned long) get_systime_totalticks();
 
 // Disable mouse port.
 // Call the main routine.
