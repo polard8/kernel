@@ -638,6 +638,10 @@ void kinguio_i2hex(unsigned int val, char* dest, int len);
 char *kinguio_itoa (int val, char *str);
 int kinguio_printf(const char *fmt, ...);
 int printf(const char *fmt, ...);
+
+int rtl_write(const char *string);
+int rtl_writeln(const char *string);
+
 void kinguio_puts(const char* str);
 int kinguio_vsprintf(char * str,const char * fmt, va_list ap);
 //#define printf  kinguio_printf

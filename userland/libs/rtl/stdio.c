@@ -2468,6 +2468,35 @@ int kinguio_printf(const char *fmt, ...)
     return (int) ret;
 }
 
+int rtl_write(const char *string)
+{
+    if ((void*)string == NULL)
+        goto fail;
+    if (*string == 0)
+        goto fail;
+
+    printf("%s",string);
+    fflush(stdout);
+    return 0;
+fail:
+    return (int) -1;
+}
+
+int rtl_writeln(const char *string)
+{
+    if ((void*)string == NULL)
+        goto fail;
+    if (*string == 0)
+        goto fail;
+
+    printf("%s\n",string);
+    return 0;
+fail:
+    return (int) -1;
+}
+
+
+
 
 //
 // =============================================================
