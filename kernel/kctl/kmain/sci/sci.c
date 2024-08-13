@@ -2359,32 +2359,85 @@ void *sci2 (
         if (t->magic != 1234){
             return NULL;
         }
-        //Giving more credits. But the scheduler will balance
-        //it at the and of the round.
-        //t->quantum = QUANTUM_FIRST_PLANE;
-        t->quantum = (QUANTUM_MAX + 88);
-        t->priority = PRIORITY_MAX;
+        // Redundant (Something is very wrong here)
+        if (arg2 != t->tid){
+            return NULL;
+        }
+        // Invalid state,
+        // We can't give input focus to a thread in zombie state.
+        if (t->state == RUNNING || t->state == READY)
+        {
+            //Giving more credits. But the scheduler will balance
+            //it at the and of the round.
+            //t->quantum = QUANTUM_FIRST_PLANE;
+            t->quantum = (QUANTUM_MAX + 88);
+            t->priority = PRIORITY_MAX;
         
-        //#test
-        //t->signal |= 1<<(SIGALRM-1);
-        //t->signal |= 1<<(SIGKILL-1);
-        
-        foreground_thread = (int) arg2;
-        
-        // #deprecated
-        // it will select the next input reponder.
-        // set_input_responder_tid(foreground_thread);
-        
-        do_credits(foreground_thread);
-        do_credits(foreground_thread);
+            //#test
+            //t->signal |= 1<<(SIGALRM-1);
+            //t->signal |= 1<<(SIGKILL-1);
 
-        // #test: Selecting the timeout thread, that will have priority in the round.
-        // Cutting the round and selecting it as next.
-        //timeout_thread = (struct thread_d *) t;
-        //timeout_thread->waiting_for_timeout = TRUE;
+            foreground_thread = (int) arg2;
+
+            // #deprecated
+            // it will select the next input reponder.
+            // set_input_responder_tid(foreground_thread);
+
+            do_credits(foreground_thread);
+            do_credits(foreground_thread);
+
+            // #test: Selecting the timeout thread, that will have priority in the round.
+            // Cutting the round and selecting it as next.
+            //timeout_thread = (struct thread_d *) t;
+            //timeout_thread->waiting_for_timeout = TRUE;
+        }
 
         return NULL;
     }
+
+    // Lose the input focus.
+    // We don't wanna be the foreground thread anymore.
+    if (number == 10012)
+    {
+        debug_print("sci2: [10012] lose input focus\n");
+        //Change the priority of the old foreground thread?
+        //set_thread_priority( threadList[foreground_thread], PRIORITY_NORMAL);
+        if (arg2<0 || arg2>=THREAD_COUNT_MAX)
+        {
+            return NULL;
+        }
+        t = (struct thread_d *) threadList[arg2];
+        if ((void*) t == NULL){
+            return NULL;
+        }
+        if (t->used != TRUE){
+            return NULL;
+        }
+        if (t->magic != 1234){
+            return NULL;
+        }
+        // Redundant (Something is very wrong here)
+        if (arg2 != t->tid){
+            return NULL;
+        }
+        // Invalid state
+        if (t->state == DEAD){
+            return NULL;
+        }
+        // Invalid state
+        if (t->state == ZOMBIE){
+            return NULL;
+        }
+        if (t->state == RUNNING || t->state == READY)
+        {
+            if (arg2 == foreground_thread){
+                foreground_thread = -1;
+            }
+        }
+
+        return NULL;
+    }
+
 
 // Get Init PID
     if (number == 10020){ 
