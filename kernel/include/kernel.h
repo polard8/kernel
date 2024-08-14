@@ -326,8 +326,9 @@
 #include "../kctl/kmain/layers.h"
 // Syscalls: (Called by the interrups 0x80, 0x81, 0x82, 0x83).
 #include "../kctl/kmain/sci/syscalls.h"
+
 // zero. (Used during the kernel initialization)
-#include "../kctl/kmain/cali/zero.h"
+#include "../kctl/kmain/overall/zero.h"
 
 // ==================================
 // ke/
@@ -337,7 +338,11 @@
 // ==================================
 // virt/
 // Project California
-#include "../kctl/kmain/cali/cali.h"
+#include "../kctl/kmain/overall/cali.h"
+
+// cgroups and namespaces
+#include "../kctl/cont/cg.h"
+#include "../kctl/cont/ns.h"
 
 // Main kernel controller header.
 #include "../kctl/kctl.h"

@@ -89,6 +89,7 @@ objects-y += i3_kmain.o
 
 # ========================
 # :: kres - Kernel resources
+# We can create interfaces that belongs to a given cgroup.
 objects-y += j1_dev.o  
 objects-y += j2_fs.o  
 objects-y += j3_gramk.o  

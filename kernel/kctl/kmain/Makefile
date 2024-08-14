@@ -95,31 +95,30 @@ kmain.o
 
 all:
 
-	$(CC) -c globals.c $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
+# Module manager.
+	$(CC) -c mod/mod.c     $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o
+	$(CC) -c mod/public.c  $(KERNEL_INCLUDE) $(CFLAGS) -o public.o
 
 # Overall routines.
-	$(CC) -c cali/debug.c    $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o
-	$(CC) -c cali/info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
-	$(CC) -c cali/panic.c    $(KERNEL_INCLUDE) $(CFLAGS) -o panic.o  
-	$(CC) -c cali/reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o
-	$(CC) -c cali/request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
-	$(CC) -c cali/system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
-	$(CC) -c cali/zero.c     $(KERNEL_INCLUDE) $(CFLAGS) -o zero.o
-	$(CC) -c cali/cali.c     $(KERNEL_INCLUDE) $(CFLAGS) -o cali.o
+	$(CC) -c overall/debug.c    $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o
+	$(CC) -c overall/info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
+	$(CC) -c overall/panic.c    $(KERNEL_INCLUDE) $(CFLAGS) -o panic.o  
+	$(CC) -c overall/reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o
+	$(CC) -c overall/request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
+	$(CC) -c overall/system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
+	$(CC) -c overall/zero.c     $(KERNEL_INCLUDE) $(CFLAGS) -o zero.o
+	$(CC) -c overall/cali.c     $(KERNEL_INCLUDE) $(CFLAGS) -o cali.o
 
 # System calls support
 	$(CC) -c sci/sys.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
 	$(CC) -c sci/sci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sci.o    
 
-# Module manager.
-	$(CC) -c mod/mod.c     $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o
-	$(CC) -c mod/public.c  $(KERNEL_INCLUDE) $(CFLAGS) -o public.o
-
 # Virtualization routines.
 	$(CC) -c virt/hv.c  $(KERNEL_INCLUDE) $(CFLAGS) -o hv.o
 
 # kmain
-	$(CC) -c kmain.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
+	$(CC) -c kmain.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
+	$(CC) -c globals.c $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
 
 # ----------------------------------------------
 # link
