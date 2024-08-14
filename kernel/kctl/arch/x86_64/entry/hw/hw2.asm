@@ -205,7 +205,8 @@ _turn_task_switch_on:
     cli 
     mov rax, qword _irq0        ;definitivo
     mov rbx, qword 32
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
     ;recarrega a nova idt (talvez seja necessario)
     ;lidt [IDT_register]
@@ -226,7 +227,8 @@ _turn_task_switch_off:
     cli
     mov rax, qword unhandled_irq
     mov rbx, qword 32
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
     ;status do mecanismo de taskswitch.
     mov qword [_task_switch_status], qword 0    ;LOCKED.

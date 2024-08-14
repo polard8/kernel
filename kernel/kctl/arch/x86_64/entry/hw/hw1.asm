@@ -137,6 +137,12 @@ global _irq0
 _irq0:
 ; Maskable interrupt
 
+    ; #ps:
+    ; Actually we dont need this in hw interrupts,
+    ; because all the IDT entries are using 8E00,
+    ; present, dpl=0, interrupt gate, where the interrupts
+    ; are disabled by default.
+
     cli
 
 ; No caso do dispatcher lançar uma nova thread,

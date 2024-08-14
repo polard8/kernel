@@ -97,7 +97,18 @@ _gdt_flush:
 ;     See: sw.asm
 ;     called by xxxhead.asm
 ;     See: sw.asm
-
+;
+; 0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
+;
+; 0x8E00 - (present, dpl=0, interrupt gate) (disable interrupts)
+; In the case of trap gates the interrupt are not disable,
+; allowing nesting interrupts. 
+;
+; Every interrupt will use
+; 0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
+; It means that it cam be called from ring3 and the interrupts
+; will be disabled.
+;
 setup_idt:
 
     ;pushad
@@ -122,34 +133,10 @@ setup_idt:
     shr rax, 32
     mov dword [d_offset_63_32], eax
 
-    ;; Isso forma os primeiros 32bit da entrada.
-    ;; (offset low and selector)
-    ;mov eax, dword 0x00080000     ; Step1: selector = 0x0008 = cs  na parte alta.
-    ;mov ax, dx                   ; Step2: uma parte do endereço na parte baixa (16 bits)
-    ;mov ax, word  [d_offset_15_0] ; Step2: uma parte do endereço na parte baixa (16 bits)
-
-    ;; #test
-    ;; Se a intenção é nos proteger
-    ;; das interrupções de hardware inesperadas, então devemos
-    ;; configurar a idt semelhante ao jeto que configuramos
-    ;; para as irqs ... já que as interrupções de software
-    ;; só ocorrerão depois de inicializadas as entradas para 
-    ;; system call.
-    ;; #importante: Porém não usaremos eoi ... e apontaremos
-    ;; tudo para unhandled_int e não para umhandled_irq.
-    ;; Ou seja, sem eoi.
-    
-    ;interrupt gate - dpl=0, present
-    ;mov dx, word 0x8E00
-
-    ;; Use this one.
-    ;; obs: 0xEE00 tem funcionado bem para todos os casos.
-    ;mov dx, word 0xEE00
-
     ;; The pointer. 64bit address
     mov rdi, qword _idt
 
-    ;; The counter.
+    ;; The counter
     mov rcx, qword 256
 
 ; loop
@@ -172,6 +159,7 @@ rp_sidt:
     xor rax, rax
     mov ax, word [d_offset_31_16]
     shl rax, 16
+    ;0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
     mov ax, word 0xEE00
     mov dword [rdi+4], eax   
 
@@ -191,7 +179,7 @@ rp_sidt:
     add  rdi, qword 16    ;;  vai pra proxima entrada.
     dec rcx               ;;  decrementa o contador.
 
-    jne rp_sidt           ;; circula
+    jne rp_sidt  ; loop
 
     ; #bugbug
     ; No. We will do this later.
@@ -203,11 +191,13 @@ rp_sidt:
     ;popad
 
     ret
+
 ;Offset address used in the function above.
 d_offset_15_0:  dw 0
 d_offset_31_16: dw 0
 d_offset_63_32: dd 0
 ;;====================================
+
 
 ; =============================================================
 ; _setup_system_interrupt: 
@@ -216,7 +206,19 @@ d_offset_63_32: dd 0
 ; IN:
 ;    rax = endereço. (callback)(endereço do handler)
 ;    rbx = número do vetor (0x80).(número da interrupção.)
-
+;
+; 0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
+;
+; 0x8E00 - (present, dpl=0, interrupt gate) (disable interrupts)
+;
+; In the case of 'trap gates' the interrupt are not disable,
+; allowing nesting interupts.
+;
+; Every interrupt will use
+; >>> 0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
+; It means that it cam be called from ring3 and the interrupts
+; will be disabled.
+;
 global _setup_system_interrupt
 _setup_system_interrupt:
 
@@ -281,6 +283,7 @@ _setup_system_interrupt:
     xor rax, rax
     mov ax, word [address_offset_31_16]
     shl rax, 16
+    ;0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
     mov ax, word 0xEE00
     mov dword [rdi+4], eax
 ;=========================================
@@ -304,6 +307,7 @@ _setup_system_interrupt:
     pop rax
 
     ret
+
 d__address:  dq 0
 d__number:   dq 0
 ;Offset address used in the function above.
@@ -311,6 +315,128 @@ address_offset_15_0:  dw 0
 address_offset_31_16: dw 0
 address_offset_63_32: dd 0
 ;;--
+;=============================================
+
+; =============================================================
+; _setup_system_interrupt: 
+; Configura um vetor da IDT para a interrupção do sistema. 
+; O endereço do ISR e o número do vetor são passados via argumento.
+; IN:
+;    rax = endereço. (callback)(endereço do handler)
+;    rbx = número do vetor (0x80).(número da interrupção.)
+;
+; 0xEE00 - (present, dpl=3, interrupt gate) (disable interrupts)
+;
+; 0x8E00 - (present, dpl=0, interrupt gate) (disable interrupts)
+;
+; In the case of 'trap gates' the interrupt are not disable,
+; allowing nesting interupts.
+;
+; Every interrupt will use
+; >>> 0x8E00 - (present, dpl=0, interrupt gate) (disable interrupts)
+; In the case of trap gates the interrupt are not disable,
+; allowing nesting interrupts. 
+;
+
+; Testing this for hw interrupts.
+global _setup_system_interrupt_hw
+_setup_system_interrupt_hw:
+
+    push rax
+    push rbx
+    push rcx
+    push rdx
+
+; Endereço e índice na tabela.
+    mov qword [__d__address], rax  ; Endereço. 64bit
+    mov qword  [__d__number], rbx  ; Número do vetor.
+
+; Calcula o deslocamento.
+    xor rax, rax
+    mov rax, qword  16
+    mov rbx, qword [__d__number]
+    mul rbx
+    ; O resuldado está em rax.
+; Adiciona o deslocamento à base rdi.
+; A base é o início da idt.
+; lembra? O resultado estava em rax.
+    mov rdi, qword _idt
+    add rdi, rax
+
+; Agora rdi contém o endereço de memória
+; dentro da idt, onde desejamos contruir a entrada.
+
+; Lidando com o endereço.
+; Salva o endereço de 64bit em rdx.
+    mov rdx, qword [__d__address] 
+; low 16 
+    mov rax, rdx 
+    mov word  [__address_offset_15_0],  ax
+; high 16
+    mov rax, rdx
+    shr rax, 16
+    mov word  [__address_offset_31_16], ax
+; high 32
+    mov rax, rdx
+    shr rax, 32
+    mov dword [__address_offset_63_32], eax
+
+;------------------
+; Lembre-se: 
+; rdi contém o endereço de memória
+; dentro da idt, onde desejamos contruir a entrada.
+; #bugbug
+; Nao sei se essa operação eh possivel,
+; mas queremos mover de double em double
+; #bugbug
+; Checar o que representa esse seletor.
+
+;==========================
+; Primeiros 32 bits. 
+; (offset low and selector)
+    xor rax, rax
+    mov eax, dword 0x00080000            ; Step1: selector = 0x0008 = cs  na parte alta.
+    mov ax, word  [__address_offset_15_0]  ; Step2: uma parte do endereço na parte baixa (16 bits)
+    mov dword [rdi+0], eax
+;=========================================
+; segundos 32 bit.
+    xor rax, rax
+    mov ax, word [__address_offset_31_16]
+    shl rax, 16
+    ;0x8E00 - (present, dpl=0, interrupt gate) (disable interrupts)
+    mov ax, word 0x8E00
+    mov dword [rdi+4], eax
+;=========================================
+; terceiros 32 bit.
+    xor rax, rax
+    mov eax, dword [__address_offset_63_32]
+    mov dword [rdi+8], eax
+;=========================================
+; quartos 32 bit.
+    xor rax, rax
+    mov dword [rdi+12], eax
+;-----------------
+
+; Do not load.
+; recarrega a nova idt
+    ;lidt [IDT_register]
+
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+
+    ret
+
+__d__address:  dq 0
+__d__number:   dq 0
+;Offset address used in the function above.
+__address_offset_15_0:  dw 0
+__address_offset_31_16: dw 0
+__address_offset_63_32: dd 0
+;;--
+;=============================================
+
 
 ;=============================================
 ; setup_faults:
@@ -318,9 +444,14 @@ address_offset_63_32: dd 0
 ; hw interrupts:
 ; see: hw1.asm
 
+; using 0xEE00
+; present, dpl=3, interrupt gate
+; Interrupts desabled.
+
 setup_faults:
     push rax
     push rbx
+
 ;#0
     mov rax, qword _fault_N0
     mov rbx, qword 0
@@ -449,6 +580,7 @@ setup_faults:
     mov rax, qword _fault_N31
     mov rbx, qword 31
     call _setup_system_interrupt
+
     pop rbx
     pop rax
     ret  
@@ -459,54 +591,71 @@ setup_faults:
 ; hw interrupts:
 ; see: hw1.asm
 
+
 setup_vectors:
 
     push rax
     push rbx 
 
+; using 0x8E00
+; present, dpl=0, interrupt gate
+
 ; 32 - Timer.
 ; Iniciamos um timer provisório, depois iniciaremos o definitivo.
+; Recreating this entry in _turn_task_switch_on() in hw2.asm.
     mov rax,  qword unhandled_irq
     mov rbx,  qword 32
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
 ; 33 - PS2 Keyboard.
 ; See: unit1hw.asm
     mov rax,  qword _irq1
     mov rbx,  qword 33
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
 ; 40 - Clock, rtc.
     mov rax,  qword unhandled_irq
     mov rbx,  qword 40
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
 ; fake nic
     ;mov rax,  qword unhandled_irq
     ;mov rbx,  qword 41
     ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
+
 
 ; 44 - PS2 Mouse.
 ; See: unit1hw.asm
     mov rax,  qword _irq12
     mov rbx,  qword 44
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
 ; 46 - ide
 ; irq 14
     mov rax,  qword unhandled_irq
     mov rbx,  qword 46
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
+
 
 ; 47 - ide
 ; irq 15
     mov rax,  qword unhandled_irq
     mov rbx,  qword 47
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
 ;
 ; == System calls ===========================
 ;
+
+; using EE00
+; present, dpl=3, interrupt gate
 
 ; System interrupts
 ; see: sw1.asm
@@ -615,7 +764,8 @@ _asm_nic_create_new_idt_entry:
 
     ;mov rbx, qword [_nic_idt_entry_new_number]
     mov rbx, qword 41  ;32+9
-    call _setup_system_interrupt
+    ;call _setup_system_interrupt
+    call _setup_system_interrupt_hw  ;#testing 0x8E00
 
 ;; #test: 
 ;; Não sei se precisa carregar novamente.

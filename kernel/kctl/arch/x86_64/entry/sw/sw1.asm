@@ -34,7 +34,11 @@ align 4
 global _int128
 _int128:
 
-; #todo: Maybe we can save the stack frame.
+    ; #ps:
+    ; We dont need disable interrupts in our syscalls,
+    ; because all the IDT entries are using EE00,
+    ; present, dpl=3, interrupt gate, where the interrupts
+    ; are disabled by default.
 
     pop qword [.int128_rip]
     pop qword [.int128_cs]
@@ -149,8 +153,11 @@ align 4
 global _int129
 _int129:
 
-; #todo: 
-; Maybe we can save the stack frame.
+    ; #ps:
+    ; We dont need disable interrupts in our syscalls,
+    ; because all the IDT entries are using EE00,
+    ; present, dpl=3, interrupt gate, where the interrupts
+    ; are disabled by default.
 
     pop qword [.int129_rip]
     pop qword [.int129_cs]
@@ -264,7 +271,11 @@ align 4
 global _int130
 _int130:
 
-; #todo: Maybe we can save the stack frame.
+    ; #ps:
+    ; We dont need disable interrupts in our syscalls,
+    ; because all the IDT entries are using EE00,
+    ; present, dpl=3, interrupt gate, where the interrupts
+    ; are disabled by default.
 
     pop qword [.int130_rip]
     pop qword [.int130_cs]
@@ -378,7 +389,11 @@ align 4
 global _int131
 _int131:
 
-; #todo: Maybe we can save the stack frame.
+    ; #ps:
+    ; We dont need disable interrupts in our syscalls,
+    ; because all the IDT entries are using EE00,
+    ; present, dpl=3, interrupt gate, where the interrupts
+    ; are disabled by default.
 
     pop qword [.int131_rip]
     pop qword [.int131_cs]
