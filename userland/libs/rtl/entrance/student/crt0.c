@@ -179,27 +179,12 @@ void crt0(unsigned long rdi)
     debug_print ("+\n");
 
 
-// Initialize heap support.
-// See: 
-// stdlib/stdlib.c
-
-    int rt_status = -1;  //fail
-    rt_status = (int) stdlibInitializeRT();
-    if (rt_status != 0){
-        // #debug: put char
-        gramado_system_call(65,'e',0,0);
+// Gramado Libc initialization
+// see: rtl.c
+    int c_status = -1;
+    c_status = (int) rtl_cinit();
+    if (c_status<0){
     }
-
-    // Stage 2
-    // #debug: put char
-    //gramado_system_call(65,'2',0,0);
-
-// return void.
-// See: 
-// stdio/stdio.c
-
-    stdioInitialize();
-
 
 // #todo
 // Chamar esse ao invés de chamar os dois acima.

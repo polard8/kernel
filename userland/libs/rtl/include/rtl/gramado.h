@@ -333,5 +333,8 @@ rtl_default_procedure(
     unsigned long long1, 
     unsigned long long2 );
 
+
+int rtl_cinit(void);
+
 #endif
 

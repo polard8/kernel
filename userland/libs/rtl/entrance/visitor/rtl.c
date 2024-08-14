@@ -2416,3 +2416,30 @@ rtl_default_procedure(
     return (int) 0;
 }
 
+// Called by crt0.c
+int rtl_cinit(void)
+{
+// Initialize heap support.
+// See: 
+// stdlib/stdlib.c
+
+    int rt_status = -1;  //fail
+    rt_status = (int) stdlibInitializeRT();
+    if (rt_status != 0){
+        // #debug: put char
+        gramado_system_call(65,'e',0,0);
+    }
+
+    // Stage 2
+    // #debug: put char
+    //gramado_system_call(65,'2',0,0);
+
+// return void.
+// See: 
+// stdio/stdio.c
+
+    stdioInitialize();
+
+    return (int) rt_status;
+}
+
