@@ -1,6 +1,6 @@
-
-// mi.c
-// Maskable interrups
+// x64sc.c
+// Syscall handlers.
+// Called by the Assembler.
 // see: sw1.asm
 
 #include <kernel.h>
@@ -17,7 +17,7 @@ unsigned long sci3_cpl=0;
 
 // This is the handler for the interrupt 0x80.
 // Called by the assembly code.
-void *mi80h ( 
+void *sc80h ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -35,21 +35,21 @@ void *mi80h (
 
     if ( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
     {
-        panic("mi80h: cpl");
+        panic("sc80h: cpl");
     }
 
     if (cpl == 0){
         printk("number=%d\n",number);
         printk("pid=%d\n",current_process);
         //if(current_process != 0){
-            panic("mi80h: cpl 0\n");
+            panic("sc80h: cpl 0\n");
         //}
     }
     if (cpl == 1){
-        panic("mi80h: cpl 1\n");
+        panic("sc80h: cpl 1\n");
     }
     if (cpl == 2){
-        panic("mi80h: cpl 2\n");
+        panic("sc80h: cpl 2\n");
     }
     if (cpl == 3){
         // ok
@@ -61,7 +61,7 @@ void *mi80h (
 
 // This is the handler for the interrupt 0x81.
 // Called by the assembly code.
-void *mi81h ( 
+void *sc81h ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -78,17 +78,17 @@ void *mi81h (
 
     if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
     {
-        panic("mi81h: cpl");
+        panic("sc81h: cpl");
     }
 
     if(cpl == 0){
-        panic("mi81h: cpl 0\n");
+        panic("sc81h: cpl 0\n");
     }
     if(cpl == 1){
-        panic("mi81h: cpl 1\n");
+        panic("sc81h: cpl 1\n");
     }
     if(cpl == 2){
-        panic("mi81h: cpl 2\n");
+        panic("sc81h: cpl 2\n");
     }
     if(cpl == 3){
         // ok
@@ -100,7 +100,7 @@ void *mi81h (
 
 // This is the handler for the interrupt 0x82.
 // Called by the assembly code.
-void *mi82h ( 
+void *sc82h ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -117,17 +117,17 @@ void *mi82h (
 
     if ( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
     {
-        panic("mi82h: cpl");
+        panic("sc82h: cpl");
     }
 
     if (cpl == 0){
-        panic("mi82h: cpl 0\n");
+        panic("sc82h: cpl 0\n");
     }
     if (cpl == 1){
-        panic("mi82h: cpl 1\n");
+        panic("sc82h: cpl 1\n");
     }
     if (cpl == 2){
-        panic("mi82h: cpl 2\n");
+        panic("sc82h: cpl 2\n");
     }
     if (cpl == 3){
         // ok
@@ -139,7 +139,7 @@ void *mi82h (
 
 // This is the handler for the interrupt 0x83.
 // Called by the assembly code.
-void *mi83h ( 
+void *sc83h ( 
     unsigned long number, 
     unsigned long arg2, 
     unsigned long arg3, 
@@ -156,17 +156,17 @@ void *mi83h (
 
     if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
     {
-        panic("mi83h: cpl");
+        panic("sc83h: cpl");
     }
 
     if(cpl == 0){
-        panic("mi83h: cpl 0\n");
+        panic("sc83h: cpl 0\n");
     }
     if(cpl == 1){
-        panic("mi83h: cpl 1\n");
+        panic("sc83h: cpl 1\n");
     }
     if(cpl == 2){
-        panic("mi83h: cpl 2\n");
+        panic("sc83h: cpl 2\n");
     }
     if(cpl == 3){
         // ok
@@ -175,5 +175,4 @@ void *mi83h (
 
     return (void*) sci3(number,arg2,arg3,arg4);
 }
-
 

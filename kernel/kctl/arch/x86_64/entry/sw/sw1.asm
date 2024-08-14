@@ -27,7 +27,7 @@ align 16
 ;     #todo: 
 ;     Maybe we can receive more values using more registers.
 
-extern _mi80h
+extern _sc80h
 extern _sci0_cpl
 ; Capture context
 align 4  
@@ -90,7 +90,7 @@ _int128:
 
     fxsave [__sw_local_fpu_buffer]
 
-    call _mi80h
+    call _sc80h
 
     fxrstor [__sw_local_fpu_buffer]
 
@@ -146,7 +146,7 @@ _int128:
 ;
 ;;-----
 
-extern _mi81h
+extern _sc81h
 extern _sci1_cpl
 ; Capture context
 align 4  
@@ -209,7 +209,7 @@ _int129:
 
     fxsave [__sw_local_fpu_buffer]
 
-    call _mi81h
+    call _sc81h
 
 ;-----------------------
     fxrstor [__sw_local_fpu_buffer]
@@ -264,7 +264,7 @@ _int129:
 ;     Maybe we can receive more values using more registers.
 ;;-----
 
-extern _mi82h
+extern _sc82h
 extern _sci2_cpl
 ; Capture context
 align 4  
@@ -327,7 +327,7 @@ _int130:
 
     fxsave [__sw_local_fpu_buffer]
 
-    call _mi82h
+    call _sc82h
 
 ; ----------------------
     fxrstor [__sw_local_fpu_buffer]
@@ -382,7 +382,7 @@ _int130:
 ;     Maybe we can receive more values using more registers.
 ;;-----
 
-extern _mi83h
+extern _sc83h
 extern _sci3_cpl
 ; Capture context
 align 4  
@@ -445,7 +445,7 @@ _int131:
 
     fxsave [__sw_local_fpu_buffer]
 
-    call _mi83h
+    call _sc83h
 
 ; ----------------------
     fxrstor [__sw_local_fpu_buffer]

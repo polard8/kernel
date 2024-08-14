@@ -331,8 +331,8 @@
 
 // ==================================
 // ke/
-// Maskable interrupts
-#include "../kctl/ke/arch/x86_64/x64mi.h"
+// syscall support
+#include "../kctl/ke/arch/x86_64/x64sc.h"
 
 // ==================================
 // virt/

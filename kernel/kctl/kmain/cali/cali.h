@@ -213,9 +213,6 @@ void I_x64ExecuteInitialProcess(void);
 
 // ===========================
 
-// see: x64nmi.c 
-void x64_nmi(unsigned long number);
-
 // Finalizations support.
 void panic( const char *format, ... );
 void soft_die(void);

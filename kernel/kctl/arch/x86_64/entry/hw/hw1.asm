@@ -1854,7 +1854,7 @@ _fault_N31:
 ; Temos que salvar o contexto,
 ; pois vamos retornar após alguns tipos de fault,
 ; como é o caso de PF.
-extern _x64_nmi
+extern _x64_all_faults
 align 4  
 all_faults:
 
@@ -1912,7 +1912,7 @@ all_faults:
 ; Call c routine in x64nmi.c.
     mov rax, qword [_save_fault_number]
     mov rdi, rax 
-    call _x64_nmi 
+    call _x64_all_faults 
 
 ; FPU
     fxrstor [_context_fpu_buffer]

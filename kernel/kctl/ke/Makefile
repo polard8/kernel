@@ -1,6 +1,6 @@
-
 # ke/
 # Compile all the files and create ar_ke.o
+# Created by Fred Nora.
 
 # Makefile for the kernel executive support.
 # It handles the thread stuff, just like,
@@ -82,7 +82,7 @@ ke.o \
 hal.o \
 apic.o apictim.o ioapic.o \
 pit.o ports64.o rtc.o \
-x64.o x64info.o x64init.o x64mi.o x64nmi.o x64smp.o \
+x64.o x64info.o x64init.o x64sc.o x64fault.o x64smp.o \
 queue.o \
 ts.o dispatch.o spawn.o x64cont.o \
 sched.o schedi.o schedq.o    
@@ -129,11 +129,11 @@ all:
 	$(CC) -c arch/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
 
 # Overview
-	$(CC) -c arch/x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
-	$(CC) -c arch/x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
-	$(CC) -c arch/x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
-	$(CC) -c arch/x86_64/x64mi.c    $(KERNEL_INCLUDE) $(CFLAGS) -o x64mi.o
-	$(CC) -c arch/x86_64/x64nmi.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64nmi.o
+	$(CC) -c arch/x86_64/x64.c       $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
+	$(CC) -c arch/x86_64/x64info.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
+	$(CC) -c arch/x86_64/x64init.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
+	$(CC) -c arch/x86_64/x64sc.c     $(KERNEL_INCLUDE) $(CFLAGS) -o x64sc.o
+	$(CC) -c arch/x86_64/x64fault.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
 
 #--------
 
