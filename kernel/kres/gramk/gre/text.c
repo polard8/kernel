@@ -52,29 +52,3 @@ draw_string (
     };
 }
 
-
-// x_panic:
-// Draw a small red rectangle in the top/left
-// and print a message into it.
-void x_panic( char *string )
-{
-
-// #todo
-// Check the string size?
-
-    backbuffer_draw_rectangle( 0, 0, 200, 28, COLOR_RED, 0 );
-    backbuffer_draw_horizontal_line( 0, 28, 200, COLOR_YELLOW, 0 );
-// string 1
-    draw_string(8,8,COLOR_WHITE,"x_panic: ");
-// string2
-    if ((void*) string != NULL){
-        draw_string(80,8,COLOR_WHITE,string);
-    }
-// done:
-    refresh_screen();
-// A soft place to fall.
-    while(1){ asm("cli"); asm("hlt"); };
-}
-
-
-

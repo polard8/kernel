@@ -337,7 +337,7 @@ void x64_all_faults(unsigned long number)
         // #todo: faults(number,arg1,arg2,arg3).
         case 3: 
             printk("\n");
-            printk ("== 3 ==\n");  
+            printk("== 3 ==\n");  
             save_current_context();
             //show_slots();
             show_reg(current_thread);
@@ -400,19 +400,19 @@ void x64_all_faults(unsigned long number)
             refresh_screen();
             // Esse tipo funciona mesmo antes do console
             // ter sido inicializado.
-            x_panic("x64_all_faults: 13"); 
+            x_panic("x64_all_faults: 13  GP"); 
             break;
 
         // (PF) - Page Fault
         // #todo: Com assembly inline podemos pegar cr2 e cr3.
-        case 14: 
+        case 14:
             printk ("== PF ==\n");  
             //if(user_thread==TRUE){
             //    printk("It's an user thread!\n");
             //}
             show_slots();
             refresh_screen();
-            x_panic("x64_all_faults: 14"); 
+            x_panic("x64_all_faults: 14  PF"); 
             break;
 
         // Intel reserved.

@@ -252,10 +252,6 @@ draw_string (
     unsigned int color,
     char *string ); 
 
-// Early panic function.
-// Print a panic message in the early stages.
-void x_panic(char *string);
-
 //
 // line
 //
