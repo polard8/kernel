@@ -76,7 +76,8 @@ KERNEL_INCLUDE := -I $(INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-OBJS = debug.o \
+OBJS = globals.o \
+debug.o \
 info.o \
 panic.o \
 reboot.o \
@@ -93,6 +94,8 @@ kmain.o
 
 
 all:
+
+	$(CC) -c globals.c $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
 
 # Overall routines.
 	$(CC) -c cali/debug.c    $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o

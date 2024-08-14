@@ -171,6 +171,10 @@ extern int g_extraheap2_initialized;
 extern unsigned long g_extraheap3_size;
 extern int g_extraheap3_initialized;
 
+
+// see: globals.c
+extern int has_booted;
+
 #endif   
 
 //

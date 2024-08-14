@@ -1,8 +1,7 @@
-
 # mm/
 # Compile all the files and create ar_mm.o
-
 # Makefile for the kernel memory manager.
+# Created by Fred Nora.
 
 INCLUDE = ../../include
 
@@ -69,9 +68,7 @@ KERNEL_INCLUDE := -I $(INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-# Everything is a file.
-OBJS = globals.o \
-mmsize.o \
+OBJS = mmsize.o \
 mmusage.o \
 mm.o \
 mminfo.o \
@@ -83,8 +80,6 @@ mmft.o
 
 
 all:
-	$(CC) -c globals.c $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
-
 	$(CC) -c mmsize.c   $(KERNEL_INCLUDE) $(CFLAGS) -o mmsize.o
 	$(CC) -c mmusage.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mmusage.o
 	$(CC) -c mm.c       $(KERNEL_INCLUDE) $(CFLAGS) -o mm.o

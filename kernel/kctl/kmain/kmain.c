@@ -649,6 +649,9 @@ void I_kmain(int arch_type)
 
     __failing_kernel_subsystem = KERNEL_SUBSYSTEM_INVALID;
 
+
+    has_booted = FALSE;
+
 // Setup debug mode.
 // Enable the usage of the serial debug.
 // It is not initialized yet.

@@ -726,6 +726,9 @@ void I_x64ExecuteInitialProcess(void)
 // Here is where the boot routine ends.
     system_state = SYSTEM_RUNNING;
 
+// The kernel has booted.
+    has_booted = TRUE;
+
 // =============
 // Fly!
 // #important:

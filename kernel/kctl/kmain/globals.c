@@ -57,6 +57,9 @@ int current_arch = CURRENT_ARCH_X86_64;
 // GRAMADO_JAIL, GRAMADO_P1 ...
 int current_mode=0;
 
+// The kernel has booted.
+// see: x86init.c
+int has_booted = FALSE;
 
 //
 // System state

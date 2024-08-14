@@ -235,8 +235,7 @@ void *sci0 (
 
 // ---------------------------------
 // Thread
-    if ( current_thread<0 || 
-         current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread<0 || current_thread >= THREAD_COUNT_MAX )
     { 
         return NULL;
     }
@@ -1839,8 +1838,7 @@ void *sci1 (
 
 // #test
 // ---------------------------------
-    if ( current_thread<0 || 
-         current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread<0 || current_thread >= THREAD_COUNT_MAX )
     { 
         return NULL; 
     }
@@ -1954,8 +1952,7 @@ void *sci2 (
 
 // #test
 // ---------------------------------
-    if ( current_thread<0 || 
-         current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread<0 || current_thread >= THREAD_COUNT_MAX )
     { 
         return NULL;
     }
@@ -2663,8 +2660,7 @@ void *sci3 (
 
 // #test
 // ---------------------------------
-    if ( current_thread<0 || 
-         current_thread >= THREAD_COUNT_MAX )
+    if ( current_thread<0 || current_thread >= THREAD_COUNT_MAX )
     { 
         return NULL;
     }
