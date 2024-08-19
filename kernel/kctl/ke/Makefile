@@ -131,7 +131,6 @@ all:
 # Overview
 	$(CC) -c hal/x86_64/x64.c       $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
 	$(CC) -c hal/x86_64/x64info.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
-	$(CC) -c hal/x86_64/x64init.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
 	$(CC) -c hal/x86_64/x64sc.c     $(KERNEL_INCLUDE) $(CFLAGS) -o x64sc.o
 	$(CC) -c hal/x86_64/x64fault.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
 
@@ -139,11 +138,13 @@ all:
 	$(CC) -c hal/hal.c    $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
 
 #--------
-	$(CC) -c intake/queue.c  $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
+# intake
+# Microkernel. 'Cause it's all about process and thread.
+	$(CC) -c intake/queue.c    $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
+	$(CC) -c intake/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
 
 #--------
 	$(CC) -c ke.c     $(KERNEL_INCLUDE) $(CFLAGS) -o ke.o
-
 
 # link
 	$(LD) -r -o i2_ke.o $(OBJS)
