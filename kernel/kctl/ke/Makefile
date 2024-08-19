@@ -91,7 +91,7 @@ sched.o schedi.o schedq.o
 all:
 
 # ---------------------
-# intake/
+# intake/  (The MICROKERNEL)
 # process, thread, dispatcher and scheduler.
 
 	$(CC) -c intake/msg.c      $(KERNEL_INCLUDE) $(CFLAGS) -o msg.o
@@ -112,34 +112,38 @@ all:
 	$(CC) -c intake/sched/schedq.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedq.o  
 
 # ---------------------
-# arch/x86_64/
+# hal/x86_64/ (HAL)
 
-	$(CC) -c arch/x86_64/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hal/x86_64/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
 
 # SMP support
-	$(CC) -c arch/x86_64/smp/apic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
-	$(CC) -c arch/x86_64/smp/apictim.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apictim.o
-	$(CC) -c arch/x86_64/smp/ioapic.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
-	$(CC) -c arch/x86_64/smp/x64smp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64smp.o
+	$(CC) -c hal/x86_64/smp/apic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
+	$(CC) -c hal/x86_64/smp/apictim.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apictim.o
+	$(CC) -c hal/x86_64/smp/ioapic.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
+	$(CC) -c hal/x86_64/smp/x64smp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64smp.o
 
 # Legacy low level stuff
-	$(CC) -c arch/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
-	#$(CC) -c arch/x86_64/pic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
-	$(CC) -c arch/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
-	$(CC) -c arch/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c hal/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
+	#$(CC) -c hal/x86_64/pic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
+	$(CC) -c hal/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c hal/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
 
 # Overview
-	$(CC) -c arch/x86_64/x64.c       $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
-	$(CC) -c arch/x86_64/x64info.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
-	$(CC) -c arch/x86_64/x64init.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
-	$(CC) -c arch/x86_64/x64sc.c     $(KERNEL_INCLUDE) $(CFLAGS) -o x64sc.o
-	$(CC) -c arch/x86_64/x64fault.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
+	$(CC) -c hal/x86_64/x64.c       $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
+	$(CC) -c hal/x86_64/x64info.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
+	$(CC) -c hal/x86_64/x64init.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
+	$(CC) -c hal/x86_64/x64sc.c     $(KERNEL_INCLUDE) $(CFLAGS) -o x64sc.o
+	$(CC) -c hal/x86_64/x64fault.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
 
 #--------
+	$(CC) -c hal/hal.c    $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
 
-	$(CC) -c queue.c  $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
+#--------
+	$(CC) -c intake/queue.c  $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
+
+#--------
 	$(CC) -c ke.c     $(KERNEL_INCLUDE) $(CFLAGS) -o ke.o
-	$(CC) -c hal.c    $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
+
 
 # link
 	$(LD) -r -o i2_ke.o $(OBJS)

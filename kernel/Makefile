@@ -2,7 +2,7 @@
 # Makefile for the Gramado kernel.
 
 # Tools
-include kctl/arch/x86_64/makeinc
+include karch/x86_64/makeinc
 
 linkTarget = KERNEL.BIN
 
@@ -16,7 +16,7 @@ linkFlags := -m elf_x86_64 \
 -s \
 -x \
 -static \
--T kctl/arch/x86_64/link.ld   
+-T karch/x86_64/link.ld   
 
 #
 # Config
@@ -81,8 +81,11 @@ CFLAGS := \
 # Objects
 
 # ========================
-# :: kctl - Resource controllers.
+# :: karch - entrypoint and assembly files.
 objects-y := head_64.o 
+
+# ========================
+# :: kctl - Resource controllers.
 objects-y += i1_clibs.o  
 objects-y += i2_ke.o  
 objects-y += i3_kmain.o  
@@ -108,8 +111,8 @@ clean
 # Resource controllers.
 k1:
 	@echo "Compiling: Compiling k1"
-# Kernel arch - Startup and entry code.
-	$(Q)$(MAKE) -C kctl/arch/x86_64/
+# Kernel karch - Startup and entry code.
+	$(Q)$(MAKE) -C karch/x86_64/
 # kernel libraries
 	$(Q)$(MAKE) -C kctl/clibs/
 # main component. (cpu)
@@ -142,7 +145,7 @@ clean-all:
 	rm -rf kctl/*.o   
 	rm -rf kres/*.o   
 
-	rm -rf kctl/arch/*.o   
+	rm -rf karch/*.o   
 	rm -rf kctl/clibs/*.o   
 	rm -rf kctl/ke/*.o   
 	rm -rf kctl/kmain/*.o   

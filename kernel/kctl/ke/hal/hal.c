@@ -12,8 +12,79 @@
 //extern unsigned long idt;
 //extern unsigned long tss;
 
-
 extern void asm_reboot(void);
+
+// hw interrupt breakers.
+// see: 
+// breaker.h 
+// x86 - hw.asm
+// ...
+
+// timer interrupt
+// kdrivers/timer.c
+int __breaker_timer_initialized=0;
+
+// ps2 keyboard
+// x/i8042/ps2kbd.c
+int __breaker_ps2keyboard_initialized=0;
+
+// Serial ports.
+// See: kdrivers/serial.c
+int __breaker_com1_initialized=0;
+int __breaker_com2_initialized=0;
+int __breaker_com3_initialized=0;
+int __breaker_com4_initialized=0;
+
+// real time clock
+// kdrivers/rtc.c
+int __breaker_rtc_initialized=0;
+
+// ps2 mouse
+// x/i8042/ps2mouse.c
+int __breaker_ps2mouse_initialized=0;
+
+// ata
+// kdrivers/ide/ata.c
+int __breaker_ata1_initialized=0;
+int __breaker_ata2_initialized=0;
+
+//...
+
+
+//
+// see: pints.h
+//
+
+// #todo:
+// Create a structure.
+
+
+//See:  gde_serv.c 
+unsigned long g_profiler_ints_gde_services=0;
+
+
+//
+// Legacy hardware interrupts (irqs) (legacy pic)
+//
+
+unsigned long g_profiler_ints_irq0=0;  // kdrivers/timer.c
+unsigned long g_profiler_ints_irq1=0;  // x/i8042/keyboard.c
+unsigned long g_profiler_ints_irq2=0;  // cascade.
+unsigned long g_profiler_ints_irq3=0;  //
+unsigned long g_profiler_ints_irq4=0;  //
+unsigned long g_profiler_ints_irq5=0;  //
+unsigned long g_profiler_ints_irq6=0;  //
+unsigned long g_profiler_ints_irq7=0;  //
+
+unsigned long g_profiler_ints_irq8=0;   // kdrivers/rtc.c
+unsigned long g_profiler_ints_irq9=0;   // kdrivers/network/nicintel.c
+unsigned long g_profiler_ints_irq10=0;  //
+unsigned long g_profiler_ints_irq11=0;  //
+unsigned long g_profiler_ints_irq12=0;  // x/i8042/mouse.c
+unsigned long g_profiler_ints_irq13=0;  //
+unsigned long g_profiler_ints_irq14=0;  // kdrivers/kdrivers/ide/atairq.c
+unsigned long g_profiler_ints_irq15=0;  // kdrivers/kdrivers/ide/atairq.c
+
 
 // not used?
 // processors count

@@ -39,9 +39,14 @@
 
 // ==================================
 // ke/
-#include "../kctl/ke/gspin.h"
-#include "../kctl/ke/gwd.h"     // whatch dogs.
-#include "../kctl/ke/pints.h"   // profiler
+#include "../kctl/ke/intake/gspin.h"
+
+// ===============================
+#include "../kctl/ke/hal/x86_64/gwd.h"     // whatch dogs.
+#include "../kctl/ke/hal/pints.h"   // profiler
+
+
+// ===============================
 #include "../kctl/ke/kinit.h"   // kernel initialization.
 
 // ===============================
@@ -53,7 +58,7 @@
 // ==================================
 // ke/
 // Gramado configuration.
-#include "../kctl/ke/jiffies.h"
+#include "../kctl/ke/hal/jiffies.h"
 
 // ==================================
 // dev/
@@ -92,7 +97,7 @@
 // ==================================
 // ke/
 // Globals. PIDs support.
-#include "../kctl/ke/kpid.h"
+#include "../kctl/ke/intake/kpid.h"
 
 // ==================================
 // mm/
@@ -115,38 +120,31 @@
 
 // ==================================
 // ke/
+
 // hal
-#include "../kctl/ke/ports64.h"
-#include "../kctl/ke/cpu.h"
-#include "../kctl/ke/arch/x86_64/tss.h"
-#include "../kctl/ke/arch/x86_64/x64gdt.h"
-#include "../kctl/ke/arch/x86_64/x64.h"
-#include "../kctl/ke/detect.h"
+#include "../kctl/ke/hal/x86_64/ports64.h"
+#include "../kctl/ke/hal/x86_64/cpu.h"
+#include "../kctl/ke/hal/x86_64/tss.h"
+#include "../kctl/ke/hal/x86_64/x64gdt.h"
+#include "../kctl/ke/hal/x86_64/x64.h"
+#include "../kctl/ke/hal/detect.h"
 // ==================================
 
-// hv
+// virt/
 #include "../kctl/kmain/virt/hv.h"
-// hal cpu
-#include "../kctl/ke/arch/x86_64/cpuid.h"
-#include "../kctl/ke/up.h"
 
-#include "../kctl/ke/arch/x86_64/smp/mp.h"
-
-// hal pic/apic/ioapic
-#include "../kctl/ke/arch/x86_64/pic.h"
-
-#include "../kctl/ke/arch/x86_64/smp/apic.h"
-#include "../kctl/ke/arch/x86_64/smp/apictim.h"
-#include "../kctl/ke/arch/x86_64/smp/ioapic.h"
-
-#include "../kctl/ke/breaker.h"
-// hal timers.
-#include "../kctl/ke/arch/x86_64/pit.h"
-#include "../kctl/ke/arch/x86_64/rtc.h"
-// ==================================
-// ke/
-// hal global
-#include "../kctl/ke/hal.h"
+// hal/
+#include "../kctl/ke/hal/x86_64/cpuid.h"
+#include "../kctl/ke/hal/x86_64/up/up.h"
+#include "../kctl/ke/hal/x86_64/smp/mp.h"
+#include "../kctl/ke/hal/x86_64/pic.h"
+#include "../kctl/ke/hal/x86_64/smp/apic.h"
+#include "../kctl/ke/hal/x86_64/smp/apictim.h"
+#include "../kctl/ke/hal/x86_64/smp/ioapic.h"
+#include "../kctl/ke/hal/x86_64/pit.h"
+#include "../kctl/ke/hal/x86_64/rtc.h"
+#include "../kctl/ke/hal/x86_64/breaker.h"
+#include "../kctl/ke/hal/hal.h"
 
 // ==================================
 // dev/
@@ -287,22 +285,19 @@
 // ps
 #include "../kctl/ke/intake/prio.h"     // Priority
 #include "../kctl/ke/intake/quantum.h"  // Quantum
-#include "../kctl/ke/image.h"
-
+#include "../kctl/ke/intake/image.h"
 #include "../kctl/ke/intake/disp/x86_64/x64cont.h"
-
 #include "../kctl/ke/intake/disp/ts.h"
-
-#include "../kctl/ke/tasks.h"
-#include "../kctl/ke/queue.h"
-#include "../kctl/ke/mk.h"
+#include "../kctl/ke/intake/tasks.h"
+#include "../kctl/ke/intake/queue.h"
+#include "../kctl/ke/intake/mk.h"
 #include "../kctl/ke/intake/dispatch.h"
 #include "../kctl/ke/intake/msg.h"
 #include "../kctl/ke/intake/thread.h"
 #include "../kctl/ke/intake/process.h"
-
 #include "../kctl/ke/intake/sched/sched.h"
 #include "../kctl/ke/intake/sched/schedq.h"
+
 
 // Precisa de todos os componentes de ke/
 #include "../kctl/ke/ke.h"
@@ -333,7 +328,7 @@
 // ==================================
 // ke/
 // syscall support
-#include "../kctl/ke/arch/x86_64/x64sc.h"
+#include "../kctl/ke/hal/x86_64/x64sc.h"
 
 // ==================================
 // virt/

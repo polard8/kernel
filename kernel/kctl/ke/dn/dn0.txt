@@ -1,5 +1,11 @@
 
-    Kernel Executive
+    ke - main kernel embedded subsystem.
+    hal - abstraction for the motherboard. (chipset stuff)
+          HAL IS NOT ABOUT DEVICES!
+    intake - Microkernel (threads and processes)
+
+----------------------------------
+
     Process, threads, Wrappers for major system routines
     that can be used by all the other kernel subsystems.
 

@@ -4,13 +4,12 @@
 
 objTARGET := head_64.o    
 
-# (KERNEL_INCLUDE) Used to build the kernel.
-KERNEL_INCLUDE   := -I ../../../include
+KERNEL_INCLUDE   := -I ../../include
 STARTUP_INCLUDE  := -I startup/    
 ENTRY_INCLUDE    := -I entry/    
 INCLUDES := $(KERNEL_INCLUDE) $(STARTUP_INCLUDE) $(ENTRY_INCLUDE)    
 
-DESTINATION_FOLDER := ../../../
+DESTINATION_FOLDER := ../../
 
 AS	= as
 LD	= ld
