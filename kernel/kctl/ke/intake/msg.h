@@ -1,5 +1,7 @@
-
 // msg.h
+// System message support.
+// Messages using the circular queue into the thread structure.
+// Created by Fred Nora.
 
 #ifndef __PS_MSG_H
 #define __PS_MSG_H    1

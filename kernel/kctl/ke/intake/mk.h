@@ -1,5 +1,7 @@
-
 // mk.h
+// 'Intake' is the microkernel component for the kernel base.
+// Created by Fred Nora.
+
 // This is an enbedded module that represents
 // the microkernel components
 // This kernel actually is not a microkernel.

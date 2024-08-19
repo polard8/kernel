@@ -1,4 +1,3 @@
-
 // msgcode.h
 // This is a place for the message codes 
 // in the base kernel.

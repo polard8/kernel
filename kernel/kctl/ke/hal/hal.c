@@ -1,5 +1,7 @@
-
 // hal.c
+// HAL for the x86_64 architecture.
+// Created by Fred Nora.
+
 
 #include <kernel.h>    
 

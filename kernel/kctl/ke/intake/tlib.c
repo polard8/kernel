@@ -1,6 +1,6 @@
-
 // tlib.c
 // Thread library.
+// Created by Fred Nora.
 
 #include <kernel.h>
 

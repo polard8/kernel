@@ -1,5 +1,6 @@
 // image.h
 // The image of a process.
+// Created by Fred Nora.
 
 // Gerenciamento de informações sobre a imagem do processo.
 // coisas como tamanho do arquivo, endereço base de carregamento,

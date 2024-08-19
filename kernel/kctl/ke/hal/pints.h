@@ -1,7 +1,8 @@
 
-// File: pints.h
+// pints.h
 // profiler, interrupts.
 // Variáveis globais para contagem de interrupções.
+// Created by Fred Nora.
 
 #ifndef __KE_PINTS_H
 #define __KE_PINTS_H    1

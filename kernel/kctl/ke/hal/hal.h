@@ -1,5 +1,7 @@
-
 // hal.h
+// HAL for the x86_64 architecture.
+// Created by Fred Nora.
+
 
 #ifndef __KE_HAL_H
 #define __KE_HAL_H    1

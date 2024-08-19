@@ -3,11 +3,17 @@
 
 #include <kernel.h>  
 
+
+int dispatcherType=0;
+int dispatcherQueueIndex=0;
+
 // Contador de dispatch por categoria de dispatch.
 // #todo: Cada processador pode ter uma dessa?
 // See: dispatch.h
 struct dispatch_count_d  *DispatchCountBlock;
 
+
+unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 
 //
 // =====================================

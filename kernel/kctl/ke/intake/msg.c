@@ -1,5 +1,6 @@
 // msg.c
-// Post message and get message.
+// System message support.
+// Messages using the circular queue into the thread structure.
 // Created by Fred Nora.
 
 #include <kernel.h>
