@@ -449,38 +449,30 @@ A conservative approach is to avoid everything above 0x00080000.
 
 // ----------------------------------
 // Frame Table
-#define __128MB_MARK_PA  (0x08000000)
-#define __256MB_MARK_PA  (0x10000000)
-// ::Start
-#define FRAMETABLE_START_PA  \
-    __128MB_MARK_PA
-// ::End
-// 256MB mark less 8MB.
-#define FRAMETABLE_END_PA  \
-    (__256MB_MARK_PA - 0x800000)
-// ----------------------------------
+
+
+// Start
+#define __128MB_MARK_PA      (0x08000000)
+#define FRAMETABLE_START_PA  __128MB_MARK_PA
+
+// End
+// #ps: End at 256MB mark less 8MB.
+#define __256MB_MARK_PA      (0x10000000)
+#define FRAMETABLE_END_PA    (__256MB_MARK_PA - 0x800000)
 
 // -----------------------------------------
 // #warning
 // When the system has 256MB installed
 // the detection routine can detect only 255,
 // because it is not checking the lask MB.
+// #ps:
+// 256 MB mark is free to use when we have 512mb of memory or more.
 // -----------------------------------------
 
+#define WINDOWS_POOL_START_PA  __256MB_MARK_PA
 
-// -----------------------------------------
-// #warning
-// We have some space here.
-// Range of free space (256~511)
-// -----------------------------------------
-
-// #todo
-// Let put something in the mark of 256MB,
-// the frametable ends a little bit earlier.
-
-// #todo
-// Only if the system has 512 MB.
-//#define TEST_REAGION__PA  __256MB_MARK_PA
+// Let's put some windows here.
+// 256/2 = 128 application windows.
 
 
 //

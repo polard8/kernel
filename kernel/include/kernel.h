@@ -105,7 +105,6 @@
 #include "../kres/mm/mmsize.h"
 #include "../kres/mm/x86_64/x64gpa.h"
 #include "../kres/mm/x86_64/x64gva.h"
-#include "../kres/mm/gentry.h"
 #include "../kres/mm/mm.h"
 #include "../kres/mm/memmap.h" 
 #include "../kres/mm/x86_64/intelmm.h"

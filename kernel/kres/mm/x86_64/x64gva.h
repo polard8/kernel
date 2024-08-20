@@ -238,6 +238,8 @@
 // #todo 1GB VA and above ...
 //
 
+// 
+#define WINDOWS_POOL_START_VA  0x100000000
 
 #endif    
 
