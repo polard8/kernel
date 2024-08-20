@@ -1,19 +1,6 @@
-/*
- * File: pit.c 
- * Descrição:
- *     Arquivo principal do driver do PIT. 
- *     Trata a irq0.
- *     Rotinas envolvendo tempo.
- *  Ambiente: 
- *     (RING 0).
- *      Módulo interno, dentro do kernenel base.
- * @todo: Criar funções que criam a estrutura timer ...
- * que será usada peloa aplicativos na forma de objeto .
- * elas devem ter um contador que enviará mensagens para o 
- * aplicativo sempre que se esgota a contagem.
- * History:
- *     2013 - Created by Fred Nora.
- */
+// pit.c
+// Programmable Interval Timer (PIT) - (Intel 8253/8254) 
+// 2013 - Created by Fred Nora.
 
 // See:
 // https://wiki.osdev.org/Programmable_Interval_Timer

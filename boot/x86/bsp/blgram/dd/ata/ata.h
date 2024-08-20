@@ -1,10 +1,12 @@
-// ata.h
+// ata.c
+// ATA/AHCI controller.
+// Environment:
+//     32bit bootloader.
+// History:
+//     2017 - Ported from Sirius OS, BSD-2-Clause License.
+//     This device driver was created by Nelson Cole, for Sirius OS.
+//     2021 - Some new changes by Fred Nora.
 
-// ATA interface.
-// IDE/AHCI
-// Credits:
-//   + Nelson Cole, (Sirius OS)
-//   + Fred Nora - A lot of changes.
 
 // =====================================================================
 //     IDE controller support by Nelson Cole
@@ -35,9 +37,6 @@ extern int ATAFlag;
 // PCI
 //
 
-// Device class
-#define PCI_CLASSE_MASS  1
-
 // Return value when initializing PCI bus.
 #define PCI_MSG_ERROR       -1
 #define PCI_MSG_AVALIABLE   0x80
@@ -64,13 +63,38 @@ extern int ATAFlag;
 #define DMA_PHYS_ADDR3  0xb0000 
 
 //
-// Types of controller
+// PCI CLASS (Mass storage device) 
 //
+
+// Device class
+#define PCI_CLASS_MASS  1
+
+//
+// Subclasses
+//
+
+// Sub-class 01h = IDE Controller
+#define __ATA_CONTROLLER      0x1
+// raid
+#define __RAID_CONTROLLER     0x4
+// Sub-class 05h = ATA Controller with ADMA
+#define __ATA_CONTROLLER_DMA  0x5
+// Sub-class 06h = SATA Controller
+#define __AHCI_CONTROLLER     0x6
 
 #define ATA_IDE_CONTROLLER   0x1
 #define ATA_RAID_CONTROLLER  0x4
 #define ATA_AHCI_CONTROLLER  0x6
 
+#define ATA_SUBCLASS_IDE_CONTROLLER   0x1
+#define ATA_SUBCLASS_RAID_CONTROLLER  0x4
+#define ATA_SUBCLASS_AHCI_CONTROLLER  0x6
+
+// Number of ports.
+#define ATA_NUMBER_OF_PORTS  4
+//#define SATA_NUMBER_OF_PORTS  ?
+
+// ============================================
 
 // IO Space Legacy BARs IDE. 
 #define ATA_IDE_BAR0  0x1F0  // Primary Command Block Base Address.
@@ -227,8 +251,8 @@ struct ata_pci
     _u16 status;
     _u8  prog_if;
     _u8  revision_id;
-    _u8  classe;
-    _u8  subclasse;
+    _u8  class;
+    _u8  subclass;
     _u8  primary_master_latency_timer;
     _u8  header_type;
     _u8  BIST;

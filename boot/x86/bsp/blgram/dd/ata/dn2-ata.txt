@@ -1,0 +1,47 @@
+Credits:
+https://stackoverflow.com/questions/23069881/pci-ide-pata-differences
+
+The terms "IDE", "ATA", and "PATA" get used interchangeably. They generally all refer to a traditional 40/44pin ribbon wire HDD interface. Note that a PCI or PCI Express IDE/ATA/PATA controller can operate in one of two modes:
+
+Legacy Mode - Emulates a legacy ISA bus IDE controller from the original PC. Uses IRQs 14 and 15. IRQs cannot be shared/remapped like a normal PCI device. Only supports a limited number of IDE channels (primary/secondary). Backwards compatible with every Operating System since the dawn of the PC.
+
+Native Mode - Acts like a traditional PCI device. IRQ number is not fixed and may be shared with other PCI devices. Supports an arbitrarty number of controllers in the system. Requires Windows 2000 or later.
+
+With the introduction of SATA, we have another layer of compatibility. SATA controllers can typically be configured for one of two modes:
+
+IDE Mode - Works like a traditional IDE/ATA/PATA controller. Allows backwards compatibility with older operating systems (Windows XP and earlier). Note that in IDE mode, you still might have the choice of Legacy vs Native Mode, listed above.
+
+AHCI Mode - A modern programming interface for SATA controllers. Natively supported by Windows Vista and later.
+
+So, a SATA controller can be:
+
+AHCI Mode
+IDE Mode -> Native
+IDE Mode -> Legacy
+To make things confusing, some BIOSes will refer to IDE mode as "Legacy", and AHCI mode as "Native". Also, not all of the modes listed above will necessarily be available for your chipset/BIOS. Older chipsets may not support AHCI. Some newer chipsets drop support for the older modes. Also, on a motherboard with several SATA ports, there may be a limitation on which ports can be in which mode.
+
+Clear as mud? Great! Now, how does this map to PCI class codes? Under PCI base class 01h (Mass Storage), there are several sub classes defined in the PCI Spec. There are three that are relevant to your question.
+
+Sub-class 01h = IDE Controller
+
+Most IDE/ATA/PATA controllers will use this subclass
+
+So will a SATA controller in IDE Mode
+
+Both Legacy and Native Mode IDE controller will use this subclass. You query other bits in the register map to determine which mode you are in.
+
+Sub-class 05h = ATA Controller with ADMA
+
+This is a special case IDE/ATA controller with special DMA capabilities.
+
+I have never seen an Intel or AMD chipset that uses this sub-class.
+
+Sub-class 06h = SATA Controller
+
+Typically this means a SATA controller in AHCI mode.
+
+However, some early SATA controllers had a proprietary interface.
+
+The Programming Interface register will tell you what mode it is in.
+
+As for Oracle VM, it probably gives you a choice of which mode the "virtual" HDD is presented to the guest Operating System. I do not have a copy in front of me though. Just glancing at the documentation, it looks like there are choices for IDE (not clear if Native/Legacy/AHCI) or SCSI.

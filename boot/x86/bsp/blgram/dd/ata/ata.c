@@ -1,14 +1,12 @@
 // ata.c
-
-/*
- * IDE/AHCI support.
- * Environment:
- *     32bit bootloader.
- * History:
- *     2017 - Ported from Sirius OS, BSD-2-Clause License.
- *     This driver was created by Nelson Cole for Sirius OS.
- *     2021 - Some new changes by Fred Nora.
- */
+// ATA/AHCI controller.
+// 'ATA is the interface' and 'IDE is the protocol'.
+// Environment:
+//     32bit bootloader.
+// History:
+//     2017 - Ported from Sirius OS, BSD-2-Clause License.
+//     This device driver was created by Nelson Cole, for Sirius OS.
+//     2021 - Some new changes by Fred Nora.
 
 // #todo:
 // Rever a tipagem.
@@ -1266,11 +1264,10 @@ __ataWritePCIConfigAddr (
     out32 ( PCI_PORT_DATA, data );
 }
 
-/*
- * __ataPCIConfigurationSpace:
- *     Espa�o de configura�ao PCI Mass Storage
- *     Aqui vamos analisar o tipo de dispositivo.
- */
+// __ataPCIConfigurationSpace:
+// Getting information:
+// Let's fill the structure with some information about the device.
+// Mass storage device only.
 static int 
 __ataPCIConfigurationSpace ( 
     char bus, 
@@ -1298,29 +1295,30 @@ __ataPCIConfigurationSpace (
         ata_pci.device_id );
 
 // ======================================================
-
-// Obtendo informa��es.
-// Classe code, programming interface, revision id.
-// Salvando informa��es.
-// Classe, sub-classe, prog if and revision.
+// Getting information about the PCI device.
+// class, subclass, prog if and revision id.
 
     data = (uint32_t) __ataReadPCIConfigAddr( bus, dev, fun, 8 );
 
-    ata_pci.classe      = data >> 24 & 0xff;
-    ata_pci.subclasse   = data >> 16 & 0xff;
+// Class and subclass
+    ata_pci.class       = data >> 24 & 0xff;
+    ata_pci.subclass    = data >> 16 & 0xff;
+// prog if
     ata_pci.prog_if     = data >>  8 & 0xff;
+// revision id
     ata_pci.revision_id = data       & 0xff;
 
-// #importante:
-// Aqui detectamos o tipo de dispositivo com base 
-// nas informa��es de classe e subclasse.
+// ===========================================
+// Detecting the device subclass base on the information above.
+
 
 //
 //  ## IDE ##
 //
 
     // 1:1 = IDE
-    if ( ata_pci.classe == 1 && ata_pci.subclasse == 1 ){
+    if ( ata_pci.class == PCI_CLASS_MASS && 
+         ata_pci.subclass == ATA_SUBCLASS_IDE_CONTROLLER ){
 
         // IDE
         //#debug
@@ -1380,7 +1378,8 @@ __ataPCIConfigurationSpace (
 //
 
     // 1:4 = RAID
-    }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 4 ){
+    } else if ( ata_pci.class == PCI_CLASS_MASS && 
+                ata_pci.subclass == ATA_SUBCLASS_RAID_CONTROLLER ){
 
         // RAID
         //printf (">>> RAID \n");
@@ -1399,12 +1398,28 @@ __ataPCIConfigurationSpace (
         // Em avaliacao
         return PCI_MSG_AVALIABLE;
 
+
+
+//
+//  ## ATA DMA ## 
+//
+
+    // 1:5 = ATA with dma
+    } else if ( ata_pci.class == PCI_CLASS_MASS && 
+                ata_pci.subclass == __ATA_CONTROLLER_DMA ){
+
+        // #panic
+        printf ("__ataPCIConfigurationSpace: ata.c\n");
+        printf ("class/subclass not supported\n\n");
+        bl_die();
+
 //
 //  ## ACHI ##  SATA
 //
 
     // 1:6 = SATA
-    } else if ( ata_pci.classe == 1 && ata_pci.subclasse == 6 ){
+    } else if ( ata_pci.class == PCI_CLASS_MASS && 
+                ata_pci.subclass == ATA_SUBCLASS_AHCI_CONTROLLER ){
 
         // ACHI
         //#debug
@@ -1458,7 +1473,7 @@ __ataPCIConfigurationSpace (
     // ?:? = Class/subclass not supported.
     } else {
         // #panic
-        printf ("__ataPCIConfigurationSpace: [bl/dd/ide.c]\n");
+        printf ("__ataPCIConfigurationSpace: ata.c\n");
         printf ("class/subclass not supported\n\n");
         bl_die();
     };
@@ -1528,12 +1543,8 @@ done:
     return (PCI_MSG_SUCCESSFUL);
 }
 
-/*
- * __ataPCIScanDevice:
- *     Esta fun��o deve retornar o n�mero de barramento, 
- *     o dispositivo e a fun��o do dispositivo conectado 
- *     ao barramento PCI de acordo a classe.
- */
+// __ataPCIScanDevice:
+// Get the bus/dev/fun for a device given the class.
 static uint32_t __ataPCIScanDevice(int class)
 {
     uint32_t data = -1;
@@ -1723,17 +1734,17 @@ static int __ata_initialize_controller(int ataflag)
 // Talvez essa sondagem pode nos dizer se o dispositivo 
 // é primary/secondary e master/slave.
 
-    //PCI_CLASSCODE_MASS
 
-    data = (_u32) __ataPCIScanDevice(PCI_CLASSE_MASS);
+// Get the bus/dev/fun for a device given the class.
+    data = (_u32) __ataPCIScanDevice(PCI_CLASS_MASS);
 
-// Error.
-    if ( data == -1 )
+// Error
+    if (data == -1)
     {
-        printf ("__ata_initialize_controller: pci_scan_device fail. ret={%d} \n", 
+        printf ("__ata_initialize_controller: pci_scan_device fail. ret={%d}\n", 
             (_u32) data );
 
-        // Abortar.
+        // Abort
         Status = (int) (PCI_MSG_ERROR);
         goto fail;
     }
@@ -1743,24 +1754,34 @@ static int __ata_initialize_controller(int ataflag)
     dev = ( data >> 3 & 31 );
     fun = ( data      & 7 );
 
-// Vamos saber mais sobre o dispositivo enconrtado.
+// ------------------------------
+// Getting information:
+// Let's fill the structure with some information about the device.
+// Mass storage device only.
     data = (_u32) __ataPCIConfigurationSpace( bus, dev, fun );
 
-    // Error.
-    if( data == PCI_MSG_ERROR ){
+// Error
+    if (data == PCI_MSG_ERROR){
 
         printf ("__ata_initialize_controller: Error Driver [%x]\n", data );
         Status = (int) 1;
         goto fail;  
 
-    // ?? Review that flag.
-    // RAID not supported?
-    }else if( data == PCI_MSG_AVALIABLE )
-          {
-              printf ("__ata_initialize_controller: RAID Controller Not supported.\n");
-              Status = (int) 1;
-              goto fail;  
-          };
+// This is a raid controller
+// but it's not supported yet.
+// RAID not supported?
+    }else if (data == PCI_MSG_AVALIABLE){
+
+        //if (ata_pci.subclass == ATA_SUBCLASS_RAID_CONTROLLER)
+            //printf ("__ata_initialize_controller: RAID Controller was found\n");
+
+        printf ("__ata_initialize_controller: RAID Controller Not supported.\n");
+        Status = (int) 1;
+        goto fail;  
+    };
+
+// After call the function above
+// now we have a lot of information into the structure.
 
 // ==============================
 // BARs
@@ -1814,7 +1835,8 @@ static int __ata_initialize_controller(int ataflag)
 
 // =========================
 // Type ATA
-    if ( ata.chip_control_type == ATA_IDE_CONTROLLER ){
+// Sub-class 01h = IDE Controller
+    if (ata.chip_control_type == ATA_IDE_CONTROLLER){
 
         //Soft Reset, defina IRQ
         
@@ -1825,11 +1847,6 @@ static int __ata_initialize_controller(int ataflag)
 
         ata_record_dev = 0xff;
         ata_record_channel = 0xff;
-
-//#ifdef KERNEL_VERBOSE
-        //printf ("Initializing IDE Mass Storage device ...\n");
-        //refresh_screen ();
-//#endif    
 
         // As estruturas de disco ser�o colocadas em 
         // uma lista encadeada.
@@ -1872,42 +1889,30 @@ static int __ata_initialize_controller(int ataflag)
         // #test
         // Nesse hora conseguiremos saber mais informaçoes sobre o dispositivo.
 
-        for ( port=0; port < 4; port++ ){
+        // Let's initilize all the four ports for the ATA controller.
+        for (port=0; port<ATA_NUMBER_OF_PORTS; port++)
+        {
             ide_dev_init(port);
         };
 
 // =========================
 // Type AHCI.
+// Sub-class 06h = SATA Controller
+    } else if (ata.chip_control_type == ATA_AHCI_CONTROLLER){
 
-    }else if( ata.chip_control_type == ATA_AHCI_CONTROLLER ){
+        printf ("__ata_initialize_controller: AHCI not supported\n");
+        bl_die();
 
-            //
-            // Nothing for now !!!
-            //
+// =========================
+// Controller type not supported
+// Not IDE and Not AHCI
+    }else{
+        printf ("__ata_initialize_controller: Controller type not supported\n");
+        bl_die();
+    };
 
-            // Aqui, vamos mapear o BAR5
-            // Estou colocando na marca 28MB
-    
-//#ifdef KERNEL_VERBOSE
-            // printf("ata_initialize: mem_map para ahci\n");
-            // refresh_screen();
-//#endif
 
-              //mem_map( (uint32_t*)0x01C00000, (uint32_t*) ATA_BAR5, 0x13, 2);
-
-              //kputs("[ AHCI Mass Storage initialize ]\n");
-              //ahci_mass_storage_init();
-
-              printf ("__ata_initialize_controller: AHCI not supported\n");
-              bl_die();
-
-          // Panic!
-          }else{
-              printf ("__ata_initialize_controller: IDE and AHCI not found\n");
-              bl_die();
-          };
 // Ok
-
     /*
     // #debug
     // #test
