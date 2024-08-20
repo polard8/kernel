@@ -266,7 +266,7 @@ tss_init (
     struct tss_d *tss, 
     void *stack_address )
 {
-    if ( (void *) tss == NULL ){
+    if ((void *) tss == NULL){
         debug_print ("[x64] tss_init:\n");
         panic       ("[x64] tss_init:\n");
     }

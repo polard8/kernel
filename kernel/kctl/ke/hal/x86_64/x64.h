@@ -7,12 +7,12 @@
 // Interrupt vectors for x64.
 
 /*
-#define X64_INTERRUPT_VECTOR_TIMER       32
-#define X64_INTERRUPT_VECTOR_KEYBOARD    33
-#define X64_INTERRUPT_VECTOR_RTC         40
-#define X64_INTERRUPT_VECTOR_MOUSE       44
-#define X64_INTERRUPT_VECTOR_IDE0        46
-#define X64_INTERRUPT_VECTOR_IDE1        47
+#define X64_INTERRUPT_VECTOR_TIMER      32
+#define X64_INTERRUPT_VECTOR_KEYBOARD   33
+#define X64_INTERRUPT_VECTOR_RTC        40
+#define X64_INTERRUPT_VECTOR_MOUSE      44
+#define X64_INTERRUPT_VECTOR_IDE0       46
+#define X64_INTERRUPT_VECTOR_IDE1       47
 #define X64_INTERRUPT_VECTOR_SYSTEM0   128   //0x80
 #define X64_INTERRUPT_VECTOR_SYSTEM1   129 
 #define X64_INTERRUPT_VECTOR_SYSTEM2   133 
@@ -21,23 +21,19 @@
 // ...
 */
 
-// CR0 bits.
-
+// CR0 bits
 #define CPUX64_CR0_PG  (1 << 31)
 #define CPUX64_CR0_CD  (1 << 30)
 #define CPUX64_CR0_NW  (1 << 29)
 //...
 
-
-// CR4 bits.
-
-#define CPUX64_CR4_MPE (1 << 11)
-#define CPUX64_CR4_PCE (1 <<  8)
-#define CPUX64_CR4_PGE (1 <<  7)
-#define CPUX64_CR4_PAE (1 <<  5)
-#define CPUX64_CR4_PSE (1 <<  4)
+// CR4 bits
+#define CPUX64_CR4_MPE  (1 << 11)
+#define CPUX64_CR4_PCE  (1 <<  8)
+#define CPUX64_CR4_PGE  (1 <<  7)
+#define CPUX64_CR4_PAE  (1 <<  5)
+#define CPUX64_CR4_PSE  (1 <<  4)
 //...
-
 
 
 /*

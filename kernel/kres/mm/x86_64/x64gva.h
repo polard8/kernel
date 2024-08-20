@@ -140,11 +140,11 @@
 
 
 // 768MB + 2MB mark (VA)
-#define FRONTBUFFER_VA  0x0000000030200000
 // Alias
 // Frontbuffer
 // Endereço virtual padrão para o Linear Frame Buffer. (LFB).
 // 768MB + 2MB mark (VA)
+#define FRONTBUFFER_VA  0x0000000030200000
 #define DEFAULT_LFB_VIRTUALADDRESS  FRONTBUFFER_VA 
 #define FRONTBUFFER_ADDRESS         FRONTBUFFER_VA
 
@@ -153,11 +153,11 @@
 //
 
 // 768MB + 4MB mark (VA)
-#define BACKBUFFER_VA   0x0000000030400000
 // Alias
 // Backbuffer
 // Endereço virtual padrão para o BackBuffer. (buffer1)
 // 768MB + 4MB mark (VA)
+#define BACKBUFFER_VA   0x0000000030400000
 #define DEFAULT_BACKBUFFER_VIRTUALADDRESS  BACKBUFFER_VA
 #define BACKBUFFER_ADDRESS                 BACKBUFFER_VA
 

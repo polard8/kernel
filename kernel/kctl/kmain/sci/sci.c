@@ -1080,12 +1080,11 @@ void *sci0 (
 
 // 224
     if (number == SCI_GETTIME){
-        return (void *) get_time();
+        return (void *) hal_get_time();
     }
-
 // 225
     if (number == SCI_GETDATE){
-        return (void *) get_date();
+        return (void *) hal_get_date();
     }
 
 // 226 - get

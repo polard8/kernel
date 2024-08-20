@@ -12,6 +12,12 @@ static void __x_panic_show_message(const char *final_string, unsigned long flags
 // =============================================
 //
 
+// see: bldisp.c
+void refresh_screen(void)
+{
+    bldisp_flush(0);
+}
+
 void gramk_refresh_screen(void)
 {
     refresh_screen();

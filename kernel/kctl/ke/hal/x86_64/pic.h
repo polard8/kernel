@@ -1,15 +1,10 @@
-/*
- * File: pic.h
- * Descrição:
- *     Header para o driver do controlador PIC.
- *     Programmable Interrupt Controller.
- *   Exemplo: 8259A.
- * 2015 - Created by Fred Nora.
- */
+// pic.h
+// 8259A PIC controller device driver.
+// 2015 - Created by Fred Nora.
+
 
 #ifndef ____PIC_H
 #define ____PIC_H    1
-
 
 /* i8259A PIC registers */
 /*
@@ -31,10 +26,9 @@ struct irq_d
 {
     //object_type_t objectType;
     //object_class_t objectClass;
-
-    int id;
     int used;
     int magic;
+    int id;
 
     unsigned long irq_address;      //(hardware.s)
     unsigned long handler_address;  
@@ -45,19 +39,17 @@ struct irq_d
     struct irq_d  *next;
 };
 
+
 struct pic_d
 {
     object_type_t objectType;
     object_class_t objectClass;
-
     int dummy;
-
     // 8 entries for pic controller.
 };
-
 // #todo
 // Put this in pic.c and create an external refrence here.
-struct pic_d *Pic;
+//struct pic_d *Pic;
 
 //
 // == IRQ Handlers =======================================

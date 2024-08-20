@@ -5,18 +5,19 @@
 
 struct rtc_d  *rtc;
 
+static unsigned long __read_cmos_bcd(unsigned reg);
+
 static void DeviceInterface_RTC(void);
 int __rtc_init_datastructure(void);
 
 // ===========================
 
-// read_cmos_bcd:
+// __read_cmos_bcd:
 // Lê da CMOS um determinado registro. 
 // IN:
 // #todo: 
 // Use a type in this parameter.
-
-unsigned long read_cmos_bcd (unsigned reg)
+static unsigned long __read_cmos_bcd (unsigned reg)
 {
 // 64bit
     unsigned long Result=0;
@@ -41,25 +42,25 @@ unsigned long read_cmos_bcd (unsigned reg)
 }
 
 /*
- * get_date: 
+ * rtc_get_date: 
  * Pega a data armazenada na CMOS. 
  * Formato(bytes): YYMD 
  * todo: 
  * Essa função pode ser trabalhada sem riscos ao sistema.
  */
-unsigned long get_date(void)
+unsigned long rtc_get_date(void)
 {
     unsigned long date=0;
 
-    date  = read_cmos_bcd(9);
-    date += read_cmos_bcd(8) * 31;
-    date += read_cmos_bcd(7) * (31*12);
+    date  = __read_cmos_bcd(9);
+    date += __read_cmos_bcd(8) * 31;
+    date += __read_cmos_bcd(7) * (31*12);
 
     return (unsigned long) date;
 }
 
 /*
- * get_time:
+ * rtc_get_time:
  * Pega o horário armazenado na CMOS.
  * Formato: Cada unidade representa 1 segundo. 
  * todo: Essa função pode ser trabalhada sem riscos ao sistema.
@@ -68,13 +69,13 @@ unsigned long get_date(void)
  * Na verdade pode estar funcionando e o relógio da máquina virtual
  * está desatualizado.
  */
-unsigned long get_time(void)
+unsigned long rtc_get_time(void)
 {
     unsigned long time=0;
 
-    time  = read_cmos_bcd(0);
-    time += read_cmos_bcd(2) * 60;
-    time += read_cmos_bcd(4) * (60*60);
+    time  = __read_cmos_bcd(0);
+    time += __read_cmos_bcd(2) * 60;
+    time += __read_cmos_bcd(4) * (60*60);
 
     return (unsigned long) time;
 }
@@ -198,21 +199,22 @@ int __rtc_init_datastructure(void)
 // Global struct
     rtc = (void *) kmalloc( sizeof(struct rtc_d) );
     if ((void *) rtc == NULL){
-        printk("get_cmos_info: rtc\n");
+        printk("__rtc_init_datastructure: rtc\n");
         goto fail;
     }
     memset( rtc, 0, sizeof(struct rtc_d) );
 
     rtc->used = FALSE;
 // Time
-    rtc->Seconds = read_cmos_bcd(0);
-    rtc->Minutes = read_cmos_bcd(2);
-    rtc->Hours   = read_cmos_bcd(4);
+    rtc->Seconds = __read_cmos_bcd(0);
+    rtc->Minutes = __read_cmos_bcd(2);
+    rtc->Hours   = __read_cmos_bcd(4);
 // Date
-    rtc->Year = read_cmos_bcd(9);    
+    rtc->Year = __read_cmos_bcd(9);
     rtc->Year = (2000 + rtc->Year);
-    rtc->Month = read_cmos_bcd(8);    
-    rtc->DayOfMonth = read_cmos_bcd(7);  
+    rtc->Month = __read_cmos_bcd(8);
+    rtc->DayOfMonth = __read_cmos_bcd(7);
+// Validate
     rtc->used = TRUE;
     rtc->magic = 1234;
 
@@ -239,8 +241,7 @@ int __rtc_init_datastructure(void)
 
 fail:
     //free(rtc);
-    refresh_screen();
-    return -1;
+    return (int) -1;
 }
 
 /*
@@ -265,7 +266,7 @@ int DDINIT_rtc(void)
 
     //unsigned long Time, Date;
     //Time = get_time();
-    //Date = get_date();  
+    //Date = rtc_get_date();  
     //printk("CLOCK INFORMATION:\n");
     //printk("Time=%d Date=%d\n", Time, Date);
 

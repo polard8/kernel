@@ -1,5 +1,7 @@
-
 // ports64.h
+// i/o ports for x86_64.
+// Created by Fred Nora.
+
 
 #ifndef __KE_PORTS64_H
 #define __KE_PORTS64_H    1
@@ -11,7 +13,7 @@
 
 // IO Delay
 #define io_delay() \
-    asm ("out %%al,$0x80"::);
+    asm ("out %%al, $0x80"::);
 
 //------------------------------------
 

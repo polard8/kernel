@@ -121,11 +121,28 @@ void hal_mp_idle(void)
 }
 */
 
+void hal_io_delay(void)
+{
+    io_delay();
+}
+
+unsigned long hal_get_date(void)
+{
+    return (unsigned long) rtc_get_date();
+}
+
+unsigned long hal_get_time(void)
+{
+    return (unsigned long)  rtc_get_time();
+}
+
+
 // see: bldisp.c
-void refresh_screen(void)
+void hal_refresh_screen(void)
 {
     bldisp_flush(0);
 }
+
 
 // Monitor vertical sync.
 // See: vsync.c
@@ -287,37 +304,30 @@ void hal_test_speaker(void)
     int i=0;
 
     debug_print ("Testing speaker ...\n");
-
 // beep, wait and stop.
     hal_speaker_on();
-    for(i=0; i<80000; i++){};
+    for (i=0; i<80000; i++)
+    {
+    };
     hal_speaker_off();
 } 
 
-
 /*
- * halInitialize:
- * Initialize kernel base hal.
- *     Archtecture independent inicialization ...
+ * hal_init_cpu:
+ *     Inicializa a estrutura do processador e as coisas associadas a ele.
+ *     Inicializa apenas o que for independente da arquitetura.
+ *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
  */
-// Called by I_Init() in init.c
-// OUT: TRUE if its ok.
-
-int halInitialize(void)
+// #todo 
+// O retorno deve ser int, para refletir o status.
+    
+void hal_init_cpu (void)
 {
-    int Status = FALSE;
-
-    init_cpu();
-// #todo:
-// Chamaremos essa inicialização básica nesse momento.
-// A inicialização completa será chamada pelo processo init.
-    early_timer_init();
-// Detecta fabricantes específicos suportados pelo núcleo.  
-    hal_hardware_detect();
-
-    return TRUE;
+    debug_print("hal_init_cpu: deprecated\n");
+    // See:
+    // init() on init.c
+    // hal_probe_processor_type() on detect.c
 }
-
 
 /*
  * hal_hardware_detect:
@@ -340,45 +350,28 @@ int hal_hardware_detect (void)
 }
 
 /*
- * init_cpu:
- *     Inicializa a estrutura do processador e as coisas associadas a ele.
- *     Inicializa apenas o que for independente da arquitetura.
- *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
+ * halInitialize:
+ * Initialize kernel base hal.
+ *     Archtecture independent inicialization ...
  */
-// #todo 
-// O retorno deve ser int, para refletir o status.
-    
-void init_cpu (void)
+// OUT: TRUE if its ok.
+int halInitialize(void)
 {
-    debug_print("init_cpu: deprecated\n");
-    // See:
-    // init() on init.c
-    // hal_probe_processor_type() on detect.c
+// Called by I_Init() in init.c
+
+    int Status = FALSE;
+
+    // #deprecated
+    //hal_init_cpu();
+
+// #todo:
+// Chamaremos essa inicialização básica nesse momento.
+// A inicialização completa será chamada pelo processo init.
+    early_timer_init();
+
+// Detecta fabricantes específicos suportados pelo núcleo.  
+    hal_hardware_detect();
+
+    return TRUE;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

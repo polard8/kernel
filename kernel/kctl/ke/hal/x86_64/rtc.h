@@ -1,5 +1,6 @@
-
 // rtc.h
+// IRQ 8 – real-time clock (RTC)
+// Created by Fred Nora.
 
 #ifndef __KE_RTC_H
 #define __KE_RTC_H    1
@@ -63,17 +64,15 @@ struct rtc_d
     unsigned long Month;
     unsigned long Year;
 };
-
 extern struct rtc_d *rtc;
+
 
 //
 // == prototypes =======================
 //
 
-unsigned long read_cmos_bcd(unsigned reg);
-
-unsigned long get_date(void);
-unsigned long get_time(void);
+unsigned long rtc_get_date(void);
+unsigned long rtc_get_time(void);
 
 unsigned short rtcGetBaseMemory(void);
 unsigned short rtcGetExtendedMemory(void);

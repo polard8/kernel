@@ -7,6 +7,8 @@
 #ifndef __GRAMK_GRAMK_H
 #define __GRAMK_GRAMK_H    1
 
+
+void refresh_screen(void);
 void gramk_refresh_screen(void);
 void gramk_putchar_in_fgconsole(unsigned long _char);
 

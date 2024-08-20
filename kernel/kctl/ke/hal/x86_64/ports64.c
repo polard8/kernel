@@ -1,6 +1,6 @@
-
 // ports64.c
-// i/o ports for xx86_64.
+// i/o ports for x86_64.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -97,29 +97,27 @@ void wait_ns (int count)
     count /= 100; 
 
     while (--count){
-        io_delay();
+        hal_io_delay();
     };
 }
 
+// #todo: use unsigned long
 void mdelay(int count)
 {
-// #todo
     int i=0;
     for (i=0; i<(count*10000); i++)
     {
-        io_delay();
-        //asm volatile ("nop;");
+        hal_io_delay();
     };
 }
 
+// #todo: use unsigned long
 void udelay(int count)
 {
-// #todo
     int i=0;
     for (i=0; i<(count*10000); i++)
     {
-        io_delay();
-        //asm volatile ("nop;");
+        hal_io_delay();
     };
 }
 
@@ -133,6 +131,10 @@ void udelay(int count)
 unsigned int portsx86_IN ( int bits, unsigned short port )
 {
     unsigned int Value=0;
+
+// #todo:
+// Check validations.
+// Who can call this service?
 
     switch (bits){
     case 8:
@@ -149,8 +151,6 @@ unsigned int portsx86_IN ( int bits, unsigned short port )
         break;
     };
 
-//fail
-    //debug_print ("portsx86_IN: FAIL\n");
     return 0;
 }
 
@@ -167,6 +167,10 @@ portsx86_OUT (
     unsigned int value )
 {
 
+// #todo:
+// Check validations.
+// Who can call this service?
+
     switch (bits){
     case 8:
         out8 ( (unsigned short) port, (unsigned char) (value & 0xFF) );
@@ -181,8 +185,6 @@ portsx86_OUT (
         return;
         break;
     };
-
-    //debug_print ("portsx86_OUT: FAIL\n");
 }
 
 

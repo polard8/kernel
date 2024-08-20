@@ -27,20 +27,16 @@ static int __kill_faulty_process(void)
     pid_t pid=-1;
     tid_t tid=-1;
 
-// The current process
+// The current process and the current thread.
     pid = (pid_t) get_current_process();
-// The current thread.
     tid = (tid_t) current_thread;
 
-//
-// PID
-//
-
-//pid
-    if (pid<0 || pid >= PROCESS_COUNT_MAX)
-        goto fail;
-
+// Process validation
 // We can't close the Kernel process or the Init process.
+    if (pid<0 || pid >= PROCESS_COUNT_MAX)
+    {
+        goto fail;
+    }
     if (pid == GRAMADO_PID_KERNEL){
         goto fail;
     }
@@ -48,69 +44,66 @@ static int __kill_faulty_process(void)
         goto fail;
     }
 
-//
-// Process structure
-//
-
-    p = (void*) processList[pid];
-    if (p->used != TRUE)
-        goto fail;
-    if (p->magic != 1234)
-        goto fail;
-
+// Process validation
 // We can't close the Kernel process or the Init process.
-    if (p == KernelProcess)
+    p = (void*) processList[pid];
+    if (p->used != TRUE){
         goto fail;
-    if (p == InitProcess)
+    }
+    if (p->magic != 1234){
         goto fail;
+    }
+    if (p == KernelProcess){
+        goto fail;
+    }
+    if (p == InitProcess){
+        goto fail;
+    }
 
-//
-// TID
-//
 
-//tid
-    if (tid<0 || tid >= THREAD_COUNT_MAX)
-        goto fail;
+// Thread validation
 // We can't close the Init thread.
 // #bugbug: Change name. The init is NOT a client application.
 // It is just the first ring 3 tid and the idle thread for now.
 // See: create.c
 // The first thread
 // The control thread of the init process.
-    if (tid == INIT_TID)
-        goto fail;
 
-//
-// Thread structure
-//
+    if (tid<0 || tid >= THREAD_COUNT_MAX)
+    {
+        goto fail;
+    }
+    if (tid == INIT_TID){
+        goto fail;
+    }
+
+// Thread validation
+// We can't close the Init thread.
 
     t = (void*) threadList[tid];
-    if (t->used != TRUE)
+    if (t->used != TRUE){
         goto fail;
-    if (t->magic != 1234)
+    }
+    if (t->magic != 1234){
         goto fail;
-
-// We can't close the Iit thread.
-    if (t == InitThread)
+    }
+    if (t == InitThread){
         goto fail;
+    }
 
-//
-// Kill the process
-//
-
-// --------------
 // Destroy the process structure.
+// Destroy the thread structure.
+
     p->magic = 0;
     p->used = FALSE;
-    p=NULL;
-// --------------
-// Destroy the thread structure.
+    p = NULL;
+
     t->magic = 0;
     t->used = FALSE;
     t = NULL;
 
-// OK
     return 0;
+
 fail:
     return (int) -1;
 }

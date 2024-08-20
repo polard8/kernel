@@ -110,7 +110,12 @@ struct hardware_d  *Hardware;
 // == prototypes =================
 //
 
-void refresh_screen(void);
+void hal_io_delay(void);
+
+unsigned long hal_get_date(void);
+unsigned long hal_get_time(void);
+
+void hal_refresh_screen(void);
 void hal_vsync(void);
 
 void hal_set_machine_type(unsigned long type);
@@ -131,9 +136,8 @@ void hal_speaker_off(void);
 // Testando o beep;
 void hal_test_speaker(void);
 
+void hal_init_cpu(void);
 int hal_hardware_detect(void);
-void init_cpu(void);
-
 int halInitialize(void);
 
 #endif    
