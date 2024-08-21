@@ -73,7 +73,7 @@
 
 ;;GRAMADO_DEFAULT_MODE EQU 0x00  ; jail        320x200
 ;;GRAMADO_DEFAULT_MODE EQU 0x01  ; p1          640x480
-GRAMADO_DEFAULT_MODE EQU 0x02  ; home        800x600
+GRAMADO_DEFAULT_MODE EQU  0x02  ; home        800x600
 ;;GRAMADO_DEFAULT_MODE EQU 0x03  ; p2          1024x768
 ;;GRAMADO_DEFAULT_MODE EQU 0x04  ; castle      ??
 ;;GRAMADO_DEFAULT_MODE EQU 0x05  ; california  ??
@@ -90,11 +90,15 @@ GRAMADO_DEFAULT_MODE EQU 0x02  ; home        800x600
 
 ;; 24bpp on qemu
 ;; G_VIDEO_MODE EQU 0x010F    ;320x200
-G_VIDEO_MODE EQU 0x0112    ;640x480
+G_VIDEO_MODE EQU  0x0112    ;640x480
 ;; G_VIDEO_MODE EQU 0x0115    ;800x600
 ;; G_VIDEO_MODE EQU 0x0118    ;1024x768
 ;; ...
 ;; ======================================
+
+
+__FAT_SEGMENT EQU  0x6000  ;0
+__FAT_OFFSET  EQU  0x0200  ;0x1000 
 
 ;; 16 bit:
 ;; Estamos no primeiro setor do BM.BIN, ele começa em 16 bit.
@@ -400,15 +404,22 @@ bootmanager_LOADFAT:
 ; ?? 0:0x1000 
 ; ?? Qual é o segmento e o offset da FAT ??
 
-    mov ax, 0 
+    ;mov ax, 0
+    mov ax, __FAT_SEGMENT
     mov es, ax
+    ;mov bx, 0x1000    ; fat_buffer ; copy FAT above bootcode.
+    mov bx, __FAT_OFFSET
 
 ; Compute location of FAT and store in "ax".
 
     mov ax, WORD [bootmanagerHiddenSectors]    ; adjust for bootsector.
     add ax, WORD [bootmanagerReservedSectors]  ; lba inicial da fat ?.
-    mov cx, 8         ; (apenas 8 setores da fat.) (246/2)  ;; metade da fat  WORD [bootmanagerSectorsPerFAT]
-    mov bx, 0x1000    ; fat_buffer ; copy FAT above bootcode.
+
+; #bugbug
+; Number of sectors from FAT.
+; We need to load 246 sectors.
+    ; WORD [bootmanagerSectorsPerFAT]
+    mov cx, 128  ; 64KB (1 segment)
     call bootmanagerReadSectors
 
 ; Nesse momento ja carregamos a FAT.
@@ -444,7 +455,8 @@ bootmanager_LOADFAT:
 
     push bx 
 
-    mov ax, 0 
+    ;mov ax, 0
+    mov ax, __FAT_SEGMENT
     mov gs, ax 
 
 ;
@@ -465,7 +477,8 @@ bootmanager_LOADIMAGE:
     ;Compute next cluster.
     mov ax, WORD [bootmanagercluster]  ; Identify current cluster.
     add ax, ax                         ; 16 bit(2 byte) FAT entry.
-    mov bx, 0x1000                     ; fat_buffer, offset.
+    ;mov bx, 0x1000                     ; fat_buffer, offset.
+    mov bx, __FAT_OFFSET
     add bx, ax                         ; Index into FAT.
     ;TESTANDO...
     mov dx, WORD [gs:bx]               ; Read two bytes from FAT.
