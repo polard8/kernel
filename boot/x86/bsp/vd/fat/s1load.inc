@@ -265,7 +265,7 @@ LOADFAT:
     mov WORD [cluster], dx 
 
 ; Efetuando o carregamento da fat no buffer es:bx. 
-; 0x17C0:0x0200.
+; 0x6000:0x0200.
 
 ;===================================
 ; #bugbug: 
@@ -274,8 +274,8 @@ LOADFAT:
 ; Estamos carregando apenas metade da fat.
 ; ?? Por que ?? Qual é o problema ??
 ;===================================
-; Read FAT into memory (17C0:0200).
-; Obs: Confiar no cáculo do início da LBA é perigoso, apesar de necessário.
+; Read FAT into memory (0x6000:0200).
+; Obs: Confiar no cálculo do início da LBA é perigoso, apesar de necessário.
 ; Por enquanto vamos determiná-lo.
 ; Obs: É possível confiarmos no cálculo do tamanho da fat, mesmo assim, vamos
 ; por enquanto, determiná-lo.
@@ -295,7 +295,18 @@ LOADFAT:
     mov ax, WORD [HiddenSectors]      ; 5 setores escondidos.
     add ax, WORD [ReservedSectors]    ; 62 setores reservados.
     ; mov  ax, 67                     ; simulando para teste
-    mov  cx,  (246/2) ; WORD [SectorsPerFAT]  ;  Metade da fat.
+    ;mov  cx,  (246/2) ; WORD [SectorsPerFAT]  ;  Metade da fat.
+
+    mov cx, 128 ; 64KB (1 segment)
+
+; #bugbug
+; This is our limit for now, we can't load more than 128 sectors.
+; It causes a lot of problems,
+; 'cause this way can't read the FAT properly, and
+; if the root dir has a lot o entries, maybe we will not be able
+; to find the information about the file we want to load.
+
+
 
 ; #bugbug
 ; Estamos carregando apenas metade da fat.

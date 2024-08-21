@@ -336,7 +336,7 @@ after_menu:
 ;
 
 ; Load the BLGRAM.BIN image at 2000H:0000H.
-; see: feature/disk.inc
+; see: features/disk.inc
 ; This routine starts the system based on a flag,
 ; that will tell us if we start the system using the graphics mode
 ; or we start the 32bit embedded shell here in the bm.

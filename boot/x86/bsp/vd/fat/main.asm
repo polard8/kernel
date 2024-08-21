@@ -66,8 +66,9 @@
 ; but the segments in 0x07C0.
 
 [ORG 0]
-
 [bits 16]
+
+HIDDEN_SECTORS EQU  63
 
 ; Sector 0.
 MBR_main:
@@ -76,9 +77,11 @@ MBR_main:
 ; >> Stage 1. The MBR.
 ;-----------------------------------
     %include "stage1.asm"
+
+eof: 
 ; Padding for setting up the VBR at the right place.
-eof:                                                      ; 
-    times (63*512) - (eof-MBR_main) db 'b' ;63 sec.
+; 63 hidden sectors.
+    times (HIDDEN_SECTORS*512) - (eof-MBR_main) db 'b'
 
 ; ----------------------------------
 ; >> The VBR of the first partition.

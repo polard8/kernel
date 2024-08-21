@@ -3,6 +3,23 @@
 ; Used to load rootdir, fat and images into the system memory.
 ; Created by Fred Nora.
 
+
+__FAT_SEGMENT EQU  0x6000
+__FAT_OFFSET  EQU  0x0200
+
+;---------------------------------------------
+; Fail. 
+; #todo: Colocar uma mensagem de erro.
+bootmanagerFAILURE:
+diskFailure:
+    int 0x18
+    jmp $
+    ;mov  si, bootmanagermsgFailure
+    ;call  String.Print
+    ;mov  ah, 0x00
+    ;int  0x16         ; await keypress
+    ;int  0x19         ; warm boot computer
+
 ;----------------------------------------------   
 ; Simply load the root dir.
 ; 0:0x1000
@@ -107,7 +124,15 @@ entry_address: dw 0
 
 ;---------------------------------------------
 ; Load FAT
-; Where? es:bx  0:0x1000
+; >> This code is in 0:8000h
+; >> We want to load the BL.BIN in 2000h:0000h
+;    and it has at least 32KB in size (64sectors)
+;    1/2 segment
+; ------------------------
+; Old address:              es:bx  0x0000:0x1000
+; Let's tray a new address: es:bx  0x6000:0x0200
+; This new address is far from the BL.bin address.
+; ------------------------
 ; #bugbug
 ; We're not loading the whole FAT table.
 ; Only 8 sectors of 246.
@@ -125,13 +150,18 @@ diskLoadFAT:
 ; ?? Qual é o segmento e o offset da FAT ??
 
     pusha
-    mov ax, 0 
+    mov ax, __FAT_SEGMENT  ;0x6000
     mov es, ax
+    mov bx, __FAT_OFFSET  ;0x0200
+
 ; Compute location of FAT and store in "ax".
     mov ax, WORD [bootmanagerHiddenSectors]    ; adjust for bootsector.
     add ax, WORD [bootmanagerReservedSectors]  ; lba inicial da fat ?.
-    mov cx, 8         ; (apenas 8 setores da fat.) (246/2)  ;; metade da fat  WORD [bootmanagerSectorsPerFAT]
-    mov bx, 0x1000    ; fat_buffer ; copy FAT above bootcode.
+
+; #bugbug
+; Number of sector in FAT.
+; The FAT has 246 sectors, 2 segments
+    mov cx, 128  ; 64KB (1 segment)
     call diskReadSectors  ;bootmanagerReadSectors
     popa
     
@@ -159,7 +189,7 @@ diskLoadImage:
 ; --------------------------------
 ; Ajust FAT segment.
 ; gs:bx para a FAT.
-    mov ax, 0 
+    mov ax, __FAT_SEGMENT  ;0x6000 
     mov gs, ax 
 
 ; Loading the image.
@@ -174,7 +204,7 @@ loop_bootmanager_LOADIMAGE_Sector:
     ;Compute next cluster.
     mov ax, WORD [bootmanagercluster]  ; Identify current cluster.
     add ax, ax                         ; 16 bit(2 byte) FAT entry.
-    mov bx, 0x1000                     ; fat_buffer, offset.
+    mov bx, __FAT_OFFSET  ;0x0200
     add bx, ax                         ; Index into FAT.
     ;TESTANDO...
     mov dx, WORD [gs:bx]               ; Read two bytes from FAT.
@@ -252,18 +282,6 @@ diskLoadBL:
 image_name_pointer: dw 0
 
 ;---------------------------------------------
-    
-; Fail. 
-; #todo: Colocar uma mensagem de erro.
-bootmanagerFAILURE:
-diskFailure:
-    int 0x18
-    jmp $
-    ;mov  si, bootmanagermsgFailure
-    ;call  String.Print
-    ;mov  ah, 0x00
-    ;int  0x16         ; await keypress
-    ;int  0x19         ; warm boot computer
 
 ; bootmanagerReadSectors:
 ;     Reads "cx" sectors from disk starting at "ax" into memory location 

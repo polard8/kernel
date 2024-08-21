@@ -37,6 +37,8 @@ IMAGE_SEGMENT EQU  0x0000
 IMAGE_OFFSET  EQU  0x8000
 
 ; Stack: (0x6000 and 0x7000).
+; Each segment has 64KB, or 128 sectors.
+; So, we need 2 segments for 246 sectors of fat
 ; Different segment from MBR.
 ; Fat has 2 segments. 
 ; When the loader of segments reaches the mark of 0x0000,
