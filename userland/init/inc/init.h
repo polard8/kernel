@@ -14,6 +14,10 @@
 
 #include "endpoint.h"
 
+// Internal library (Creating a template)
+#include "../libinit/libinit.h"
+
+
 struct init_d
 {
 // This structure is initialized.
@@ -33,13 +37,6 @@ struct init_d
 };
 extern struct init_d  Init;
 
-//
-// ==================================================
-//
-
-// See: msgloop.c
-int msgloop_RunServer(void);
-int msgloop_RunServer_HeadlessMode(void);
 
 #endif    
 

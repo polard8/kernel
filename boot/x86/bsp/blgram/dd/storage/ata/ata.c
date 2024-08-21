@@ -23,8 +23,7 @@ IDE can connect up to 4 drives. Each drive can be one of the following:
   ATAPI (Parallel): Commonly used for optical drives.
 */
 
-#include "../../bl.h"
-
+#include "../../../bl.h"
 
 
 // pci support
@@ -73,7 +72,8 @@ int g_current_ide_device=0;   // Master/Slave
 int g_current_ide_port = 0;
 
 
-//see: ide.h
+// see: ata.h
+// #todo: Initialize these structure before using them.
 struct ide_ports_d  ide_ports[4];
 
 unsigned long ide_handler_address=0;
@@ -1626,6 +1626,13 @@ static int __ata_initialize_controller(int ataflag)
     _u8 bus=0;
     _u8 dev=0;
     _u8 fun=0;
+
+// Clear
+// Just to avoid sosme dirty values.
+    bzero( &ide_ports[0], sizeof(struct ide_ports_d) );
+    bzero( &ide_ports[1], sizeof(struct ide_ports_d) );
+    bzero( &ide_ports[2], sizeof(struct ide_ports_d) );
+    bzero( &ide_ports[3], sizeof(struct ide_ports_d) );
 
 // ================================================
 

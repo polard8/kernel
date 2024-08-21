@@ -59,7 +59,6 @@ pages.o heap.o \
 keyboard.o pci.o libata.o ata.o storage.o timer.o \
 fs.o \
 shell.o \
-r_render.o \
 proced.o \
 abort.o \
 faults.o    
@@ -83,9 +82,11 @@ bl-x86:
 	$(CC) -c dd/pci.c         $(myIncludes) $(CFLAGS)  -o pci.o
 	$(CC) -c dd/keyboard.c    $(myIncludes) $(CFLAGS)  -o keyboard.o
 	$(CC) -c dd/timer.c       $(myIncludes) $(CFLAGS)  -o timer.o
-	$(CC) -c dd/ata/libata.c  $(myIncludes) $(CFLAGS)  -o libata.o
-	$(CC) -c dd/ata/ata.c     $(myIncludes) $(CFLAGS)  -o ata.o
-	$(CC) -c dd/storage.c     $(myIncludes) $(CFLAGS)  -o storage.o
+
+	$(CC) -c dd/storage/ata/libata.c  $(myIncludes) $(CFLAGS)  -o libata.o
+	$(CC) -c dd/storage/ata/ata.c     $(myIncludes) $(CFLAGS)  -o ata.o
+	$(CC) -c dd/storage/storage.c     $(myIncludes) $(CFLAGS)  -o storage.o
+
 
 # fs
 	$(CC) -c fs/fs.c      $(myIncludes) $(CFLAGS) -o fs.o
@@ -99,9 +100,6 @@ bl-x86:
 # mm
 	$(CC) -c mm/pages.c $(myIncludes) $(CFLAGS) -o pages.o
 	$(CC) -c mm/heap.c  $(myIncludes) $(CFLAGS) -o heap.o
-
-# render
-	$(CC) -c render/r_render.c $(myIncludes) $(CFLAGS) -o r_render.o
 
 # x86
 	$(CC) -c x86/faults.c $(myIncludes) $(CFLAGS)  -o faults.o

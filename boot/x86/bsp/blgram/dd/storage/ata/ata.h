@@ -97,12 +97,22 @@ extern int ATAFlag;
 // ============================================
 
 // IO Space Legacy BARs IDE. 
-#define ATA_IDE_BAR0  0x1F0  // Primary Command Block Base Address.
-#define ATA_IDE_BAR1  0x3F6  // Primary Control Block Base Address.
-#define ATA_IDE_BAR2  0x170  // Secondary Command Block Base Address.
-#define ATA_IDE_BAR3  0x376  // Secondary Control Block Base Address.
+#define ATA_IDE_BAR0  0x1F0  // (p) Primary Command Block Base Address.
+#define ATA_IDE_BAR1  0x3F6  // (p) Primary Control Block Base Address.
+#define ATA_IDE_BAR2  0x170  // (s) Secondary Command Block Base Address.
+#define ATA_IDE_BAR3  0x376  // (s) Secondary Control Block Base Address.
 #define ATA_IDE_BAR4  0      // Bus Master Base Address.
 #define ATA_IDE_BAR5  0      // Usado pelo AHCI.
+
+/*
+// Read and write registers
+#define REG_CMD_BASE0	0x1F0	// (p) command base register of controller 0 
+#define REG_CMD_BASE1	0x170	// (s) command base register of controller 1 
+#define REG_CTL_BASE0	0x3F6	// (p) control base register of controller 0 
+#define REG_CTL_BASE1	0x376	// (s) control base register of controller 1 
+*/
+
+
 
 // ATA/ATAPI Command Set.
 #define ATA_CMD_CFA_ERASE_SECTORS               0xC0
@@ -267,10 +277,8 @@ struct ata_pci
     _u32 capabilities_pointer;
     _u8  interrupt_line;
     _u8  interrupt_pin;
-
-    // AHCI
 };
-//see: ide.c
+//see: ata.c
 extern struct ata_pci  ata_pci;
 
 // ata:
@@ -332,21 +340,17 @@ extern int g_current_ide_port;
 // 2 secondary master 
 // 3 secondary slave.
 typedef enum {
-
     ideportsPrimaryMaster,      // 0
     ideportsPrimarySlave,       // 1
     ideportsSecondaryMaster,    // 2
     ideportsSecondarySlave      // 3
-
 }ide_ports_t;
 
 typedef enum {
-
     idetypesPrimaryMaster,      // 0
     idetypesPrimarySlave,       // 1
     idetypesSecondaryMaster,    // 2
     idetypesSecondarySlave      // 3
-
 }ide_types_t;
 
 typedef enum {
@@ -359,23 +363,35 @@ typedef enum {
 }ide_device_types_t;
 
 
+// ->state field
+// #define ATA_DEVICE_STATE_INITIALIZING  1000
+// ...
+// #define ATA_DEVICE_STATE_DEAD          2000
+
+
 // IDE ports support
 struct ide_ports_d 
 {
-    uint8_t id;
     int used;
     int magic;
+
+// Identification
+    uint8_t id;
     // PATA, SATA, PATAPI, SATAPI
     int type;
-    unsigned short base_port;
     char *name;
-    //...
-    // D� pra colocar aqui mais informa��es sobre 
-    // o dispositivo conectado a porta.
-    // podemos usar ponteiros para estruturas.
-};
 
-//see: ide.c
+    //int state;
+
+// Ports
+    unsigned short base_port;
+    //unsigned short base_cmd;		//command base register 
+    //unsigned short base_ctl;		//control base register 
+
+    //...
+};
+// see: ata.c
+// #todo: Initialize these structure before using them.
 extern struct ide_ports_d  ide_ports[4];
 
 

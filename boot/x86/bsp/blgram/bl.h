@@ -260,7 +260,10 @@ extern void refresh_screen();
 
 #include "mm/memmap.h"   // Memory Map - address.
 #include "mm/heap.h"
-#include "dd/diskmap.h"  // Disk Map   - sectors.
+
+// Disk Map   - sectors.
+#include "dd/storage/diskmap.h"
+
 
 // Lib C.
 #include "libs/types.h"
@@ -287,7 +290,6 @@ extern void refresh_screen();
 #include "dd/pci.h"
 
 #include "dd/display.h"
-#include "dd/r_render.h"  // Graphics
 #include "dd/keyboard.h"  // irq 1.
 
 //
@@ -295,11 +297,15 @@ extern void refresh_screen();
 //
 
 // ATA
+#include "dd/storage/ata/libata.h"
+#include "dd/storage/ata/ata.h"
+// AHCI
+#include "dd/storage/ahci/ahci.h"
 
-#include "dd/ata/libata.h"
-#include "dd/ata/ata.h"
+// STORAGE
+#include "dd/storage/storage.h"
 
-#include "dd/storage.h"
+
 
 //#include "timer.h"  // irq 0.
 

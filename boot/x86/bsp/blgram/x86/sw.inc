@@ -7,7 +7,7 @@
 ; Imported functions.
 ;
 
-extern _system_services    ;System services oferecidos pelo boot loader.
+;extern _system_services    ;System services oferecidos pelo boot loader.
 ;extern _change_procedure   ;Muda o procedimento.
 ;...
 
@@ -146,7 +146,7 @@ _int200:
 ;chama a rotina de atendimento aos servi�os.
 ;se a interrup��o foi chamada com um numero de servi�o
 ;v�lido.
-    call _system_services
+    ;call _system_services
     ;Nothing.
 .exit_serv:
     mov al, 0x20
