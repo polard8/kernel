@@ -8,6 +8,10 @@
 //     This device driver was created by Nelson Cole, for Sirius OS.
 //     2021 - Some new changes by Fred Nora.
 
+// See:
+// https://wiki.osdev.org/ATA_PIO_Mode
+
+
 // #todo:
 // Rever a tipagem.
 // Usar os nomes tradicionais para os tipos.
@@ -163,6 +167,7 @@ __ata_initialization_dialog (
     unsigned long long2 );
 
 
+static int __identify_device(uint8_t nport);
 
 //=======================
 
@@ -503,10 +508,8 @@ fail:
 }
 
 // OUT:
-//   0x00 = PATA/SATA
-//   0x80 = PATAPI/SATAPI
-//     -1 = fail
-int ide_identify_device(uint8_t nport)
+// see: ata.h for values.
+static int __identify_device(uint8_t nport)
 {
     _u8 status=0;
 // Signature bytes
@@ -563,8 +566,8 @@ int ide_identify_device(uint8_t nport)
 // ================================
 // PATA
 
-    if ( sigbyte1 == 0 && 
-         sigbyte2 == 0 )
+    if ( sigbyte1 == ATADEV_PATA_SIG1 && 
+         sigbyte2 == ATADEV_PATA_SIG2 )
     {
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
@@ -583,15 +586,40 @@ int ide_identify_device(uint8_t nport)
 
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
-        return 0;
+        
+        return (int) ATADEV_PATA;
     }
 
+// ================================
+// PATAPI
+
+    if ( sigbyte1 == ATADEV_PATAPI_SIG1 && 
+         sigbyte2 == ATADEV_PATAPI_SIG2 )
+    {
+        //kputs("Unidade PATAPI\n");   
+        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_wait(400);
+        ata_wait_drq(); 
+        __ata_pio_read ( ata_identify_dev_buf, 512 );
+        ata_wait_not_busy();
+        ata_wait_no_drq();
+
+        // Salvando o tipo em estrutura de porta.
+        ide_ports[nport].id = (uint8_t) nport;
+        ide_ports[nport].name = "PATAPI";
+        ide_ports[nport].type = (int) idedevicetypesPATAPI;
+
+        ide_ports[nport].used = (int) TRUE;
+        ide_ports[nport].magic = (int) 1234;
+
+        return (int) ATADEV_PATAPI;
+    }
 
 // ================================
 // SATA
 
-    if ( sigbyte1 == 0x3C && 
-         sigbyte2 == 0xC3 )
+    if ( sigbyte1 == ATADEV_SATA_SIG1 && 
+         sigbyte2 == ATADEV_SATA_SIG2 )
     {
         //kputs("Unidade SATA\n");   
         // O dispositivo responde imediatamente um erro ao cmd Identify device
@@ -610,38 +638,15 @@ int ide_identify_device(uint8_t nport)
 
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
-        return 0;
-    }
 
-// ================================
-// PATAPI
-
-    if ( sigbyte1 == 0x14 && 
-         sigbyte2 == 0xEB )
-    {
-        //kputs("Unidade PATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        ata_wait(400);
-        ata_wait_drq(); 
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-
-        // Salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].name = "PATAPI";
-        ide_ports[nport].type = (int) idedevicetypesPATAPI;
-
-        ide_ports[nport].used = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-        return (int) 0x80;
+        return (int) ATADEV_SATA;
     }
 
 // ================================
 // SATAPI
 
-    if ( sigbyte1 == 0x69 && 
-         sigbyte2 == 0x96 )
+    if ( sigbyte1 == ATADEV_SATAPI_SIG1 && 
+         sigbyte2 == ATADEV_SATAPI_SIG2 )
     {
         //kputs("Unidade SATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
@@ -658,16 +663,12 @@ int ide_identify_device(uint8_t nport)
 
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
-        return (int) 0x80;
+
+        return (int) ATADEV_SATAPI;
     };
 
-// #bugbug
-// What is this?
-// Fail?
-    return 0;
-
 fail:
-    return (int) -1;
+    return (int) ATADEV_UNKNOWN;
 }
 
 // Set address.
@@ -759,7 +760,7 @@ void ide_mass_storage_initialize()
 // -1 = fail
 int ide_dev_init(char port)
 {
-    int data=0;
+    int DevType = ATADEV_UNKNOWN;
     st_dev_t *new_dev;
 
 // Storage device structure.
@@ -769,15 +770,16 @@ int ide_dev_init(char port)
         bl_die();
     }
 
-    data = (int) ide_identify_device(port);
-    if (data == -1){
-        printf ("ide_dev_init: [FAIL] ide_identify_device fail\n");
+    DevType = (int) __identify_device(port);
+    if (DevType == ATADEV_UNKNOWN){
+        printf ("ide_dev_init: [FAIL] __identify_device fail\n");
         goto fail;
     }
 
 // ========================
-// Unidades ATA.
-    if (data == 0){
+// ATA device.
+
+    if (DevType == ATADEV_PATA){
 
         new_dev->dev_type = 
             (ata_identify_dev_buf[0] &0x8000)?    0xffff: ATA_DEVICE_TYPE;
@@ -807,7 +809,7 @@ int ide_dev_init(char port)
 
 // ========================
 // Unidades ATAPI.
-    }else if(data == 0x80){
+    }else if (DevType == ATADEV_PATAPI){
 
         new_dev->dev_type = 
               (ata_identify_dev_buf[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
@@ -836,8 +838,15 @@ int ide_dev_init(char port)
         new_dev->dev_size = 
             (new_dev->dev_total_num_sector_lba48 * 2048);
 
-// ========================
-// Invalid type.
+
+    }else if (DevType == ATADEV_SATA){
+        printf ("ide_dev_init: [FAIL] SATA not supported :)\n");
+        goto fail;
+
+    }else if (DevType == ATADEV_SATAPI){
+        printf ("ide_dev_init: [FAIL] SATAPI not supported :)\n");
+        goto fail;
+
     }else{
         printf ("ide_dev_init: [FAIL] Invalid device type\n");
         goto fail;
@@ -1276,10 +1285,11 @@ __ataPCIConfigurationSpace (
 {
     uint32_t data=0;
 
-//#ifdef KERNEL_VERBOSE	
-    //printf ("__ataPCIConfigurationSpace:\n");
+// Controller type.
+    ata.chip_control_type = CONTROLLER_TYPE_UNKNOWN;
+
+
     printf ("Initializing PCI Mass Storage support..\n");
-//#endif
 
 // Indentification Device e
 // Salvando configura��es.
@@ -1303,6 +1313,7 @@ __ataPCIConfigurationSpace (
 // Class and subclass
     ata_pci.class       = data >> 24 & 0xff;
     ata_pci.subclass    = data >> 16 & 0xff;
+
 // prog if
     ata_pci.prog_if     = data >>  8 & 0xff;
 // revision id
@@ -1312,13 +1323,23 @@ __ataPCIConfigurationSpace (
 // Detecting the device subclass base on the information above.
 
 
+// SCSI
+    if ( ata_pci.class == PCI_CLASS_MASS && 
+         ata_pci.subclass == __SCSI_CONTROLLER ){
+
+        ata.chip_control_type = __SCSI_CONTROLLER; // :)
+        printf ("SCSI not supported\n");
+        return (int) PCI_MSG_ERROR;
+
 //
 //  ## IDE ##
 //
 
-    // 1:1 = IDE
-    if ( ata_pci.class == PCI_CLASS_MASS && 
-         ata_pci.subclass == ATA_SUBCLASS_IDE_CONTROLLER ){
+    // 1:1 = ATA
+    } else if ( ata_pci.class == PCI_CLASS_MASS && 
+         ata_pci.subclass == __ATA_CONTROLLER ){
+
+        ata.chip_control_type = __ATA_CONTROLLER; // :)
 
         // IDE
         //#debug
@@ -1326,8 +1347,6 @@ __ataPCIConfigurationSpace (
         //refresh_screen();
         //while(1){}
         //refresh_screen();
-
-        ata.chip_control_type = ATA_IDE_CONTROLLER; 
 
         // Compatibilidade e nativo, primary.
         data  = __ataReadPCIConfigAddr( bus, dev, fun, 8 );
@@ -1379,26 +1398,11 @@ __ataPCIConfigurationSpace (
 
     // 1:4 = RAID
     } else if ( ata_pci.class == PCI_CLASS_MASS && 
-                ata_pci.subclass == ATA_SUBCLASS_RAID_CONTROLLER ){
+                ata_pci.subclass == __RAID_CONTROLLER ){
 
-        // RAID
-        //printf (">>> RAID \n");
-        //#debug
-        //refresh_screen();
-        //while(1){}
-        //refresh_screen();
-
-        ata.chip_control_type = ATA_RAID_CONTROLLER;
- 
-        printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-            ata_sub_class_code_register_strings[ata.chip_control_type], 
-            ata_pci.prog_if,
-            ata_pci.revision_id );
-
-        // Em avaliacao
-        return PCI_MSG_AVALIABLE;
-
-
+        ata.chip_control_type = __RAID_CONTROLLER; // :)
+        printf ("RAID not supported\n");
+        return (int) PCI_MSG_ERROR;
 
 //
 //  ## ATA DMA ## 
@@ -1408,10 +1412,9 @@ __ataPCIConfigurationSpace (
     } else if ( ata_pci.class == PCI_CLASS_MASS && 
                 ata_pci.subclass == __ATA_CONTROLLER_DMA ){
 
-        // #panic
-        printf ("__ataPCIConfigurationSpace: ata.c\n");
-        printf ("class/subclass not supported\n\n");
-        bl_die();
+        ata.chip_control_type = __ATA_CONTROLLER_DMA; // :)
+        printf ("ATA DMA not supported\n");
+        return (int) PCI_MSG_ERROR;
 
 //
 //  ## ACHI ##  SATA
@@ -1419,15 +1422,15 @@ __ataPCIConfigurationSpace (
 
     // 1:6 = SATA
     } else if ( ata_pci.class == PCI_CLASS_MASS && 
-                ata_pci.subclass == ATA_SUBCLASS_AHCI_CONTROLLER ){
+                ata_pci.subclass == __AHCI_CONTROLLER ){
+
+        ata.chip_control_type = __AHCI_CONTROLLER; // :)
 
         // ACHI
         //#debug
         //printf (">>> SATA \n");
         //while(1){}
         //refresh_screen();
-
-        ata.chip_control_type = ATA_AHCI_CONTROLLER;
 
         // Compatibilidade e nativo, primary.
         data = __ataReadPCIConfigAddr ( bus, dev, fun, 8 );
@@ -1469,13 +1472,31 @@ __ataPCIConfigurationSpace (
             ata_pci.prog_if,
             ata_pci.revision_id );
 
+
+    // 1:8 = NVME
+    } else if ( ata_pci.class == PCI_CLASS_MASS && 
+                ata_pci.subclass == __NVME_CONTROLLER ){
+
+        ata.chip_control_type = __NVME_CONTROLLER; // :)
+        printf ("NVME not supported\n");
+        return (int) PCI_MSG_ERROR;
+
+    // 1:9 = SAS
+    } else if ( ata_pci.class == PCI_CLASS_MASS && 
+                ata_pci.subclass == __SAS_CONTROLLER ){
+
+        ata.chip_control_type = __SAS_CONTROLLER; // :)
+        printf ("SAS not supported\n");
+        return (int) PCI_MSG_ERROR;
+
     // Fail
     // ?:? = Class/subclass not supported.
     } else {
-        // #panic
-        printf ("__ataPCIConfigurationSpace: ata.c\n");
-        printf ("class/subclass not supported\n\n");
-        bl_die();
+
+        ata.chip_control_type = CONTROLLER_TYPE_UNKNOWN; // :)
+        printf ("Unknown controller type. Class=%d Subclass=%d\n", 
+            ata_pci.class, ata_pci.subclass);
+        return (int) PCI_MSG_ERROR;
     };
 
 // #obs:
@@ -1512,35 +1533,26 @@ __ataPCIConfigurationSpace (
 
 // ------------------------
 
-// #debug
-#ifdef KERNEL_VERBOSE
+    // #debug
+    //printf ("[ Command %x Status %x ]\n", 
+        //ata_pci.command, 
+        //ata_pci.status );
 
-    printf ("[ Command %x Status %x ]\n", 
-        ata_pci.command, 
-        ata_pci.status );
-
-    printf ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
-        ata_pci.interrupt_pin, 
-        ata_pci.interrupt_line );
-
-#endif
+    // #debug
+    //printf ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
+        //ata_pci.interrupt_pin, 
+        //ata_pci.interrupt_line );
 
 // ================
 // Get Synchronous DMA Control Register.
 
+    //??
     data = __ataReadPCIConfigAddr(bus,dev,fun,0x48);
 
-#ifdef KERNEL_VERBOSE
-    printf ("[ Synchronous DMA Control Register %X ]\n", data );
-#endif
+    //printf ("[ Synchronous DMA Control Register %X ]\n", data );
+    //refresh_screen();
 
-done:
-
-#ifdef KERNEL_VERBOSE
-    refresh_screen();
-#endif 
-
-    return (PCI_MSG_SUCCESSFUL);
+    return (int) PCI_MSG_SUCCESSFUL;
 }
 
 // __ataPCIScanDevice:
@@ -1766,26 +1778,12 @@ static int __ata_initialize_controller(int ataflag)
 // Let's fill the structure with some information about the device.
 // Mass storage device only.
     data = (_u32) __ataPCIConfigurationSpace( bus, dev, fun );
-
-// Error
-    if (data == PCI_MSG_ERROR){
-
+    if (data != PCI_MSG_SUCCESSFUL)
+    {
         printf ("__ata_initialize_controller: Error Driver [%x]\n", data );
         Status = (int) 1;
         goto fail;  
-
-// This is a raid controller
-// but it's not supported yet.
-// RAID not supported?
-    }else if (data == PCI_MSG_AVALIABLE){
-
-        //if (ata_pci.subclass == ATA_SUBCLASS_RAID_CONTROLLER)
-            //printf ("__ata_initialize_controller: RAID Controller was found\n");
-
-        printf ("__ata_initialize_controller: RAID Controller Not supported.\n");
-        Status = (int) 1;
-        goto fail;  
-    };
+    }
 
 // After call the function above
 // now we have a lot of information into the structure.
@@ -1843,7 +1841,7 @@ static int __ata_initialize_controller(int ataflag)
 // =========================
 // Type ATA
 // Sub-class 01h = IDE Controller
-    if (ata.chip_control_type == ATA_IDE_CONTROLLER){
+    if (ata.chip_control_type == __ATA_CONTROLLER){
 
         //Soft Reset, defina IRQ
         
@@ -1903,9 +1901,23 @@ static int __ata_initialize_controller(int ataflag)
         };
 
 // =========================
+// Type RAID
+    } else if (ata.chip_control_type == __RAID_CONTROLLER){
+
+        printf ("__ata_initialize_controller: RAID not supported\n");
+        bl_die();
+
+// =========================
+// Type ATA DMA.
+    } else if (ata.chip_control_type == __ATA_CONTROLLER_DMA){
+
+        printf ("__ata_initialize_controller: ATA DMA not supported\n");
+        bl_die();
+
+// =========================
 // Type AHCI.
 // Sub-class 06h = SATA Controller
-    } else if (ata.chip_control_type == ATA_AHCI_CONTROLLER){
+    } else if (ata.chip_control_type == __AHCI_CONTROLLER){
 
         printf ("__ata_initialize_controller: AHCI not supported\n");
         bl_die();
@@ -1932,6 +1944,7 @@ static int __ata_initialize_controller(int ataflag)
 
     Status = 0;
     goto done;
+
 fail:
     printf ("__ata_initialize_controller: fail\n");
     refresh_screen();

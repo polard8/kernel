@@ -8,6 +8,9 @@
 //     2021 - Some new changes by Fred Nora.
 
 
+// See:
+// https://wiki.osdev.org/ATA_Command_Matrix
+
 // =====================================================================
 //     IDE controller support by Nelson Cole
 // =====================================================================
@@ -71,24 +74,43 @@ extern int ATAFlag;
 
 //
 // Subclasses
+// (Controller type)
 //
 
+/*
+Here's a list of subclasses for the PCI class 1 (Mass Storage Controller):
+
+0x00: SCSI
+0x01: IDE (Integrated Drive Electronics)
+0x02: RAID
+0x03: Fibre Channel
+0x04: IPI (Intelligent Peripheral Interface)
+0x05: USB
+0x06: SATA (Serial ATA)
+0x07: SSA (Serial Storage Architecture)
+0x08: NVMe (Non-Volatile Memory Express)
+0x09: SAS (Serial Attached SCSI)
+0x0A: SD/MMC
+0x0B: UFS (Universal Flash Storage)
+0x0C: PCIe (PCI Express)
+*/
+
+#define CONTROLLER_TYPE_UNKNOWN  (-1)
+
+// 0x00: SCSI
+#define __SCSI_CONTROLLER     0x0
 // Sub-class 01h = IDE Controller
 #define __ATA_CONTROLLER      0x1
 // raid
 #define __RAID_CONTROLLER     0x4
 // Sub-class 05h = ATA Controller with ADMA
-#define __ATA_CONTROLLER_DMA  0x5
+#define __ATA_CONTROLLER_DMA  0x5   // (USB ?)
 // Sub-class 06h = SATA Controller
 #define __AHCI_CONTROLLER     0x6
-
-#define ATA_IDE_CONTROLLER   0x1
-#define ATA_RAID_CONTROLLER  0x4
-#define ATA_AHCI_CONTROLLER  0x6
-
-#define ATA_SUBCLASS_IDE_CONTROLLER   0x1
-#define ATA_SUBCLASS_RAID_CONTROLLER  0x4
-#define ATA_SUBCLASS_AHCI_CONTROLLER  0x6
+// 0x08: NVMe (Non-Volatile Memory Express)
+#define __NVME_CONTROLLER     0x08
+// 0x09: SAS (Serial Attached SCSI)
+#define __SAS_CONTROLLER      0x09
 
 // Number of ports.
 #define ATA_NUMBER_OF_PORTS  4
@@ -115,27 +137,29 @@ extern int ATAFlag;
 
 
 // ATA/ATAPI Command Set.
-#define ATA_CMD_CFA_ERASE_SECTORS               0xC0
+
 #define ATA_CMD_CFA REQUEST_EXTENDED_ERROR_CODE 0x03
-#define ATA_CMD_CHECK_MEDIA_CARD_TYPE           0xD1
-#define ATA_CMD_CHECK_POWER_MODE                0xE5
 #define ATA_CMD_DEVICE_RESET                    0x08
-#define ATA_CMD_EXECUTE_DEVICE_DIAGNOSTIC       0x90
-#define ATA_CMD_FLUSH_CACHE                     0xE7
-#define ATA_CMD_FLUSH_CACHE_EXT                 0xEA
-#define ATA_CMD_IDENTIFY_DEVICE                 0xEC
-#define ATA_CMD_IDENTIFY_PACKET_DEVICE          0xA1
-#define ATA_CMD_PACKET                          0xA0
-#define ATA_CMD_READ_BUFFER                     0xE4
-#define ATA_CMD_READ_DMA                        0xC8
-#define ATA_CMD_READ_DMA_EXT                    0x25
 #define ATA_CMD_READ_SECTORS                    0x20
 #define ATA_CMD_READ_SECTORS_EXT                0x24
-#define ATA_CMD_WRITE_BUFFER                    0xE8
-#define ATA_CMD_WRITE_DMA                       0xCA
-#define ATA_CMD_WRITE_DMA_EXT                   0x35
+#define ATA_CMD_READ_DMA_EXT                    0x25
 #define ATA_CMD_WRITE_SECTORS                   0x30
 #define ATA_CMD_WRITE_SECTORS_EXT               0x34
+#define ATA_CMD_WRITE_DMA_EXT                   0x35
+#define ATA_CMD_EXECUTE_DEVICE_DIAGNOSTIC       0x90
+#define ATA_CMD_PACKET                          0xA0
+#define ATA_CMD_IDENTIFY_PACKET_DEVICE          0xA1
+#define ATA_CMD_CFA_ERASE_SECTORS               0xC0
+#define ATA_CMD_READ_DMA                        0xC8
+#define ATA_CMD_WRITE_DMA                       0xCA
+#define ATA_CMD_CHECK_MEDIA_CARD_TYPE           0xD1
+#define ATA_CMD_READ_BUFFER                     0xE4
+#define ATA_CMD_CHECK_POWER_MODE                0xE5
+#define ATA_CMD_FLUSH_CACHE                     0xE7
+#define ATA_CMD_WRITE_BUFFER                    0xE8
+#define ATA_CMD_FLUSH_CACHE_EXT                 0xEA
+#define ATA_CMD_IDENTIFY_DEVICE                 0xEC
+
 
 // ATAPI descrito no SCSI.
 #define ATAPI_CMD_READ  0xA8
@@ -261,8 +285,10 @@ struct ata_pci
     _u16 status;
     _u8  prog_if;
     _u8  revision_id;
+
     _u8  class;
     _u8  subclass;
+
     _u8  primary_master_latency_timer;
     _u8  header_type;
     _u8  BIST;
@@ -354,13 +380,44 @@ typedef enum {
 }ide_types_t;
 
 typedef enum {
-
     idedevicetypesPATA,    // 0
-    idedevicetypesSATA,    // 1
-    idedevicetypesPATAPI,  // 2
+    idedevicetypesPATAPI,  // 1
+    idedevicetypesSATA,    // 2
     idedevicetypesSATAPI   // 3
-
 }ide_device_types_t;
+
+
+//
+// DEVICE TYPES
+//
+
+#define ATADEV_UNKNOWN  (-1)
+
+// PATA
+#define ATADEV_PATA    idedevicetypesPATA
+#define ATADEV_PATAPI  idedevicetypesPATAPI
+
+// SATA
+#define ATADEV_SATA    idedevicetypesSATA
+#define ATADEV_SATAPI  idedevicetypesSATAPI
+
+
+//
+// SIGNATURE
+//
+
+// PATA
+#define ATADEV_PATA_SIG1    0
+#define ATADEV_PATA_SIG2    0
+#define ATADEV_PATAPI_SIG1  0x14
+#define ATADEV_PATAPI_SIG2  0xEB
+
+// SATA
+#define ATADEV_SATA_SIG1    0x3c
+#define ATADEV_SATA_SIG2    0xc3
+#define ATADEV_SATAPI_SIG1  0x69
+#define ATADEV_SATAPI_SIG2  0x96
+
 
 
 // ->state field
@@ -495,7 +552,6 @@ int ide_dev_init(char port);
 void set_ata_addr(int channel);
 
 // ata.c
-int ide_identify_device(uint8_t nport);
 void ata_wait(int val);
 _u8 ata_wait_not_busy();
 _u8 ata_wait_busy();
