@@ -15,7 +15,10 @@
 int g_ata_driver_initialized=FALSE;
 
 int ATAFlag=0;
-unsigned short *ata_identify_dev_buf;
+
+static unsigned short *ata_devinfo_buffer;
+
+
 // Saving values.
 unsigned char ata_record_dev=0;
 unsigned char ata_record_channel=0;
@@ -640,15 +643,15 @@ static int __ide_identify_device(uint8_t nport)
 
 // ==========================
 // # PATA
-    if ( sig_byte_1 == 0 && 
-         sig_byte_2 == 0 )
+    if ( sig_byte_1 == ATADEV_PATA_SIG1 && 
+         sig_byte_2 == ATADEV_PATA_SIG2 )
     {
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
         // e eviamos 256 word de dados PIO
 
         ata_wait_drq(nport);
-        __ata_pio_read( nport, ata_identify_dev_buf, 512 );
+        __ata_pio_read( nport, ata_devinfo_buffer, 512 );
 
         ata_wait_not_busy(nport);
         ata_wait_no_drq(nport);
@@ -717,9 +720,67 @@ static int __ide_identify_device(uint8_t nport)
     }
 
 // ==========================
+// # PATAPI
+    if ( sig_byte_1 == ATADEV_PATAPI_SIG1 && 
+         sig_byte_2 == ATADEV_PATAPI_SIG2 )
+    {
+        //kputs("Unidade PATAPI\n");   
+        ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_wait(400);
+        ata_wait_drq(nport); 
+        __ata_pio_read( nport, ata_devinfo_buffer, 512 );
+        ata_wait_not_busy(nport);
+        ata_wait_no_drq(nport);
+
+        // See: ide.h
+
+        ide_ports[nport].id = (uint8_t) nport;
+        ide_ports[nport].type = (int) idedevicetypesPATAPI;
+        ide_ports[nport].name = "PATAPI";
+        ide_ports[nport].channel = ata_port[nport].channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata_port[nport].dev_num;  // Master or slave.
+        ide_ports[nport].used = (int) TRUE;
+        ide_ports[nport].magic = (int) 1234;
+
+        // Disk
+        // See: disk.h
+        disk = (struct disk_d *) kmalloc(sizeof(struct disk_d));
+        if ((void*) disk == NULL){
+            debug_print("__ide_identify_device: disk on PATAPI\n");
+            goto fail;
+        }
+        if ((void *) disk != NULL)
+        {
+            memset (disk, 0, sizeof(struct disk_d) );
+            disk->used = TRUE;
+            disk->magic = 1234;
+            disk->diskType = DISK_TYPE_PATAPI;
+            // disk->diskClass = ?
+
+            disk->id = nport;  
+                        
+            // name
+            
+            //disk->name = "PATAPI-TEST";
+            ksprintf ( (char *) name_buffer, "PATAPI-TEST-%d",nport);
+            disk->name = (char *) strdup ( (const char *) name_buffer);  
+
+            disk->channel = ata_port[nport].channel;  // Primary or secondary.
+            disk->dev_num = ata_port[nport].dev_num;  // Master or slave.
+
+            // #todo: Check overflow.
+            diskList[nport] = (unsigned long) disk;
+        }
+
+        // It's a PATAPI device.
+        // 0x80 = PATAPI or SATAPI.
+        return (int) 0x80;
+    }
+
+// ==========================
 // #SATA
-    if ( sig_byte_1 == 0x3C && 
-         sig_byte_2 == 0xC3 )
+    if ( sig_byte_1 == ATADEV_SATA_SIG1 && 
+         sig_byte_2 == ATADEV_SATA_SIG2 )
     {
         //kputs("Unidade SATA\n");   
         // O dispositivo responde imediatamente um erro ao cmd Identify device
@@ -727,7 +788,7 @@ static int __ide_identify_device(uint8_t nport)
         // em seguida enviar 256 word de dados PIO.
 
         ata_wait_drq(nport); 
-        __ata_pio_read ( nport, ata_identify_dev_buf, 512 );
+        __ata_pio_read ( nport, ata_devinfo_buffer, 512 );
         ata_wait_not_busy(nport);
         ata_wait_no_drq(nport);
 
@@ -790,73 +851,15 @@ static int __ide_identify_device(uint8_t nport)
     }
 
 // ==========================
-// # PATAPI
-    if ( sig_byte_1 == 0x14 && 
-         sig_byte_2 == 0xEB )
-    {
-        //kputs("Unidade PATAPI\n");   
-        ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        ata_wait(400);
-        ata_wait_drq(nport); 
-        __ata_pio_read( nport, ata_identify_dev_buf, 512 );
-        ata_wait_not_busy(nport);
-        ata_wait_no_drq(nport);
-
-        // See: ide.h
-
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].type = (int) idedevicetypesPATAPI;
-        ide_ports[nport].name = "PATAPI";
-        ide_ports[nport].channel = ata_port[nport].channel;  // Primary or secondary.
-        ide_ports[nport].dev_num = ata_port[nport].dev_num;  // Master or slave.
-        ide_ports[nport].used = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-
-        // Disk
-        // See: disk.h
-        disk = (struct disk_d *) kmalloc(sizeof(struct disk_d));
-        if ((void*) disk == NULL){
-            debug_print("__ide_identify_device: disk on PATAPI\n");
-            goto fail;
-        }
-        if ((void *) disk != NULL)
-        {
-            memset (disk, 0, sizeof(struct disk_d) );
-            disk->used = TRUE;
-            disk->magic = 1234;
-            disk->diskType = DISK_TYPE_PATAPI;
-            // disk->diskClass = ?
-
-            disk->id = nport;  
-                        
-            // name
-            
-            //disk->name = "PATAPI-TEST";
-            ksprintf ( (char *) name_buffer, "PATAPI-TEST-%d",nport);
-            disk->name = (char *) strdup ( (const char *) name_buffer);  
-
-            disk->channel = ata_port[nport].channel;  // Primary or secondary.
-            disk->dev_num = ata_port[nport].dev_num;  // Master or slave.
-
-            // #todo: Check overflow.
-            diskList[nport] = (unsigned long) disk;
-        }
-
-        // It's a PATAPI device.
-        // 0x80 = PATAPI or SATAPI.
-        return (int) 0x80;
-    }
-
-// ==========================
 // # SATAPI
-    if (sig_byte_1 == 0x69  && 
-        sig_byte_2 == 0x96)
+    if (sig_byte_1 == ATADEV_SATAPI_SIG1  && 
+        sig_byte_2 == ATADEV_SATAPI_SIG2)
     {
         //kputs("Unidade SATAPI\n");   
         ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
         ata_wait_drq(nport); 
-        __ata_pio_read(nport,ata_identify_dev_buf,512);
+        __ata_pio_read(nport,ata_devinfo_buffer,512);
         ata_wait_not_busy(nport);
         ata_wait_no_drq(nport);
 
@@ -1019,17 +1022,16 @@ static int ata_initialize_ide_device(char port)
 // Worker
 // + Identify the device.
 // + Register device info into the structure.
-    data = (int) __ide_identify_device(port);
-
+// ================
+// Unidade de classe desconhecida.
 // Erro
 // 0xFF = erro ao identificar o número.
 // 0    = PATA ou SATA
 // 0x80 = ATAPI ou SATAPI
 
-// ================
-// Unidade de classe desconhecida.
+    data = (int) __ide_identify_device(port);
     if (data == 0xFF){
-        debug_print ("ata_initialize_ide_device: [FIXME] data\n");
+        debug_print ("ata_initialize_ide_device: Invalid device type\n");
         return (int) -1;
     }
 
@@ -1040,11 +1042,11 @@ static int ata_initialize_ide_device(char port)
 
         // Is it an ata device?
         new_dev->dev_type = 
-            (ata_identify_dev_buf[0] & 0x8000) ? 0xffff : ATA_DEVICE_TYPE;
+            (ata_devinfo_buffer[0] & 0x8000) ? 0xffff : ATA_DEVICE_TYPE;
 
         // What kind of lba?
         new_dev->dev_access = 
-            (ata_identify_dev_buf[83] & 0x0400) ? ATA_LBA48 : ATA_LBA28;
+            (ata_devinfo_buffer[83] & 0x0400) ? ATA_LBA48 : ATA_LBA28;
 
         // Let's set up the PIO support.
         // Where ATAFlag was defined?
@@ -1056,18 +1058,18 @@ static int ata_initialize_ide_device(char port)
         // Com esse pode funcionar em dma
         }else{
             new_dev->dev_modo_transfere = 
-                 ( ata_identify_dev_buf[49] & 0x0100 ) 
+                 ( ata_devinfo_buffer[49] & 0x0100 ) 
                  ? ATA_DMA_MODO 
                  : ATA_PIO_MODO;
         };
 
         //old
-        //new_dev->dev_total_num_sector  = ata_identify_dev_buf[60];
-        //new_dev->dev_total_num_sector += ata_identify_dev_buf[61];
+        //new_dev->dev_total_num_sector  = ata_devinfo_buffer[60];
+        //new_dev->dev_total_num_sector += ata_devinfo_buffer[61];
 
         //#test
         //new_dev->dev_total_num_sector  = 
-        //    *(unsigned long*) (short *) &ata_identify_dev_buf[60];
+        //    *(unsigned long*) (short *) &ata_devinfo_buffer[60];
 
         // #bugbug
         // We can not do this.
@@ -1076,27 +1078,27 @@ static int ata_initialize_ide_device(char port)
 
         new_dev->dev_byte_per_sector = 512;
 
-        //new_dev->dev_total_num_sector_lba48  = ata_identify_dev_buf[100];
-        //new_dev->dev_total_num_sector_lba48 |= ata_identify_dev_buf[101];
-        //new_dev->dev_total_num_sector_lba48 |= ata_identify_dev_buf[102];
-        //new_dev->dev_total_num_sector_lba48 |= ata_identify_dev_buf[103];
+        //new_dev->dev_total_num_sector_lba48  = ata_devinfo_buffer[100];
+        //new_dev->dev_total_num_sector_lba48 |= ata_devinfo_buffer[101];
+        //new_dev->dev_total_num_sector_lba48 |= ata_devinfo_buffer[102];
+        //new_dev->dev_total_num_sector_lba48 |= ata_devinfo_buffer[103];
 
-        value1 = ata_identify_dev_buf[103];  
+        value1 = ata_devinfo_buffer[103];  
         new_dev->lba48_value1 = (unsigned short) value1;
         value1 = ( value1 << 48 );           
         value1 = ( value1 & 0xFFFF000000000000 );    
         
-        value2 = ata_identify_dev_buf[102];  
+        value2 = ata_devinfo_buffer[102];  
         new_dev->lba48_value2 = (unsigned short) value2;
         value2 = ( value2 << 32 );
         value2 = ( value2 & 0x0000FFFF00000000 );
 
-        value3 = ata_identify_dev_buf[101];
+        value3 = ata_devinfo_buffer[101];
         new_dev->lba48_value3 = (unsigned short) value3;  
         value3 = ( value3 << 16 );
         value3 = ( value3 & 0x00000000FFFF0000 );
 
-        value4 = ata_identify_dev_buf[100];
+        value4 = ata_devinfo_buffer[100];
         new_dev->lba48_value4 = (unsigned short) value4;  
         //value4 = ( value4 << 0 );
         value4 = ( value4 & 0x000000000000FFFF );
@@ -1116,11 +1118,11 @@ static int ata_initialize_ide_device(char port)
         // Quantidade de setores.
         // Uma parte está em 61 e outra em 60.
 
-        value1 = ata_identify_dev_buf[61];  // First part
+        value1 = ata_devinfo_buffer[61];  // First part
         new_dev->lba28_value1 = (unsigned short) value1;
         value1 = ( value1 << 16 );
         value1 = ( value1 & 0xFFFF0000 );
-        value2 = ata_identify_dev_buf[60];  // Second part
+        value2 = ata_devinfo_buffer[60];  // Second part
         new_dev->lba28_value2 = (unsigned short) value2;
         value2 = ( value2 & 0x0000FFFF );
         // Total number of blocks.
@@ -1146,7 +1148,7 @@ static int ata_initialize_ide_device(char port)
 
         // Is this an ATAPI device ?
         new_dev->dev_type = 
-            (ata_identify_dev_buf[0] & 0x8000) ? ATAPI_DEVICE_TYPE : 0xffff;
+            (ata_devinfo_buffer[0] & 0x8000) ? ATAPI_DEVICE_TYPE : 0xffff;
 
         // What kind of lba?
         new_dev->dev_access = ATA_LBA28;
@@ -1161,7 +1163,7 @@ static int ata_initialize_ide_device(char port)
 
         // Com esse pode funcionar em dma
         }else{
-            new_dev->dev_modo_transfere = (ata_identify_dev_buf[49] & 0x0100) ? ATA_DMA_MODO : ATA_PIO_MODO;
+            new_dev->dev_modo_transfere = (ata_devinfo_buffer[49] & 0x0100) ? ATA_DMA_MODO : ATA_PIO_MODO;
         };
 
         // ?
@@ -1177,29 +1179,29 @@ static int ata_initialize_ide_device(char port)
 
         //#test
         //new_dev->dev_total_num_sector  = 
-            //*(unsigned long*) (short *) &ata_identify_dev_buf[60];
+            //*(unsigned long*) (short *) &ata_devinfo_buffer[60];
 
         new_dev->dev_total_num_sector_lba48  = 0;
         new_dev->dev_total_num_sector_lba48 |= 0;
         new_dev->dev_total_num_sector_lba48 |= 0;
         new_dev->dev_total_num_sector_lba48 |= 0;
 
-        value1 = ata_identify_dev_buf[103];  
+        value1 = ata_devinfo_buffer[103];  
         new_dev->lba48_value1 = (unsigned short) value1;
         value1 = ( value1 << 48 );           
         value1 = ( value1 & 0xFFFF000000000000 );    
 
-        value2 = ata_identify_dev_buf[102];  
+        value2 = ata_devinfo_buffer[102];  
         new_dev->lba48_value2 = (unsigned short) value2;
         value2 = ( value2 << 32 );
         value2 = ( value2 & 0x0000FFFF00000000 );
 
-        value3 = ata_identify_dev_buf[101];
+        value3 = ata_devinfo_buffer[101];
         new_dev->lba48_value3 = (unsigned short) value3;  
         value3 = ( value3 << 16 );
         value3 = ( value3 & 0x00000000FFFF0000 );
 
-        value4 = ata_identify_dev_buf[100];
+        value4 = ata_devinfo_buffer[100];
         new_dev->lba48_value4 = (unsigned short) value4;  
         //value4 = ( value4 << 0 );
         value4 = ( value4 & 0x000000000000FFFF );
@@ -1218,11 +1220,11 @@ static int ata_initialize_ide_device(char port)
         // Quantidade de setores.
         // Uma parte está em 61 e outra em 60.
  
-        value1 = ata_identify_dev_buf[61];
+        value1 = ata_devinfo_buffer[61];
         new_dev->lba28_value1 = (unsigned short) value1;  
         value1 = ( value1 << 16 );           
         value1 = ( value1 & 0xFFFF0000 );    
-        value2 = ata_identify_dev_buf[60];
+        value2 = ata_devinfo_buffer[60];
         new_dev->lba28_value2 = (unsigned short) value2;  
         value2 = ( value2 & 0x0000FFFF );  
         new_dev->dev_total_num_sector = (value1 | value2);
@@ -1568,6 +1570,7 @@ static int __ata_initialize(int ataflag)
 // #bugbug: 
 // Esse retorno é só um código de erro.
 // Nessa hora configuramos os valores na estrutura 'ata_port.xxx'
+// see: atapci.c
 
     Value = 
         (unsigned long) atapciSetupMassStorageController( (struct pci_device_d*) PCIDeviceATA );
@@ -1703,13 +1706,13 @@ static int __ata_initialize(int ataflag)
         // #bugbug
         // Is this a buffer? For what?
         // Is this buffer enough?
-        ata_identify_dev_buf = (unsigned short *) kmalloc(4096);
-        if ((void *) ata_identify_dev_buf == NULL){
-            printk ("ata_initialize: ata_identify_dev_buf\n");
+        ata_devinfo_buffer = (unsigned short *) kmalloc(4096);
+        if ((void *) ata_devinfo_buffer == NULL){
+            printk ("ata_initialize: ata_devinfo_buffer\n");
             Status = (int) -1;
             goto fail;
         }
-        memset (ata_identify_dev_buf, 0, 4096);
+        memset (ata_devinfo_buffer, 0, 4096);
 
         // Sondando dispositivos e imprimindo na tela.
         // As primeiras quatro portas do controlador ATA. 

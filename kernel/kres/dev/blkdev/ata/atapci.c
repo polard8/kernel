@@ -112,10 +112,8 @@ uint32_t diskPCIScanDevice(int class)
     return (uint32_t) (-1);
 }
 
-/*
- * atapciSetupMassStorageController:
- *     Espaço de configuraçao PCI Mass Storage.
- */
+// atapciSetupMassStorageController:
+// Espaço de configuraçao PCI Mass Storage.
 // Nessa rotina:
 // + Encontra o tipo de driver, ser é IDE, RAID, AHCI ou Desconhecido.
 
@@ -182,14 +180,28 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 // Aqui detectamos o tipo de dispositivo com base 
 // nas informações de classe e subclasse.
 
+
+//
+// == #SCSI ========
+//
+
+// ====
+    // 1:0 = SCSI controller.
+    if ( D->classCode == PCI_CLASSCODE_MASS && 
+         D->subclass == PCI_SUBCLASS_SCSI ){
+
+        AtaController.controller_type = (uint8_t) PCI_SUBCLASS_SCSI;
+        printk ("atapciSetupMassStorageController: SCSI not supported\n");
+        goto fail;
+
 //
 // == #IDE ========
 //
 
 // ====
     // 1:1 = IDE controller.
-    if ( D->classCode == PCI_CLASSCODE_MASS && 
-         D->subclass == PCI_SUBCLASS_IDE ){
+    } else if ( D->classCode == PCI_CLASSCODE_MASS && 
+                D->subclass == PCI_SUBCLASS_IDE ){
 
         // #type: (IDE).
         AtaController.controller_type = (uint8_t) ATA_IDE_CONTROLLER; 
@@ -302,6 +314,31 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
         //     ata_pci.progif,
         //     ata_pci.revisionId );
 
+
+    // 1:7
+    }else if ( D->classCode == PCI_CLASSCODE_MASS && 
+               D->subclass == PCI_SUBCLASS_SERIALSCSI ){
+
+        AtaController.controller_type = (uint8_t) PCI_SUBCLASS_SCSI;
+        printk ("atapciSetupMassStorageController: Serial SCSI not supported\n");
+        goto fail;
+
+    // 1:8
+    }else if ( D->classCode == PCI_CLASSCODE_MASS && 
+               D->subclass == PCI_SUBCLASS_NVMEMORY ){
+
+        AtaController.controller_type = (uint8_t) PCI_SUBCLASS_SCSI;
+        printk ("atapciSetupMassStorageController: NVMe not supported\n");
+        goto fail;
+
+    // 1:9
+    }else if ( D->classCode == PCI_CLASSCODE_MASS && 
+               D->subclass == PCI_SUBCLASS_SAS ){
+
+        AtaController.controller_type = (uint8_t) PCI_SUBCLASS_SCSI;
+        printk ("atapciSetupMassStorageController: SAS not supported\n");
+        goto fail;
+
 // ====
 // No type
 // Fail!
@@ -310,8 +347,8 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
     // Fail
     // ?:? = Class/subclass not supported.
+    // #type: Unknown controller.
     }else{
-        // #type: Unknown controller.
         AtaController.controller_type = (uint8_t) ATA_UNKNOWN_CONTROLLER;
         printk("atapciSetupMassStorageController: Mass Storage Device NOT supported\n");
         goto fail;

@@ -61,7 +61,8 @@ struct dev_nport  dev_nport;
 struct ata_pci  ata_pci;
 struct ata  ata;
 
-_u16 *ata_identify_dev_buf;
+static _u16 *ata_devinfo_buffer;
+
 _u8 ata_record_dev=0;
 _u8 ata_record_channel=0;
 
@@ -574,7 +575,7 @@ static int __identify_device(uint8_t nport)
         // e eviamos 256 word de dados PIO
 
         ata_wait_drq();
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
+        __ata_pio_read ( ata_devinfo_buffer, 512 );
 
         ata_wait_not_busy();
         ata_wait_no_drq();
@@ -600,7 +601,7 @@ static int __identify_device(uint8_t nport)
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
         ata_wait_drq(); 
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
+        __ata_pio_read ( ata_devinfo_buffer, 512 );
         ata_wait_not_busy();
         ata_wait_no_drq();
 
@@ -627,7 +628,7 @@ static int __identify_device(uint8_t nport)
         // em seguida enviar 256 word de dados PIO.
 
         ata_wait_drq(); 
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
+        __ata_pio_read ( ata_devinfo_buffer, 512 );
         ata_wait_not_busy();
         ata_wait_no_drq();
 
@@ -652,7 +653,7 @@ static int __identify_device(uint8_t nport)
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
         ata_wait_drq(); 
-        __ata_pio_read(ata_identify_dev_buf,512);
+        __ata_pio_read(ata_devinfo_buffer,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
 
@@ -735,8 +736,8 @@ void ide_mass_storage_initialize()
     // Buffer to get information 
     // about a single device, i guess.
 
-    ata_identify_dev_buf = (_u16 *) malloc(4096);
-    if ((void*) ata_identify_dev_buf == NULL)
+    ata_devinfo_buffer = (_u16 *) malloc(4096);
+    if ((void*) ata_devinfo_buffer == NULL)
     {
         printf("ide_mass_storage_initialize: [FAIL] invalid buffer\n");
         // #todo
@@ -782,9 +783,9 @@ int ide_dev_init(char port)
     if (DevType == ATADEV_PATA){
 
         new_dev->dev_type = 
-            (ata_identify_dev_buf[0] &0x8000)?    0xffff: ATA_DEVICE_TYPE;
+            (ata_devinfo_buffer[0] &0x8000)?    0xffff: ATA_DEVICE_TYPE;
         new_dev->dev_access = 
-            (ata_identify_dev_buf[83]&0x0400)? ATA_LBA48: ATA_LBA28;
+            (ata_devinfo_buffer[83]&0x0400)? ATA_LBA48: ATA_LBA28;
 
         if (ATAFlag == FORCEPIO){
             //com esse s� funciona em pio
@@ -792,18 +793,18 @@ int ide_dev_init(char port)
         }else{
             //com esse pode funcionar em dma
             new_dev->dev_modo_transfere = 
-                (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+                (ata_devinfo_buffer[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
         };
 
-        new_dev->dev_total_num_sector  = ata_identify_dev_buf[60];
-        new_dev->dev_total_num_sector += ata_identify_dev_buf[61];
+        new_dev->dev_total_num_sector  = ata_devinfo_buffer[60];
+        new_dev->dev_total_num_sector += ata_devinfo_buffer[61];
 
         new_dev->dev_byte_per_sector = 512;
 
-        new_dev->dev_total_num_sector_lba48  = ata_identify_dev_buf[100];
-        new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[101];
-        new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[102];
-        new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[103];
+        new_dev->dev_total_num_sector_lba48  = ata_devinfo_buffer[100];
+        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[101];
+        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[102];
+        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[103];
 
         new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 512);
 
@@ -812,7 +813,7 @@ int ide_dev_init(char port)
     }else if (DevType == ATADEV_PATAPI){
 
         new_dev->dev_type = 
-              (ata_identify_dev_buf[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
+              (ata_devinfo_buffer[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
 
         new_dev->dev_access = ATA_LBA28;
 
@@ -822,7 +823,7 @@ int ide_dev_init(char port)
         }else{
             //com esse pode funcionar em dma
             new_dev->dev_modo_transfere = 
-                (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+                (ata_devinfo_buffer[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
         };
 
         new_dev->dev_total_num_sector  = 0;
@@ -1881,9 +1882,9 @@ static int __ata_initialize_controller(int ataflag)
         current_dev->next = NULL;
 
         // ??
-        ata_identify_dev_buf = (_u16 *) malloc(4096);
-        if ((void *) ata_identify_dev_buf == NULL){
-            printf("__ata_initialize_controller: ata_identify_dev_buf fail\n");
+        ata_devinfo_buffer = (_u16 *) malloc(4096);
+        if ((void *) ata_devinfo_buffer == NULL){
+            printf("__ata_initialize_controller: ata_devinfo_buffer fail\n");
             bl_die();
         }
 

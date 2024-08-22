@@ -438,8 +438,27 @@ Class Code	Description
 #define PCI_SUBCLASS_ATA         0x05  //ATA controller.
 #define PCI_SUBCLASS_SATA        0x06  //SATA controller.
 #define PCI_SUBCLASS_SERIALSCSI  0x07  //Serial Attached SCSI controller.
-#define PCI_SUBCLASS_NVMEMORY    0x08  //Non-Volatile memory controller.
+#define PCI_SUBCLASS_NVMEMORY    0x08  //Non-Volatile memory controller. (NVME)
+#define PCI_SUBCLASS_SAS         0x09  //SAS (Serial Attached SCSI)
 #define PCI_SUBCLASS_MASS        0x80  //Mass storage controller.
+
+/*
+Here's a list of subclasses for the PCI class 1 (Mass Storage Controller):
+0x00: SCSI
+0x01: IDE (Integrated Drive Electronics)
+0x02: RAID
+0x03: Fibre Channel
+0x04: IPI (Intelligent Peripheral Interface)
+0x05: USB
+0x06: SATA (Serial ATA)
+0x07: SSA (Serial Storage Architecture)
+0x08: NVMe (Non-Volatile Memory Express)
+0x09: SAS (Serial Attached SCSI)
+0x0A: SD/MMC
+0x0B: UFS (Universal Flash Storage)
+0x0C: PCIe (PCI Express)
+*/
+
 
 //2
 #define PCI_SUBCLASS_ETHERNET    0     //Ethernet controller

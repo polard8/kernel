@@ -135,9 +135,7 @@ Here's a list of subclasses for the PCI class 1 (Mass Storage Controller):
 */
 
 
-
 // ATA/ATAPI Command Set.
-
 #define ATA_CMD_CFA REQUEST_EXTENDED_ERROR_CODE 0x03
 #define ATA_CMD_DEVICE_RESET                    0x08
 #define ATA_CMD_READ_SECTORS                    0x20
