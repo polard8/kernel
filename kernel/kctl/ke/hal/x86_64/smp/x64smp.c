@@ -88,7 +88,7 @@ struct mp_floating_pointer_structure_d *MPTable;
 // see: mp.h
 struct mp_configuration_table_d *MPConfigurationTable;
 // see: mp.h
-struct smp_info_d smp_info;
+struct smp_info_d  smp_info;
 
 // ------------------------------------
 static int __acpi_check_header(unsigned int *ptr, char *sig);
@@ -96,6 +96,41 @@ static int __acpi_check_header(unsigned int *ptr, char *sig);
 static int __x64_probe_smp_via_acpi(void);
 static int __x64_probe_smp_via_mptable(void);
 // ------------------------------------
+
+
+//
+// ======================================================
+//
+
+void x64smp_show_info(void)
+{
+    if (smp_info.initialized != TRUE)
+    {
+        printk ("smp_info not initialized!\n");
+        return;
+    }
+
+// Probe via
+    if (smp_info.probe_via == SMP_VIA_ACPI)
+        printk("Probe via ACPI\n");
+    if (smp_info.probe_via == SMP_VIA_MP_TABLE)
+        printk("Probe via MP TABLE\n");
+
+    printk("Number of processors: %d\n",
+        smp_info.number_of_processors );
+
+    printk("NR AP running: %d\n",
+        smp_info.nr_ap_running );
+
+    printk("PIC disabled: %d\n",
+        smp_info.bsp_pic_is_disabled );
+
+    printk("Using LACPI: %d\n",
+        smp_info.bsp_is_using_lapic );
+
+// ...
+}
+
 
 // Checks for a given header and validates checksum.
 // Credits:
@@ -125,6 +160,11 @@ static int __acpi_check_header(unsigned int *ptr, char *sig)
    return (int) (-1);
 }
 
+
+//
+// $
+// VIA ACPI
+//
 
 // After you've gathered the information, 
 // you'll need to disable the PIC and prepare for I/O APIC. 
@@ -354,6 +394,11 @@ fail:
 }
 
 
+//
+// $
+// VIA MP TABLE
+//
+
 // x64_probe_smp:
 // MP Floating Point Structure:
 // To use these tables, the MP Floating Point Structure 
@@ -468,14 +513,13 @@ static int __x64_probe_smp_via_mptable(void)
 // https://wiki.osdev.org/User:Shikhin/Tutorial_SMP
 // hal/mp.h
 
-    unsigned long table_address = 
-        (unsigned long) (ebda_address + i);
-    MPTable = 
-        (struct mp_floating_pointer_structure_d *) table_address;
+    unsigned long table_address = (unsigned long) (ebda_address + i);
 
 // Saving
+    MPTable = (struct mp_floating_pointer_structure_d *) table_address;
     smp_info.mp_floating_point = 
         (struct mp_floating_pointer_structure_d *) MPTable;
+
 // ---------------------------------------------
 // Print table info
 
@@ -607,18 +651,17 @@ static int __x64_probe_smp_via_mptable(void)
 // Entries
 //
 
+    printk("\n");
+    printk("------------------\n");
+
 // Probing the entries right below the MPConfigurationTable.
 
 // -------------------------------
 // Max number of entries.
 
-    register int EntryCount = 
-        (int) MPConfigurationTable->entry_count;
-
-    printk("\n");
-    printk("------------------\n");
-    printk("Entry count: {%d}\n",
-        MPConfigurationTable->entry_count);
+    // This field tell us how many entries we have to probe.
+    register int EntryCount = (int) MPConfigurationTable->entry_count;
+    printk("Entry count: {%d}\n", MPConfigurationTable->entry_count);
 
     //#debug
     //refresh_screen();
@@ -638,6 +681,7 @@ static int __x64_probe_smp_via_mptable(void)
 // a entrada tem 20 bytes, caso contrario tem 8 bytes.
 // see: mp.h
 
+// Base address
 // The address of the first entry.
     unsigned long entry_base = 
     (unsigned long) ( configurationtable_address + 
@@ -648,11 +692,11 @@ static int __x64_probe_smp_via_mptable(void)
 entry info:
 Description | Type | Length | Comments
 
-Processor   |    0 |     20 | One entry per processor.
+Processor * |    0 |     20 | One entry per processor.
 
 Bus         |    1 |      8 | One entry per bus.
 
-I/O APIC    |    2 |      8 | One entry per I/O APIC. :)
+I/O APIC  * |    2 |      8 | One entry per I/O APIC. :)
 
 I/O 
 Interrupt 
@@ -679,6 +723,12 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
     unsigned int NumberOfProcessors=0;
     g_processor_count = NumberOfProcessors;
 
+// Clean the list
+    for (i=0; i<32; i++){
+        smp_info.processors[i] = 0;
+    };
+    smp_info.number_of_processors = 0;
+
 // #test
 // #bugbug
 // EntryCount has the max number of entries.
@@ -688,13 +738,8 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
         EntryCount = 32;
     }
 
-// Clean the list
-    for (i=0; i<32; i++){
-        smp_info.processors[i] = 0;
-    };
-    smp_info.number_of_processors = 0;
-
-// loop:
+// --------------------------------------
+// LOOP:
 // Check all the n entries indicated in the table above.
     for (i=0; i<EntryCount; i++)
     {
@@ -711,13 +756,14 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
         e = (struct entry_processor_d *) entry_base;
 
         // ---------------------------
+        // [ PROCESSOR ] ~> Size 20
         // It is a processor entry.
-        // Size = 20.
-        if (e->type == 0){
+        if (e->type == ENTRY_IS_PROCESSOR){
 
-            printk("\n");
-            printk("------------------\n");
-            printk(">>>>> PROCESSOR found! in entry %d\n",i);
+            //printk("\n");
+            //printk("------------------\n");
+            //printk(">>>>> PROCESSOR found! in entry %d\n",i);
+            printk("Entry %d: Type %d [PROCESSOR]\n", i, e->type );
 
             smp_info.processors[NumberOfProcessors] = (unsigned long) e;
             NumberOfProcessors += 1;
@@ -744,9 +790,9 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
             entry_base = (unsigned long) (entry_base + 20);
 
         // ---------------------------
+        // [ NOT A PROCESSOR ] ~> Size 8
         // Not a processor entry.
-        // Size = 8.
-        } else if (e->type != 0){
+        } else if (e->type != ENTRY_IS_PROCESSOR){
             //printk ("Device type %d in entry %d\n", e->type, i );
 
             // #todo
@@ -755,21 +801,24 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
             // Let's save the address for the i/o apic 
             // if we find an entry for i/o apic.
             
-            // #test
+            // [ IOAPIC ]
             // This is the type for i/o apic entries.
-            if (e->type == 2){
-                printk("\n");
-                printk("------------------\n");
-                printk(">>>>> IOAPIC found! in entry %d\n",i);
-                // #debug:
-                // Checking if we found the i/o apic entry.
-                // panic("#debug: ioapic\n");
+            if (e->type == ENTRY_IS_BUS){
+                printk("Entry %d: Type %d [BUS]\n", i, e->type );
+            }else if (e->type == ENTRY_IS_IOAPIC){
+                printk("Entry %d: Type %d [IOAPIC]\n", i, e->type );
+            }else if (e->type == 3){
+                printk("Entry %d: Type %d [IO INTERRUPT]\n", i, e->type );
+            }else if (e->type == 4){
+                printk("Entry %d: Type %d [LOCAL INTERRUPT]\n", i, e->type );
+            }else{
+                printk("Entry %d: Type %d [?]\n", i, e->type );
             }
             
             //...
             
             entry_base = (unsigned long) (entry_base + 8);
-        }
+        };
     };
 
 //done:
@@ -778,16 +827,10 @@ Assignment  |    4 |      8 | One entry per system interrupt source.
     printk("------------------\n");
 
 // Global number of processors.
-    g_processor_count = 
-        (unsigned int) NumberOfProcessors;
-
+    g_processor_count = (unsigned int) NumberOfProcessors;
 // smp number of processors.
-    smp_info.number_of_processors = 
-        (unsigned int) NumberOfProcessors;
-
-// #debug
-    printk("Processor count: {%d}\n",
-        smp_info.number_of_processors );
+    smp_info.number_of_processors = (unsigned int) NumberOfProcessors;
+    printk("Processor count: {%d}\n", smp_info.number_of_processors );
 
 // smp done.
     smp_info.initialized = TRUE;
@@ -807,10 +850,15 @@ fail:
 }
 
 
+//
+// $
+// SMP INITIALIZATION
+//
+
 // Probe for smp support and initialize lapic.
 // see:
 // https://wiki.osdev.org/SMP
-int x64_initialize_smp(void)
+int x64smp_initialization(void)
 {
 // Called I_kmain() in kmain.c
 // Probing if smp is supported.
@@ -826,22 +874,26 @@ int x64_initialize_smp(void)
 // The SMP support.
 //
 
-    //PROGRESS("x64_initialize_smp:\n");
+    //PROGRESS("x64smp_initialization:\n");
 
     // #debug
-    //printk("\n");
-    //printk("---- SMP START ----\n");
-    printk("x64_initialize_smp:\n");
+    printk("\n");
+    printk("---- SMP START ----\n");
+
+    printk("x64smp_initialization:\n");
 
 // ----------------------
 // ACPI
+
+    printk("\n");
+    printk("---------------------------\n");
 
     // #test #todo
     // Using the ACPI tables.
     smp_info.probe_via = SMP_VIA_ACPI;
     smp_status = (int) __x64_probe_smp_via_acpi();
     if (smp_status != TRUE){
-        printk("x64_initialize_smp: [x64_probe_smp_via_acpi] fail\n");
+        printk("x64smp_initialization: [x64_probe_smp_via_acpi] fail\n");
     }
 
     // #debug
@@ -857,17 +909,24 @@ int x64_initialize_smp(void)
 // It doesn't work on Virtualbox. (Table not found).
 // See: x64.c
 
+    printk("\n");
+    printk("---------------------------\n");
+
     smp_info.probe_via = SMP_VIA_MP_TABLE;
     smp_status = (int) __x64_probe_smp_via_mptable();
 
     if (smp_status == TRUE)
     {
-        printk("x64_initialize_smp: [x64_probe_smp] ok\n");
+        printk("x64smp_initialization: [x64_probe_smp] ok\n");
         // Initialize LAPIC based on the address we found before.
         if ((void*) MPConfigurationTable != NULL)
         {
             if (MPConfigurationTable->lapic_address != 0)
             {
+                // #todo
+                // Disable PIC for BSP.
+
+                // Enable LAPIC for BSP.
                 // see: apic.c
                 lapic_initializing( MPConfigurationTable->lapic_address );
                 if (LAPIC.initialized == TRUE){
@@ -879,13 +938,14 @@ int x64_initialize_smp(void)
         }
     }
 
+    printk("---- SMP END ----\n");
+    printk("\n");
+
     // #debug
     // #breakpoint
-    // while (1){ asm("hlt"); };
+    //x64smp_show_info();
+    //while (1){ asm("hlt"); };
 
-    //printk("---- SMP END ----\n");
-    //printk("\n");
-    
     return (int) smp_status;
 }
 

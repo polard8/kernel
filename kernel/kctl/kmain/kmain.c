@@ -836,7 +836,7 @@ void I_kmain(int arch_type)
 
             // k2_ke/x86_64/x64smp.c
             // Probe for smp support and initialize lapic.
-            smp_status = (int) x64_initialize_smp();
+            smp_status = (int) x64smp_initialization();
             //if (smp_status != TRUE)
                 //panic("smp\n");
 

@@ -135,7 +135,9 @@
 // hal/
 #include "../kctl/ke/hal/x86_64/cpuid.h"
 #include "../kctl/ke/hal/x86_64/up/up.h"
-#include "../kctl/ke/hal/x86_64/smp/mp.h"
+
+#include "../kctl/ke/hal/x86_64/smp/x64smp.h"
+
 #include "../kctl/ke/hal/x86_64/pic.h"
 #include "../kctl/ke/hal/x86_64/smp/apic.h"
 #include "../kctl/ke/hal/x86_64/smp/apictim.h"

@@ -269,8 +269,7 @@ void lapic_initializing(unsigned long lapic_pa)
 // que servira de base para criarmos uma pagetable.
 // Mas endereço físico e virtual são iguais nessa região.
 // Identidade 1:1.
-    unsigned long *pt_lapic = 
-        (unsigned long *) get_table_pointer_va();
+    unsigned long *pt_lapic = (unsigned long *) get_table_pointer_va();
 
 // -------------
 // pa
@@ -301,6 +300,9 @@ void lapic_initializing(unsigned long lapic_pa)
     asm ("movq %rax, %cr3");
 
 //=====================================
+
+
+// Let's get some information about the BSP LAPIC.
 
 // Check values into the registers:
 // see: 
