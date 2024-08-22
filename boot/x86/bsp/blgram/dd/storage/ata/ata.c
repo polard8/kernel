@@ -523,9 +523,17 @@ static int __identify_device(uint8_t nport)
 
     __ata_assert_dever(nport);
 
-// Sem unidade conectada ao barramento 
-    if ( ata_status_read() == 0xff )
+// Bus with no devices.
+// See:
+// https://wiki.osdev.org/ATA_PIO_Mode
+// Before sending any data to the IO ports, read the Regular Status byte. 
+// The value 0xFF is an illegal status value, and indicates that the bus has no drives. 
+
+    if ( ata_status_read() == 0xFF )
     {
+        printf ("0xFF: Bus with no devices.\n");
+        printf ("Floating Bus?\n");
+        //refresh_screen();
         goto fail;
     }
 
@@ -550,9 +558,11 @@ static int __identify_device(uint8_t nport)
 
     ata_wait (400);
 
-// Sem unidade no canal
+// Channel with no device
     if ( ata_status_read() == 0 )
-    {  
+    {
+        printf ("0x00: Channel with no devices.\n");
+        //refresh_screen();
         goto fail;
     }
 
@@ -668,7 +678,11 @@ static int __identify_device(uint8_t nport)
         return (int) ATADEV_SATAPI;
     };
 
+fail0:
+    printf("__identify_device: Invalid signature sig1={%x} sig2={%x}\n",
+       sigbyte1, sigbyte2 );
 fail:
+    //refresh_screen();
     return (int) ATADEV_UNKNOWN;
 }
 
@@ -1844,12 +1858,15 @@ static int __ata_initialize_controller(int ataflag)
 // Sub-class 01h = IDE Controller
     if (ata.chip_control_type == __ATA_CONTROLLER){
 
+        // #test
+        // Suspending that 'reset', this way the 0xFF test
+        // will be the first interaction with the controller.
+        // See: ide_dev_init() bellow.
         //Soft Reset, defina IRQ
-        
-        out8 ( ATA_BAR1, 0xff );
-        out8 ( ATA_BAR3, 0xff );
-        out8 ( ATA_BAR1, 0x00 );
-        out8 ( ATA_BAR3, 0x00 );
+        //out8 ( ATA_BAR1, 0xff );
+        //out8 ( ATA_BAR3, 0xff );
+        //out8 ( ATA_BAR1, 0x00 );
+        //out8 ( ATA_BAR3, 0x00 );
 
         ata_record_dev = 0xff;
         ata_record_channel = 0xff;

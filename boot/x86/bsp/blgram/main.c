@@ -22,7 +22,7 @@
 
 
 // This is for debug via verbose on baremetal.
-//#define BAREMETAL_VERBOSE    1
+// #define BAREMETAL_VERBOSE    1
 
 
 //
@@ -715,26 +715,51 @@ void bl_main(void)
         bl_die();
     }
 
+
+// -------------------------------------------
+// Loading root dir.
 #if defined(BAREMETAL_VERBOSE)
     printf ("bl: Load rootdir\n");
     refresh_screen();
 #endif  
-
-// Loading root dir.
-    fs_load_rootdirEx();
+   fs_load_rootdirEx();
     g_fat16_root_status = TRUE;
 
 
+// -------------------------------------------
+// Loading FAT.
 #if defined(BAREMETAL_VERBOSE)
     printf ("bl: Load fat\n");
     refresh_screen();
 #endif  
-
-
-// Loading FAT.
     fs_load_fatEx();
     g_fat16_fat_status = TRUE;
 
+
+// -------------------------------------------
+// Testing if the driver is reading.
+#if defined(BAREMETAL_VERBOSE)
+
+    printf ("bl: Testing read operation\n");
+    refresh_screen();
+
+    static char MySectorBuffer[512];
+
+    // Read the first sector of rootdir.
+    read_lba ( MySectorBuffer, FAT16_ROOTDIR_LBA  );
+
+    MySectorBuffer[31] = 0;
+
+    // Print the first entry.
+    printf("Data={%s}\n",MySectorBuffer);
+    
+    //refresh_screen();
+    //while(1){ asm("cli"); asm("hlt"); }
+
+#endif  
+
+
+// -------------------------------------------
 // Loading kernel image.
 
 #if defined(BAREMETAL_VERBOSE)
