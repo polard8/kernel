@@ -155,10 +155,19 @@ __ataPCIConfigurationSpace (
 
 static uint32_t __ataPCIScanDevice(int class);
 
+//
+// $
+// INITIALIZATION
+//
+
+static int __detect_device_type(uint8_t nport);
+
+int __ata_identify_device(char port);
+
+static int __ata_initialize_controller(void);
 
 // Inicializa o IDE e mostra informações sobre o disco.
-static int __ata_initialize_controller(int ataflag);
-
+static int __ata_probe_controller(int ataflag);
 
 // Rotina de diálogo com o driver ATA.
 static int 
@@ -167,10 +176,9 @@ __ata_initialization_dialog (
     unsigned long long1, 
     unsigned long long2 );
 
-
-static int __identify_device(uint8_t nport);
-
-//=======================
+//
+// =====================================================
+//
 
 /*
  * diskATAIRQHandler1
@@ -508,184 +516,6 @@ fail:
     return -1;
 }
 
-// OUT:
-// see: ata.h for values.
-static int __identify_device(uint8_t nport)
-{
-    _u8 status=0;
-// Signature bytes
-    _u8 sigbyte1=0;
-    _u8 sigbyte2=0;
-
-    if (nport > 3){
-        goto fail;
-    }
-
-    __ata_assert_dever(nport);
-
-// Bus with no devices.
-// See:
-// https://wiki.osdev.org/ATA_PIO_Mode
-// Before sending any data to the IO ports, read the Regular Status byte. 
-// The value 0xFF is an illegal status value, and indicates that the bus has no drives. 
-
-    if ( ata_status_read() == 0xFF )
-    {
-        printf ("0xFF: Bus with no devices.\n");
-        printf ("Floating Bus?\n");
-        //refresh_screen();
-        goto fail;
-    }
-
-    out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-    out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0
-    out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
-    out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
-
-    // Select device.
-    out8 ( 
-        ata.cmd_block_base_address + ATA_REG_DEVSEL, 
-        0xE0 | ata.dev_num << 4 );
-    ata_wait(400);
-
-    // cmd
-    ata_cmd_write (ATA_CMD_IDENTIFY_DEVICE); 
-    
-    // ata_wait_irq();
-    // Nunca espere por um IRQ aqui
-    // Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
-    // Melhor seria fazermos polling
-
-    ata_wait (400);
-
-// Channel with no device
-    if ( ata_status_read() == 0 )
-    {
-        printf ("0x00: Channel with no devices.\n");
-        //refresh_screen();
-        goto fail;
-    }
-
-// Get signature bytes.
-    sigbyte1 = (_u8) in8( ata.cmd_block_base_address + ATA_REG_LBA1 );
-    sigbyte2 = (_u8) in8( ata.cmd_block_base_address + ATA_REG_LBA2 );
-
-//
-// # type # 
-//
-
-// ================================
-// PATA
-
-    if ( sigbyte1 == ATADEV_PATA_SIG1 && 
-         sigbyte2 == ATADEV_PATA_SIG2 )
-    {
-        // kputs("Unidade PATA\n");
-        // aqui esperamos pelo DRQ
-        // e eviamos 256 word de dados PIO
-
-        ata_wait_drq();
-        __ata_pio_read ( ata_devinfo_buffer, 512 );
-
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-
-        // Salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].name = "PATA";
-        ide_ports[nport].type = (int) idedevicetypesPATA;
-
-        ide_ports[nport].used = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-        
-        return (int) ATADEV_PATA;
-    }
-
-// ================================
-// PATAPI
-
-    if ( sigbyte1 == ATADEV_PATAPI_SIG1 && 
-         sigbyte2 == ATADEV_PATAPI_SIG2 )
-    {
-        //kputs("Unidade PATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        ata_wait(400);
-        ata_wait_drq(); 
-        __ata_pio_read ( ata_devinfo_buffer, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-
-        // Salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].name = "PATAPI";
-        ide_ports[nport].type = (int) idedevicetypesPATAPI;
-
-        ide_ports[nport].used = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-
-        return (int) ATADEV_PATAPI;
-    }
-
-// ================================
-// SATA
-
-    if ( sigbyte1 == ATADEV_SATA_SIG1 && 
-         sigbyte2 == ATADEV_SATA_SIG2 )
-    {
-        //kputs("Unidade SATA\n");   
-        // O dispositivo responde imediatamente um erro ao cmd Identify device
-        // entao devemos esperar pelo DRQ ao invez de um BUSY
-        // em seguida enviar 256 word de dados PIO.
-
-        ata_wait_drq(); 
-        __ata_pio_read ( ata_devinfo_buffer, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].name = "SATA";
-        ide_ports[nport].type = (int) idedevicetypesSATA;
-
-        ide_ports[nport].used = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-
-        return (int) ATADEV_SATA;
-    }
-
-// ================================
-// SATAPI
-
-    if ( sigbyte1 == ATADEV_SATAPI_SIG1 && 
-         sigbyte2 == ATADEV_SATAPI_SIG2 )
-    {
-        //kputs("Unidade SATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        ata_wait(400);
-        ata_wait_drq(); 
-        __ata_pio_read(ata_devinfo_buffer,512);
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (uint8_t) nport;
-        ide_ports[nport].name = "SATAPI";
-        ide_ports[nport].type = (int) idedevicetypesSATAPI;
-
-        ide_ports[nport].used = (int) TRUE;
-        ide_ports[nport].magic = (int) 1234;
-
-        return (int) ATADEV_SATAPI;
-    };
-
-fail0:
-    printf("__identify_device: Invalid signature sig1={%x} sig2={%x}\n",
-       sigbyte1, sigbyte2 );
-fail:
-    //refresh_screen();
-    return (int) ATADEV_UNKNOWN;
-}
-
 // Set address.
 // Primary or secondary.
 void set_ata_addr(int channel)
@@ -716,206 +546,6 @@ void set_ata_addr(int channel)
             //PANIC
             //break;
     };
-}
-
-/*
- * ide_mass_storage_initialize:
- *     Rotina de inicializa��o de dispositivo de armazenamento de dados.
- */
-void ide_mass_storage_initialize()
-{
-    int port=0;
-
-//
-// Vamos trabalhar na lista de dispositivos.
-//
-
-// Iniciando a lista.
-
-    ready_queue_dev = 
-        ( struct st_dev * ) malloc( sizeof( struct st_dev) );
-
-// #bugbug
-// Check validation!
-
-    current_dev = (struct st_dev *) ready_queue_dev;
-
-    current_dev->dev_id      = dev_next_pid++;
-    current_dev->dev_type    = -1;
-    current_dev->dev_num     = -1;
-    current_dev->dev_channel = -1;
-    current_dev->dev_nport   = -1;
-    current_dev->next = NULL;
-
-    // Buffer to get information 
-    // about a single device, i guess.
-
-    ata_devinfo_buffer = (_u16 *) malloc(4096);
-    if ((void*) ata_devinfo_buffer == NULL)
-    {
-        printf("ide_mass_storage_initialize: [FAIL] invalid buffer\n");
-        // #todo
-        // hang here
-    }
-
-// Initializing the IDE ports.
-
-    for ( port=0; port < 4; port++ )
-    {
-        ide_dev_init(port);
-    };
-}
-
-/*
- * ide_dev_init:
- *    Obtendo informa��es sobre um dos dispositivos.
- */
-// OUT: 
-// 0 = ok 
-// -1 = fail
-int ide_dev_init(char port)
-{
-    int DevType = ATADEV_UNKNOWN;
-    st_dev_t *new_dev;
-
-// Storage device structure.
-    new_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
-    if ((void *) new_dev ==  NULL){
-        printf ("ide_dev_init: [FAIL] new_dev\n");
-        bl_die();
-    }
-
-    DevType = (int) __identify_device(port);
-    if (DevType == ATADEV_UNKNOWN){
-        printf ("ide_dev_init: [FAIL] __identify_device fail\n");
-        goto fail;
-    }
-
-// ========================
-// ATA device.
-
-    if (DevType == ATADEV_PATA){
-
-        new_dev->dev_type = 
-            (ata_devinfo_buffer[0] &0x8000)?    0xffff: ATA_DEVICE_TYPE;
-        new_dev->dev_access = 
-            (ata_devinfo_buffer[83]&0x0400)? ATA_LBA48: ATA_LBA28;
-
-        if (ATAFlag == FORCEPIO){
-            //com esse s� funciona em pio
-            new_dev->dev_modo_transfere = 0;
-        }else{
-            //com esse pode funcionar em dma
-            new_dev->dev_modo_transfere = 
-                (ata_devinfo_buffer[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
-        };
-
-        new_dev->dev_total_num_sector  = ata_devinfo_buffer[60];
-        new_dev->dev_total_num_sector += ata_devinfo_buffer[61];
-
-        new_dev->dev_byte_per_sector = 512;
-
-        new_dev->dev_total_num_sector_lba48  = ata_devinfo_buffer[100];
-        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[101];
-        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[102];
-        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[103];
-
-        new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 512);
-
-// ========================
-// Unidades ATAPI.
-    }else if (DevType == ATADEV_PATAPI){
-
-        new_dev->dev_type = 
-              (ata_devinfo_buffer[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
-
-        new_dev->dev_access = ATA_LBA28;
-
-        if (ATAFlag == FORCEPIO){
-            // com esse s� funciona em pio  
-            new_dev->dev_modo_transfere = 0; 
-        }else{
-            //com esse pode funcionar em dma
-            new_dev->dev_modo_transfere = 
-                (ata_devinfo_buffer[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
-        };
-
-        new_dev->dev_total_num_sector  = 0;
-        new_dev->dev_total_num_sector += 0;
-
-        new_dev->dev_byte_per_sector = 2048; 
-
-        new_dev->dev_total_num_sector_lba48  = 0;
-        new_dev->dev_total_num_sector_lba48 += 0;
-        new_dev->dev_total_num_sector_lba48 += 0;
-        new_dev->dev_total_num_sector_lba48 += 0;
-
-        new_dev->dev_size = 
-            (new_dev->dev_total_num_sector_lba48 * 2048);
-
-
-    }else if (DevType == ATADEV_SATA){
-        printf ("ide_dev_init: [FAIL] SATA not supported :)\n");
-        goto fail;
-
-    }else if (DevType == ATADEV_SATAPI){
-        printf ("ide_dev_init: [FAIL] SATAPI not supported :)\n");
-        goto fail;
-
-    }else{
-        printf ("ide_dev_init: [FAIL] Invalid device type\n");
-        goto fail;
-    };
-
-// Dados em comum
-    new_dev->dev_id      = dev_next_pid++;
-    new_dev->dev_num     = ata.dev_num;
-    new_dev->dev_channel = ata.channel;  // 
-    new_dev->dev_nport   = port;
-
-// port
-// No estilo do Nelson?
-    switch (port){
-    case 0:  dev_nport.dev0 = 0x81;  break;
-    case 1:  dev_nport.dev1 = 0x82;  break;
-    case 2:  dev_nport.dev2 = 0x83;  break;
-    case 3:  dev_nport.dev3 = 0x84;  break;
-    default: 
-        printf ("ide_dev_init: [FAIL] Invalid port?\n");
-        break; 
-    };
-
-// #todo: 
-// This verbose belongs to the boot loader, not kernel.
-// #ifdef BL_VERBOSE
-#ifdef KERNEL_VERBOSE
-    printf ("[DEBUG]: Detected Disk type: {%s}\n", 
-        dev_type[new_dev->dev_type] );
-    refresh_screen ();
-#endif
-
-    new_dev->next = NULL;
-
-// Queue
-// Add no fim da lista (ready_queue_dev).
-
-    st_dev_t *tmp_dev;
-
-    tmp_dev = (struct st_dev *) ready_queue_dev;
-    if ((void*) tmp_dev == NULL){
-        printf("ide_dev_init: [FAIL] tmp_dev\n");
-        bl_die();
-    }
-
-    while (tmp_dev->next){
-        tmp_dev = tmp_dev->next;
-    };
-    tmp_dev->next = new_dev;
-
-// OK
-    return 0;
-fail:
-    return (int) -1;
 }
 
 // dev_switch:
@@ -1623,6 +1253,439 @@ static uint32_t __ataPCIScanDevice(int class)
 }
 
 
+// OUT:
+// see: ata.h for values.
+static int __detect_device_type(uint8_t nport)
+{
+    _u8 status=0;
+
+// Signature bytes
+    unsigned char sigbyte1=0;
+    unsigned char sigbyte2=0;
+
+	int spin=0;
+    int st=0;
+
+    if (nport > 3){
+        goto fail;
+    }
+
+    __ata_assert_dever(nport);
+
+// Bus with no devices.
+// See:
+// https://wiki.osdev.org/ATA_PIO_Mode
+// Before sending any data to the IO ports, read the Regular Status byte. 
+// The value 0xFF is an illegal status value, and indicates that the bus has no drives. 
+
+    if ( ata_status_read() == 0xFF )
+    {
+        printf ("0xFF: Bus with no devices.\n");
+        printf ("Floating Bus?\n");
+        //refresh_screen();
+        goto fail;
+    }
+
+    // #todo
+    ata_soft_reset();
+    ata_wait_not_busy();
+
+    out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
+    out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
+
+// Select device.
+
+    // #suspended
+    //out8 ( 
+        //ata.cmd_block_base_address + ATA_REG_DEVSEL, 
+        //0xE0 | ata.dev_num << 4 );
+    // #test
+    out8 ( 
+        ata.cmd_block_base_address + ATA_REG_DEVSEL, 
+        0xA0 | ata.dev_num << 4 );
+    ata_wait(400);
+
+    //#todo
+	ata_wait_not_busy();
+
+    // cmd
+    ata_cmd_write (ATA_CMD_IDENTIFY_DEVICE); 
+    ata_wait (400);
+
+
+/*
+// #old
+// Channel with no device
+    if ( ata_status_read() == 0 ){
+        printf ("0x00: Channel with no devices.\n");
+        goto fail;
+    }
+*/
+
+	spin = 1000000;
+	// Ignora bit de erro
+    while (spin--) 
+    { 	
+		if ( !(ata_status_read() & ATA_SR_BSY) )
+            break;
+	};
+
+	st = ata_status_read();
+	if (!st)
+    {
+		return (int) ATADEV_UNKNOWN;
+	}
+
+// Get signature bytes.
+    sigbyte1 = (unsigned char) in8( ata.cmd_block_base_address + ATA_REG_LBA1 );
+    sigbyte2 = (unsigned char) in8( ata.cmd_block_base_address + ATA_REG_LBA2 );
+    // more 2 bytes ...
+
+//
+// # type # 
+//
+
+    // Invalid
+    if ( sigbyte1 == 0x7F && sigbyte2 == 0x7F )
+    {
+        goto fail0;
+    }
+    if ( sigbyte1 == 0xFF && sigbyte2 == 0xFF )
+    {
+        goto fail0;
+    }
+
+
+// ================================
+// PATA
+    if ( sigbyte1 == ATADEV_PATA_SIG1 && sigbyte2 == ATADEV_PATA_SIG2 )
+    {
+        return (int) ATADEV_PATA;
+    }
+
+// ================================
+// PATAPI
+    if ( sigbyte1 == ATADEV_PATAPI_SIG1 && sigbyte2 == ATADEV_PATAPI_SIG2 )
+    {
+        return (int) ATADEV_PATAPI;
+    }
+
+// ================================
+// SATA
+    if ( sigbyte1 == ATADEV_SATA_SIG1 && sigbyte2 == ATADEV_SATA_SIG2 )
+    {
+        return (int) ATADEV_SATA;
+    }
+
+// ================================
+// SATAPI
+
+    if ( sigbyte1 == ATADEV_SATAPI_SIG1 && sigbyte2 == ATADEV_SATAPI_SIG2 )
+    {
+        return (int) ATADEV_SATAPI;
+    }
+
+fail0:
+    printf("Invalid signature sig1={%x} sig2={%x}\n",
+       sigbyte1, sigbyte2 );
+fail:
+    return (int) ATADEV_UNKNOWN;
+}
+
+/*
+ * __ata_identify_device:
+ *    Obtendo informa��es sobre um dos dispositivos.
+ */
+// OUT: 
+// 0 = ok 
+// -1 = fail
+int __ata_identify_device(char port)
+{
+    int DevType = ATADEV_UNKNOWN;
+    st_dev_t *new_dev;
+
+    //#debug
+    printf ("\n");
+    printf (":: Port %d:\n",port);
+
+
+// Storage device structure.
+    new_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
+    if ((void *) new_dev == NULL){
+        printf ("__ata_identify_device: [FAIL] new_dev\n");
+        bl_die();
+    }
+
+    DevType = (int) __detect_device_type(port);
+    if (DevType == ATADEV_UNKNOWN){
+        printf("Port %d: Unknown\n",port);
+        goto fail;
+    }
+
+// ========================
+// ATA device.
+
+    if (DevType == ATADEV_PATA){
+        printf("Port %d: PATA device\n",port);
+
+        // kputs("Unidade PATA\n");
+        // aqui esperamos pelo DRQ
+        // e eviamos 256 word de dados PIO
+
+        __ata_pio_read ( ata_devinfo_buffer, 512 );
+        ata_wait_not_busy();
+        ata_wait_no_drq();
+
+        // Salvando o tipo em estrutura de porta.
+        ide_ports[port].id = (uint8_t) port;
+        ide_ports[port].name = "PATA";
+        ide_ports[port].type = (int) idedevicetypesPATA;
+
+        ide_ports[port].used = (int) TRUE;
+        ide_ports[port].magic = (int) 1234;
+
+        new_dev->dev_type = 
+            (ata_devinfo_buffer[0] &0x8000)?    0xffff: ATA_DEVICE_TYPE;
+        new_dev->dev_access = 
+            (ata_devinfo_buffer[83]&0x0400)? ATA_LBA48: ATA_LBA28;
+
+        if (ATAFlag == FORCEPIO){
+            //com esse s� funciona em pio
+            new_dev->dev_modo_transfere = 0;
+        }else{
+            //com esse pode funcionar em dma
+            new_dev->dev_modo_transfere = 
+                (ata_devinfo_buffer[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+        };
+
+        new_dev->dev_total_num_sector  = ata_devinfo_buffer[60];
+        new_dev->dev_total_num_sector += ata_devinfo_buffer[61];
+
+        new_dev->dev_byte_per_sector = 512;
+
+        new_dev->dev_total_num_sector_lba48  = ata_devinfo_buffer[100];
+        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[101];
+        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[102];
+        new_dev->dev_total_num_sector_lba48 += ata_devinfo_buffer[103];
+
+        new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 512);
+
+// ========================
+// Unidades ATAPI.
+    }else if (DevType == ATADEV_PATAPI){
+        printf("Port %d: PATAPI device\n",port);
+
+        //kputs("Unidade PATAPI\n");   
+        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+
+        ata_wait(400);
+        ata_wait_drq(); 
+        __ata_pio_read ( ata_devinfo_buffer, 512 );
+        //ata_wait_not_busy();
+        //ata_wait_no_drq();
+
+        // Salvando o tipo em estrutura de porta.
+        ide_ports[port].id = (uint8_t) port;
+        ide_ports[port].name = "PATAPI";
+        ide_ports[port].type = (int) idedevicetypesPATAPI;
+
+        ide_ports[port].used = (int) TRUE;
+        ide_ports[port].magic = (int) 1234;
+
+        new_dev->dev_type = 
+              (ata_devinfo_buffer[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
+
+        new_dev->dev_access = ATA_LBA28;
+
+        if (ATAFlag == FORCEPIO){
+            // com esse s� funciona em pio  
+            new_dev->dev_modo_transfere = 0; 
+        }else{
+            //com esse pode funcionar em dma
+            new_dev->dev_modo_transfere = 
+                (ata_devinfo_buffer[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+        };
+
+        new_dev->dev_total_num_sector  = 0;
+        new_dev->dev_total_num_sector += 0;
+
+        new_dev->dev_byte_per_sector = 2048; 
+
+        new_dev->dev_total_num_sector_lba48  = 0;
+        new_dev->dev_total_num_sector_lba48 += 0;
+        new_dev->dev_total_num_sector_lba48 += 0;
+        new_dev->dev_total_num_sector_lba48 += 0;
+
+        new_dev->dev_size = 
+            (new_dev->dev_total_num_sector_lba48 * 2048);
+
+
+    }else if (DevType == ATADEV_SATA){
+        printf("Port %d: SATA device\n",port);
+
+        //kputs("Unidade SATA\n");   
+        // O dispositivo responde imediatamente um erro ao cmd Identify device
+        // entao devemos esperar pelo DRQ ao invez de um BUSY
+        // em seguida enviar 256 word de dados PIO.
+
+        ata_wait_drq(); 
+        __ata_pio_read ( ata_devinfo_buffer, 512 );
+        //ata_wait_not_busy();
+        //ata_wait_no_drq();
+
+        //salvando o tipo em estrutura de porta.
+        ide_ports[port].id = (uint8_t) port;
+        ide_ports[port].name = "SATA";
+        ide_ports[port].type = (int) idedevicetypesSATA;
+
+        ide_ports[port].used = (int) TRUE;
+        ide_ports[port].magic = (int) 1234;
+
+        printf ("__ata_identify_device: [FAIL] SATA not supported :)\n");
+        goto fail;
+
+    }else if (DevType == ATADEV_SATAPI){
+        printf("Port %d: SATAPI device\n",port);
+
+        //kputs("Unidade SATAPI\n");   
+        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_wait(400);
+        ata_wait_drq(); 
+        __ata_pio_read(ata_devinfo_buffer,512);
+        //ata_wait_not_busy();
+        //ata_wait_no_drq();
+
+        //salvando o tipo em estrutura de porta.
+        ide_ports[port].id = (uint8_t) port;
+        ide_ports[port].name = "SATAPI";
+        ide_ports[port].type = (int) idedevicetypesSATAPI;
+
+        ide_ports[port].used = (int) TRUE;
+        ide_ports[port].magic = (int) 1234;
+
+        printf ("__ata_identify_device: [FAIL] SATAPI not supported :)\n");
+        goto fail;
+
+    }else{
+        printf("Port %d: Invalid device type\n",port);
+        //printf ("__ata_identify_device: [FAIL] Invalid device type\n");
+        goto fail;
+    };
+
+// ----------------------------------
+
+// Dados em comum
+    new_dev->dev_id      = dev_next_pid++;
+    new_dev->dev_num     = ata.dev_num;
+    new_dev->dev_channel = ata.channel;  // 
+    new_dev->dev_nport   = port;
+
+// port
+// No estilo do Nelson?
+    switch (port){
+    case 0:  dev_nport.dev0 = 0x81;  break;
+    case 1:  dev_nport.dev1 = 0x82;  break;
+    case 2:  dev_nport.dev2 = 0x83;  break;
+    case 3:  dev_nport.dev3 = 0x84;  break;
+    default: 
+        printf ("__ata_identify_device: [FAIL] Invalid port?\n");
+        break; 
+    };
+
+// #todo: 
+// This verbose belongs to the boot loader, not kernel.
+// #ifdef BL_VERBOSE
+#ifdef KERNEL_VERBOSE
+    printf ("[DEBUG]: Detected Disk type: {%s}\n", 
+        dev_type[new_dev->dev_type] );
+    refresh_screen ();
+#endif
+
+    new_dev->next = NULL;
+
+// Queue
+// Add no fim da lista (ready_queue_dev).
+
+    st_dev_t *tmp_dev;
+
+    tmp_dev = (struct st_dev *) ready_queue_dev;
+    if ((void*) tmp_dev == NULL){
+        printf("__ata_identify_device: [FAIL] tmp_dev\n");
+        bl_die();
+    }
+
+    while (tmp_dev->next){
+        tmp_dev = tmp_dev->next;
+    };
+    tmp_dev->next = new_dev;
+
+// OK
+    return 0;
+fail:
+    return (int) -1;
+}
+
+static int __ata_initialize_controller(void)
+{
+    int port=0;
+
+    // #test
+    // Suspending that 'reset', this way the 0xFF test
+    // will be the first interaction with the controller.
+    // See: __ata_identify_device() bellow.
+    //Soft Reset, defina IRQ
+    //out8 ( ATA_BAR1, 0xff );
+    //out8 ( ATA_BAR3, 0xff );
+    //out8 ( ATA_BAR1, 0x00 );
+    //out8 ( ATA_BAR3, 0x00 );
+
+    ata_record_dev = 0xff;
+    ata_record_channel = 0xff;
+
+    // Vamos trabalhar na lista de dispositivos.
+
+    // Iniciando a lista.
+    ready_queue_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
+    if ((void *) ready_queue_dev == NULL){
+        printf("__ata_initialize_controller: ready_queue_dev struct fail\n");
+        bl_die();
+    }
+
+    // #todo:
+    // Checar a validade da estrutura.
+
+    current_dev = (struct st_dev *) ready_queue_dev;
+
+    current_dev->dev_id = dev_next_pid++;
+
+    current_dev->dev_type    = -1;
+    current_dev->dev_num     = -1;
+    current_dev->dev_channel = -1;
+    current_dev->dev_nport   = -1;
+    current_dev->next = NULL;
+
+    // ??
+    ata_devinfo_buffer = (_u16 *) malloc(4096);
+    if ((void *) ata_devinfo_buffer == NULL){
+        printf("__ata_initialize_controller: ata_devinfo_buffer fail\n");
+        bl_die();
+    }
+
+// Sondando dispositivos
+// As primeiras quatro portas do controlador IDE.
+// Inicializa estrutura de dispositivo e coloca na lista
+// encadeada de dispositivo.
+// #test
+// Nesse hora conseguiremos saber mais informaçoes sobre o dispositivo.
+
+// Let's initilize all the four ports for the ATA controller.
+    for (port=0; port<ATA_NUMBER_OF_PORTS; port++)
+    {
+        __ata_identify_device(port);
+    };
+}
 
 //
 // $
@@ -1630,13 +1693,13 @@ static uint32_t __ataPCIScanDevice(int class)
 //
 
 /*
- * __ata_initialize_controller:
+ * __ata_probe_controller:
  *     Initialize the IDE controller e show some information about the disk.
  *     #bugbug: It uses some predefined values for port and device.
  *              see: config.h
  * Credits: Nelson Cole.
  */
-static int __ata_initialize_controller(int ataflag)
+static int __ata_probe_controller(int ataflag)
 {
 // Sondando a interface PCI para encontrarmos um dispositivo
 // que seja de armazenamento de dados.
@@ -1647,7 +1710,6 @@ static int __ata_initialize_controller(int ataflag)
 // é primary/secondary e master/slave.
 
     int Status = 1;  //error
-    int port=0;
     _u32 data=0;
 
     _u8 bus=0;
@@ -1757,7 +1819,7 @@ static int __ata_initialize_controller(int ataflag)
 // Messages
 
 //#ifdef KERNEL_VERBOSE
-    //printf ("sm-disk-disk-__ata_initialize_controller:\n");
+    //printf ("sm-disk-disk-__ata_probe_controller:\n");
     //printf ("Initializing IDE/AHCI support ...\n");
     //refresh_screen();
 //#endif
@@ -1775,7 +1837,7 @@ static int __ata_initialize_controller(int ataflag)
 // Error
     if (data == -1)
     {
-        printf ("__ata_initialize_controller: pci_scan_device fail. ret={%d}\n", 
+        printf ("__ata_probe_controller: pci_scan_device fail. ret={%d}\n", 
             (_u32) data );
 
         // Abort
@@ -1795,7 +1857,7 @@ static int __ata_initialize_controller(int ataflag)
     data = (_u32) __ataPCIConfigurationSpace( bus, dev, fun );
     if (data != PCI_MSG_SUCCESSFUL)
     {
-        printf ("__ata_initialize_controller: Error Driver [%x]\n", data );
+        printf ("__ata_probe_controller: Error Driver [%x]\n", data );
         Status = (int) 1;
         goto fail;  
     }
@@ -1858,78 +1920,20 @@ static int __ata_initialize_controller(int ataflag)
 // Sub-class 01h = IDE Controller
     if (ata.chip_control_type == __ATA_CONTROLLER){
 
-        // #test
-        // Suspending that 'reset', this way the 0xFF test
-        // will be the first interaction with the controller.
-        // See: ide_dev_init() bellow.
-        //Soft Reset, defina IRQ
-        //out8 ( ATA_BAR1, 0xff );
-        //out8 ( ATA_BAR3, 0xff );
-        //out8 ( ATA_BAR1, 0x00 );
-        //out8 ( ATA_BAR3, 0x00 );
-
-        ata_record_dev = 0xff;
-        ata_record_channel = 0xff;
-
-        // As estruturas de disco ser�o colocadas em 
-        // uma lista encadeada.
-
-        //ide_mass_storage_initialize();
-
-        // Vamos trabalhar na lista de dispositivos.
-
-        // Iniciando a lista.
-        ready_queue_dev = (struct st_dev *) malloc( sizeof(struct st_dev) );
-        if ((void *) ready_queue_dev == NULL){
-            printf("__ata_initialize_controller: ready_queue_dev struct fail\n");
-            bl_die();
-        }
-
-        // #todo:
-        // Checar a validade da estrutura.
-
-        current_dev = (struct st_dev *) ready_queue_dev;
-
-        current_dev->dev_id = dev_next_pid++;
-
-        current_dev->dev_type    = -1;
-        current_dev->dev_num     = -1;
-        current_dev->dev_channel = -1;
-        current_dev->dev_nport   = -1;
-        current_dev->next = NULL;
-
-        // ??
-        ata_devinfo_buffer = (_u16 *) malloc(4096);
-        if ((void *) ata_devinfo_buffer == NULL){
-            printf("__ata_initialize_controller: ata_devinfo_buffer fail\n");
-            bl_die();
-        }
-
-        // Sondando dispositivos
-        // As primeiras quatro portas do controlador IDE.
-        // Inicializa estrutura de dispositivo e coloca na lista
-        // encadeada de dispositivo.
-        // #test
-        // Nesse hora conseguiremos saber mais informaçoes sobre o dispositivo.
-
-        // Let's initilize all the four ports for the ATA controller.
-        for (port=0; port<ATA_NUMBER_OF_PORTS; port++)
-        {
-            ide_dev_init(port);
-        };
+        __ata_initialize_controller();
 
 // =========================
 // Type RAID
     } else if (ata.chip_control_type == __RAID_CONTROLLER){
 
-        printf ("__ata_initialize_controller: RAID not supported\n");
+        printf ("__ata_probe_controller: RAID not supported\n");
         bl_die();
 
 // =========================
 // Type ATA DMA.
     } else if (ata.chip_control_type == __ATA_CONTROLLER_DMA){
 
-        printf ("__ata_initialize_controller: ATA DMA not supported\n");
+        printf ("__ata_probe_controller: ATA DMA not supported\n");
         bl_die();
 
 // =========================
@@ -1937,14 +1941,14 @@ static int __ata_initialize_controller(int ataflag)
 // Sub-class 06h = SATA Controller
     } else if (ata.chip_control_type == __AHCI_CONTROLLER){
 
-        printf ("__ata_initialize_controller: AHCI not supported\n");
+        printf ("__ata_probe_controller: AHCI not supported\n");
         bl_die();
 
 // =========================
 // Controller type not supported
 // Not IDE and Not AHCI
     }else{
-        printf ("__ata_initialize_controller: Controller type not supported\n");
+        printf ("__ata_probe_controller: Controller type not supported\n");
         bl_die();
     };
 
@@ -1964,7 +1968,7 @@ static int __ata_initialize_controller(int ataflag)
     goto done;
 
 fail:
-    printf ("__ata_initialize_controller: fail\n");
+    printf ("__ata_probe_controller: fail\n");
     refresh_screen();
 done:
     return (int) Status;
@@ -1987,7 +1991,7 @@ __ata_initialization_dialog (
     //ATAMSG_INITIALIZE
     //Initialize driver.
     case 1:
-        __ata_initialize_controller((int) long1);
+        __ata_probe_controller((int) long1);
         Status = 0;
         goto done;
         break;

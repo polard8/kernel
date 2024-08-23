@@ -543,8 +543,6 @@ void show_ide_info();
 
 // ata_dev.c
 int nport_ajuste(char nport);
-void ide_mass_storage_initialize();
-int ide_dev_init(char port);
 
 // ata_main.c
 void set_ata_addr(int channel);
@@ -589,9 +587,7 @@ void ahci_mass_storage_init();
 // INITIALIZATION
 //
 
-
 int ata_initialize(void);
-
 
 #endif    
 

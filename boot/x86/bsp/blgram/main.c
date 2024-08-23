@@ -22,7 +22,7 @@
 
 
 // This is for debug via verbose on baremetal.
-// #define BAREMETAL_VERBOSE    1
+//#define BAREMETAL_VERBOSE    1
 
 
 //
@@ -753,7 +753,7 @@ void bl_main(void)
     // Print the first entry.
     printf("Data={%s}\n",MySectorBuffer);
     
-    //refresh_screen();
+    refresh_screen();
     //while(1){ asm("cli"); asm("hlt"); }
 
 #endif  
