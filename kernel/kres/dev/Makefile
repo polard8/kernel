@@ -125,6 +125,7 @@ all:
 # i/o
 	$(CC) -c devmgr.c   $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
 	$(CC) -c io.c       $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
+
 # pci
 	$(CC) -c pci.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pci.o
 	$(CC) -c pciinfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pciinfo.o
