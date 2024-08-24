@@ -1,4 +1,4 @@
-// mk.h
+// intake.h
 // 'Intake' is the microkernel component for the kernel base.
 // Created by Fred Nora.
 
@@ -23,7 +23,7 @@
 // == prototypes =========================
 //
 
-int psInitializeMKComponents (void);
+int keInitializeIntake (void);
 
 #endif   
 

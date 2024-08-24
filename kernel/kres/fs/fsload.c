@@ -301,8 +301,8 @@ fsLoadFile (
     if (FileSize >= BufferSizeInBytes)
     {
         debug_print("fsLoadFile: [FIXME] Buffer Overflow\n");
-             printk("fsLoadFile: [FIXME] FileSize %d BufferSizeInBytes %d\n",
-                 FileSize, BufferSizeInBytes );
+        printk("fsLoadFile: [FIXME] FileSize %d BufferSizeInBytes %d\n",
+            FileSize, BufferSizeInBytes );
         goto fail;
     }
 

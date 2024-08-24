@@ -317,30 +317,6 @@ static int __create_system_partition(void)
     return 0;
 }
 
-
-int init_storage_support(void)
-{
-// Called by I_initKernelComponents in x64init.c
-// #bugbug
-// When the rest of the structure is initialized?
-
-    storage = (void *) kmalloc( sizeof(struct storage_d) );
-    if ((void *) storage == NULL)
-    {
-       printk("init_storage_support: storage\n");
-       return FALSE;
-    }
-    memset( storage, 0, sizeof(struct storage_d) );
-    // Set up only the main elements of the structure.
-    storage->used = TRUE;
-    storage->magic = 1234;
-    storage->system_disk = NULL;
-    storage->system_volume = NULL;
-    storage->bootvolume_fp = NULL;
-    // ...
-    return TRUE;
-}
-
 // local
 // Create vfs partition
 // Volume 0.
@@ -888,6 +864,116 @@ void *volume_get_current_volume_info (void)
 }
 
 
+/*
+ * read_lba:
+ *     Carrega um um setor na memória, dado o LBA.
+ *     Obs: 
+ *     Talvez essa rotina tenha que ter algum retorno no caso de falhas. 
+ */
+// #bugbug
+// Essa rotina e' independente do sistema de arquivos.
+// Change name to dest_buffer
+// #bugbug
+// Disk info?
+// Qual é o disco?
+// Qual é a porta IDE?
+// ...
+// #todo
+// use 'buffer_va'.
+
+void 
+read_lba ( 
+    unsigned long address, 
+    unsigned long lba )
+{
+// #todo
+// Fazer algum filtro de argumentos?
+
+    // if ( address == 0 ){}
+
+// Is it FAT12/FAT16/FA32 boot disk?
+// Is it a FAT disk at all?
+// See: volume.h
+
+    switch (g_currentvolume_fatbits){
+
+    case 32:
+        debug_print ("read_lba: [FAIL] FAT32 not supported\n");
+        return;
+        break;
+
+    // atahdd.c
+    case 16:
+        //#todo: return value.
+        //#todo: IN: buffer,lba,?,?,
+        ataReadSector ( address, lba, 0, 0 );
+        return;
+        break;
+
+    // Nothing.
+    case 12:
+        debug_print ("read_lba: [FAIL] FAT12 not supported\n");
+        return;
+        break;
+
+    default:
+        debug_print ("read_lba: [FAIL] g_currentvolume_fatbits not supported\n");
+        panic ("read_lba: default\n");
+        break;
+    };
+}
+
+/*
+ * write_lba:
+ *     Grava um setor no disco dado o endereço do buffer e o lba. 
+ */
+// #bugbug
+// Essa rotina e' independente do sistema de arquivos.
+// #todo: use 'int' return.
+void write_lba( unsigned long address, unsigned long lba )
+{
+
+// #todo: 
+// Check lba limits.
+
+    if (address == 0){
+        debug_print ("write_lba: [FAIL] Limits\n");
+        goto fail;
+    }
+
+    // See: volume.h
+    switch (g_currentvolume_fatbits){
+
+    case 32:
+        printk ("write_lba: [ERROR] FAT32 not supported\n");
+        goto fail;
+        break;
+
+    //See: atahdd.c
+    case 16:
+        
+        ataWriteSector ( address, lba, 0, 0 ); 
+        return;
+        break;
+
+    case 12:
+        printk ("write_lba: [ERROR] FAT12 not supported\n");
+        goto fail;
+        break;
+
+    default:
+        printk ("write_lba: default\n");
+        panic ("read_lba: default\n");
+        break;
+    };
+
+// Nothing.
+
+fail:
+    refresh_screen();
+    return;
+}
+
 // Get the number of sectors in the boot disk
 // and save it into a global variable, for now.
 int storage_set_total_lba_for_boot_disk(void)
@@ -942,4 +1028,35 @@ int storage_set_total_lba_for_boot_disk(void)
 fail:
     return FALSE;
 }
+
+//
+// $
+// INITIALIZATION
+//
+
+int init_storage_support(void)
+{
+// Called by I_initKernelComponents in x64init.c
+// #bugbug
+// When the rest of the structure is initialized?
+
+    storage = (void *) kmalloc( sizeof(struct storage_d) );
+    if ((void *) storage == NULL)
+    {
+       printk("init_storage_support: storage\n");
+       return FALSE;
+    }
+    memset( storage, 0, sizeof(struct storage_d) );
+    // Set up only the main elements of the structure.
+    storage->used = TRUE;
+    storage->magic = 1234;
+    storage->system_disk = NULL;
+    storage->system_volume = NULL;
+    storage->bootvolume_fp = NULL;
+    // ...
+
+    return TRUE;
+}
+
+
 

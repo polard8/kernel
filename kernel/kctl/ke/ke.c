@@ -763,12 +763,12 @@ void ke_x64ExecuteInitialProcess(void)
     //goto InitializeEnd;
 }
 
-// Called by I_init().
-int psInitializeMKComponents(void)
+// Called by I_initKernelComponents().
+int keInitializeIntake(void)
 {
     //int Status = FALSE;
 
-    //PROGRESS("psInitializeMKComponents:\n");
+    //PROGRESS("keInitializeIntake:\n");
 
 // Init scheduler.
 // See: sched/sched.c
@@ -795,7 +795,7 @@ int psInitializeMKComponents(void)
         (void *) kmalloc( sizeof(struct dispatch_count_d) );
 
     if ((void *) DispatchCountBlock == NULL){
-        printk ("init_microkernel: DispatchCountBlock\n");
+        printk ("keInitializeIntake: DispatchCountBlock\n");
         return FALSE;
     }
 
@@ -816,7 +816,7 @@ int psInitializeMKComponents(void)
 // por isso não deu pra limpar a tela antes.
 
 #ifdef BREAKPOINT_TARGET_AFTER_MK
-    printk ("#breakpoint: after init_microkernel");
+    printk ("#breakpoint: after keInitializeIntake");
     die();
 #endif
 

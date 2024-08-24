@@ -657,26 +657,9 @@ void doSetupVersion(void)
 
 int zeroInitializeSystemComponents(void)
 {
-// Initialize pci, rtc and ata.
-
-    //int Status = FALSE;
+    // #deprecated
 
     debug_print ("zeroInitializeSystemComponents:\n");
-
-// Initializat PCI interface.
-    init_pci();
-
-// Initializat RTC device driver.
-    DDINIT_rtc();
-
-// Initializat ata device driver.
-// see: ata.c
-// IN: msg, data1.
-    DDINIT_ata( 1, FORCEPIO );
-
-    // #debug
-    //while(1){}
-
     return TRUE;
 }
 

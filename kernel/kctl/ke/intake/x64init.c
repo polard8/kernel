@@ -1119,50 +1119,53 @@ static int I_x64CreateTID0(void)
 // OUT: TRUE if it is ok.
 // + Initialize globals.
 // + Initialize device manager.
-// + Initialize storage manager.
-// + Initialize disk and volume support.
-// + Initialize filesystem support.
 // + Initialize hal components.
-// + Initialize mm, ipc, ps components.
-// + Initialize pci, rtc and ata.
-// + Set the number of sectors in the boot disk.
-// + MBR info
-// + FAT support and main directories.
-// + Create the processor structure.
-// + Get processor information.
-// + Initialize fpu/see support.
-// + Detect the hypervisor.
+// + Initialize storage manager.
+// + Initialize filesystem support.
 
 static int I_initKernelComponents(void)
 {
     int Status = FALSE;
-    unsigned char ProcessorType=0;
 
     //PROGRESS("I_initKernelComponents:\n");
 
-// ==================
 // Check kernel phase.
-
     if (Initialization.current_phase != 1){
         printk ("I_initKernelComponents: Initialization phase is Not 1.\n");
         return FALSE;
     }
 
-// ===============================
-// Globals
+// Initialize globals.
 // See: kmain.c
-
     keInitGlobals();
     //PROGRESS("init_globals ok\n"); 
 
-// ===============================
-// Initialize device manager.
-// At this moment we didn't initialize any device,
-// maybe only the 'serial port' used in the basic debug.
-// see: dev/devmgr.c
+
+// Create the device list for all the devices
+// in our system, including the hal stuff i guess.
     devmgr_initialize();
 
+
+// Initialize system HAL.
+    Status = halInitialize();
+    if (Status != TRUE){
+        printk("I_initKernelComponents: halInitialize fail\n");
+        return FALSE;
+    }
+    //PROGRESS("halInitialize ok\n"); 
+
+// Initializat PCI interface.
+    init_pci();
+
+
+//
+// $
+// STORAGE
+//
+
+// ++
 // ===============================
+
 // Storage manager
 // Ordem: storage, disk, volume, file system.
 // #importante 
@@ -1178,45 +1181,22 @@ static int I_initKernelComponents(void)
        printk("I_initKernelComponents: init_storage_support fail\n");
        return FALSE;
     }
+
+    // #bugbug
+    // The current compilation method is not allowing us
+    // to move the routines bellow as part of init_storage_support().
+
 // Disks and volumes.
 // see: storage.c
     disk_init();
     volume_init();
-// File systems support.
-// see: fs.c
-    //vfsInit();
-    fsInit();
-    // ...
 
-// ==========================
-// hal
-    Status = halInitialize();
-    if (Status != TRUE){
-        printk("I_initKernelComponents: halInitialize fail\n");
-        return FALSE;
-    }
-    //PROGRESS("halInitialize ok\n"); 
+// Initializat ata device driver.
+// see: ata.c
+// IN: msg, data1.
+    DDINIT_ata( 1, FORCEPIO );
 
-// ==========================
-// microkernel components:
-// mm, ipc, ps ...
-    Status = psInitializeMKComponents();
-    if (Status != TRUE){
-        printk ("I_initKernelComponents: psInitializeMKComponents fail\n");
-        return FALSE;
-    }
-    //PROGRESS("psInitializeMKComponents ok\n"); 
-
-// =========================================
-// Executive components
-// Initialize pci, rtc and ata.
-    Status = zeroInitializeSystemComponents();
-    if (Status != TRUE){
-        printk ("I_initKernelComponents: zeroInitializeSystemComponents fail\n"); 
-        return FALSE;
-    }
-    //PROGRESS("zeroInitializeSystemComponents ok\n"); 
-
+// >> Precisa do bootdisk e do ata device.
 // Set the number of sectors in the boot disk.
 // It depends on the disk and ata initialization.
 // So, now we can do this.
@@ -1232,108 +1212,15 @@ static int I_initKernelComponents(void)
 // Its because we're gonna rad the disk to get the partition tables.
     disk_initialize_mbr_info();
 
-// FAT support for the boot partition
-    fsbp_initialize_fat();
+// ===============================
+//--
 
-// Initialize boot partitions canonical directories.
-// see: fsbp.c
-    fsbp_initialize_bp_directories();
+// File systems support.
+// see: fs.c
+
+    //vfsInit();
+    fsInit();
     // ...
-
-// =========================================
-// ::(5)(3)(9)
-// Initialize processor information.
-// + 'processor' structuture initialization.
-// + Probing processor type.
-// + Initialize fpu and smp support.
-// + Detect the hypervisor.
-
-    //PROGRESS("processor, fpu, smp, hv\n"); 
-
-// --------
-// 'processor' structuture initialization.
-    processor = (void *) kmalloc( sizeof(struct processor_d) ); 
-    if ((void *) processor == NULL){
-        printk("I_initKernelComponents: processor\n");
-        return FALSE;
-    }
-    memset( processor, 0, sizeof(struct processor_d) );
-// Validate the structure
-// This is a valid structure,
-// but it's not initialized yet.
-    processor->objectType = ObjectTypeProcessor;
-    processor->objectClass = ObjectClassKernelObject;
-    processor->used = TRUE;
-    processor->magic = 1234;
-
-// --------
-// Probing processor type.
-// #todo
-// Check if cpuid instruction is available.
-// See: _x86_test_cpuid_support on bootmx/headlib.asm
-// #todo: extern int x86_test_cpuid_support(void);
-// Sonda pra ver qual é a marca do processador.
-// #todo: 
-// É a segunda vez que fazemos a sondagem ?!
-// See: hal/detect.c
-// This routine is valid for intel and amd processors.
-// Ok.
-// Let's make some initialization and 
-// get more information about the processor
-// using the cpuid instruction.
-// See: 
-// detect.c
-// x86.c
-// cpuamd.c
-
-    ProcessorType = (int) hal_probe_processor_type();
-    processor->Type = (int) ProcessorType;
-
-// --------
-// Initialize fpu and smp support.
-
-    int fpu_status = -1;     // fail
-    int smp_status = FALSE;  // fail
-
-    switch (ProcessorType){
-
-    // INTEL:
-    // + Get processor information.
-    // + Initialize fpu/see support.
-    case Processor_INTEL:
-    case Processor_AMD:
-        // Get processor information.
-        x64_init_intel();
-        //init_amd(); 
-        //Initialize fpu/see support.
-        fpu_status = (int) x64_init_fpu_support();
-        if (fpu_status<0){
-            printk("I_initKernelComponents: [FAIL] FPU Initialization fail\n");
-            return FALSE;
-        }
-
-        // --------
-        // Detect the hypervisor.
-        // Saved into the processor data structure.
-        // Save the option found into a global variable.
-        // #todo: We need a structure for that thing.
-        // see: virt/hv.c
-        // Essa rotina eh valida para AMD e Intel.
-        //int hv_return = -1;
-        hv_probe_info();
-
-        //#breakpoint
-        //printk("#breakpoint in I_init()\n");
-        //refresh_screen();
-        //while(1){}
-
-        break;
-    // ...
-    default:
-        printk ("I_initKernelComponents: [ERROR] default ProcessorType\n");
-        return FALSE;
-        break;
-    };
 
 // ok
 // Return to the main initialization routine
@@ -1462,28 +1349,22 @@ int I_x64_initialize(void)
 // Starting phase 2.
     Initialization.current_phase = 2;
 
+
+// ==========================
+// microkernel components:
+// scheduler, process, thread (intake)
+
+    Status = keInitializeIntake();
+    if (Status != TRUE){
+        printk ("I_x64_initialize: keInitializeIntake fail\n");
+        return FALSE;
+    }
+    //PROGRESS("keInitializeIntake ok\n"); 
+
+
 // -------------------------------
 // Starting phase 3.
     Initialization.current_phase = 3;
-
-// ================================
-// DANGER !!!
-// :::: GDT ::::
-// Setup GDT again.
-// We already made this at kernel startup.
-// # Caution.
-// Lets create a TSS and setup a GDT.
-// This way we can use 'current_tss' when we create threads.
-// This function creates a TSS and sets up a GDT.
-// #todo
-// Depois de renovarmos a GDT precisamos
-// recarregar os registradores de segmento?
-// See: hal/arch/x86/x86.c
-// #bugbug
-// see: x64.c
-
-    //PROGRESS(":: GDT\n"); 
-    x64_init_gdt();
 
 // ================================
 // [KERNEL PROCESS] :: Creating kernel process.

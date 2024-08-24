@@ -72,56 +72,6 @@ __do_save_sequence (
 }
 
 /*
- * write_lba:
- *     Grava um setor no disco dado o endereço do buffer e o lba. 
- */
-// #bugbug
-// Essa rotina e' independente do sistema de arquivos.
-// #todo: use 'int' return.
-void write_lba( unsigned long address, unsigned long lba )
-{
-
-// #todo: 
-// Check lba limits.
-
-    if (address == 0){
-        debug_print ("write_lba: [FAIL] Limits\n");
-        goto fail;
-    }
-
-    // See: volume.h
-    switch (g_currentvolume_fatbits){
-
-    case 32:
-        printk ("write_lba: [ERROR] FAT32 not supported\n");
-        goto fail;
-        break;
-
-    //See: atahdd.c
-    case 16:
-        ataWriteSector ( address, lba, 0, 0 ); 
-        return;
-        break;
-
-    case 12:
-        printk ("write_lba: [ERROR] FAT12 not supported\n");
-        goto fail;
-        break;
-
-    default:
-        printk ("write_lba: [ERROR] g_currentvolume_fatbits NOT SUPPORTED\n");
-        goto fail;
-        break;
-    };
-
-// Nothing.
-
-fail:
-    refresh_screen();
-    return;
-}
-
-/*
  * fatWriteCluster:
  *     Salva um cluster no disco.
  * Argumentos:

@@ -64,7 +64,7 @@ void write_lba ( unsigned long address, unsigned long lba )
     switch (ControllerType)
     {
         case CONTROLLER_TYPE_AHCI:
-            //ahci_read_sector(...)
+            //ahci_write_sector(...)
             break;
 
         case CONTROLLER_TYPE_ATA:

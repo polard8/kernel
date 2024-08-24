@@ -2560,7 +2560,7 @@ fail:
 
 // ------------------------------
 // fsInit:
-// Called by I_init() in x64init.c
+// Called by I_initKernelComponents() in x64init.c
 int fsInit (void)
 {
     register int i=0;
@@ -2749,6 +2749,17 @@ int fsInit (void)
 // Target dir struct
 // Inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
+
+
+// FAT support for the boot partition
+    fsbp_initialize_fat();
+
+// Initialize boot partitions canonical directories.
+// see: fsbp.c
+    fsbp_initialize_bp_directories();
+    // ...
+
+
 
     return 0;
 }

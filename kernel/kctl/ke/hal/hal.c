@@ -360,9 +360,109 @@ int halInitialize(void)
 // Called by I_Init() in init.c
 
     int Status = FALSE;
+    unsigned char ProcessorType=0;
 
-    // #deprecated
-    //hal_init_cpu();
+
+
+//
+// HAL <<<<<<
+//
+
+// =========================================
+// ::(5)(3)(9)
+// Initialize processor information.
+// + 'processor' structuture initialization.
+// + Probing processor type.
+// + Initialize fpu and smp support.
+// + Detect the hypervisor.
+
+    //PROGRESS("processor, fpu, smp, hv\n"); 
+
+// --------
+// 'processor' structuture initialization.
+    processor = (void *) kmalloc( sizeof(struct processor_d) ); 
+    if ((void *) processor == NULL){
+        printk("I_initKernelComponents: processor\n");
+        return FALSE;
+    }
+    memset( processor, 0, sizeof(struct processor_d) );
+// Validate the structure
+// This is a valid structure,
+// but it's not initialized yet.
+    processor->objectType = ObjectTypeProcessor;
+    processor->objectClass = ObjectClassKernelObject;
+    processor->used = TRUE;
+    processor->magic = 1234;
+
+// --------
+// Probing processor type.
+// #todo
+// Check if cpuid instruction is available.
+// See: _x86_test_cpuid_support on bootmx/headlib.asm
+// #todo: extern int x86_test_cpuid_support(void);
+// Sonda pra ver qual é a marca do processador.
+// #todo: 
+// É a segunda vez que fazemos a sondagem ?!
+// See: hal/detect.c
+// This routine is valid for intel and amd processors.
+// Ok.
+// Let's make some initialization and 
+// get more information about the processor
+// using the cpuid instruction.
+// See: 
+// detect.c
+// x86.c
+// cpuamd.c
+
+    ProcessorType = (int) hal_probe_processor_type();
+    processor->Type = (int) ProcessorType;
+
+// --------
+// Initialize fpu and smp support.
+
+    int fpu_status = -1;     // fail
+    int smp_status = FALSE;  // fail
+
+    switch (ProcessorType){
+
+    // INTEL:
+    // + Get processor information.
+    // + Initialize fpu/see support.
+    case Processor_INTEL:
+    case Processor_AMD:
+        // Get processor information.
+        x64_init_intel();
+        //init_amd(); 
+        //Initialize fpu/see support.
+        fpu_status = (int) x64_init_fpu_support();
+        if (fpu_status<0){
+            printk("I_initKernelComponents: [FAIL] FPU Initialization fail\n");
+            return FALSE;
+        }
+
+        // --------
+        // Detect the hypervisor.
+        // Saved into the processor data structure.
+        // Save the option found into a global variable.
+        // #todo: We need a structure for that thing.
+        // see: virt/hv.c
+        // Essa rotina eh valida para AMD e Intel.
+        //int hv_return = -1;
+        hv_probe_info();
+
+        //#breakpoint
+        //printk("#breakpoint in I_init()\n");
+        //refresh_screen();
+        //while(1){}
+
+        break;
+    // ...
+    default:
+        printk ("I_initKernelComponents: [ERROR] default ProcessorType\n");
+        return FALSE;
+        break;
+    };
+
 
 // #todo:
 // Chamaremos essa inicialização básica nesse momento.
@@ -372,6 +472,33 @@ int halInitialize(void)
 // Detecta fabricantes específicos suportados pelo núcleo.  
     hal_hardware_detect();
 
+// Initializat RTC device driver.
+// hal
+    DDINIT_rtc();
+
+
+// ================================
+// DANGER !!!
+// :::: GDT ::::
+// Setup GDT again.
+// We already made this at kernel startup.
+// # Caution.
+// Lets create a TSS and setup a GDT.
+// This way we can use 'current_tss' when we create threads.
+// This function creates a TSS and sets up a GDT.
+// #todo
+// Depois de renovarmos a GDT precisamos
+// recarregar os registradores de segmento?
+// See: hal/arch/x86/x86.c
+// #bugbug
+// see: x64.c
+
+    //PROGRESS(":: GDT\n"); 
+    x64_init_gdt();
+
     return TRUE;
+
+fail:
+    return FALSE;
 }
 

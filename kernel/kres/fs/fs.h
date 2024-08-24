@@ -512,8 +512,6 @@ fatClustToSect (
     unsigned long spc, 
     unsigned long first_data_sector );
 
-void read_lba( unsigned long address, unsigned long lba );
-
 void 
 fatLoadCluster ( 
     unsigned long sector, 
@@ -548,8 +546,6 @@ void fsbp_initialize_fat(void);
 // For boot partition
 int fsbp_initialize_bp_directories(void);
 
-// disk? not fs.
-void write_lba( unsigned long address, unsigned long lba );
 
 void 
 fatWriteCluster ( 

@@ -65,61 +65,6 @@ fatClustToSect (
     return (unsigned long) (C * spc) + first_data_sector;
 }
 
-/*
- * read_lba:
- *     Carrega um um setor na memória, dado o LBA.
- *     Obs: 
- *     Talvez essa rotina tenha que ter algum retorno no caso de falhas. 
- */
-// #bugbug
-// Essa rotina e' independente do sistema de arquivos.
-// Change name to dest_buffer
-// #bugbug
-// Disk info?
-// Qual é o disco?
-// Qual é a porta IDE?
-// ...
-// #todo
-// use 'buffer_va'.
-
-void 
-read_lba ( 
-    unsigned long address, 
-    unsigned long lba )
-{
-// #todo
-// Fazer algum filtro de argumentos?
-
-    // if ( address == 0 ){}
-
-// See: volume.h
-
-    switch (g_currentvolume_fatbits){
-
-    case 32:
-        debug_print ("read_lba: [FAIL] FAT32 not supported\n");
-        return;
-        break;
-
-    // atahdd.c
-    case 16:
-        //#todo: return value.
-        //#todo: IN: buffer,lba,?,?,
-        ataReadSector ( address, lba, 0, 0 );
-        return;
-        break;
-
-    // Nothing.
-    case 12:
-        debug_print ("read_lba: [FAIL] FAT12 not supported\n");
-        return;
-        break;
-
-    default:
-        debug_print ("read_lba: [FAIL] g_currentvolume_fatbits not supported\n");
-        break;
-    };
-}
 
 /*
  * fatLoadCluster:

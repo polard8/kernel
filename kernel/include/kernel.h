@@ -291,7 +291,7 @@
 #include "../kctl/ke/intake/disp/ts.h"
 #include "../kctl/ke/intake/tasks.h"
 #include "../kctl/ke/intake/queue.h"
-#include "../kctl/ke/intake/mk.h"
+#include "../kctl/ke/intake/intake.h"
 #include "../kctl/ke/intake/disp/dispatch.h"
 #include "../kctl/ke/intake/msg.h"
 #include "../kctl/ke/intake/thread.h"

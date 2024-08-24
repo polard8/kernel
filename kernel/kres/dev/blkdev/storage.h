@@ -1,5 +1,5 @@
-
 // storage.h
+// Created by Fred Nora.
 
 #ifndef  __STORAGE_H
 #define  __STORAGE_H    1
@@ -80,13 +80,37 @@ struct storage_d
 struct storage_d  *storage;
 
 
-// prototypes
+//
+// == prototypes ============================================
+//
 
-int init_storage_support(void);
+
+
+void read_lba( unsigned long address, unsigned long lba );
+void write_lba( unsigned long address, unsigned long lba );
+
+
+int
+storage_read_sector( 
+    unsigned long buffer, 
+    unsigned long lba );
+
+int
+storage_write_sector( 
+    unsigned long buffer, 
+    unsigned long lba );
+
 
 // Get the number of sectors in the boot disk
 // and save it into a global variable, for now.
 int storage_set_total_lba_for_boot_disk(void);
+
+//
+// $
+// INITIALIZATION
+//
+
+int init_storage_support(void);
 
 #endif    
 

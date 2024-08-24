@@ -343,6 +343,13 @@ devmgr_register_device (
 // Called by I_initKernelComponents() in x64init.c.
 // Inicializa o gerenciamento de dispositivos.
 // Inicializa a lista de dispositivos.
+// ===============================
+// Initialize device manager.
+// >>> We're gonna hace a list of devices,
+// including the hal stuff.
+// At this moment we didn't initialize any device,
+// maybe only the 'serial port' used in the basic debug.
+
 void devmgr_initialize(void)
 {
     register int i=0;
