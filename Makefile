@@ -9,9 +9,9 @@ BASE = your/base
 # Display server, libraries and client-side GUI applications.
 DEP_L1  = ../de
 # Extra stuff. No time for this.
-DEP_L2  = ../de/t00/commands
-DEP_L3  = ../de/t00/browser
-DEP_L4  = ../de/t00/aurora
+DEP_L2  = ../de/native/commands
+DEP_L3  = ../de/apps/browser
+DEP_L4  = ../de/native/aurora
 
 # Make variables (CC, etc...)
 AS      = as
@@ -175,18 +175,18 @@ copy-extras:
 # ------------------------
 # LEVEL 1: (de/) Display servers and applications.
 
-    # Well consolidated applications
-	-cp $(DEP_L1)/core/ds00/bin/DS00.BIN   $(BASE)/
-	-cp $(DEP_L1)/shell/bin/TASKBAR.BIN    $(BASE)/
-	-cp $(DEP_L1)/shell/bin/XTB.BIN        $(BASE)/
-	-cp $(DEP_L1)/shell/bin/TERMINAL.BIN   $(BASE)/
-	#-cp $(DEP_L1)/shell/bin/GWS.BIN       $(BASE)/
+    # Well consolidated server and applications
+	-cp $(DEP_L1)/fw/ds00/bin/DS00.BIN   $(BASE)/
+	-cp $(DEP_L1)/apps/bin/TASKBAR.BIN    $(BASE)/
+	-cp $(DEP_L1)/apps/bin/XTB.BIN        $(BASE)/
+	-cp $(DEP_L1)/apps/bin/TERMINAL.BIN   $(BASE)/
+	#-cp $(DEP_L1)/apps/bin/GWS.BIN       $(BASE)/
     # Experimental applications
     # These need the '@' prefix.
-	-cp $(DEP_L1)/shell/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
-	-cp $(DEP_L1)/shell/bin/DOC.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_L1)/shell/bin/GDM.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_L1)/shell/bin/EDITOR.BIN   $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/apps/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/apps/bin/DOC.BIN      $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/apps/bin/GDM.BIN      $(BASE)/GRAMADO/
+	-cp $(DEP_L1)/apps/bin/EDITOR.BIN   $(BASE)/GRAMADO/
 
 # ------------------------
 # LEVEL 2: (commands/)  Posix comands.

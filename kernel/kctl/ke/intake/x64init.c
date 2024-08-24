@@ -1325,19 +1325,9 @@ int I_x64_initialize(void)
 // Initialize a lot of kernel components
 // + Initialize globals.
 // + Initialize device manager.
-// + Initialize storage manager.
-// + Initialize disk and volume support.
-// + Initialize filesystem support.
 // + Initialize hal components.
-// + Initialize mm, ipc, ps components.
-// + Initialize pci, rtc and ata.
-// + Set the number of sectors in the boot disk.
-// + MBR info
-// + FAT support and main directories.
-// + Create the processor structure.
-// + Get processor information.
-// + Initialize fpu/see support.
-// + Detect the hypervisor.
+// + Initialize storage manager.
+// + Initialize filesystem support.
 
     Status = (int) I_initKernelComponents(); 
     if (Status != TRUE){
