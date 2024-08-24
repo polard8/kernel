@@ -407,15 +407,17 @@ void debug ()
 
 void testa_mbr()
 {
-    my_read_hd_sector ( MBR_ADDRESS, MBR_LBA, 0, 0 );
-    printf ("%s", MBR_ADDRESS );
+    // ATA only
+    //ata_read_hd_sector ( MBR_ADDRESS, MBR_LBA, 0, 0 );
+    //printf ("%s", MBR_ADDRESS );
 }
 
 // Mudar nome
 void testa_root()
 {
-    my_read_hd_sector( FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA, 0, 0 );
-    printf("%s", FAT16_ROOTDIR_ADDRESS );
+    // ATA only
+    //ata_read_hd_sector( FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA, 0, 0 );
+    //printf("%s", FAT16_ROOTDIR_ADDRESS );
 }
 
 // #todo: Move this routine to another file.

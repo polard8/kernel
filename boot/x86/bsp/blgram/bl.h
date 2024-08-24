@@ -306,7 +306,6 @@ extern void refresh_screen();
 #include "dd/storage/storage.h"
 
 
-
 //#include "timer.h"  // irq 0.
 
 // Embedded mini-shell

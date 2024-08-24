@@ -1,6 +1,5 @@
 // libata.c
 
-
 // IDE controller support.
 // 2013 - Created by Fred Nora.
 
@@ -9,8 +8,8 @@
  * Environment:
  *     32bit bootloader.
  * Two functions are used in this document.
- * >> my_read_hd_sector() is called by read_lba().
- * >> my_write_hd_sector() is called by write_lba().
+ * >> ata_read_sector() is called by read_lba().
+ * >> ata_write_sector() is called by write_lba().
  * read_lba() and write_lba are called by fs.c.
  */
 
@@ -50,39 +49,34 @@ int hddStatus=0;
 int hddError=0;
 //...
 
-// ------------------------------------------------------------
 
-// #bugbug
-// inline is not good
 
-static void hdd_ata_pio_read ( 
+static void 
+__libata_pio_read ( 
     int p, 
     void *buffer, 
-    int bytes )
-{
-    asm volatile (\
-        "cld;\
-         rep; insw":: "D" (buffer),\
-         "d" ( ide_ports[p].base_port + 0 ),\
-          "c" (bytes/2));
-}
+    int bytes );
 
-
-// #bugbug
-// inline is not good
-
-void 
-hdd_ata_pio_write ( 
+static void 
+__libata_pio_write ( 
     int p, 
     void *buffer, 
-    int bytes )
-{
-    asm volatile (\
-                "cld;\
-                rep; outsw"::"S"(buffer),\
-                "d"( ide_ports[p].base_port + 0 ),\
-                "c"(bytes/2));
-}
+    int bytes );
+
+
+// Read or write a sector using PIO mode.
+
+static int 
+__ata_pio_rw_sector ( 
+    unsigned long buffer, 
+    unsigned long lba, 
+    int rw, 
+    int port,
+    int slave ); 
+
+
+// ===================================================================
+
 
 uint8_t hdd_ata_status_read(int p)
 {
@@ -124,8 +118,36 @@ int hdd_ata_wait_no_drq (int p)
     return 0;
 }
 
+static void 
+__libata_pio_read ( 
+    int p, 
+    void *buffer, 
+    int bytes )
+{
+    asm volatile (\
+        "cld;\
+         rep; insw":: "D" (buffer),\
+         "d" ( ide_ports[p].base_port + 0 ),\
+          "c" (bytes/2));
+}
+
+
+static void 
+__libata_pio_write ( 
+    int p, 
+    void *buffer, 
+    int bytes )
+{
+    asm volatile (\
+                "cld;\
+                rep; outsw"::"S"(buffer),\
+                "d"( ide_ports[p].base_port + 0 ),\
+                "c"(bytes/2));
+}
+
+
 /*
- * pio_rw_sector
+ * __ata_pio_rw_sector
  * IN:
  *     buffer - Buffer address
  *     lba    - LBA number 
@@ -137,8 +159,8 @@ int hdd_ata_wait_no_drq (int p)
 // IN:
 // port = We have 4 valid ports.
 // slave = slave or not.
-int 
-pio_rw_sector ( 
+static int 
+__ata_pio_rw_sector ( 
     unsigned long buffer, 
     unsigned long lba, 
     int rw, 
@@ -255,7 +277,7 @@ again:
         timeout--;
         if (timeout == 0)
         {
-            printf("pio_rw_sector: [FAIL] rw sector timeout\n");
+            printf("__ata_pio_rw_sector: [FAIL] rw sector timeout\n");
             return -3;
         }
 
@@ -273,7 +295,7 @@ again:
 
         // read
         case 0x20:
-            hdd_ata_pio_read ( 
+            __libata_pio_read ( 
                 (int)    port, 
                 (void *) buffer, 
                 (int)    512 );
@@ -283,7 +305,7 @@ again:
         // write
         case 0x30:
  
-            hdd_ata_pio_write ( 
+            __libata_pio_write ( 
                 (int)    port, 
                 (void *) buffer, 
                 (int)    512 );
@@ -301,7 +323,7 @@ again:
 
         // fail
         default:
-            printf ("pio_rw_sector: default\n");
+            printf ("__ata_pio_rw_sector: default\n");
             bl_die();
             break;
     };
@@ -310,14 +332,14 @@ again:
 }
 
 /*
- * my_read_hd_sector:
+ * ata_read_sector:
  * eax - buffer
  * ebx - lba
  * ecx - null
  * edx - null
  */
 void 
-my_read_hd_sector ( 
+ata_read_sector ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
@@ -345,7 +367,7 @@ my_read_hd_sector (
 // IN:
 // (buffer, lba, rw flag, port number, master )
 
-    pio_rw_sector ( 
+    __ata_pio_rw_sector ( 
         (unsigned long) ax,  // Buffer
         (unsigned long) bx,  // LBA
         (int) Operation, 
@@ -369,7 +391,7 @@ my_read_hd_sector (
 }
 
 /*
- * my_write_hd_sector:
+ * ata_write_sector:
  * eax - buffer
  * ebx - lba
  * ecx - null
@@ -377,7 +399,7 @@ my_read_hd_sector (
  */
 
 void 
-my_write_hd_sector ( 
+ata_write_sector ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
@@ -406,9 +428,9 @@ my_write_hd_sector (
 // apresentou problemas. Estamos testando ...
 
 // read test (buffer, lba, rw flag, port number )
-    // pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );
+    // __ata_pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );
 
-    pio_rw_sector ( 
+    __ata_pio_rw_sector ( 
         (unsigned long) ax,  // Buffer
         (unsigned long) bx,  // LBA
         (int) Operation, 
@@ -429,26 +451,6 @@ my_write_hd_sector (
 
 }
 
-/*
- * read_lba: 
- * Read a LBA from the disk.
- */
-void read_lba( unsigned long address, unsigned long lba )
-{
-// Called by fsLoadFile in fs.c
-    // if ( address == 0 ){}
-    my_read_hd_sector ( address, lba, 0, 0 );
-}
-
-/*
- * write_lba: 
- * Write a LBA into the disk.
- */
-void write_lba ( unsigned long address, unsigned long lba )
-{
-    // if ( address == 0 ){}
-    my_write_hd_sector ( address, lba, 0, 0 );
-}
 
 
 

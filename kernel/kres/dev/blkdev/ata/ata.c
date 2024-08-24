@@ -77,20 +77,24 @@ struct ata_controller_d AtaController;
 // == Private functions: prototypes ==============
 //
 
-static int __ata_initialize(int ataflag);
-
 static void __local_io_delay(void);
 static void __ata_pio_read ( int p, void *buffer, int bytes );
 static void __ata_pio_write ( int p, void *buffer, int bytes );
 static unsigned char __ata_config_structure(char nport);
 static void __set_ata_addr (int p, int channel);
 
-static int __ide_identify_device(uint8_t nport);
-static int ata_initialize_ide_device(char port);
-
 static void dev_switch(void);
 static int getnport_dev(void);
 static int nport_ajust(char nport);
+
+//
+// $
+// INITIALIZATION
+//
+
+static int __ide_identify_device(uint8_t nport);
+static int ata_initialize_ide_device(char port);
+static int __ata_initialize(int ataflag);
 
 // =======================================================
 
@@ -384,8 +388,77 @@ int ata_get_current_ide_port_index(void)
     return (int) g_current_ide_port_index;
 }
 
-
+// dev_switch:
+static void dev_switch(void)
+{
 // Worker
+
+// ??
+// Pula, se ainda não tiver nenhuma unidade.
+
+    if ( !current_sd )
+    {
+        return;
+    }
+
+// Obter a próxima tarefa a ser executada.
+// Se caímos no final da lista vinculada, 
+// comece novamente do início.
+    current_sd = current_sd->next;    
+    if ( !current_sd ){
+        current_sd = ready_queue_dev;
+    }
+}
+
+static int getnport_dev(void)
+{
+    if ((void *) current_sd == NULL){
+        return -1;
+    }
+    return (int) current_sd->dev_nport;
+}
+
+// #todo
+// Explain it better.
+static int nport_ajust(char nport)
+{
+    char i = 0;
+
+    // #todo
+    // Simplify this thing.
+ 
+    while ( nport != getnport_dev() )
+    {
+        if (i == 4){
+            return (int) 1; 
+        }
+        dev_switch();
+        i++;
+    };
+
+    if ( getnport_dev() == -1 )
+    { 
+        return (int) 1; 
+    }
+
+    return 0;
+}
+
+// #todo ioctl
+int 
+ata_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("ata_ioctl: #todo\n");
+    if(fd<0){
+        return -1;
+    }
+    return -1;
+}
+
+
 // __ide_identify_device:
 // O número da porta identica qual disco queremos pegar informações.
 // Salvaremos algumas informações na estrutura de disco.
@@ -643,8 +716,7 @@ static int __ide_identify_device(uint8_t nport)
 
 // ==========================
 // # PATA
-    if ( sig_byte_1 == ATADEV_PATA_SIG1 && 
-         sig_byte_2 == ATADEV_PATA_SIG2 )
+    if ( sig_byte_1 == ATADEV_PATA_SIG1 && sig_byte_2 == ATADEV_PATA_SIG2 )
     {
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
@@ -721,8 +793,7 @@ static int __ide_identify_device(uint8_t nport)
 
 // ==========================
 // # PATAPI
-    if ( sig_byte_1 == ATADEV_PATAPI_SIG1 && 
-         sig_byte_2 == ATADEV_PATAPI_SIG2 )
+    if ( sig_byte_1 == ATADEV_PATAPI_SIG1 && sig_byte_2 == ATADEV_PATAPI_SIG2 )
     {
         //kputs("Unidade PATAPI\n");   
         ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
@@ -779,8 +850,7 @@ static int __ide_identify_device(uint8_t nport)
 
 // ==========================
 // #SATA
-    if ( sig_byte_1 == ATADEV_SATA_SIG1 && 
-         sig_byte_2 == ATADEV_SATA_SIG2 )
+    if ( sig_byte_1 == ATADEV_SATA_SIG1 && sig_byte_2 == ATADEV_SATA_SIG2 )
     {
         //kputs("Unidade SATA\n");   
         // O dispositivo responde imediatamente um erro ao cmd Identify device
@@ -852,8 +922,7 @@ static int __ide_identify_device(uint8_t nport)
 
 // ==========================
 // # SATAPI
-    if (sig_byte_1 == ATADEV_SATAPI_SIG1  && 
-        sig_byte_2 == ATADEV_SATAPI_SIG2)
+    if (sig_byte_1 == ATADEV_SATAPI_SIG1  && sig_byte_2 == ATADEV_SATAPI_SIG2)
     {
         //kputs("Unidade SATAPI\n");   
         ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
@@ -996,15 +1065,14 @@ static int ata_initialize_ide_device(char port)
 //
 
 // See: ata.h
+// Ata device structure.
 
-    // Ata device structure.
-    new_dev = 
-        (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
+    new_dev = (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
     if ((void *) new_dev ==  NULL){
         printk("ata_initialize_ide_device: new_dev\n");
         goto fail;
     }
-    memset(new_dev, 0, sizeof(struct ata_device_d) );
+    memset ( new_dev, 0, sizeof(struct ata_device_d) );
 
 // Validation
     new_dev->used = TRUE;
@@ -1037,7 +1105,7 @@ static int ata_initialize_ide_device(char port)
 
 // ================
 // Unidades ATA.
-// 0    = PATA ou SATA
+// 0 = PATA ou SATA
     if (data == 0){
 
         // Is it an ata device?
@@ -1245,7 +1313,7 @@ static int ata_initialize_ide_device(char port)
 // ================
 // Unidade de classe desconhecida.
 // #bugbug: Not panic()
-    }else{
+    } else {
         debug_print("ata_initialize_ide_device: [ERROR] not ATA, not ATAPI.\n");
         return (int) -1;
     };
@@ -1360,82 +1428,12 @@ static int ata_initialize_ide_device(char port)
 //done:
     //debug_print ("ata_initialize_ide_device: done\n");
     return 0;
+
 fail:
     refresh_screen();
     panic("ata_initialize_ide_device: fail\n");
     return -1;  // Not reached.
 }
-
-// dev_switch:
-static void dev_switch(void)
-{
-// Worker
-
-// ??
-// Pula, se ainda não tiver nenhuma unidade.
-
-    if ( !current_sd )
-    {
-        return;
-    }
-
-// Obter a próxima tarefa a ser executada.
-// Se caímos no final da lista vinculada, 
-// comece novamente do início.
-    current_sd = current_sd->next;    
-    if ( !current_sd ){
-        current_sd = ready_queue_dev;
-    }
-}
-
-static int getnport_dev(void)
-{
-    if ((void *) current_sd == NULL){
-        return -1;
-    }
-    return (int) current_sd->dev_nport;
-}
-
-// #todo
-// Explain it better.
-static int nport_ajust(char nport)
-{
-    char i = 0;
-
-    // #todo
-    // Simplify this thing.
- 
-    while ( nport != getnport_dev() )
-    {
-        if (i == 4){
-            return (int) 1; 
-        }
-        dev_switch();
-        i++;
-    };
-
-    if ( getnport_dev() == -1 )
-    { 
-        return (int) 1; 
-    }
-
-    return 0;
-}
-
-// #todo ioctl
-int 
-ata_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg )
-{
-    debug_print("ata_ioctl: #todo\n");
-    if(fd<0){
-        return -1;
-    }
-    return -1;
-}
-
 
 // ++
 //----------------------------------------------
@@ -1451,7 +1449,7 @@ ata_ioctl (
 
 static int __ata_initialize(int ataflag)
 {
-// Called by init_ata().
+// Called by DDINIT_ata().
 // Here we're gonna know some things about the ata controller.
 // + What is the type of ata controller we have: ATA, RAID or AHCI.
 // + For ATA controller we're gonna initialize the 'ports', or the
@@ -1721,25 +1719,25 @@ static int __ata_initialize(int ataflag)
         // We're gonna create the structure for each 
         // of the devices.
 
+        // This routine is too long.
+        // And it is gonna setup the values in the structure
+        // given the port.
+
+        // #bugbug
+        // The structure is gonna stay with the
+        // values for the last time we called this routine.
+        // So, it's gonna work only if we're 
+        // using a single device.
+        // But we're saving the device info into another structure.
+
+        // Inicializa uma estrutura de ata_device e 
+        // coloca o ponteiro numa lista encadeada.
+
         for ( 
             iPortNumber=0; 
             iPortNumber < 4; 
             iPortNumber++ )
         {
-            // This routine is too long.
-            // And it is gonna setup the values in the structure
-            // given the port.
-
-            // #bugbug
-            // The structure is gonna stay with the
-            // values for the last time we called this routine.
-            // So, it's gonna work only if we're 
-            // using a single device.
-            // But we're saving the device info into another structure.
-
-            // Inicializa uma estrutura de ata_device e 
-            // coloca o ponteiro numa lista encadeada.
-
             ata_initialize_ide_device(iPortNumber);
         };
 
@@ -1812,6 +1810,11 @@ done:
 
     return (int) Status;
 }
+
+//
+// $
+// INITIALIZATION
+//
 
 //----------------------------------------------
 //--

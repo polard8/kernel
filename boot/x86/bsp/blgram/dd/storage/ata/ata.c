@@ -1908,8 +1908,12 @@ static int __ata_probe_controller(int ataflag)
     // ATA_BAR5
 
 //
-// De acordo com o tipo.
+// given the controller type
 //
+
+
+    BootDisk.initialized = FALSE;
+    BootDisk.controller_type = -1;
 
 //
 // Se for IDE.
@@ -1919,13 +1923,15 @@ static int __ata_probe_controller(int ataflag)
 // Type ATA
 // Sub-class 01h = IDE Controller
     if (ata.chip_control_type == __ATA_CONTROLLER){
-
+        
+        BootDisk.controller_type = CONTROLLER_TYPE_ATA;
         __ata_initialize_controller();
 
 // =========================
 // Type RAID
     } else if (ata.chip_control_type == __RAID_CONTROLLER){
 
+        BootDisk.controller_type = -1;
         printf ("__ata_probe_controller: RAID not supported\n");
         bl_die();
 
@@ -1933,6 +1939,7 @@ static int __ata_probe_controller(int ataflag)
 // Type ATA DMA.
     } else if (ata.chip_control_type == __ATA_CONTROLLER_DMA){
 
+        BootDisk.controller_type = -1;
         printf ("__ata_probe_controller: ATA DMA not supported\n");
         bl_die();
 
@@ -1941,6 +1948,7 @@ static int __ata_probe_controller(int ataflag)
 // Sub-class 06h = SATA Controller
     } else if (ata.chip_control_type == __AHCI_CONTROLLER){
 
+        BootDisk.controller_type = CONTROLLER_TYPE_AHCI;
         printf ("__ata_probe_controller: AHCI not supported\n");
         bl_die();
 
@@ -1948,9 +1956,12 @@ static int __ata_probe_controller(int ataflag)
 // Controller type not supported
 // Not IDE and Not AHCI
     }else{
+        BootDisk.controller_type = -1;
         printf ("__ata_probe_controller: Controller type not supported\n");
         bl_die();
     };
+
+    BootDisk.initialized = TRUE;
 
 
 // Ok
