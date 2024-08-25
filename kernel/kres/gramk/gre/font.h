@@ -1,7 +1,7 @@
-
 // fonts.h
 // Fonts support.
 // ring 0.
+// Created by Fred Nora.
 
 #ifndef  __FONTS_H
 #define  __FONTS_H    1
@@ -17,24 +17,10 @@
 //#define BIOSFONT8X8 0x000FFA6E
 //...
 
-// # char support # 
-#define CHAR_WIDTH   8
-#define CHAR_HEIGHT  8 
+// Char support
 #define DEFAULT_CHAR_WIDTH   8
 #define DEFAULT_CHAR_HEIGHT  8
 //...
-
-
-// see: font.c
-extern unsigned long gws_currentfont_address;
-extern unsigned long g8x8fontAddress;          // 8×8, 80×25,CGA, EGA
-extern unsigned long g8x14fontAddress;         // 8x14,80×25,EGA
-extern unsigned long g8x16fontAddress;         // ??
-extern unsigned long g9x14fontAddress;         // 9x14,80×25,MDA, Hercules
-extern unsigned long g9x16fontAddress;         // 9x16,80×25,VGA
-//...
-
-extern int gfontSize;
 
 typedef enum {
     FONTNULL,
@@ -43,22 +29,34 @@ typedef enum {
     // ...
 }font_type_t;
 
+struct font_initialization_d
+{
+    int initialized;
+    unsigned long address;
+    unsigned long width;
+    unsigned long height;
+
+// index
+// 8x8 | 8x16 ...
+    int font_size;
+};
+extern struct font_initialization_d  FontInitialization;
+
 //
 // == prototypes ============================
 //
 
-int gwsInitializeDefaultKernelFont(void);
 int gwsGetCurrentFontCharWidth (void);
 void gwsSetCurrentFontCharWidth (int width);
 int gwsGetCurrentFontCharHeight (void);
 void gwsSetCurrentFontCharHeight (int height);
 
 unsigned long fontGetCurrentAddress(void);
+
 void fontSetCurrentAddress(unsigned long address);
 
-int gwsInstallFont ( char *file_name );
+int gwsInstallFont (char *file_name);
+
+int font_initialize(void);
 
 #endif    
-
-
-

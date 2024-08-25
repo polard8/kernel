@@ -6,22 +6,22 @@
 
 void set_char_width ( int width )
 {
-    gcharWidth = (int) width;
+    FontInitialization.width = (int) width;
 }
 
 void set_char_height (int height)
 {
-    gcharHeight = (int) height;
+    FontInitialization.height = (int) height;
 }
 
 int get_char_width (void)
 {
-    return (int) gcharWidth;
+    return (int) FontInitialization.width;
 }
 
 int get_char_height (void)
 {
-    return (int) gcharHeight;
+    return (int) FontInitialization.height;
 }
 
 /*
@@ -68,29 +68,35 @@ d_draw_char (
 // if we do not have loadable one.
 
     // default: BIOS font.
-    if (gws_currentfont_address == 0){
-        gws_currentfont_address = (unsigned long) BIOSFONT8X8;
+    if (FontInitialization.address == 0){
+        FontInitialization.address = (unsigned long) BIOSFONT8X8;
     }
 
     // default: 8x8
-    if ( gcharWidth <= 0 || gcharHeight <= 0 )
+    if ( FontInitialization.width <= 0 || FontInitialization.height <= 0 )
     {
-        gcharWidth  = DEFAULT_CHAR_WIDTH;
-        gcharHeight = DEFAULT_CHAR_HEIGHT;
+        FontInitialization.width  = DEFAULT_CHAR_WIDTH;
+        FontInitialization.height = DEFAULT_CHAR_HEIGHT;
     }
 
 // Checking the font size.
 
-    switch (gfontSize){
+    unsigned long FontSize = FONT8X8;
+    if (FontInitialization.initialized == TRUE){
+        FontSize = FontInitialization.font_size;
+    }
+
+    switch (FontSize)
+    {
 
         case FONT8X8:
-            //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+            //FontInitialization.address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
             set_char_width (8);
             set_char_height (8);
             break;
 
         case FONT8X16:
-            //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+            //FontInitialization.address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
             set_char_width (8);
             set_char_height (16);
             break;
@@ -103,13 +109,12 @@ d_draw_char (
 
         // ROM bios.
         default:
-            gws_currentfont_address = (unsigned long) BIOSFONT8X8; 
+            FontInitialization.address = (unsigned long) BIOSFONT8X8; 
             set_char_width (8);
             set_char_height (8);
-            gfontSize = FONT8X8;  //#todo: fu��o para configurar isso.
+            FontInitialization.font_size = FONT8X8; 
             break;
     };
-
 
 // ??
 // tentando pintar um espa�o em branco.
@@ -120,17 +125,18 @@ d_draw_char (
 // O caractere sendo trabalhado.
 // Offset da tabela de chars de altura 8 na ROM.
 
-    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
+    work_char = 
+        (void *) FontInitialization.address + (c * FontInitialization.height);
 
 // Draw
     
     unsigned int FinalColor = 0;
     
-    for ( y2=0; y2 < gcharHeight; y2++ )
+    for ( y2=0; y2 < FontInitialization.height; y2++ )
     {
         bit_mask = 0x80;
 
-        for ( x2=0; x2 < gcharWidth; x2++ )
+        for ( x2=0; x2 < FontInitialization.width; x2++ )
         {
             FinalColor = (*work_char & bit_mask) ? fgcolor: bgcolor;
              
@@ -189,7 +195,7 @@ d_drawchar_transparent (
 
 // Set the base address for the current font.
 // See: font.c
-    if (gws_currentfont_address == 0){
+    if (FontInitialization.address == 0){
         fontSetCurrentAddress(BIOSFONT8X8);
     }
 
@@ -197,10 +203,11 @@ d_drawchar_transparent (
 // #bugbug: Is it 'int' type?
 // default: 8x8
 
-    if ( gcharWidth <= 0 || gcharHeight <= 0 )
+    if ( FontInitialization.width <= 0 || 
+         FontInitialization.height <= 0 )
     {
-        gcharWidth  = DEFAULT_CHAR_WIDTH;
-        gcharHeight = DEFAULT_CHAR_HEIGHT;
+        FontInitialization.width  = DEFAULT_CHAR_WIDTH;
+        FontInitialization.height = DEFAULT_CHAR_HEIGHT;
     }
 
 // Checking the font size.
@@ -208,16 +215,21 @@ d_drawchar_transparent (
 // Não precisamos configurar a fonte
 // toda vez que formos desenhar um char.
 
-    switch (gfontSize){
+    unsigned long FontSize = 8;
+    if (FontInitialization.initialized == TRUE){
+        FontSize = FontInitialization.font_size;
+    }
+
+    switch (FontSize){
 
         case FONT8X8:
-            //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+            //FontInitialization.address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
             set_char_width (8);
             set_char_height (8);
             break;
 
         case FONT8X16:
-            //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+            //FontInitialization.address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
             set_char_width (8);
             set_char_height (16);
             break;
@@ -229,32 +241,33 @@ d_drawchar_transparent (
         // que usar o tamanho padr�o.
         // ROM bios
         default:
-            gws_currentfont_address = (unsigned long) BIOSFONT8X8;    
+            FontInitialization.address = (unsigned long) BIOSFONT8X8;    
             set_char_width (8);
             set_char_height (8);
-            gfontSize = FONT8X8;  //#todo: fu��o para configurar isso.
+            FontInitialization.font_size = FONT8X8; 
             break;
     };
 
 // O caractere sendo trabalhado.
 // Offset da tabela de chars de altura 8 na ROM.
 
-    if (gws_currentfont_address == 0){
-        debug_print ("d_drawchar_transparent: [FAIL]gws_currentfont_address\n");
+    if (FontInitialization.address == 0){
+        debug_print ("d_drawchar_transparent: [FAIL]FontInitialization.address\n");
         return;
     }
 
 // Work char:
-    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
+    work_char = 
+        (void *) FontInitialization.address + (c * FontInitialization.height);
 
 // Draw
 // See:  pixel.c
 
-    for ( y2=0; y2 < gcharHeight; y2++ )
+    for ( y2=0; y2 < FontInitialization.height; y2++ )
     {
         bit_mask = 0x80;
 
-        for ( x2=0; x2 < gcharWidth; x2++ )
+        for ( x2=0; x2 < FontInitialization.width; x2++ )
         {
             if ( ( *work_char & bit_mask ) )
             {

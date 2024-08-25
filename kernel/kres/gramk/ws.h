@@ -1,4 +1,3 @@
-
 // ws.h
 // Window system support.
 // Colors and color scheme.
@@ -38,9 +37,6 @@ extern int logonStatus;              //Logon status.
 extern int logoffStatus;             //Logoff status.
 extern int userenvironmentStatus;    //User environment status.
 
-// draw char support
-extern int gcharWidth;
-extern int gcharHeight;
 extern unsigned long g_system_color;
 extern unsigned long g_char_attrib;
 // LFB - address for kernel graphic mode

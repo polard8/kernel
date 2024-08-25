@@ -71,6 +71,10 @@
 #include "../kctl/clibs/ktypes.h"
 #include "../kctl/clibs/ktypes2.h"
 
+// #todo: Move this one above.
+#include "../kctl/clibs/ascii.h"
+
+
 // Kernel objects.
 #include "../kctl/kmain/kobject.h"
 
@@ -172,14 +176,15 @@
 // bootloader display device
 #include "../kres/dev/chardev/display/bldisp/bldisp.h"
 
+// #todo: Move this one above.
+//#include "../kctl/clibs/ascii.h"
+
 // ==================================
 // gramk/
 // sw - Graphics Engine
-#include "../kres/gramk/color.h"
-#include "../kres/gramk/fonts.h"
-// #todo: Move this one above.
-#include "../kctl/clibs/ascii.h"
-#include "../kres/gramk/bg.h"
+#include "../kres/gramk/gre/color.h"
+#include "../kres/gramk/gre/font.h"
+#include "../kres/gramk/gre/bg.h"
 
 // ==================================
 // ke/

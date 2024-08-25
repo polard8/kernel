@@ -4,31 +4,12 @@
 
 #include <kernel.h>
 
-// #todo
-// Move more variables from ws.h to font.c.
-unsigned long gws_currentfont_address=0;
-unsigned long g8x8fontAddress=0;     // 8×8, 80×25,CGA, EGA
-unsigned long g8x14fontAddress=0;    // 8x14,80×25,EGA
-unsigned long g8x16fontAddress=0;    // ??
-unsigned long g9x14fontAddress=0;    // 9x14,80×25,MDA, Hercules
-unsigned long g9x16fontAddress=0;    // 9x16,80×25,VGA
-//...
+struct font_initialization_d  FontInitialization;
 
-int gfontSize=8;
 
-// #todo: 
-// We need a global structure for font support.
-
-int gwsInitializeDefaultKernelFont(void)
-{
-// BIOS 8x8 font.
-
-    fontSetCurrentAddress(BIOSFONT8X8);
-    gwsSetCurrentFontCharWidth(8);
-    gwsSetCurrentFontCharHeight(8);
-    gfontSize = FONT8X8;
-    return 0;
-}
+//
+// ==================================================
+//
 
 
 int gwsGetCurrentFontCharWidth (void)
@@ -53,13 +34,13 @@ void gwsSetCurrentFontCharHeight (int height)
 
 unsigned long fontGetCurrentAddress(void)
 {
-    return (unsigned long) gws_currentfont_address;
+    return (unsigned long) FontInitialization.address;
 }
 
 // Set the base address for the current font.
 void fontSetCurrentAddress(unsigned long address)
 {
-    gws_currentfont_address = (unsigned long) address;
+    FontInitialization.address = (unsigned long) address;
 }
 
 // gwsInstallFont:
@@ -110,6 +91,32 @@ int gwsInstallFont(char *file_name)
 // Set the address for the current font.
     unsigned long base_address = (unsigned long) (font_buffer + 0x2000);
     fontSetCurrentAddress(base_address);
+
+    return 0;
+}
+
+//
+// $
+// INITIALIZATION
+//
+
+// BIOS 8x8 font.
+int font_initialize(void)
+{
+// Called by zero_initialize_default_kernel_font() in zero.c.
+
+    // Old way (#todo: Delete this)
+    fontSetCurrentAddress(BIOSFONT8X8);
+    gwsSetCurrentFontCharWidth(8);
+    gwsSetCurrentFontCharHeight(8);
+
+    // New way
+    // Using our new global structure.
+    FontInitialization.address = BIOSFONT8X8;
+    FontInitialization.width = 8;
+    FontInitialization.height = 8;
+    FontInitialization.font_size = FONT8X8;
+    FontInitialization.initialized = TRUE;
 
     return 0;
 }

@@ -48,10 +48,8 @@ void zero_initialize_background(void)
 // see: gre/font.c
 void zero_initialize_default_kernel_font(void)
 {
-    gwsInitializeDefaultKernelFont();
-    //PROGRESS("zero_initialize_default_kernel_font: ok\n");
+    font_initialize();
 }
-
 
 // =================================
 // Console:

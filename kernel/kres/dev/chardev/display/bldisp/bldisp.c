@@ -786,9 +786,9 @@ static int __videoInit(void)
 
 // #todo: 
 // Usar a função que configura essas variáveis.
-    gcharWidth  = VIDEO_BIOS_FONT8X8_WIDTH;
-    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;
-    gfontSize   = FONT8X8;
+    FontInitialization.width  = VIDEO_BIOS_FONT8X8_WIDTH;
+    FontInitialization.height = VIDEO_BIOS_FONT8X8_HEIGHT;
+    FontInitialization.font_size = FONT8X8;
 
     return 0;
     //return (int) Status;    

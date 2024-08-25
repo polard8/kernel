@@ -32,9 +32,6 @@ int logonStatus=0;            //Logon status.
 int logoffStatus=0;           //Logoff status.
 int userenvironmentStatus=0;  //User environment status.
 
-// draw char support
-int gcharWidth=8;
-int gcharHeight=8;
 unsigned long g_system_color=0;
 unsigned long g_char_attrib=0;
 
