@@ -5,9 +5,7 @@
 
 #include <kernel.h>
 
-
-// Local
-static struct network_initialization_d  NetworkInitialization;
+struct network_initialization_d  NetworkInitialization;
 
 
 static unsigned long on_receiving_counter=0;
@@ -26,7 +24,7 @@ file *____network_file;
 struct network_buffer_d  NETWORK_BUFFER;
 
 struct host_info_d *HostInfo;
-struct network_info_d *CurrentNetwork;
+struct network_info_d *NetworkInfo;
 
 // #todo: Use 'const char*'
 char *default_network_name_string = "default-network-name";
@@ -524,6 +522,17 @@ network_on_receiving (
 // + Handle ethernet header.
 // + Call the handler for the given protocol.
 
+    if ((void*) frame == NULL)
+        return (int) -1;
+
+    //if (frame_size<0)
+        //return (int) -1;
+
+    return (int) network_handle_ethernet(frame,frame_size);
+
+//-----------------
+
+/*
     struct ether_header *eth = (struct ether_header *) frame;
     uint16_t Type=0;
 
@@ -590,18 +599,16 @@ network_on_receiving (
 // Let's save it for future use.
 // We're gonna need to send responses.
 
-/*
-    printk ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
-        eth->dst[0], eth->dst[1], eth->dst[2], 
-        eth->dst[3], eth->dst[4], eth->dst[5] );
+    //printk ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
+        //eth->dst[0], eth->dst[1], eth->dst[2], 
+        //eth->dst[3], eth->dst[4], eth->dst[5] );
 
-    printk ("   |-Source Address      : %x-%x-%x-%x-%x-%x \n", 
-        eth->src[0], eth->src[1], eth->src[2], 
-        eth->src[3], eth->src[4], eth->src[5] );
+    //printk ("   |-Source Address      : %x-%x-%x-%x-%x-%x \n", 
+        //eth->src[0], eth->src[1], eth->src[2], 
+        //eth->src[3], eth->src[4], eth->src[5] );
 
-    printk ("   |-Ethertype           : %x \n",
-        (unsigned short) eth->type);
-*/
+    //printk ("   |-Ethertype           : %x \n",
+        //(unsigned short) eth->type);
 
 // Save the MAC of the caller.
     network_fill_mac(__saved_caller_mac, eth->mac_src);
@@ -646,11 +653,13 @@ network_on_receiving (
         goto fail;
         break;
     };
+*/
+
 
 // done:
-    return 0;
-fail:
-    return (int) -1;
+    //return 0;
+//fail:
+    //return (int) -1;
 }
 
 // Called when sending some raw packet.
@@ -906,21 +915,25 @@ void networkUpdateCounter(int the_counter)
 // Update counter for the current network.
 // 1=TX | 2=RX.
 
-    if ( (void*) CurrentNetwork == NULL )
+    if ((void*) NetworkInfo == NULL)
         return;
-    if (CurrentNetwork->magic != 1234)
+    if (NetworkInfo->magic != 1234)
         return;
 
     if (the_counter == 1){
-        CurrentNetwork->tx_counter++;
+        NetworkInfo->tx_counter++;
         return;
     }
     if (the_counter == 2){
-        CurrentNetwork->rx_counter++;
+        NetworkInfo->rx_counter++;
         return;
     }
 }
 
+//
+// $
+// INITIALIZATION
+//
 
 // networkInit:
 // Called by keInitialize() in ke.c.
@@ -1003,7 +1016,7 @@ int networkInit(void)
     
     // This structure is initialized.
     ni->initialized = TRUE;
-    CurrentNetwork = (struct network_info_d *) ni;
+    NetworkInfo = (struct network_info_d *) ni;
 
 //======================================
 
@@ -1089,7 +1102,7 @@ int networkInit(void)
     HostInfo->used = TRUE;
     HostInfo->magic = 1234;
 
-    CurrentNetwork->host_info = (void*) HostInfo;
+    NetworkInfo->host_info = (void*) HostInfo;
 
 // =====================================
 // Localhost socket structure.

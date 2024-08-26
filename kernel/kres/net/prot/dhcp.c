@@ -39,151 +39,23 @@ unsigned char __dhcp_target_mac[6] = {
 
 //---------------
 
-// When receving DHCP packet from NIC device.
-void 
-network_handle_dhcp( 
-    const unsigned char *buffer, 
-    ssize_t size )
+void network_show_dhcp_info(void)
 {
-    struct dhcp_d *dhcp;
-    uint8_t your_ipv4[4];    // yiaddr: Your IP address.
-    uint8_t server_ipv4[4];  // siaddr: Server IP address.
-
-    //printk ("DHCP: Received\n");
-
-// #warning
-// It's ok to use pointer here.
-// We're not allocating memory, we're using 
-// a pre-allocated buffer.
-    dhcp = (struct dhcp_d *) buffer;
-    if ((void*) dhcp == NULL){
+    if (dhcp_info.initialized != TRUE){
+        printk("DHCP: Not initialized\n");
         return;
     }
-
-// Minimum size
-    //if (size < ? )
-        //return;
-
-// yiaddr: Your IP address.
-    your_ipv4[0] = (uint8_t) (  dhcp->yiaddr        & 0xFF);
-    your_ipv4[1] = (uint8_t) ( (dhcp->yiaddr >> 8)  & 0xFF);
-    your_ipv4[2] = (uint8_t) ( (dhcp->yiaddr >> 16) & 0xFF);
-    your_ipv4[3] = (uint8_t) ( (dhcp->yiaddr >> 24) & 0xFF);
-    printk ("network_handle_dhcp: Your IP %d.%d.%d.%d  <<< ---------\n",
-        your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
-
-// siaddr: Server IP address.
-    server_ipv4[0] = (uint8_t) (  dhcp->siaddr        & 0xFF);
-    server_ipv4[1] = (uint8_t) ( (dhcp->siaddr >> 8)  & 0xFF);
-    server_ipv4[2] = (uint8_t) ( (dhcp->siaddr >> 16) & 0xFF);
-    server_ipv4[3] = (uint8_t) ( (dhcp->siaddr >> 24) & 0xFF);
-    printk ("network_handle_dhcp: Server IP %d.%d.%d.%d  <<< ---------\n",
-        server_ipv4[0], server_ipv4[1], server_ipv4[2], server_ipv4[3] );
-
-// chaddr: Client hardware address.
-// Pra certificar que a mensagem foi pra nós.
-    printk("network_handle_dhcp: Client MAC %x.%x.%x.%x.%x.%x\n",
-        dhcp->chaddr[0],
-        dhcp->chaddr[1],
-        dhcp->chaddr[2],
-        dhcp->chaddr[3],
-        dhcp->chaddr[4],
-        dhcp->chaddr[5] );
-
-// Operation
-// Is it a Reply?
-
-    //if (dhcp->op == 1)
-        //return;
-    if (dhcp->op == 2){
-        printk ("DHCP: Reply received\n");
-    }
-
-// 53 = DHCP Message type.
-
-    //if (dhcp->options[0] != OPT_DHCP_MESSAGE_TYPE)
-        //return;
-    //dhcp->options[1] = 0x01;  // lenght
-    //dhcp->options[2] = (uint8_t) message_type;  // Discover or Request.
-
-// As a client, we send Discover and Request,
-// and only receive Offer, Acknowledge or Decline.
-
-// ---------------------------
-// Offer: d'O'ra 
-// + We received an Offer from the server.
-// + Let's send a Request.
-    if (dhcp->options[2] == DORA_O)
-    {
-        printk("DHCP: DORA-O\n");
-
-        // #debug
-        //printk ("When receiving Offer: Your IP %d.%d.%d.%d\n",
-        //    your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
-        //while (1){}
-
-        // Sending REQUEST - do'R'a.
-        // Request: do'R'a
-        network_dhcp_send( 
-            dhcp,
-            DORA_R,
-            your_ipv4, 
-            server_ipv4,
-            68, 
-            67 );
-
-        return;
-    }
-
-// ---------------------------
-// Ack
-// We received an ACK from the server.
-// Let's do:
-// + Save some information.
-// + Set the online status for the network.
-// + Print some information about dhcp, for debug.
-// ----------
-// Save your IP.
-// Save the server IP.
-// Se the initialization flag.
-// Set the online status.
-    if ( dhcp->options[2] == DORA_A )
-    {
-        printk("DHCP: DORA-A\n");
-
-        // #debug
-        //printk ("When receiving ack: Your IP %d.%d.%d.%d\n",
-        //    your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
-        //while (1){}
-
-        // #debug
-        //printk ("When receiving ack: Server IP %d.%d.%d.%d\n",
-        //    server_ipv4[0], server_ipv4[1], server_ipv4[2], server_ipv4[3] );
-        //while (1){}
-
-        // Save info
-        network_fill_ipv4( dhcp_info.your_ipv4, your_ipv4 );
-        network_fill_ipv4( dhcp_info.server_ipv4, server_ipv4 );
-        dhcp_info.initialized = TRUE;
-        // Set online status 
-        networkSetOnlineStatus(ONLINE);
-        // Show info.
-        network_show_dhcp_info();
-        // #debug
-        //die();
-        return;
-    }
-
-// ---------------------------
-// Decline
-// The server declined our request.
-    if ( dhcp->options[2] == DHCP_DECLINE ){
-        printk ("DHCP: Decline received\n");
-        return;
-    }
-
-// Unknown option
-    //printf("DHCP: Unknown option\n")
+    printk ("DHCP: Your IP is %d.%d.%d.%d\n",
+        dhcp_info.your_ipv4[0], 
+        dhcp_info.your_ipv4[1], 
+        dhcp_info.your_ipv4[2], 
+        dhcp_info.your_ipv4[3] );
+    printk ("DHCP: Server IP is %d.%d.%d.%d\n",
+        dhcp_info.server_ipv4[0], 
+        dhcp_info.server_ipv4[1], 
+        dhcp_info.server_ipv4[2], 
+        dhcp_info.server_ipv4[3] );
+    //...
 }
 
 // Called by some handler to 
@@ -447,6 +319,10 @@ fail:
     return;
 }
 
+//
+// $
+// INITIALIZATION
+//
 
 // Initialize the dhcp_info structure,
 // by calling the dialog with the dhcp server via dhcp/udp/ip.
@@ -500,22 +376,157 @@ fail:
     return -1;
 }
 
-void network_show_dhcp_info(void)
+//
+// $
+// HANDLER
+//
+
+// When receving DHCP packet from NIC device.
+void 
+network_handle_dhcp( 
+    const unsigned char *buffer, 
+    ssize_t size )
 {
-    if (dhcp_info.initialized != TRUE){
-        printk("DHCP: Not initialized\n");
+    struct dhcp_d *dhcp;
+    uint8_t your_ipv4[4];    // yiaddr: Your IP address.
+    uint8_t server_ipv4[4];  // siaddr: Server IP address.
+
+    //printk ("DHCP: Received\n");
+
+// #warning
+// It's ok to use pointer here.
+// We're not allocating memory, we're using 
+// a pre-allocated buffer.
+    dhcp = (struct dhcp_d *) buffer;
+    if ((void*) dhcp == NULL){
         return;
     }
-    printk ("DHCP: Your IP is %d.%d.%d.%d\n",
-        dhcp_info.your_ipv4[0], 
-        dhcp_info.your_ipv4[1], 
-        dhcp_info.your_ipv4[2], 
-        dhcp_info.your_ipv4[3] );
-    printk ("DHCP: Server IP is %d.%d.%d.%d\n",
-        dhcp_info.server_ipv4[0], 
-        dhcp_info.server_ipv4[1], 
-        dhcp_info.server_ipv4[2], 
-        dhcp_info.server_ipv4[3] );
-    //...
+
+// Minimum size
+    //if (size < ? )
+        //return;
+
+// yiaddr: Your IP address.
+    your_ipv4[0] = (uint8_t) (  dhcp->yiaddr        & 0xFF);
+    your_ipv4[1] = (uint8_t) ( (dhcp->yiaddr >> 8)  & 0xFF);
+    your_ipv4[2] = (uint8_t) ( (dhcp->yiaddr >> 16) & 0xFF);
+    your_ipv4[3] = (uint8_t) ( (dhcp->yiaddr >> 24) & 0xFF);
+    printk ("network_handle_dhcp: Your IP %d.%d.%d.%d  <<< ---------\n",
+        your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
+
+// siaddr: Server IP address.
+    server_ipv4[0] = (uint8_t) (  dhcp->siaddr        & 0xFF);
+    server_ipv4[1] = (uint8_t) ( (dhcp->siaddr >> 8)  & 0xFF);
+    server_ipv4[2] = (uint8_t) ( (dhcp->siaddr >> 16) & 0xFF);
+    server_ipv4[3] = (uint8_t) ( (dhcp->siaddr >> 24) & 0xFF);
+    printk ("network_handle_dhcp: Server IP %d.%d.%d.%d  <<< ---------\n",
+        server_ipv4[0], server_ipv4[1], server_ipv4[2], server_ipv4[3] );
+
+// chaddr: Client hardware address.
+// Pra certificar que a mensagem foi pra nós.
+    printk("network_handle_dhcp: Client MAC %x.%x.%x.%x.%x.%x\n",
+        dhcp->chaddr[0],
+        dhcp->chaddr[1],
+        dhcp->chaddr[2],
+        dhcp->chaddr[3],
+        dhcp->chaddr[4],
+        dhcp->chaddr[5] );
+
+// Operation
+// Is it a Reply?
+
+    //if (dhcp->op == 1)
+        //return;
+    if (dhcp->op == 2){
+        printk ("DHCP: Reply received\n");
+    }
+
+// 53 = DHCP Message type.
+
+    //if (dhcp->options[0] != OPT_DHCP_MESSAGE_TYPE)
+        //return;
+    //dhcp->options[1] = 0x01;  // lenght
+    //dhcp->options[2] = (uint8_t) message_type;  // Discover or Request.
+
+// As a client, we send Discover and Request,
+// and only receive Offer, Acknowledge or Decline.
+
+// ---------------------------
+// Offer: d'O'ra 
+// + We received an Offer from the server.
+// + Let's send a Request.
+    if (dhcp->options[2] == DORA_O)
+    {
+        printk("DHCP: DORA-O\n");
+
+        // #debug
+        //printk ("When receiving Offer: Your IP %d.%d.%d.%d\n",
+        //    your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
+        //while (1){}
+
+        // Sending REQUEST - do'R'a.
+        // Request: do'R'a
+        network_dhcp_send( 
+            dhcp,
+            DORA_R,
+            your_ipv4, 
+            server_ipv4,
+            68, 
+            67 );
+
+        return;
+    }
+
+// ---------------------------
+// Ack
+// We received an ACK from the server.
+// Let's do:
+// + Save some information.
+// + Set the online status for the network.
+// + Print some information about dhcp, for debug.
+// ----------
+// Save your IP.
+// Save the server IP.
+// Se the initialization flag.
+// Set the online status.
+    if ( dhcp->options[2] == DORA_A )
+    {
+        printk("DHCP: DORA-A\n");
+
+        // #debug
+        //printk ("When receiving ack: Your IP %d.%d.%d.%d\n",
+        //    your_ipv4[0], your_ipv4[1], your_ipv4[2], your_ipv4[3] );
+        //while (1){}
+
+        // #debug
+        //printk ("When receiving ack: Server IP %d.%d.%d.%d\n",
+        //    server_ipv4[0], server_ipv4[1], server_ipv4[2], server_ipv4[3] );
+        //while (1){}
+
+        // Save info
+        network_fill_ipv4( dhcp_info.your_ipv4, your_ipv4 );
+        network_fill_ipv4( dhcp_info.server_ipv4, server_ipv4 );
+        dhcp_info.initialized = TRUE;
+        // Set online status 
+        networkSetOnlineStatus(ONLINE);
+        // Show info.
+        network_show_dhcp_info();
+        // #debug
+        //die();
+        return;
+    }
+
+// ---------------------------
+// Decline
+// The server declined our request.
+    if ( dhcp->options[2] == DHCP_DECLINE ){
+        printk ("DHCP: Decline received\n");
+        return;
+    }
+
+// Unknown option
+    //printf("DHCP: Unknown option\n")
 }
+
+
 

@@ -5,6 +5,14 @@
 
 static char tcp_payload[1024];
 
+// ===================================================
+
+
+//
+// $
+// HANDLER
+//
+
 // When receiving tcp frame from NIC device.
 void 
 network_handle_tcp( 

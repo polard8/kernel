@@ -1,5 +1,5 @@
-
 // arp.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -112,167 +112,6 @@ void arp_show_table(void)
     };
     printk("-------------------------------------\n");
 }
-
-// When receving ARP packet from NIC device.
-// handle arp package
-// IN:
-// buffer = The address after the ethernet header.
-void 
-network_handle_arp( 
-    const unsigned char *buffer, 
-    ssize_t size )
-{
-// Called by network_on_receiving() in network.c.
-// 0x0806
-
-    struct ether_arp *ar;
-
-
-// #warning
-// It's ok to use pointer here.
-// We're not allocating memory, we're using 
-// a pre-allocated buffer.
-    ar = (struct ether_arp *) buffer;
-    if ((void*) ar == NULL){
-        printk("network_handle_arp: ar\n");
-        goto fail;
-    }
-
-// The minimum size.
-    //if (size < ARP_HEADER_LENGHT){
-    //    printk("network_handle_arp: size\n");
-    //    goto fail;
-    //}
-
-/*
-// Show data.
-// Bytes: Net-style.
-// Hardware type (HTYPE)   (00 01) = Ethernet.
-    printk("Hardware type: {%x}\n",ar->type);
-// Protocol type (PTYPE)   (08 00) = ipv4.
-// In the case of Ethernet, a 0x0806 EtherType value 
-// is used to identify ARP frames.
-    printk("Protocol type: {%x}\n",ar->proto);
-    printk("Hardware address lenght: {%x}\n",ar->hlen);
-    printk("Protocol address lenght: {%x}\n",ar->plen);
-    printk("ARP operation {%x}\n",ar->op);
-    // continua: macs e ips ... 
-*/
-
-// Operation
-    uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
-
-// ------------
-// REQUEST
-// Sending a reply.
-// sha is the [mac] of the machine that sent us a request.
-// spa is the [ip]  of the machine that sent us a request.
-    if (op == ARP_OPC_REQUEST){
-        //printk("ARP: REQUEST\n");
-        network_send_arp_reply( 
-            ar->arp_sha,     // Target mac
-            ar->arp_spa );   // Target ip
-        return;
-
-// ------------
-// REPLY
-    } else if (op == ARP_OPC_REPLY){
-
-        // #todo: This is a work in progress.
-        // #test
-        // #bugbug: Setting only the first index.
-        //arp_table_set_entry( 
-        //   0,
-        //   ar->arp_spa,
-        //   ar->arp_sha );
-
-        // #debug
-        printk("ARP: REPLY from %d.%d.%d.%d\n",
-            ar->arp_spa[0], 
-            ar->arp_spa[1], 
-            ar->arp_spa[2], 
-            ar->arp_spa[3] );
-
-        // From gateway?
-        // #todo:
-        // We got to use the ipv4 given by the dhcp dialog.
-        if ( ar->arp_spa[0] == 192 && 
-             ar->arp_spa[1] == 168 && 
-             ar->arp_spa[2] == 1 &&
-             ar->arp_spa[3] == 1 )
-        {
-            // Show MAC
-            //printk("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
-                //ar->arp_sha[0], 
-                //ar->arp_sha[1], 
-                //ar->arp_sha[2], 
-                //ar->arp_sha[3],
-                //ar->arp_sha[4],
-                //ar->arp_sha[5] );
-
-            // Save into the default network info.
-            if ((void*) CurrentNetwork != NULL)
-            {
-                if (CurrentNetwork->initialized == TRUE)
-                {
-                    // #debug
-                    printk("Saving gateway info\n");
-                    network_fill_ipv4( 
-                        CurrentNetwork->gateway_ipv4,
-                        ar->arp_spa );
-                    network_fill_mac( 
-                        CurrentNetwork->gateway_mac,
-                        ar->arp_sha );
-
-                    // Show saved MAC
-                    //printk("ARP:  Saved MAC %x.%x.%x.%x.%x.%x\n",
-                        //CurrentNetwork->gateway_mac[0], 
-                        //CurrentNetwork->gateway_mac[1], 
-                        //CurrentNetwork->gateway_mac[2], 
-                        //CurrentNetwork->gateway_mac[3],
-                        //CurrentNetwork->gateway_mac[4],
-                        //CurrentNetwork->gateway_mac[5] );
-                }
-            }
-            //die();
-        }
-
-        // Show IP
-        //printk("ARP: REPLY to %d.%d.%d.%d\n",
-        //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
-
-        /*
-        // to me
-        if ( ar->arp_tpa[3] == 12 )
-        {
-            printk("ARP: Reply to ME!\n");
-            printk("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
-                ar->arp_sha[0], 
-                ar->arp_sha[1], 
-                ar->arp_sha[2], 
-                ar->arp_sha[3],
-                ar->arp_sha[4],
-                ar->arp_sha[5] );
-            //refresh_screen();
-            //while(1){}
-
-            // #todo
-            // Save this values to use in the future.
-            // zzzz_save_mac(ar->arp_sha);
-        }
-        */
-    
-        return;
-    } else {
-        //Invalid operation
-    };
-
-    return;
-fail:
-    printk("network_handle_arp: Fail\n");
-    return;
-}
-
 
 // Ethernet + arp
 void 
@@ -531,4 +370,172 @@ network_send_arp_reply(
         target_ip,            // dst ip (Linux)
         ARP_OPC_REPLY );
 }
+
+
+//
+// $
+// HANDLER
+//
+
+// When receving ARP packet from NIC device.
+// handle arp package
+// IN:
+// buffer = The address after the ethernet header.
+void 
+network_handle_arp( 
+    const unsigned char *buffer, 
+    ssize_t size )
+{
+// Called by network_on_receiving() in network.c.
+// 0x0806
+
+    struct ether_arp *ar;
+
+
+// #warning
+// It's ok to use pointer here.
+// We're not allocating memory, we're using 
+// a pre-allocated buffer.
+    ar = (struct ether_arp *) buffer;
+    if ((void*) ar == NULL){
+        printk("network_handle_arp: ar\n");
+        goto fail;
+    }
+
+// The minimum size.
+    //if (size < ARP_HEADER_LENGHT){
+    //    printk("network_handle_arp: size\n");
+    //    goto fail;
+    //}
+
+/*
+// Show data.
+// Bytes: Net-style.
+// Hardware type (HTYPE)   (00 01) = Ethernet.
+    printk("Hardware type: {%x}\n",ar->type);
+// Protocol type (PTYPE)   (08 00) = ipv4.
+// In the case of Ethernet, a 0x0806 EtherType value 
+// is used to identify ARP frames.
+    printk("Protocol type: {%x}\n",ar->proto);
+    printk("Hardware address lenght: {%x}\n",ar->hlen);
+    printk("Protocol address lenght: {%x}\n",ar->plen);
+    printk("ARP operation {%x}\n",ar->op);
+    // continua: macs e ips ... 
+*/
+
+// Operation
+    uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
+
+// ------------
+// REQUEST
+// Sending a reply.
+// sha is the [mac] of the machine that sent us a request.
+// spa is the [ip]  of the machine that sent us a request.
+    if (op == ARP_OPC_REQUEST){
+        //printk("ARP: REQUEST\n");
+        network_send_arp_reply( 
+            ar->arp_sha,     // Target mac
+            ar->arp_spa );   // Target ip
+        return;
+
+// ------------
+// REPLY
+    } else if (op == ARP_OPC_REPLY){
+
+        // #todo: This is a work in progress.
+        // #test
+        // #bugbug: Setting only the first index.
+        //arp_table_set_entry( 
+        //   0,
+        //   ar->arp_spa,
+        //   ar->arp_sha );
+
+        // #debug
+        printk("ARP: REPLY from %d.%d.%d.%d\n",
+            ar->arp_spa[0], 
+            ar->arp_spa[1], 
+            ar->arp_spa[2], 
+            ar->arp_spa[3] );
+
+        // From gateway?
+        // #todo:
+        // We got to use the ipv4 given by the dhcp dialog.
+        if ( ar->arp_spa[0] == 192 && 
+             ar->arp_spa[1] == 168 && 
+             ar->arp_spa[2] == 1 &&
+             ar->arp_spa[3] == 1 )
+        {
+            // Show MAC
+            //printk("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+                //ar->arp_sha[0], 
+                //ar->arp_sha[1], 
+                //ar->arp_sha[2], 
+                //ar->arp_sha[3],
+                //ar->arp_sha[4],
+                //ar->arp_sha[5] );
+
+            // Save into the default network info.
+            if ((void*) NetworkInfo != NULL)
+            {
+                if (NetworkInfo->initialized == TRUE)
+                {
+                    // #debug
+                    printk("Saving gateway info\n");
+                    network_fill_ipv4( 
+                        NetworkInfo->gateway_ipv4,
+                        ar->arp_spa );
+                    network_fill_mac( 
+                        NetworkInfo->gateway_mac,
+                        ar->arp_sha );
+
+                    // Show saved MAC
+                    //printk("ARP:  Saved MAC %x.%x.%x.%x.%x.%x\n",
+                        //NetworkInfo->gateway_mac[0], 
+                        //NetworkInfo->gateway_mac[1], 
+                        //NetworkInfo->gateway_mac[2], 
+                        //NetworkInfo->gateway_mac[3],
+                        //NetworkInfo->gateway_mac[4],
+                        //NetworkInfo->gateway_mac[5] );
+                }
+            }
+            //die();
+        }
+
+        // Show IP
+        //printk("ARP: REPLY to %d.%d.%d.%d\n",
+        //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
+
+        /*
+        // to me
+        if ( ar->arp_tpa[3] == 12 )
+        {
+            printk("ARP: Reply to ME!\n");
+            printk("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+                ar->arp_sha[0], 
+                ar->arp_sha[1], 
+                ar->arp_sha[2], 
+                ar->arp_sha[3],
+                ar->arp_sha[4],
+                ar->arp_sha[5] );
+            //refresh_screen();
+            //while(1){}
+
+            // #todo
+            // Save this values to use in the future.
+            // zzzz_save_mac(ar->arp_sha);
+        }
+        */
+    
+        return;
+    } else {
+        //Invalid operation
+    };
+
+    return;
+fail:
+    printk("network_handle_arp: Fail\n");
+    return;
+}
+
+
 

@@ -16,11 +16,13 @@
 
 // ------------------------------------------------------
 // Device flags:
+
+// Sending verbose to serial port.
 #define USE_SERIALDEBUG    0
-// #test
-// #debug
-// Sometimes it crashes the system.
-#define USE_E1000          0  
+
+// Enable the initialization of e1000 controller.
+#define USE_E1000          0
+
 // ...
 
 // ------------------------------------------------------

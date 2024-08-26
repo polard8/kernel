@@ -106,6 +106,19 @@ ethernet_send(
     size_t len, 
     const char *data );
 
+
+int ethernet_on_sending (void);
+
+//
+// $
+// HANDLER
+//
+
+int 
+network_handle_ethernet ( 
+    const unsigned char *frame, 
+    ssize_t frame_size );
+
 #endif    
 
 

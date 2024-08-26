@@ -100,6 +100,7 @@ struct network_initialization_d
 // ...
 
 };
+extern struct network_initialization_d  NetworkInitialization;
 
 // =================================================
 
@@ -174,7 +175,7 @@ struct network_info_d
 
     struct network_info_d  *next;
 };
-extern struct network_info_d *CurrentNetwork;
+extern struct network_info_d *NetworkInfo;
 
 // =================================================
 

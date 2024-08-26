@@ -82,11 +82,6 @@ void arp_table_show_index(int index);
 void arp_show_table(void);
 
 void 
-network_handle_arp( 
-    const unsigned char *buffer, 
-    ssize_t size );
-
-void 
 network_send_arp( 
     uint8_t target_mac[6],
     uint8_t source_ip[4], 
@@ -105,6 +100,18 @@ void
 network_send_arp_reply(
     uint8_t target_mac[6],
     uint8_t target_ip[4] );
+
+
+//
+// $
+// HANDLER
+//
+
+void 
+network_handle_arp( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 
 #endif    
 

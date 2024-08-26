@@ -30,10 +30,6 @@ struct udp_d
     uint16_t uh_sum;
 } __attribute__ ((packed));
 
-void 
-network_handle_udp( 
-    const unsigned char *buffer, 
-    ssize_t size );
 
 int
 network_send_udp ( 
@@ -55,5 +51,16 @@ void network_test_udp(void);
 void network_test_udp2(void);
 
 void udp_save_mac( uint8_t mac[6] );
+
+//
+// $
+// HANDLER
+//
+
+void 
+network_handle_udp( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 
 #endif   

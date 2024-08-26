@@ -6,6 +6,151 @@
 
 unsigned int ipv4_counter = 0;
 
+// ======================================================
+
+int 
+ipv4_send (
+    unsigned char protocol, 
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6],
+    char *data_buffer,     // IPV4 payload
+    size_t data_lenght )
+{
+
+    register int i=0;
+
+// Frame base
+    unsigned long addr = (unsigned long) data_buffer;  // IPV4 payload;
+
+//==============================================
+// # ethernet header #
+
+// Ethernet base
+    //ether_header *eh = (ether_header *) addr;
+    struct ether_header  Leh;
+
+// Destination MAC
+    //fillMac(Leh.mac_dst, target_mac);
+// Our MAC
+    //fillMac(Leh.mac_src, currentNIC->mac_address);
+// Type of protocol
+    //Leh.type = (uint16_t) ToNetByteOrder16(ETHERTYPE_IPV4);
+
+    for (i=0; i<6; i++){
+        Leh.mac_src[i] = (uint8_t) currentNIC->mac_address[i];  // source 
+        Leh.mac_dst[i] = (uint8_t) target_mac[i];               // dest
+    };
+    Leh.type = (uint16_t) ToNetByteOrder16(ETHERTYPE_IPV4);
+
+
+//==============================================
+// # ipv4 header #
+
+// IPV4 base
+    //ip_d *hdr = (ip_d*)( addr + sizeof(ether_header) );
+    struct ip_d  Lipv4;
+
+    // Ipv4 header
+    //hdr->ihl = 5;
+    //hdr->ver = 4;
+    //hdr->tos = 0;
+
+//>>>>
+    Lipv4.v_hl = 0x45;    // 8 bit
+
+// Type of service (8bits)
+// - Differentiated Services Code Point (6bits)
+// - Explicit Congestion Notification (2bits)
+    Lipv4.ip_tos = 0x00;  // 8 bit (0=Normal)
+
+
+// Lenght
+// IPV4 Length
+// ip + (ip payload)
+// 16 bit
+// This 16-bit field defines the entire packet size in bytes, 
+// including header and data. 
+// The minimum size is 20 bytes (header without data) and the maximum is 65,535 bytes. 
+// ip header + (udp header + data).
+// #todo: Check if it is right?
+// No payload do ip temos o (udp+data)
+// O lenght do protocolo precisa conter o seu proprio header e o seu proprio payload.
+
+    uint16_t xxxdata = (uint16_t) (data_lenght & 0xFFFF);
+    uint16_t __ipheaderlen = IP_HEADER_LENGHT;
+    uint16_t __ippayloadlen = (uint16_t) (UDP_HEADER_LENGHT +  xxxdata);
+    uint16_t __iplen = (uint16_t) (__ipheaderlen + __ippayloadlen); 
+    Lipv4.ip_len = (uint16_t) ToNetByteOrder16(__iplen);
+
+
+// Identification
+// ... identifying the group of fragments of a single IP datagram. 
+// 16 bit
+
+    Lipv4.ip_id = ToNetByteOrder16(ipv4_counter);
+    ipv4_counter++;
+
+    Lipv4.ip_off = ToNetByteOrder16(0x4000);  //htons(0x4000);
+    Lipv4.ip_ttl = 64;
+    Lipv4.ip_p = protocol;
+    Lipv4.ip_sum = 0;   // Checksum
+
+//
+// IPV4
+//
+
+    //network_fill_ipv4(hdr->src, source_ip);
+    //network_fill_ipv4(hdr->dst, target_ip);
+
+    unsigned char *spa = (unsigned char *) &Lipv4.ip_src.s_addr;
+    unsigned char *tpa = (unsigned char *) &Lipv4.ip_dst.s_addr;
+
+    register int it=0;
+    for (it=0; it<4; it++)
+    {
+        spa[it] = (uint8_t) source_ip[it]; 
+        tpa[it] = (uint8_t) target_ip[it]; 
+    };
+
+
+//
+// Checksum
+//
+
+    Lipv4.ip_sum = 0;
+    Lipv4.ip_sum =
+         (uint16_t)  net_checksum(
+              0, 
+              0,
+              (const unsigned char *) &Lipv4, 
+              (const unsigned char *) &Lipv4 + sizeof(struct ip_d));
+    Lipv4.ip_sum =
+         (uint16_t) ToNetByteOrder16(Lipv4.ip_sum);
+
+    printk("ip_sum={%x} \n",Lipv4.ip_sum);
+
+    //printk ("size %d\n", sizeof (struct ip_d) );
+    //refresh_screen();
+    //while(1){}
+
+// Send frame via hardware
+    size_t FRAME_SIZE = 
+               ( ETHERNET_HEADER_LENGHT +\
+                 IP_HEADER_LENGHT +\
+                 data_lenght );
+
+    ethernet_send( currentNIC, FRAME_SIZE, addr );
+
+    return 0;
+}
+
+
+//
+// $
+// HANDLER
+//
+
 // When receving IPV4 packet from NIC device.
 // handle ipv4 package
 // IN:
@@ -177,152 +322,6 @@ drop:
 fail:
     printk("network_handle_ipv4: Fail\n");
     return;
-}
-
-
-int 
-ipv4_send (
-    unsigned char protocol, 
-    uint8_t source_ip[4], 
-    uint8_t target_ip[4], 
-    uint8_t target_mac[6],
-    char *data_buffer,     // IPV4 payload
-    size_t data_lenght )
-{
-
-    register int i=0;
-
-// Frame base
-    unsigned long addr = (unsigned long) data_buffer;  // IPV4 payload;
-
-//==============================================
-// # ethernet header #
-
-// Ethernet base
-    //ether_header *eh = (ether_header *) addr;
-    struct ether_header  Leh;
-
-// Destination MAC
-    //fillMac(Leh.mac_dst, target_mac);
-// Our MAC
-    //fillMac(Leh.mac_src, currentNIC->mac_address);
-// Type of protocol
-    //Leh.type = (uint16_t) ToNetByteOrder16(ETHERTYPE_IPV4);
-
-    for (i=0; i<6; i++){
-        Leh.mac_src[i] = (uint8_t) currentNIC->mac_address[i];  // source 
-        Leh.mac_dst[i] = (uint8_t) target_mac[i];               // dest
-    };
-    Leh.type = (uint16_t) ToNetByteOrder16(ETHERTYPE_IPV4);
-
-
-//==============================================
-// # ipv4 header #
-
-// IPV4 base
-    //ip_d *hdr = (ip_d*)( addr + sizeof(ether_header) );
-    struct ip_d  Lipv4;
-
-    // Ipv4 header
-    //hdr->ihl = 5;
-    //hdr->ver = 4;
-    //hdr->tos = 0;
-
-//>>>>
-    Lipv4.v_hl = 0x45;    // 8 bit
-
-// Type of service (8bits)
-// - Differentiated Services Code Point (6bits)
-// - Explicit Congestion Notification (2bits)
-    Lipv4.ip_tos = 0x00;  // 8 bit (0=Normal)
-
-
-// Lenght
-// IPV4 Length
-// ip + (ip payload)
-// 16 bit
-// This 16-bit field defines the entire packet size in bytes, 
-// including header and data. 
-// The minimum size is 20 bytes (header without data) and the maximum is 65,535 bytes. 
-// ip header + (udp header + data).
-// #todo: Check if it is right?
-// No payload do ip temos o (udp+data)
-// O lenght do protocolo precisa conter o seu proprio header e o seu proprio payload.
-
-    uint16_t xxxdata = (uint16_t) (data_lenght & 0xFFFF);
-    uint16_t __ipheaderlen = IP_HEADER_LENGHT;
-    uint16_t __ippayloadlen = (uint16_t) (UDP_HEADER_LENGHT +  xxxdata);
-    uint16_t __iplen = (uint16_t) (__ipheaderlen + __ippayloadlen); 
-    Lipv4.ip_len = (uint16_t) ToNetByteOrder16(__iplen);
-
-
-// Identification
-// ... identifying the group of fragments of a single IP datagram. 
-// 16 bit
-
-    Lipv4.ip_id = ToNetByteOrder16(ipv4_counter);
-    ipv4_counter++;
-
-    Lipv4.ip_off = ToNetByteOrder16(0x4000);  //htons(0x4000);
-    Lipv4.ip_ttl = 64;
-    Lipv4.ip_p = protocol;
-    Lipv4.ip_sum = 0;   // Checksum
-
-//
-// IPV4
-//
-
-    //network_fill_ipv4(hdr->src, source_ip);
-    //network_fill_ipv4(hdr->dst, target_ip);
-
-    unsigned char *spa = (unsigned char *) &Lipv4.ip_src.s_addr;
-    unsigned char *tpa = (unsigned char *) &Lipv4.ip_dst.s_addr;
-
-    register int it=0;
-    for (it=0; it<4; it++)
-    {
-        spa[it] = (uint8_t) source_ip[it]; 
-        tpa[it] = (uint8_t) target_ip[it]; 
-    };
-
-
-
-//
-// Checksum
-//
-
-    Lipv4.ip_sum = 0;
-    Lipv4.ip_sum =
-         (uint16_t)  net_checksum(
-              0, 
-              0,
-              (const unsigned char *) &Lipv4, 
-              (const unsigned char *) &Lipv4 + sizeof(struct ip_d));
-    Lipv4.ip_sum =
-         (uint16_t) ToNetByteOrder16(Lipv4.ip_sum);
-
-    printk("ip_sum={%x} \n",Lipv4.ip_sum);
-
-    //printk ("size %d\n", sizeof (struct ip_d) );
-    //refresh_screen();
-    //while(1){}
-
-//
-// Send frame via hardware
-//
-
-    size_t FRAME_SIZE = 
-               ( ETHERNET_HEADER_LENGHT +\
-                 IP_HEADER_LENGHT +\
-                 data_lenght );
-
-
-    ethernet_send( 
-        currentNIC, 
-        FRAME_SIZE, 
-        addr );
-
-    return 0;
 }
 
 

@@ -1,5 +1,5 @@
-
 // ip.h
+// Created by Fred Nora.
 
 #ifndef __NET_IP_H
 #define __NET_IP_H    1
@@ -98,12 +98,6 @@ struct ip_d
 
 // =====================================
 
-void 
-network_handle_ipv4( 
-    const unsigned char *buffer, 
-    ssize_t size );
-
-
 int 
 ipv4_send (
     unsigned char protocol, 
@@ -112,6 +106,17 @@ ipv4_send (
     uint8_t target_mac[6],
     char *data_buffer, 
     size_t data_lenght );
+
+
+//
+// $
+// HANDLER
+//
+
+void 
+network_handle_ipv4( 
+    const unsigned char *buffer, 
+    ssize_t size );
 
 
 #endif   

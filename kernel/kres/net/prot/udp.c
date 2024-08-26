@@ -1,4 +1,3 @@
-
 // udp.c
 // Created by Fred Nora.
 
@@ -38,7 +37,9 @@ unsigned char udp_saved_mac[6] = {
 
 static void __handle_gprotocol(uint16_t s_port, uint16_t d_port);
 
-//---------------------
+//
+// =========================================================
+//
 
 // #test: 
 // Respond the UDP message receive on port 11888.
@@ -154,181 +155,6 @@ void udp_save_mac(uint8_t mac[6])
     for (i=0; i<6; i++){
         udp_saved_mac[i] = (uint8_t) mac[i];
     };
-}
-
-// When receving UDP packet from NIC device.
-// IN:
-// buffer = udp header base address.
-// size     = udp packet size. (header + data)
-void 
-network_handle_udp( 
-    const unsigned char *buffer, 
-    ssize_t size )
-{
-    struct udp_d *udp;
-    register int i=0;
-
-    //printk ("UDP: Received\n");
-
-
-// Parameters:
-    if ((void*) buffer == NULL){
-        printk("network_handle_udp: buffer\n");
-        return;
-    }
-    if (size < 0){
-        //
-    }
-// The minimum size.
-// Only the udp header.
-    //if (size < UDP_HEADER_LENGHT){
-    //    printk("network_handle_udp: size\n");
-    //    return;
-    //}
-
-// #warning
-// It's ok to use pointer here.
-// We're not allocating memory, we're using 
-// a pre-allocated buffer.
-    udp = (struct udp_d *) buffer;
-
-    uint16_t sport = (uint16_t) FromNetByteOrder16(udp->uh_sport);
-    uint16_t dport = (uint16_t) FromNetByteOrder16(udp->uh_dport);
-
-/*
-    //#debug
-    printk ("sp ={%d}\n",sport);
-    printk ("dp ={%d}\n",dport);
-    printk ("len={%d}\n",udp->uh_ulen);
-    printk ("sum={%d}\n",udp->uh_sum);
-*/
-
-// Clean the payload local buffer.
-    memset( udp_payload, 0, sizeof(udp_payload) );
-
-//
-// Create a local copy of the payload.
-//
-
-    char *p2; 
-    p2 = (buffer + UDP_HEADER_LENGHT);
-    size_t p_size = strlen(p2);
-    if (p_size <= 512)
-    {
-        strncpy(
-            udp_payload,
-            p2,
-            p_size );
-        udp_payload[p_size] = 0;
-        udp_payload[p_size +1] = 0;
-    }
-    /*
-    strncpy(
-        udp_payload,
-        (buffer + UDP_HEADER_LENGHT),
-        1020 );
-    */
-    udp_payload[1021] = 0;
-
-    //#debug
-    // A lot of noise.
-    //printk("UDP: dport{%d} #debug\n",dport);
-
-// Don't print every message.
-// Is it a valid port?
-// Hang if the port is valid.
-
-    char *p;
-    p = udp_payload;
-    int mFlag=0;
-
-// #test
-// DHCP dialog
-// Receiving Offer and Ack.
-// Handle dhcp protocol.
-
-    //printk("UDP: dport{%d}   #debug\n",dport);
-    //die();
-
-    // DHCP ports
-    if (dport == 68 || dport == 67)
-    {
-        network_handle_dhcp(
-            (buffer + UDP_HEADER_LENGHT),
-            (udp->uh_ulen - UDP_HEADER_LENGHT) );
-        return;
-    }
-
-//
-// Ports
-//
-
-// --------------
-// #test
-// Copy into a list of buffers.
-// The application is gonna get this.
-// #bugbug: 
-// What kind of data we're pushing into these buffers?
-// Is it the raw frame only? Or only UDP?
-// see: network.c
-    //int PushIntoTheQueue = TRUE;
-    int PushIntoTheQueue = FALSE;
-
-    int NoReply = TRUE;
-
-    if ( dport == 11888 ||
-         dport == 22888 ||
-         dport == 34884 )
-    {
-
-        // #bugbug
-        // This is just a test. Actually we're gonna put
-        // into the queue all kind of frames, not just
-        // the udp's payloads.
-        if (PushIntoTheQueue == TRUE){
-            // #test
-            network_push_packet( udp_payload, 512 );
-        } else {
-
-            // Print the message for these ports.
-            printk("UDP: { %s }\n", udp_payload );
-
-            // #test
-            // System message
-            // Send a command to the init process.
-            //post_message_to_init(77888, 1234, 5678);
-
-            __handle_gprotocol(sport,dport);
-        };
-
-        // Clear UDP local buffer.
-        memset(udp_payload, 0, sizeof(udp_payload));
-        //for (i=0; i<1024; i++){
-        //    udp_payload[i]=0;
-        //};
-    }
-
-// fail:
-    return;
-
-// Response
-done:
-    if (NoReply == TRUE)
-        return;
-    if (dport == 11888)
-    {
-        //printk ("kernel: Sending response\n");
-        //refresh_screen();
-
-        network_send_udp(  
-            dhcp_info.your_ipv4,  // scr ip
-            __saved_caller_ipv4,  // dst ip
-            __saved_caller_mac,   // dst mac
-            dport,                // source port: "US"
-            sport,                // target port  "Who sent"
-            udp_payload,          // udp payload
-            256 );                // udp payload size
-    }
 }
 
 // -----------------
@@ -759,4 +585,185 @@ fail:
     printk ("Fail\n");
     return -1;
 }
+
+//
+// $
+// HANDLER
+//
+
+// When receving UDP packet from NIC device.
+// IN:
+// buffer = udp header base address.
+// size     = udp packet size. (header + data)
+void 
+network_handle_udp( 
+    const unsigned char *buffer, 
+    ssize_t size )
+{
+    struct udp_d *udp;
+    register int i=0;
+
+    //printk ("UDP: Received\n");
+
+
+// Parameters:
+    if ((void*) buffer == NULL){
+        printk("network_handle_udp: buffer\n");
+        return;
+    }
+    if (size < 0){
+        //
+    }
+// The minimum size.
+// Only the udp header.
+    //if (size < UDP_HEADER_LENGHT){
+    //    printk("network_handle_udp: size\n");
+    //    return;
+    //}
+
+// #warning
+// It's ok to use pointer here.
+// We're not allocating memory, we're using 
+// a pre-allocated buffer.
+    udp = (struct udp_d *) buffer;
+
+    uint16_t sport = (uint16_t) FromNetByteOrder16(udp->uh_sport);
+    uint16_t dport = (uint16_t) FromNetByteOrder16(udp->uh_dport);
+
+/*
+    //#debug
+    printk ("sp ={%d}\n",sport);
+    printk ("dp ={%d}\n",dport);
+    printk ("len={%d}\n",udp->uh_ulen);
+    printk ("sum={%d}\n",udp->uh_sum);
+*/
+
+// Clean the payload local buffer.
+    memset( udp_payload, 0, sizeof(udp_payload) );
+
+//
+// Create a local copy of the payload.
+//
+
+    char *p2; 
+    p2 = (buffer + UDP_HEADER_LENGHT);
+    size_t p_size = strlen(p2);
+    if (p_size <= 512)
+    {
+        strncpy(
+            udp_payload,
+            p2,
+            p_size );
+        udp_payload[p_size] = 0;
+        udp_payload[p_size +1] = 0;
+    }
+    /*
+    strncpy(
+        udp_payload,
+        (buffer + UDP_HEADER_LENGHT),
+        1020 );
+    */
+    udp_payload[1021] = 0;
+
+    //#debug
+    // A lot of noise.
+    //printk("UDP: dport{%d} #debug\n",dport);
+
+// Don't print every message.
+// Is it a valid port?
+// Hang if the port is valid.
+
+    char *p;
+    p = udp_payload;
+    int mFlag=0;
+
+// #test
+// DHCP dialog
+// Receiving Offer and Ack.
+// Handle dhcp protocol.
+
+    //printk("UDP: dport{%d}   #debug\n",dport);
+    //die();
+
+    // DHCP ports
+    if (dport == 68 || dport == 67)
+    {
+        network_handle_dhcp(
+            (buffer + UDP_HEADER_LENGHT),
+            (udp->uh_ulen - UDP_HEADER_LENGHT) );
+        return;
+    }
+
+//
+// Ports
+//
+
+// --------------
+// #test
+// Copy into a list of buffers.
+// The application is gonna get this.
+// #bugbug: 
+// What kind of data we're pushing into these buffers?
+// Is it the raw frame only? Or only UDP?
+// see: network.c
+    //int PushIntoTheQueue = TRUE;
+    int PushIntoTheQueue = FALSE;
+
+    int NoReply = TRUE;
+
+    if ( dport == 11888 ||
+         dport == 22888 ||
+         dport == 34884 )
+    {
+
+        // #bugbug
+        // This is just a test. Actually we're gonna put
+        // into the queue all kind of frames, not just
+        // the udp's payloads.
+        if (PushIntoTheQueue == TRUE){
+            // #test
+            network_push_packet( udp_payload, 512 );
+        } else {
+
+            // Print the message for these ports.
+            printk("UDP: { %s }\n", udp_payload );
+
+            // #test
+            // System message
+            // Send a command to the init process.
+            //post_message_to_init(77888, 1234, 5678);
+
+            __handle_gprotocol(sport,dport);
+        };
+
+        // Clear UDP local buffer.
+        memset(udp_payload, 0, sizeof(udp_payload));
+        //for (i=0; i<1024; i++){
+        //    udp_payload[i]=0;
+        //};
+    }
+
+// fail:
+    return;
+
+// Response
+done:
+    if (NoReply == TRUE)
+        return;
+    if (dport == 11888)
+    {
+        //printk ("kernel: Sending response\n");
+        //refresh_screen();
+
+        network_send_udp(  
+            dhcp_info.your_ipv4,  // scr ip
+            __saved_caller_ipv4,  // dst ip
+            __saved_caller_mac,   // dst mac
+            dport,                // source port: "US"
+            sport,                // target port  "Who sent"
+            udp_payload,          // udp payload
+            256 );                // udp payload size
+    }
+}
+
 

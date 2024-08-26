@@ -1,15 +1,17 @@
-
 // domain.c
 // 2023 - Created by Fred Nora.
+
 
 #include <kernel.h>
 
 
 static struct domain_d *__domain_create_object(void);
 
-// ----------------------
+//
+// ===========================================================
+//
 
-// Create domain object,
+// Create domain object
 static struct domain_d *__domain_create_object(void)
 {
     struct domain_d *d;
@@ -67,11 +69,9 @@ int domain_set_as_dc(struct domain_d *domain)
     }
 
     domain->is_dc = TRUE;
-
     return TRUE;
+
 fail:
     return FALSE;
 }
-
-
 

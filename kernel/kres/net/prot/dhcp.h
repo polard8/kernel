@@ -116,10 +116,7 @@ struct dhcp_d
 
 // ------------------------------
 
-void 
-network_handle_dhcp( 
-    const unsigned char *buffer, 
-    ssize_t size );
+void network_show_dhcp_info(void);
 
 void network_save_dhcp_server_id( uint8_t ip[4] );
 
@@ -132,9 +129,24 @@ network_dhcp_send(
     unsigned short sport, 
     unsigned short dport );
 
+
+//
+// $
+// INITIALIZATION
+//
+
 int network_initialize_dhcp(void);
 
-void network_show_dhcp_info(void);
+//
+// $
+// HANDLER
+//
+
+void 
+network_handle_dhcp( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 
 #endif    
 
