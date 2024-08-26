@@ -726,6 +726,11 @@ int fs_save_fat16_cache(void)
     return 0;
 }
 
+//
+// $
+// INITIALIZATION
+//
+
 // fat16Init:
 // Called by fsInit inthis document.
 int fat16Init(void)
