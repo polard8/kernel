@@ -128,11 +128,15 @@
 #define MSG_CONTROL_ARROW_RIGHT  83
 
 
+// --------------------------
+// #deprecated
+// (Delete these messages)
 //  Terminal commands
 #define MSG_TERMINALCOMMAND      100
 #define TERMINALCOMMAND_PRINTCHAR 1000
 //#define TERMINALCOMMAND_PRINT??? 1001
-//...
+// --------------------------
+
 
 // Scroll
 // o evento de rolagem aconteceu ...
@@ -140,10 +144,15 @@
 #define MSG_HSCROLL  2000
 #define MSG_VSCROLL  2001
 
+// #test
+// Notify parent about some important event that happed with the child.
+// The data value can specify what happened.
+#define MSG_NOTIFY_PARENT  4000
+
+
 // ??
 // Hotkey
 #define MSG_HOTKEY  8888
-
 
 // ...
 

@@ -25,12 +25,78 @@ static struct thread_d  *p6q;  // Higher
 // == Private functions: prototypes =============
 //
 
+static void __sched_notify_parent(struct thread_d *thread, int event_number);
 static tid_t __scheduler_rr(unsigned long sched_flags);
-
 
 // =======================================
 
-//----------------
+static void __sched_notify_parent(struct thread_d *thread, int event_number)
+{
+// Notify parent process that something happened.
+
+
+    //#todo
+    // This is a work in progress!
+
+    struct process_d *p_owner;
+    struct process_d *p_parent;
+
+    //printk ("__sched_notify_parent: #test\n");
+
+// Parameter:
+    if ( (void*) thread == NULL )
+        return;
+    if (thread->magic != 1234)
+        return;
+
+// Owner process
+// The thread belongs to this process
+    pid_t owner_pid = thread->owner_pid;
+    if (owner_pid<0)
+        return;
+    if (owner_pid >= PROCESS_COUNT_MAX)
+        return;
+    p_owner = (struct process_d *) processList[owner_pid];
+    if ( (void*) p_owner == NULL )
+        return;
+    if (p_owner->magic != 1234)
+        return;
+
+// Parent process
+    pid_t parent_pid = p_owner->ppid;
+    if (parent_pid<0)
+        return;
+    if (parent_pid >= PROCESS_COUNT_MAX)
+        return;
+    p_parent = (struct process_d *) processList[parent_pid];
+    if ( (void*) p_parent == NULL )
+        return;
+    if (p_parent->magic != 1234)
+        return;
+
+
+// Get target thread.
+    struct thread_d *target_thread;
+    target_thread = (struct thread_d *) p_parent->control;
+    if ( (void*) target_thread == NULL )
+        return;
+    if (target_thread->magic != 1234)
+        return;
+
+// #test
+// Send message to the control thread of
+// the parent process.
+    tid_t Sender   = thread->tid; 
+    tid_t Receiver = target_thread->tid;
+    post_message_to_tid (
+        Sender,
+        Receiver,
+        MSG_NOTIFY_PARENT,
+        Sender,
+        Receiver );
+
+    //printk ("__sched_notify_parent: done\n");
+}
 
 // Lock scheduler
 void scheduler_lock (void){
@@ -307,6 +373,12 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                     panic("__scheduler_rr: Can't kill InitThread\n");
                 }
                 
+                // #test
+                // (This is a work in progress)
+                // Notify parent process.
+                // IN: thread struct, event number.
+                // __sched_notify_parent(TmpThread,0);
+
                 TmpThread->used = FALSE;
                 TmpThread->magic = 0;
                 TmpThread = NULL;
@@ -385,8 +457,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 {
                     if (TmpThread != Idle)
                     {
-                        // não sera mais selecionada pelo scheduler.
-                        // O dead thred collector pode terminar de deleta
+                        // >> Não sera mais selecionada pelo scheduler.
+                        // #todo: O dead thred collector pode terminar de deleta
                         // essa thread e deletar o processo dela
                         // se ele estiver sinalizado como exit in progress
                         // e ela for a thread de controle dele.
