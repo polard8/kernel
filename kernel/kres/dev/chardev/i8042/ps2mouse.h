@@ -125,7 +125,7 @@ unsigned char i8042_mouse_read (void);
 void i8042_mouse_write(unsigned char data);
 void i8042_mouse_expect_ack (void);
 
-void ps2mouse_poll(void);
+void DeviceInterface_PS2Mouse(void);
 
 #endif   
 

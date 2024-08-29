@@ -172,7 +172,7 @@ int get_alt_status (void);
 int get_ctrl_status (void);
 int get_shift_status (void);
 
-void ps2kbd_poll(void);
+void DeviceInterface_PS2Keyboard(void); 
 
 #endif    
 

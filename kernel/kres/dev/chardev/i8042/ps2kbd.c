@@ -46,73 +46,189 @@ static void keyboard_init_modifier_keys(void)
 	//...
 }
 
-// #todo: 
-// We need a file structure and the function ps2kbd_ioctl();
-void ps2kbd_initialize_device (void)
+// i8042_keyboard_disable:
+// Disable keyboard.
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting disable command.
+   
+void i8042_keyboard_disable (void)
 {
-    debug_print ("ps2kbd_initialize_device:\n");
-    PS2Keyboard.initialized = FALSE;
-    PS2Keyboard.irq_is_working = FALSE;
-    PS2Keyboard.use_polling = FALSE;
-    PS2Keyboard.last_jiffy = jiffies;
+    while ( (in8(0x64) & 2) != 0 )
+    {
+        // Nothing
+    };
+    out8(0x60,0xF5);
+    //sleep(100);
+}
 
-//====================================
-// #test
-// register device
-// create file.
-    file *fp;
-    fp = (file *) kmalloc( sizeof(file) );
-    if ((void *) fp == NULL){
-        panic("kbd: fp\n");
+// i8042_keyboard_enable:
+// Enable keyboard.
+void i8042_keyboard_enable(void)
+{
+    // #bugbug
+    // Dizem que isso pode travar o sistema.
+
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting Enable command.
+    while ( (in8(0x64) & 2) != 0 )
+    {
+    };
+    out8 (0x60,0xF4);
+    //sleep(100);
+}
+
+// Setup keyboard LEDs.
+// see: ps2kbd.h
+void keyboard_set_leds(unsigned char flags)
+{
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting the flag.
+    while ( (in8(0x64) & 2) != 0 )
+    {
+        // Nothing
+    };
+    out8(0x60,KEYBOARD_SET_LEDS); 
+    pit_sleep(100);
+
+// Wait for bit 1 of status reg to be zero.
+// Send flag. 
+    while ( (in8(0x64) & 2) != 0 )
+    {
+        // Nothing
+    };
+    out8(0x60,flags);
+    pit_sleep(100);
+}
+
+// [API]
+// keyboardGetKeyState:
+// Pega o status das teclas de modificação.
+unsigned long keyboardGetKeyState(int vk)
+{
+    unsigned long State=0;
+    int Lvk = (int) (vk & 0xFF);
+
+    if (Lvk<0){
+        return 0;
     }
-    memset ( fp, 0, sizeof(file) );
-    fp->used = TRUE;
-    fp->magic = 1234;
-    fp->____object = ObjectTypeFile;
-    fp->isDevice = TRUE;
-// #todo
-    fp->dev_major = 0;
-    fp->dev_minor = 0;
 
-// #todo: Initialize the file structure ... buffer ...
-
-// #test
-// Registrando o dispositivo.
-    devmgr_register_device ( 
-        (file *) fp, 
-        "PS2KBD",            // pathname 
-        DEVICE_CLASS_CHAR,   // class (char, block, network)
-        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
-        NULL,                // Not a pci device.
-        NULL );              // Not a tty device. (not for now)
-//====================================
-
-// globals
-    keyboard_init_lock_keys();
-    keyboard_init_modifier_keys();
+    switch (Lvk){
+    case VK_LSHIFT:    State = shift_status;       break;
+    case VK_LCONTROL:  State = ctrl_status;        break;
+    case VK_LWIN:      State = winkey_status;      break;
+    case VK_LMENU:     State = alt_status;         break;
+    case VK_RWIN:      State = winkey_status;      break;
+    case VK_RCONTROL:  State = ctrl_status;        break;
+    case VK_RSHIFT:    State = shift_status;       break;
+    case VK_CAPITAL:   State = capslock_status;    break;
+    case VK_NUMLOCK:   State = numlock_status;     break;
+    case VK_SCROLL:    State = scrolllock_status;  break;
     // ...
+    default:
+        return 0;
+        break;
+    };
 
-// Enable keyboard port
-    wait_then_write(I8042_STATUS, 0xae);
-    i8042_keyboard_expect_ack();
-
-    __prefix=0;
-
-    PS2Keyboard.initialized = TRUE;
+// TRUE or FALSE.
+    return (unsigned long) (State & 0xFFFFFFFF);
 }
 
-// #test
-// Poll keyboard
-void ps2kbd_poll(void)
+// [API]
+// Get alt Status.
+int get_alt_status (void)
 {
-    if (PS2Keyboard.initialized != TRUE)
-        return;
-    if (PS2Keyboard.irq_is_working == TRUE)
-        return;
-    if (PS2Keyboard.use_polling == TRUE){
-        DeviceInterface_PS2Keyboard();
-    }
+    return (int) alt_status;
 }
+
+// [API]
+// Get control status.
+int get_ctrl_status (void)
+{
+    return (int) ctrl_status;
+}
+
+// [API]
+// Get shift status.
+int get_shift_status (void)
+{
+    return (int) shift_status;
+}
+
+
+// i8042_keyboard_read:
+// Esta função será usada para ler dados do teclado na 
+// porta 0x60, fora do IRQ1.
+uint8_t i8042_keyboard_read (void)
+{
+    uint8_t Value=0;
+
+    prepare_for_input();
+    Value = in8(0x60);
+    wait_ns(400);
+
+    return (uint8_t) Value;
+}
+
+// i8042_keyboard_write: 
+// Esta função será usada para escrever dados do teclado 
+// na porta 0x60, fora do IRQ1.
+void i8042_keyboard_write (uint8_t data)
+{
+    prepare_for_output();
+    out8 ( 0x60, data );
+    wait_ns(400);
+}
+
+// i8042_keyboard_read2:
+// Get byte in port 0x60.
+unsigned char i8042_keyboard_read2(void)
+{
+    prepare_for_input();
+    return (unsigned char) in8(0x60);
+}
+
+void i8042_keyboard_expect_ack (void)
+{
+    unsigned char ack_value=0;
+    int timeout=100;
+
+    // #bugbug
+    // ? loop infinito  
+    // while ( xxx_mouse_read() != 0xFA );
+
+    while (1)
+    {
+        timeout--;
+        if (timeout <= 0){
+            break;
+        }
+
+        // #todo: Use a worker like this?
+        //ack_value = (unsigned char) i8042_keyboard_read2();
+        
+        prepare_for_input();
+        ack_value = (unsigned char) in8(0x60);
+        
+        // OK
+        if (ack_value == 0xFA){
+            return;  
+        }
+    }; 
+
+// Acabou o tempo, vamos checar o valor.
+// Provavelmente esta errado.
+    if (ack_value != 0xFA)
+    {
+        //#debug
+        //printk ("expect_ack: not ack\n");
+        return;
+        //return -1;
+    }
+
+    return;
+    //return 0;
+}
+
 
 /*
  * DeviceInterface_PS2Keyboard: 
@@ -308,182 +424,62 @@ done:
     return;
 }
 
-// i8042_keyboard_disable:
-// Disable keyboard.
-// Wait for bit 1 of status reg to be zero.
-// Send code for setting disable command.
-   
-void i8042_keyboard_disable (void)
+
+// #todo: 
+// We need a file structure and the function ps2kbd_ioctl();
+void ps2kbd_initialize_device (void)
 {
-    while ( (in8(0x64) & 2) != 0 )
-    {
-        // Nothing
-    };
-    out8(0x60,0xF5);
-    //sleep(100);
-}
+    debug_print ("ps2kbd_initialize_device:\n");
+    PS2Keyboard.initialized = FALSE;
+    PS2Keyboard.irq_is_working = FALSE;
+    PS2Keyboard.use_polling = FALSE;
+    PS2Keyboard.last_jiffy = jiffies;
 
-// i8042_keyboard_enable:
-// Enable keyboard.
-void i8042_keyboard_enable(void)
-{
-    // #bugbug
-    // Dizem que isso pode travar o sistema.
-
-// Wait for bit 1 of status reg to be zero.
-// Send code for setting Enable command.
-    while ( (in8(0x64) & 2) != 0 )
-    {
-    };
-    out8 (0x60,0xF4);
-    //sleep(100);
-}
-
-// Setup keyboard LEDs.
-// see: ps2kbd.h
-void keyboard_set_leds(unsigned char flags)
-{
-// Wait for bit 1 of status reg to be zero.
-// Send code for setting the flag.
-    while ( (in8(0x64) & 2) != 0 )
-    {
-        // Nothing
-    };
-    out8(0x60,KEYBOARD_SET_LEDS); 
-    pit_sleep(100);
-
-// Wait for bit 1 of status reg to be zero.
-// Send flag. 
-    while ( (in8(0x64) & 2) != 0 )
-    {
-        // Nothing
-    };
-    out8(0x60,flags);
-    pit_sleep(100);
-}
-
-// keyboardGetKeyState:
-// Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState(int vk)
-{
-    unsigned long State=0;
-    int Lvk = (int) (vk & 0xFF);
-
-    if (Lvk<0){
-        return 0;
+//====================================
+// #test
+// register device
+// create file.
+    file *fp;
+    fp = (file *) kmalloc( sizeof(file) );
+    if ((void *) fp == NULL){
+        panic("kbd: fp\n");
     }
+    memset ( fp, 0, sizeof(file) );
+    fp->used = TRUE;
+    fp->magic = 1234;
+    fp->____object = ObjectTypeFile;
+    fp->isDevice = TRUE;
+// #todo
+    fp->dev_major = 0;
+    fp->dev_minor = 0;
 
-    switch (Lvk){
-    case VK_LSHIFT:    State = shift_status;       break;
-    case VK_LCONTROL:  State = ctrl_status;        break;
-    case VK_LWIN:      State = winkey_status;      break;
-    case VK_LMENU:     State = alt_status;         break;
-    case VK_RWIN:      State = winkey_status;      break;
-    case VK_RCONTROL:  State = ctrl_status;        break;
-    case VK_RSHIFT:    State = shift_status;       break;
-    case VK_CAPITAL:   State = capslock_status;    break;
-    case VK_NUMLOCK:   State = numlock_status;     break;
-    case VK_SCROLL:    State = scrolllock_status;  break;
+// #todo: Initialize the file structure ... buffer ...
+
+// #test
+// Registrando o dispositivo.
+    devmgr_register_device ( 
+        (file *) fp, 
+        "PS2KBD",            // pathname 
+        DEVICE_CLASS_CHAR,   // class (char, block, network)
+        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
+        NULL,                // Not a pci device.
+        NULL );              // Not a tty device. (not for now)
+//====================================
+
+// globals
+    keyboard_init_lock_keys();
+    keyboard_init_modifier_keys();
     // ...
-    default:
-        return 0;
-        break;
-    };
 
-// TRUE or FALSE.
-    return (unsigned long) (State & 0xFFFFFFFF);
+// Enable keyboard port
+    wait_then_write(I8042_STATUS, 0xae);
+    i8042_keyboard_expect_ack();
+
+    __prefix=0;
+
+    PS2Keyboard.initialized = TRUE;
 }
 
-// Get alt Status.
-int get_alt_status (void)
-{
-    return (int) alt_status;
-}
-
-// Get control status.
-int get_ctrl_status (void)
-{
-    return (int) ctrl_status;
-}
-
-// Get shift status.
-int get_shift_status (void)
-{
-    return (int) shift_status;
-}
-
-// i8042_keyboard_read:
-// Esta função será usada para ler dados do teclado na 
-// porta 0x60, fora do IRQ1.
-
-uint8_t i8042_keyboard_read (void)
-{
-    uint8_t Value=0;
-
-    prepare_for_input();
-    Value = in8(0x60);
-    wait_ns(400);
-
-    return (uint8_t) Value;
-}
-
-// i8042_keyboard_write: 
-// Esta função será usada para escrever dados do teclado 
-// na porta 0x60, fora do IRQ1.
-void i8042_keyboard_write (uint8_t data)
-{
-    prepare_for_output();
-    out8 ( 0x60, data );
-    wait_ns(400);
-}
-
-// i8042_keyboard_read2:
-// Get byte in port 0x60.
-unsigned char i8042_keyboard_read2(void)
-{
-    prepare_for_input();
-    return (unsigned char) in8(0x60);
-}
-
-void i8042_keyboard_expect_ack (void)
-{
-    unsigned char ack_value=0;
-    int timeout=100;
-
-    // #bugbug
-    // ? loop infinito  
-    // while ( xxx_mouse_read() != 0xFA );
-
-    while (1)
-    {
-        timeout--;
-        if (timeout <= 0){
-            break;
-        }
-
-        // #todo: Use a worker like this?
-        //ack_value = (unsigned char) i8042_keyboard_read2();
-        
-        prepare_for_input();
-        ack_value = (unsigned char) in8(0x60);
-        
-        // OK
-        if (ack_value == 0xFA){
-            return;  
-        }
-    }; 
-
-// Acabou o tempo, vamos checar o valor.
-// Provavelmente esta errado.
-    if (ack_value != 0xFA)
-    {
-        //#debug
-        //printk ("expect_ack: not ack\n");
-        return;
-        //return -1;
-    }
-
-    return;
-    //return 0;
-}
-
+//
+// End
+//

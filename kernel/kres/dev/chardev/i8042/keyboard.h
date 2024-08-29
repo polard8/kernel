@@ -4,7 +4,8 @@
 #ifndef ____KEYBOARD_H
 #define ____KEYBOARD_H    1
 
-void DeviceInterface_PS2Keyboard(void); 
+
+void ps2kbd_poll(void);
 
 #endif   
 

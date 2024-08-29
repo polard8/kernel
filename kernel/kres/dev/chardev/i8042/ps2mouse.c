@@ -446,6 +446,151 @@ int __get_device_id(void)
     return (int) i8042_mouse_read(); 
 }
 
+// Called by irq12_MOUSE in mouse.c.
+// See: https://wiki.osdev.org/Mouse_Input
+// See: https://wiki.osdev.org/User:Kmtdk
+// See: https://wiki.osdev.org/PS/2_Mouse
+void DeviceInterface_PS2Mouse(void)
+{
+    unsigned char _byte=0;
+    int posX = 0;
+    int posY = 0;
+
+//#debug
+//#todo: deletar isso.
+    //debug_print ("DeviceInterface_PS2Mouse:\n");
+
+// Not initialized
+    if (PS2.mouse_initialized != TRUE){
+        debug_print ("DeviceInterface_PS2Mouse: Not initialized yet\n");
+        return;
+    }
+
+// Get one byte in the controler.
+// #todo
+// Temos que checar se o primeiro byte é um ack ou um resend.
+// isso acontece logo apos a inicialização.
+// #define ACKNOWLEDGE         0xFA
+// #define RESEND              0xFE
+
+// == bytes =================================
+// #todo
+// Read this to understand the bytes.
+// https://wiki.osdev.org/Mouse_Input
+
+/*
+ One of the biggest problems with streaming 
+ mode is "alignment" -- the packets were never defined 
+ to have an obvious boundary. This means that it is 
+ very easy to lose track of which mouse byte is 
+ supposed to be the first byte of the next packet. 
+ This problem is completely avoided if you specifically 
+ request single packets (instead of using streaming mode) 
+ because every packet begins with an ACK (0xFA), 
+ which is easily recognizable.
+*/
+
+
+// =============================================
+// #test
+// Get status
+    unsigned char status = in8(I8042_STATUS);
+// buffer full?
+    if (!(status & I8042_BUFFER_FULL)){
+        return;
+    }
+// which device?
+// Is it a mouse device?
+// Return if it is not a mouse device.
+    int is_mouse_device = 
+        ((status & I8042_WHICH_BUFFER) == I8042_MOUSE_BUFFER) 
+        ? TRUE 
+        : FALSE;
+    if (is_mouse_device == FALSE)
+        return;
+// =============================================
+
+    PS2Mouse.last_jiffy = (unsigned long) get_systime_totalticks();
+
+// Get the byte
+    _byte = (unsigned char) in8(0x60);
+
+// ACK: 
+// Significa início do pacote quando no modo
+// 'request single packets'.
+// Então vamos reinicializar o contador.
+
+/*
+    // O ACK não é enviado se estivermos
+    // no modo streaming.
+    if (_byte == 0xFA){
+        //debug_print ("[0xFA]: ACK\n");
+        mouse_stage = 0;
+        return;
+    }
+*/
+
+/*
+// RESEND: 
+// ??? Resend é comando e não estatus.
+    if (_byte == 0xFE){
+        //debug_print ("[0xFE]: RESEND\n");
+        printk ("DeviceInterface_PS2Mouse: resend\n");
+        refresh_screen();
+        //mouse_stage = 0;
+        return;
+    }
+*/
+
+// First byte.
+// Y overflow, X overflow, Y sign bit, X sign bit
+// Always 1, Middle Btn, Right Btn, Left Btn
+
+    // Save
+    buffer_mouse[mouse_stage] = (char) _byte;
+
+    switch (mouse_stage){
+
+    case 0:
+        if (!(_byte & MOUSE_FLAGS_ALWAYS_1))
+        {
+            mouse_stage=0;
+            break;
+        }
+        mouse_stage++;
+        break;
+    case 1:
+        mouse_stage++;
+        break;
+    case 2:
+        // If we have wheel, so we got another stage.
+        if (PS2Mouse.has_wheel == TRUE)
+        {
+            mouse_stage++;
+            break;
+        }
+        // If we do not have the wheel.
+        // Commit packet.
+        __ps2mouse_parse_data_packet();
+        mouse_stage = 0;
+        break;
+    case 3:
+        __ps2mouse_parse_data_packet();
+        mouse_stage = 0;
+        break;
+    // Error: drain and clean
+    default:
+        in8(0x60);
+        mouse_stage = 0;
+        break;
+    };
+
+// #todo
+// Coloque os pacotes num arquivo,
+// o window server poderá ler depois.
+   //write_packet(mousefp,...)
+}
+
 // ps2mouse_initialize_device:
 //     Initialize the device.
 /*
@@ -779,169 +924,10 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
     PS2Mouse.initialized = TRUE;
 }
 
-// #test
-// Poll keyboard
-void ps2mouse_poll(void)
-{
-
-// #bugbug
-// #todo
-// We need a loop for mouse polling.
-// It's because a packet uses more than on interrupt.
-
-/*
-    if (PS2Mouse.initialized != TRUE)
-        return;
-    if (PS2Mouse.irq_is_working == TRUE)
-        return;
-    if (PS2Mouse.use_polling == TRUE){
-        DeviceInterface_PS2Mouse();
-    }
-*/
-}
-
-// Called by irq12_MOUSE in mouse.c.
-// See: https://wiki.osdev.org/Mouse_Input
-// See: https://wiki.osdev.org/User:Kmtdk
-// See: https://wiki.osdev.org/PS/2_Mouse
-void DeviceInterface_PS2Mouse(void)
-{
-    unsigned char _byte=0;
-    int posX = 0;
-    int posY = 0;
-
-//#debug
-//#todo: deletar isso.
-    //debug_print ("DeviceInterface_PS2Mouse:\n");
-
-// Not initialized
-    if (PS2.mouse_initialized != TRUE){
-        debug_print ("DeviceInterface_PS2Mouse: Not initialized yet\n");
-        return;
-    }
-
-// Get one byte in the controler.
-// #todo
-// Temos que checar se o primeiro byte é um ack ou um resend.
-// isso acontece logo apos a inicialização.
-// #define ACKNOWLEDGE         0xFA
-// #define RESEND              0xFE
-
-// == bytes =================================
-// #todo
-// Read this to understand the bytes.
-// https://wiki.osdev.org/Mouse_Input
-
-/*
- One of the biggest problems with streaming 
- mode is "alignment" -- the packets were never defined 
- to have an obvious boundary. This means that it is 
- very easy to lose track of which mouse byte is 
- supposed to be the first byte of the next packet. 
- This problem is completely avoided if you specifically 
- request single packets (instead of using streaming mode) 
- because every packet begins with an ACK (0xFA), 
- which is easily recognizable.
-*/
+//
+// End
+//
 
 
-// =============================================
-// #test
-// Get status
-    unsigned char status = in8(I8042_STATUS);
-// buffer full?
-    if (!(status & I8042_BUFFER_FULL)){
-        return;
-    }
-// which device?
-// Is it a mouse device?
-// Return if it is not a mouse device.
-    int is_mouse_device = 
-        ((status & I8042_WHICH_BUFFER) == I8042_MOUSE_BUFFER) 
-        ? TRUE 
-        : FALSE;
-    if (is_mouse_device == FALSE)
-        return;
-// =============================================
 
-    PS2Mouse.last_jiffy = (unsigned long) get_systime_totalticks();
-
-// Get the byte
-    _byte = (unsigned char) in8(0x60);
-
-// ACK: 
-// Significa início do pacote quando no modo
-// 'request single packets'.
-// Então vamos reinicializar o contador.
-
-/*
-    // O ACK não é enviado se estivermos
-    // no modo streaming.
-    if (_byte == 0xFA){
-        //debug_print ("[0xFA]: ACK\n");
-        mouse_stage = 0;
-        return;
-    }
-*/
-
-/*
-// RESEND: 
-// ??? Resend é comando e não estatus.
-    if (_byte == 0xFE){
-        //debug_print ("[0xFE]: RESEND\n");
-        printk ("DeviceInterface_PS2Mouse: resend\n");
-        refresh_screen();
-        //mouse_stage = 0;
-        return;
-    }
-*/
-
-// First byte.
-// Y overflow, X overflow, Y sign bit, X sign bit
-// Always 1, Middle Btn, Right Btn, Left Btn
-
-    // Save
-    buffer_mouse[mouse_stage] = (char) _byte;
-
-    switch (mouse_stage){
-
-    case 0:
-        if (!(_byte & MOUSE_FLAGS_ALWAYS_1))
-        {
-            mouse_stage=0;
-            break;
-        }
-        mouse_stage++;
-        break;
-    case 1:
-        mouse_stage++;
-        break;
-    case 2:
-        // If we have wheel, so we got another stage.
-        if (PS2Mouse.has_wheel == TRUE)
-        {
-            mouse_stage++;
-            break;
-        }
-        // If we do not have the wheel.
-        // Commit packet.
-        __ps2mouse_parse_data_packet();
-        mouse_stage = 0;
-        break;
-    case 3:
-        __ps2mouse_parse_data_packet();
-        mouse_stage = 0;
-        break;
-    // Error: drain and clean
-    default:
-        in8(0x60);
-        mouse_stage = 0;
-        break;
-    };
-
-// #todo
-// Coloque os pacotes num arquivo,
-// o window server poderá ler depois.
-   //write_packet(mousefp,...)
-}
 

@@ -30,6 +30,31 @@ unsigned long scrolllock_status=0;
 
 // ==================================
 
+//
+// #test
+// POLLING
+//
+
+// #test
+// Poll keyboard
+void ps2kbd_poll(void)
+{
+    if (PS2Keyboard.initialized != TRUE)
+        return;
+    if (PS2Keyboard.irq_is_working == TRUE)
+        return;
+    if (PS2Keyboard.use_polling == TRUE){
+        DeviceInterface_PS2Keyboard();
+    }
+}
+
+
+
+//
+// $
+// HANDLER
+//
+
 // ps/2 keyboard irq handler.
 __VOID_IRQ 
 irq1_KEYBOARD (void)

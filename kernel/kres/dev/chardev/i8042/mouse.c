@@ -21,6 +21,38 @@ int mouse_button_action=FALSE;
 
 // ==============
 
+//
+// $
+// POLLING
+//
+
+// #test
+// Poll keyboard
+void ps2mouse_poll(void)
+{
+
+// #bugbug
+// #todo
+// We need a loop for mouse polling.
+// It's because a packet uses more than on interrupt.
+
+/*
+    if (PS2Mouse.initialized != TRUE)
+        return;
+    if (PS2Mouse.irq_is_working == TRUE)
+        return;
+    if (PS2Mouse.use_polling == TRUE){
+        DeviceInterface_PS2Mouse();
+    }
+*/
+}
+
+
+//
+// $
+// HANDLER
+//
+
 // ps/2 mouse irq handler.
 __VOID_IRQ 
 irq12_MOUSE (void)
