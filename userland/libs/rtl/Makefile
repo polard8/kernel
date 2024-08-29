@@ -13,6 +13,9 @@ NAME = rtl
 TARGETOS ?= gramado
 #TARGETOS ?= linux
 
+
+CC = gcc 
+
 #STATIC_LIB = obj/lib/libc03.a
 #SHARED_LIB = obj/lib/libc03.so
 
@@ -67,61 +70,64 @@ link install clean
 	@echo "Ok?"
 
 libc-header:
+
+ifeq ($(TARGETOS),gramado)
+
 # student
-	gcc  -c  entrance/student/crt0.c  $(CFLAGS) $(LIBS) -o crt0.o
+	$(CC) -c entrance/student/crt0.c  $(CFLAGS) $(LIBS) -o crt0.o
 # visitor
-	gcc -c entrance/visitor/rtl.c  $(CFLAGS) $(LIBS) -o rtl.o
+	$(CC) -c entrance/visitor/rtl.c  $(CFLAGS) $(LIBS) -o rtl.o
+
+endif  
+
 
 libc-content:
 
-	gcc  -c  ctype.c    $(CFLAGS)  $(LIBS) -o ctype.o
-	gcc  -c  fcntl.c    $(CFLAGS)  $(LIBS) -o fcntl.o
-	gcc  -c  mmap.c     $(CFLAGS)  $(LIBS) -o mmap.o
-	gcc  -c  fscanf.c   $(CFLAGS)  $(LIBS) -o fscanf.o
-	gcc  -c  ioctl.c    $(CFLAGS)  $(LIBS) -o ioctl.o
-	gcc  -c  signal.c   $(CFLAGS)  $(LIBS) -o signal.o
-	gcc  -c  socket.c   $(CFLAGS)  $(LIBS) -o socket.o
-	gcc  -c  stdio.c    $(CFLAGS)  $(LIBS) -o stdio.o
-	gcc  -c  stdlib.c   $(CFLAGS)  $(LIBS) -o stdlib.o
-	gcc  -c  termios.c  $(CFLAGS)  $(LIBS) -o termios.o
-	gcc  -c  unistd.c   $(CFLAGS)  $(LIBS) -o unistd.o
-	gcc  -c  conio.c    $(CFLAGS)  $(LIBS) -o conio.o
-	gcc  -c  string.c   $(CFLAGS)  $(LIBS) -o string.o
-	gcc  -c  time.c     $(CFLAGS)  $(LIBS) -o time.o
-	gcc  -c  wait.c     $(CFLAGS)  $(LIBS) -o wait.o
-	gcc  -c  math.c      $(CFLAGS)  $(LIBS) -o math.o
-	gcc  -c  strtoul.c   $(CFLAGS)  $(LIBS) -o strtoul.o
-	gcc  -c  strtol.c    $(CFLAGS)  $(LIBS) -o strtol.o
-	gcc  -c  err.c       $(CFLAGS)  $(LIBS) -o err.o
-	gcc  -c  locale.c    $(CFLAGS)  $(LIBS) -o locale.o
-	gcc  -c  assert.c    $(CFLAGS)  $(LIBS) -o assert.o
-	gcc  -c  pty.c       $(CFLAGS)  $(LIBS) -o pty.o
-	gcc  -c  tty.c       $(CFLAGS)  $(LIBS) -o tty.o
-	gcc  -c  _split.c    $(CFLAGS)  $(LIBS) -o _split.o
-	gcc  -c  linkaddr.c  $(CFLAGS)  $(LIBS) -o linkaddr.o
-
-	gcc  -c  sched.c  $(CFLAGS)  $(LIBS) -o sched.o
-
-	gcc  -c  inet.c  $(CFLAGS)  $(LIBS) -o inet.o
+	$(CC) -c  _split.c    $(CFLAGS)  $(LIBS) -o _split.o
+	$(CC) -c  assert.c    $(CFLAGS)  $(LIBS) -o assert.o
+	$(CC) -c  conio.c    $(CFLAGS)  $(LIBS) -o conio.o
+	$(CC) -c  ctype.c    $(CFLAGS)  $(LIBS) -o ctype.o
+	$(CC) -c  err.c       $(CFLAGS)  $(LIBS) -o err.o
+	$(CC) -c  fcntl.c    $(CFLAGS)  $(LIBS) -o fcntl.o
+	$(CC) -c  fscanf.c   $(CFLAGS)  $(LIBS) -o fscanf.o
+	$(CC) -c  inet.c  $(CFLAGS)  $(LIBS) -o inet.o
+	$(CC) -c  ioctl.c    $(CFLAGS)  $(LIBS) -o ioctl.o
+	$(CC) -c  linkaddr.c  $(CFLAGS)  $(LIBS) -o linkaddr.o
+	$(CC) -c  locale.c    $(CFLAGS)  $(LIBS) -o locale.o
+	$(CC) -c  math/math.c      $(CFLAGS)  $(LIBS) -o math.o
+	$(CC) -c  mmap.c     $(CFLAGS)  $(LIBS) -o mmap.o
+	$(CC) -c  pty.c       $(CFLAGS)  $(LIBS) -o pty.o
+	$(CC) -c  sched.c  $(CFLAGS)  $(LIBS) -o sched.o
+	$(CC) -c  signal.c   $(CFLAGS)  $(LIBS) -o signal.o
+	$(CC) -c  socket.c   $(CFLAGS)  $(LIBS) -o socket.o
+	$(CC) -c  stdio.c    $(CFLAGS)  $(LIBS) -o stdio.o
+	$(CC) -c  stdlib.c   $(CFLAGS)  $(LIBS) -o stdlib.o
+	$(CC) -c  string.c   $(CFLAGS)  $(LIBS) -o string.o
+	$(CC) -c  strtol.c    $(CFLAGS)  $(LIBS) -o strtol.o
+	$(CC) -c  strtoul.c   $(CFLAGS)  $(LIBS) -o strtoul.o
+	$(CC) -c  termios.c  $(CFLAGS)  $(LIBS) -o termios.o
+	$(CC) -c  time.c     $(CFLAGS)  $(LIBS) -o time.o
+	$(CC) -c  tty.c       $(CFLAGS)  $(LIBS) -o tty.o
+	$(CC) -c  unistd.c   $(CFLAGS)  $(LIBS) -o unistd.o
+	$(CC) -c  wait.c     $(CFLAGS)  $(LIBS) -o wait.o
 
 # ...
 
-
 #tests 
-#	gcc  -c  tests/test1.c   $(CFLAGS) -I. -I include/ -o test1.o
+#	$(CC) -c  tests/test1.c   $(CFLAGS) -I. -I include/ -o test1.o
  
 # test
 # entry point para a biblioteca compartilhada. .so
 
-	#gcc  -c  socrt0.c -fno-stack-protector -fpic -mno-red-zone -DEFI_FUNCTION_WRAPPER  $(CFLAGS)  $(LIBS) -o socrt0.o	
-	#gcc  -c  somain.c -fno-stack-protector -fpic -mno-red-zone -DEFI_FUNCTION_WRAPPER  $(CFLAGS)  $(LIBS) -o somain.o	
+	#$(CC) -c  socrt0.c -fno-stack-protector -fpic -mno-red-zone -DEFI_FUNCTION_WRAPPER  $(CFLAGS)  $(LIBS) -o socrt0.o	
+	#$(CC) -c  somain.c -fno-stack-protector -fpic -mno-red-zone -DEFI_FUNCTION_WRAPPER  $(CFLAGS)  $(LIBS) -o somain.o	
 
 #ifeq ($(TARGETOS),gramado)
-#	gcc  -c  sysdeps/gramado/gramado.c  $(CFLAGS)  $(LIBS) -o gramado.o
+#	$(CC) -c  sysdeps/gramado/gramado.c  $(CFLAGS)  $(LIBS) -o gramado.o
 #endif
 
 #ifeq ($(TARGETOS),linux)
-#	gcc  -c  sysdeps/gramado/linux.c  $(CFLAGS)  $(LIBS) -o linux.o
+#	$(CC) -c  sysdeps/gramado/linux.c  $(CFLAGS)  $(LIBS) -o linux.o
 #endif
 
 libc-footer:
@@ -133,7 +139,7 @@ libc-footer:
 link:
 #	ar rc LIBC03.A $(OBJECTS)
 #	ld -m elf_i386 socrt0.o somain.o -nostdlib -T elf_ia32_efi.lds -shared -znocombreloc -Bsymbolic -L . -l:LIBC03.A -o LIBC03.SO -Map map.s
-	#$(LD) -r -o archive_rtl.o 
+	#$(LD) -r -o ar_rtl.o 
 install:
 	-mkdir         obj/
 	-cp *.o        obj/

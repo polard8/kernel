@@ -4,8 +4,9 @@
 #ifndef __MATH_H
 #define __MATH_H    1
 
-// hehe
-#define GRAMADO_PI  3.14159265 
+#define GRAMADO_PI    3.14159265 
+#define GRAMADO_E     2.71828182846
+
 
 union __float_u {
 	unsigned char __dummy[sizeof(float)];
@@ -94,14 +95,40 @@ struct exception {
 #define PLOSS      6
 
 
+double log(double x);
+float logf(float x);
+
+double fabs(double x);
+float fabsf(float x);
+
+double fmin(double x, double y);
+float fminf(float x, float y);
+
+double fmax(double x, double y);
+float fmaxf(float x, float y);
+
+double modf(double x, double *iptr);
+float modff(float x, float *iptr);
+
 // sin, cos, tan
 double sin(double __x);
 double cos(double __x);
 double tan(double __x);
+//------------------------------
+double tan00(double x);
+double cot00(double x);
+double cot01(double x);
+
+//------------------------------
+double sec00(double x);
+double cossec00(double x);
+
+
 // asin, acos, atan
 double asin(double __x);
 double acos(double __x);
 double atan(double __x);
+
 // floor, ceil
 double floor(double __x);
 double ceil(double __x);
@@ -116,11 +143,24 @@ long power1(long x, unsigned int n);
 long power2(long x, unsigned int y);
 float power3(float x, int y);
 double power4(double x, int y);
+double pow00(double x, double y);
+
+double exp(double x);
 
 //----------------
 float sinf(float arg);
 float cosf(float arg);
 float tanf(float arg);
+
+//------------------------------
+
+float tanf00(float x);
+float cotf00(float x);
+float cotf01(float x);
+
+//------------------------------
+float secf00(float x);
+float cossecf00(float x);
 
 // #test
 float neutral_element_of_add(void);

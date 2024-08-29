@@ -5,6 +5,72 @@
 // #todo
 // Remember: double is double precision float.
 
+#include <math.h>
+
+
+// See:
+// https://man7.org/linux/man-pages/man3/log.3.html
+double log(double x)
+{
+    return (double) 0.0;
+}
+float logf(float x)
+{
+    return (float) 0.0f;
+}
+
+
+double fabs(double x)
+{
+    return (double) 0.0;
+}
+float fabsf(float x)
+{
+    return (float) 0.0f;
+}
+
+
+// see:
+// https://linux.die.net/man/3/fmin
+double fmin(double x, double y) 
+{
+    return (double) (x < y ? x : y);
+}
+float fminf(float x, float y)
+{
+    return (float) (x < y ? x : y);
+}
+
+// see:
+// https://linux.die.net/man/3/fmax
+double fmax(double x, double y) 
+{
+    return (double) (x > y ? x : y);
+}
+float fmaxf(float x, float y)
+{
+    return (float) (x > y ? x : y);
+}
+
+
+// See:
+// https://linux.die.net/man/3/modf
+double modf(double x, double *iptr)
+{
+    return (double) 0.0;
+}
+
+// See:
+// https://linux.die.net/man/3/modf
+float modff(float x, float *iptr)
+{
+    return (double) 0.0f;
+}
+
+//
+// sin, cos, tan
+//
+
 
 double sin(double __x)
 {
@@ -16,9 +82,39 @@ double cos(double __x)
 }
 double tan(double __x)
 {
-    return 0;
+	return (double) ( sin(__x) / cos(__x) );
 }
 
+//------------------------------
+
+double tan00(double x)
+{
+	return (double) ( sin(x) / cos(x) );
+}
+double cot00(double x)
+{
+	return (double) ( cos(x) / sin(x) );
+}
+double cot01(double x)
+{
+	return (double)  ( 1 / tan00(x) );
+}
+
+//------------------------------
+
+double sec00(double x)
+{
+    return (double) (1/cos(x));
+}
+
+double cossec00(double x)
+{
+    return (double) (1/sin(x));
+}
+
+//
+// asin, acos, atan
+//
 
 // Returns the arcsine of x.
 double asin(double __x)
@@ -60,16 +156,25 @@ double ceil(double __x)
 // x to power of y
 double pow(double __x, double __y)
 {
-// If x^0 return 1
-    if (__y == 0){ return (double) 1; }
-// If we need to find of 0^y
-    if (__x == 0){ return 0; }
+    double RetValue = 0.0;
+    asm volatile (
+        "fyl2x;"
+        "fld %%st;"
+        "frndint;"
+        "fsub %%st, %%st(1);"
+        "fxch;"
+        "fchs;"
+        "f2xm1;"
+        "fld1;"
+        "faddp;"
+        "fxch;"
+        "fld1;"
+        "fscale;"
+        "fstp %%st(1);"
+        "fmulp;" : "=t"(RetValue) : "0"(__x),"u"(__y) : "st(1)" );
 
-// #todo
-
-    return 0;
+    return (double) RetValue;
 }
-
 
 // sqrt:
 // Computes the square root of the source 
@@ -199,6 +304,19 @@ double power4(double x, int y)
     };
 }
 
+
+double pow00(double x, double y)
+{
+    return (double) pow(x,y);
+}
+
+// -------------------------------
+
+double exp(double x)
+{
+	return (double) pow(GRAMADO_E, x);
+}
+
 // -------------------------------
 
 // IN: angle
@@ -229,6 +347,36 @@ float tanf(float arg)
 {
     return (float) __builtin_tan(arg);
 }
+
+//------------------------------
+
+float tanf00(float x)
+{
+	return (float)  (sinf(x) / cosf(x) );
+}
+float cotf00(float x)
+{
+	return (float)  ( cosf(x) / sinf(x) );
+}
+float cotf01(float x)
+{
+	return (float)  ( 1 / tanf00(x) );
+}
+
+
+//------------------------------
+
+float secf00(float x)
+{
+    return (float) (1/cosf(x));
+}
+
+float cossecf00(float x)
+{
+    return (float) (1/sinf(x));
+}
+
+
 
 // #test
 float neutral_element_of_add(void)
