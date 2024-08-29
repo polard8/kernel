@@ -115,8 +115,9 @@ all:
 	$(CC) -c chardev/serial/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
 # tty
 	$(CC) -c chardev/tty/tty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c chardev/tty/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
 	$(CC) -c chardev/tty/pty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pty.o
+
+	$(CC) -c chardev/console/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
 
 # e1000
 	$(CC) -c netdev/e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 

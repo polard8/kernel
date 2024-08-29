@@ -168,7 +168,8 @@
 #include "../kres/dev/chardev/tty/ttydrv.h"
 #include "../kres/dev/chardev/tty/tty.h"
 #include "../kres/dev/chardev/tty/pty.h"
-#include "../kres/dev/chardev/tty/console.h"
+
+#include "../kres/dev/chardev/console/console.h"
 
 // hw stuff - display device
 // display device support.
