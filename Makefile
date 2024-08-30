@@ -5,13 +5,12 @@
 
 BASE = your/base
 
-
 # Display server, libraries and client-side GUI applications.
 DEP_L1  = ../de
 # Extra stuff. No time for this.
-DEP_L2  = ../de/native/commands
+DEP_L2  = ../de/extra/commands
 DEP_L3  = ../de/apps/browser
-DEP_L4  = ../de/native/aurora
+DEP_L4  = ../de/extra/aurora
 
 # Make variables (CC, etc...)
 AS      = as
@@ -176,7 +175,7 @@ copy-extras:
 # LEVEL 1: (de/) Display servers and applications.
 
     # Well consolidated server and applications
-	-cp $(DEP_L1)/fw/ds00/bin/DS00.BIN   $(BASE)/
+	-cp $(DEP_L1)/ds/ds00/bin/DS00.BIN    $(BASE)/
 	-cp $(DEP_L1)/apps/bin/TASKBAR.BIN    $(BASE)/
 	-cp $(DEP_L1)/apps/bin/XTB.BIN        $(BASE)/
 	-cp $(DEP_L1)/apps/bin/TERMINAL.BIN   $(BASE)/
