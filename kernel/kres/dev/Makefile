@@ -80,8 +80,7 @@ tty.o console.o pty.o \
 i8042.o kbdmap.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 serial.o \
 e1000.o \
-devmgr.o io.o \
-pci.o pciinfo.o pciscan.o     
+devmgr.o io.o    
 
 all:
 
@@ -100,6 +99,7 @@ all:
 
 # bl display device
 	$(CC) -c chardev/display/bldisp/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
+#$(CC) -c chardev/display/qemudisp/qemudisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o qemudisp.o
 
 # Keyboard map.
 	$(CC) -c chardev/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
@@ -126,12 +126,6 @@ all:
 # i/o
 	$(CC) -c devmgr.c   $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
 	$(CC) -c io.c       $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
-
-# pci
-	$(CC) -c pci.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pci.o
-	$(CC) -c pciinfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pciinfo.o
-	$(CC) -c pciscan.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pciscan.o
-
 
 # link
 	$(LD) -r -o j1_dev.o $(OBJS)

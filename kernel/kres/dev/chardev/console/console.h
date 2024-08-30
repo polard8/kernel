@@ -169,7 +169,7 @@ __local_gotoxy (
     int new_y, 
     int console_number );
     
-void __local_insert_char ( int console_number );
+void __local_insert_char (int console_number);
 void __local_insert_line (int console_number);
 void __local_save_cur (int console_number);
 void __local_restore_cur (int console_number);
@@ -204,7 +204,6 @@ clear_console (
     int console_number );
 
 int console_clear(void);
-
 
 int VirtualConsole_early_initialization(void);
 

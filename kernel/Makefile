@@ -93,6 +93,7 @@ objects-y += i3_kmain.o
 # ========================
 # :: kres - Kernel resources
 # We can create interfaces that belongs to a given cgroup.
+objects-y += j0_bus.o  
 objects-y += j1_dev.o  
 objects-y += j2_fs.o  
 objects-y += j3_gramk.o  
@@ -124,6 +125,7 @@ k1:
 # Kernel resources
 k2:
 	@echo "Compiling: Compiling k2"
+	$(Q)$(MAKE) -C kres/bus/
 	$(Q)$(MAKE) -C kres/dev/
 	$(Q)$(MAKE) -C kres/fs/
 	$(Q)$(MAKE) -C kres/gramk/
@@ -150,6 +152,7 @@ clean-all:
 	rm -rf kctl/ke/*.o   
 	rm -rf kctl/kmain/*.o   
 
+	rm -rf kres/bus/*.o   
 	rm -rf kres/dev/*.o   
 	rm -rf kres/fs/*.o   
 	rm -rf kres/gramk/*.o   

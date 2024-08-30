@@ -282,6 +282,7 @@ extern int g_boottime_ide_port_index;
  * criada para o gramado, 
  * definida em pci.h e criada em atapci.c
  */
+// see: atapci.c
 extern struct pci_device_d *PCIDeviceATA;
 // extern struct pci_device_d *PCIDeviceATA2;
 // ...

@@ -154,7 +154,7 @@
 // ==================================
 // dev/
 // PCI bus.
-#include "../kres/dev/pci.h"
+#include "../kres/bus/pci/pci.h"
 // ==================================
 // dev/
 // io
@@ -176,6 +176,7 @@
 #include "../kres/dev/chardev/display/display.h"
 // bootloader display device
 #include "../kres/dev/chardev/display/bldisp/bldisp.h"
+//#include "../kres/dev/chardev/display/qemudisp/qemudisp.h"
 
 // #todo: Move this one above.
 //#include "../kctl/clibs/ascii.h"
