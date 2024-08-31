@@ -491,8 +491,9 @@ void jobcontrol_switch_console(int n)
     unsigned int bg_color=COLOR_BLACK;
     unsigned int fg_color=COLOR_WHITE;
 
-    if (n<0 || n >= CONSOLETTYS_COUNT_MAX){
-        debug_print("jobcontrol_switch_console: Limits\n");
+    if  (n<0 || 
+         n >= CONSOLETTYS_COUNT_MAX )
+    {
         return;
     }
 
@@ -503,10 +504,12 @@ void jobcontrol_switch_console(int n)
 // IN: bg color, fg color, console number.
     bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color;
     fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
-    clear_console( bg_color, fg_color, n );
+    console_clear_imp( bg_color, fg_color, n );
 
 // banner
-    printk ("Console number {%d}\n", n);
+    zero_show_banner();
+    consolePrompt();
+    //printk ("Console number {%d}\n", n);
 }
 
 /*
@@ -533,8 +536,27 @@ void jobcontrol_switch_console(int n)
 // Change to setup_fgconsole_cursor(..)
 void set_up_cursor ( unsigned long x, unsigned long y )
 {
-    if (fg_console<0){ return; }
-    if (fg_console>=CONSOLETTYS_COUNT_MAX){ return; }
+
+// Console number:
+    if (fg_console<0){ 
+        return;
+    }
+    if (fg_console >= CONSOLETTYS_COUNT_MAX){
+        return;
+    }
+
+// Parameters:
+// #todo:
+// Check the limits. We don't want to setup an invalid value.
+
+/*
+    // #test
+    if (x >= CONSOLE_TTYS[fg_console].cursor_right)
+        x = (CONSOLE_TTYS[fg_console].cursor_right - 1);
+    if (x >= CONSOLE_TTYS[fg_console].cursor_bottom)
+        x = (CONSOLE_TTYS[fg_console].cursor_bottom - 1);
+*/
+
     CONSOLE_TTYS[fg_console].cursor_x = (unsigned long) x;
     CONSOLE_TTYS[fg_console].cursor_y = (unsigned long) y;
 }
@@ -714,32 +736,23 @@ static void __ConsoleDraw_Outbyte (int c, int console_number)
 
     unsigned long screenx=0;
     unsigned long screeny=0;
-    unsigned int bg_color=0;
-    unsigned int fg_color=0;
-
+    unsigned int bg_color = COLOR_BLUE;
+    unsigned int fg_color = COLOR_WHITE;
 
 // Parameter:
-    if ( n < 0 || n >= CONSOLETTYS_COUNT_MAX  )
+    if ( n < 0 || 
+         n >= CONSOLETTYS_COUNT_MAX )
     {
-        debug_print ("__ConsoleDraw_Outbyte: [FAIL] n\n");
-        x_panic     ("__ConsoleDraw_Outbyte: [FAIL] n");
+        x_panic ("__ConsoleDraw_Outbyte: n");
     }
-
     if ( cWidth == 0 || cHeight == 0 )
     {
-        debug_print ("__ConsoleDraw_Outbyte: char w h\n");
-        x_panic     ("__ConsoleDraw_Outbyte: fail w h");
+        x_panic ("__ConsoleDraw_Outbyte: fail w h");
     }
 
 // #bugbug
 // Caso estejamos em modo texto.
 // Isso ainda não é suportado.
-
-    if (VideoBlock.useGui != TRUE){
-        debug_print ("__ConsoleDraw_Outbyte: kernel in text mode\n");
-        x_panic     ("__ConsoleDraw_Outbyte: kernel in text mode");
-    }
-
 // #Importante: 
 // Essa rotina não sabe nada sobre janela, ela escreve na tela como 
 // um todo. Só está considerando as dimensões do 'char'.
@@ -751,7 +764,10 @@ static void __ConsoleDraw_Outbyte (int c, int console_number)
 // See: char.c
 
     if (VideoBlock.useGui != TRUE)
-        return;
+    {
+        debug_print ("__ConsoleDraw_Outbyte: kernel in text mode\n");
+        x_panic     ("__ConsoleDraw_Outbyte: kernel in text mode");
+    }
 
 // Screen position.
     screenx = (unsigned long) (cWidth  * CONSOLE_TTYS[n].cursor_x);
@@ -761,10 +777,7 @@ static void __ConsoleDraw_Outbyte (int c, int console_number)
     bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color; 
     fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
 
-//
-// Draw
-//
-
+// Draw:
 // Sempre pinte o bg e o fg.
 // see: gre/char.c
 
@@ -818,29 +831,25 @@ void console_outbyte (int c, int console_number)
     // #debug
     // debug_print ("console_outbyte:\n");
 
-    // #todo: Check overflow.
-    //if (n<0)
-    //{
-    //    debug_print ("console_outbyte: n\n");
-    //    return;
-    //}
-
-    if (n < 0 || n >= CONSOLETTYS_COUNT_MAX){
-        debug_print ("console_outbyte: [FAIL] n\n");
-        x_panic     ("console_outbyte: [FAIL] n\n");
+    if ( n < 0 || 
+         n >= CONSOLETTYS_COUNT_MAX )
+    {
+        x_panic ("console_outbyte: n");
     }
-
-    if (__cWidth == 0 || __cHeight == 0){
-        x_panic ("console_outbyte: [FAIL] char size\n");
+    if ( __cWidth == 0 || 
+         __cHeight == 0 )
+    {
+        x_panic ("console_outbyte: char size");
     }
 
 // #test
 // Tem momento da inicialização em que esse array de estruturas
 // não funciona, e perdemos a configuração feita
 
-    if (CONSOLE_TTYS[n].initialized != TRUE){
+    if (CONSOLE_TTYS[n].initialized != TRUE)
+    {
+        debug_print ("console_outbyte: Console not initialized\n");
         //x_panic ("console_outbyte: CONSOLE_TTYS");
-        debug_print ("console_outbyte: [BUGBUG] CONSOLE_TTYS not initialized\n");
         return;
     }
 
@@ -877,7 +886,7 @@ void console_outbyte (int c, int console_number)
         // Melhorar esse limite.
         if (CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom){
             if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
-                 console_scroll(n);
+                console_scroll(n);
             }
             // Última linha.
             CONSOLE_TTYS[n].cursor_y = ( CONSOLE_TTYS[n].cursor_bottom -1 );
@@ -991,26 +1000,22 @@ void console_outbyte (int c, int console_number)
 //
 
 //
-// Collision.
+// Collision
 //
 
 // Out of screen
 // Sem espaço horizontal.
     if ( CONSOLE_TTYS[n].cursor_left >= CONSOLE_TTYS[n].cursor_right )
     {
-        panic ("console_oubyte: l >= r ");
+        panic ("console_oubyte: l >= r \n");
     }
 
 // Out of screen
 // Sem espaço vertical.
     if ( CONSOLE_TTYS[n].cursor_top >= CONSOLE_TTYS[n].cursor_bottom )
     {
-        panic ("console_oubyte: t >= b ");
+        panic ("console_oubyte: t >= b \n");
     }
-
-
-    //__ConsoleDraw_Outbyte(Ch,n);
-    //prev = Ch;
 
 // Fim da linha.
 // Limites para o número de caracteres numa linha.
@@ -1039,11 +1044,7 @@ void console_outbyte (int c, int console_number)
             (CONSOLE_TTYS[n].cursor_bottom -1);
     }
 
-
-//
-// Draw
-//
-
+// Draw:
 // Draw in x*8 | y*8.
 // Only if the echo mode is enabled.
 // Nesse momento imprimiremos os caracteres.
@@ -1072,31 +1073,27 @@ void console_outbyte2 (int c, int console_number)
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
     // #debug
-    // debug_print ("console_outbyte:\n");
+    // debug_print ("console_outbyte2:\n");
 
-    // #todo: Check overflow.
-    //if (n<0)
-    //{
-    //    debug_print ("console_outbyte: n\n");
-    //    return;
-    //}
-
-    if (n < 0 || n >= CONSOLETTYS_COUNT_MAX){
-        debug_print ("console_outbyte: [FAIL] n\n");
-        x_panic     ("console_outbyte: [FAIL] n\n");
+    if ( n < 0 || 
+         n >= CONSOLETTYS_COUNT_MAX )
+    {
+        x_panic ("console_outbyte2: n");
     }
-
-    if (__cWidth == 0 || __cHeight == 0){
-        x_panic ("console_outbyte: [FAIL] char size\n");
+    if ( __cWidth == 0 || 
+         __cHeight == 0 )
+    {
+        x_panic ("console_outbyte2: char size");
     }
 
 // #test
 // Tem momento da inicialização em que esse array de estruturas
 // não funciona, e perdemos a configuração feita
 
-    if (CONSOLE_TTYS[n].initialized != TRUE){
-        //x_panic ("console_outbyte: CONSOLE_TTYS");
-        debug_print ("console_outbyte: [BUGBUG] CONSOLE_TTYS not initialized\n");
+    if (CONSOLE_TTYS[n].initialized != TRUE)
+    {
+        debug_print ("console_outbyte2: Console not initialized\n");
+        //x_panic ("console_outbyte2: CONSOLE_TTYS");
         return;
     }
 
@@ -1136,7 +1133,7 @@ void console_outbyte2 (int c, int console_number)
         
         if (CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom){
             if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
-                 console_scroll(n);
+                console_scroll(n);
             }
             // Vai para última linha
             CONSOLE_TTYS[n].cursor_y = ( CONSOLE_TTYS[n].cursor_bottom -1 );
@@ -1265,16 +1262,15 @@ void console_outbyte2 (int c, int console_number)
 // Sem espaço horizontal.
     if ( CONSOLE_TTYS[n].cursor_left >= CONSOLE_TTYS[n].cursor_right )
     {
-        panic ("console_oubyte: l >= r ");
+        panic ("console_outbyte2: l >= r \n");
     }
 
 // Out of screen
 // Sem espaço vertical.
     if ( CONSOLE_TTYS[n].cursor_top >= CONSOLE_TTYS[n].cursor_bottom )
     {
-        panic ("console_oubyte: t >= b ");
+        panic ("console_outbyte2: t >= b \n");
     }
-
 
     int Increment = FALSE;
 
@@ -1306,7 +1302,6 @@ void console_outbyte2 (int c, int console_number)
             (CONSOLE_TTYS[n].cursor_bottom -1);
     }
 
-
 // draw:
 // Draw in x*8 | y*8.
 // Don't change the position.
@@ -1315,9 +1310,7 @@ void console_outbyte2 (int c, int console_number)
 // Imprime os caracteres normais.
 
 // local modes
-    tcflag_t c_lflag = 
-        (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
-    
+    tcflag_t c_lflag = (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
     if (c_lflag & ECHO){
         __ConsoleDraw_Outbyte(Ch,n);
     }
@@ -1325,21 +1318,24 @@ void console_outbyte2 (int c, int console_number)
 // Atualisa o prev.
     prev = Ch;
 
-
-// Refresh.
+// Refresh
     unsigned long x=0;
     unsigned long y=0;
     x = (unsigned long) (CONSOLE_TTYS[n].cursor_x * __cWidth);
     y = (unsigned long) (CONSOLE_TTYS[n].cursor_y * __cHeight);
     refresh_rectangle ( x, y, __cWidth, __cHeight );
 
-    if (Increment)
+// Increment
+    if (Increment){
         CONSOLE_TTYS[n].cursor_x++;
+    }
 }
 
 void console_echo(int c, int console_number)
 {
-    if (console_number<0)
+    if (console_number < 0)
+        return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
         return;
     console_outbyte2(c,console_number);
 }
@@ -1383,7 +1379,9 @@ void console_putchar(int c, int console_number)
 // CONSOLETTYS_COUNT_MAX
 // See: tty.h
 
-    if (console_number < 0 || console_number > 3){
+    if ( console_number < 0 || 
+         console_number >= CONSOLETTYS_COUNT_MAX )
+    {
         panic ("console_putchar: console_number\n");
     }
 
@@ -1697,9 +1695,13 @@ console_read (
 // #todo
 // Not fully implemented!
 
-// Console number
-    if (console_number < 0 || console_number > 3){
-        printk ("console_read: [FAIL] console_number\n");
+// Console mumber
+    if (console_number < 0){
+        printk ("console_read: console_number\n");
+        goto fail;
+    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX){
+        printk ("console_read: console_number\n");
         goto fail;
     }
 // Buffer
@@ -1724,7 +1726,7 @@ console_read (
 */
 
 fail:
-    return -1;  //todo
+    return (int) -1;  //todo
 }
 
 // ------------------------------
@@ -1760,9 +1762,10 @@ console_write (
 
     //debug_print ("console_write: [test]\n");
 
-// Console number
-    if (console_number < 0 || console_number > 3){
-        printk ("console_write: [FAIL] console_number\n");
+// Parameters:
+    if (console_number < 0)
+        goto fail;
+    if (console_number >= CONSOLETTYS_COUNT_MAX){
         goto fail;
     }
 // Buffer
@@ -2243,33 +2246,58 @@ console_write (
     return (ssize_t) StringSize;
 fail:
     refresh_screen();
-    return -1;
+    return (ssize_t) -1;
 }
 
-
-void console_write_string(int console_number, char *string)
+ssize_t console_write_string(int console_number, const char *string)
 {
 // Write a string into a console.
     char *p;
     p = string;
-    size_t i=0;
-    size_t size = strlen(string);
-    if(size<=0)
-        return;
-    for (i=0; i<size; i++)
+    register size_t i=0;
+    size_t StringSize=0;
+    size_t Counter = 0;
+
+// Parameters:
+
+    if (console_number < 0)
+        goto fail;
+    if (console_number >= CONSOLETTYS_COUNT_MAX){
+        goto fail;
+    }
+
+    if ((void*) string == NULL)
+        goto fail;
+    if (*string == 0)
+        goto fail;
+    StringSize = (size_t) strlen(string);
+// Limits:
+// Is there a maximum limit?
+    if (StringSize <= 0){
+        goto fail;
+    }
+
+// Write
+    for (i=0; i<StringSize; i++)
     {
-        console_write(
-            console_number, 
-            p,
-            1 );
+        console_write ( console_number, p, 1 );
+        Counter++;
         p++;
     };
-}
+    return (ssize_t) Counter;
 
+fail:
+    return (ssize_t) 0;
+}
 
 void __respond (int console_number)
 {
     char *p = __RESPONSE;
+
+    if (console_number < 0)
+        return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
     console_write_string(console_number,p);
 }
 
@@ -2279,10 +2307,11 @@ void __respond (int console_number)
 
 void __local_insert_char(int console_number)
 {
-// #todo: max limit
-    if (console_number<0){
+
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
 	//int i=x;
 	//unsigned short tmp,old=0x0720;
@@ -2395,104 +2424,6 @@ void csi_at (int nr, int console_number)
     };
 }
 
-// VirtualConsole_early_initialization:
-// Early initialization of the consoles.
-// It's gonna be reinitializad by __initialize_virtual_consoles()
-// in kstdio.c
-// Intialize the support for virtual consoles.
-// #todo: Explain it better.
-// We have 4 preallocated tty structures for virtual consoles.
-int VirtualConsole_early_initialization(void)
-{
-// Called by zero_initialize_virtual_consoles() in zero.c
-
-    register int i=0;
-
-// Virtual Console:
-// The kernel only have four virtual consoles.
-// If this initialization fail, it will happen again
-
-    // #debug
-    PROGRESS("VirtualConsole_early_initialization: (First time)\n");;
-
-// Console em primeiro plano.
-    fg_console = CONSOLE0;
-// Redirecionador.
-    redirect = NULL;
-
-// No embedded shell for now.
-// No input in prompt[].
-    ShellFlag = FALSE;
-
-    __EscapeSequenceStage=0;
-
-// Limpa o array de parâmetros usado durante o 
-// tratamento de escape sequencies.
-    for (i=0; i<NPAR; i++){
-        par[i]=0;
-    };
-
-    unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
-    unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
-
-// -----------------------------
-// c0 console: --> INIT.BIN
-// Default kernel console.
-    bg_colors[0] = (unsigned int) COLOR_BLUE;
-    fg_colors[0] = (unsigned int) COLOR_WHITE;
-// -----------------------------
-// c1 console: --> GRAMLAND.BIN
-    bg_colors[1] = (unsigned int) COLOR_BLUE;
-    fg_colors[1] = (unsigned int) COLOR_YELLOW;
-// -----------------------------
-// c2 console: --> NICCTLD.BIN
-// Warning console.
-    bg_colors[2] = (unsigned int) COLOR_ORANGE;
-    fg_colors[2] = (unsigned int) COLOR_WHITE;
-// -----------------------------
-// c3 console: --> NETCTLD.BIN
-// Danger console.
-    bg_colors[3] = (unsigned int) COLOR_RED;
-    fg_colors[3] = (unsigned int) COLOR_YELLOW;
-
-
-    for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
-    {
-        // IN: console index, bg color, fg color
-        DDINIT_console(
-            i,
-            bg_colors[i],
-            fg_colors[i] );
-
-        //#todo
-        // We need to register all the tty device.
-        //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
-        // Register tty device.
-        //devmgr_register_device ( 
-        //    (file *) __file, 
-        //    newname,            // pathname 
-        //    0,                  // class (char, block, network)
-        //    1,                  // type (pci, legacy
-        //    NULL,  // Not a pci device.
-        //    tmp_tty );  // tty device
-    };
-
-// Setup foreground console.
-    jobcontrol_switch_console(0);
-
-// Cursor for the current console.
-// See: system.c
-    set_up_cursor(0,0);
-
-// #hackhack
-// Esse trabalho não nos pertence, pertence ao stdio,
-// mas funciona.
-    stdio_terminalmode_flag = TRUE;
-    stdio_verbosemode_flag = TRUE;
-
-    return 0;
-}
-
 // Console banner:
 // This will be the first message in the screen.
 // It is goona be seen at top/left corner of the screen.
@@ -2503,30 +2434,48 @@ console_banner(
     const char *build_string, 
     unsigned long banner_flags )
 {
+
+    unsigned int bg_color = COLOR_BLUE;
+    unsigned int fg_color = COLOR_WHITE;
+
 // Serial debug
     if (Initialization.is_serial_log_initialized == TRUE){
         debug_print ("Gramado OS\n");
     }
-// Virtual console
-    if (Initialization.is_console_log_initialized == TRUE)
-    {
-        if (fg_console < 0 || fg_console > 3)
-            return;
-        if (CONSOLE_TTYS[fg_console].initialized != TRUE){
-            debug_print ("console_banner: fg_console not initialized\n");
-            //x_panic("x");
-            return;
-        }
-        clear_console(
-            CONSOLE_TTYS[fg_console].bg_color,
-            CONSOLE_TTYS[fg_console].fg_color,
-            fg_console );
-        set_up_cursor(0,0);
-        printk ("%s\n", product_string );
-        printk ("%s\n", build_string );
-        // Print gcc version
-        printk("gcc: %d\n",GCC_VERSION);
+
+//
+// Kernel console
+//
+
+    if (Initialization.is_console_log_initialized != TRUE){
+        return;
     }
+
+    if (fg_console < 0)
+        return;
+    if (fg_console >= CONSOLETTYS_COUNT_MAX)
+        return;
+
+    if (CONSOLE_TTYS[fg_console].initialized != TRUE)
+    {
+        debug_print ("console_banner: fg_console not initialized\n");
+        //x_panic("x");
+        return;
+    }
+
+    bg_color = CONSOLE_TTYS[fg_console].bg_color;
+    fg_color = CONSOLE_TTYS[fg_console].fg_color;
+    console_clear_imp( bg_color, fg_color, fg_console );
+    set_up_cursor(0,0);
+
+    if ((void*) product_string == NULL)
+        return;
+    if ((void*) build_string == NULL){
+        return;
+    }
+    printk ("%s %s\n", product_string, build_string);
+    // #debug Print gcc version
+    // printk("gcc: %d\n",GCC_VERSION);
 }
 
 // console_ioctl:
@@ -2648,7 +2597,7 @@ console_ioctl (
 // Clear console.
 // IN: bg color, fg color, console number.
     case 440:
-        clear_console( 
+        console_clear_imp( 
             (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
             (unsigned int) CONSOLE_TTYS[fg_console].fg_color, 
             fg_console );
@@ -2918,8 +2867,9 @@ void console_refresh_screen(file *f)
 
 }
 
+// Implementation
 int 
-clear_console (
+console_clear_imp (
     unsigned int bg_color, 
     unsigned int fg_color, 
     int console_number )
@@ -2929,8 +2879,11 @@ clear_console (
     if (VideoBlock.useGui != TRUE){
         goto fail;
     }
-    // FIRST_CONSOLE and LAST_CONSOLE.
-    if (console_number<0 || console_number > 3){
+
+// Parameters:
+    if (console_number < 0)
+        goto fail;
+    if (console_number >= CONSOLETTYS_COUNT_MAX){
         goto fail;
     }
 
@@ -2958,23 +2911,120 @@ fail:
 
 int console_clear(void)
 {
-    if (fg_console<0 || fg_console > 3){
+    unsigned int bg_color = COLOR_BLUE; 
+    unsigned int fg_color = COLOR_WHITE;
+
+    if (fg_console < 0)
+        goto fail;
+    if (fg_console >= CONSOLETTYS_COUNT_MAX){
         goto fail;
     }
-
-    //backgroundDraw(COLOR_EMBEDDED_SHELL_BG);
-    //set_up_cursor(1,1);
-
+    bg_color = (unsigned int) CONSOLE_TTYS[fg_console].bg_color; 
+    fg_color = (unsigned int) CONSOLE_TTYS[fg_console].fg_color;
 // IN: bg color, fg color, console number.
-    clear_console(
-        (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
-        (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
-        fg_console );
+    console_clear_imp( bg_color, fg_color, fg_console );
+    return 0;
+fail:
+    return (int) -1;
+}
+
+
+// VirtualConsole_early_initialization:
+// Early initialization of the consoles.
+// It's gonna be reinitializad by __initialize_virtual_consoles()
+// in kstdio.c
+// Intialize the support for virtual consoles.
+// #todo: Explain it better.
+// We have 4 preallocated tty structures for virtual consoles.
+int VirtualConsole_early_initialization(void)
+{
+// Called by zero_initialize_virtual_consoles() in zero.c
+
+    register int i=0;
+
+// Virtual Console:
+// The kernel only have four virtual consoles.
+// If this initialization fail, it will happen again
+
+    // #debug
+    PROGRESS("VirtualConsole_early_initialization: (First time)\n");;
+
+// Console em primeiro plano.
+    fg_console = CONSOLE0;
+// Redirecionador.
+    redirect = NULL;
+
+// No embedded shell for now.
+// No input in prompt[].
+    ShellFlag = FALSE;
+
+    __EscapeSequenceStage=0;
+
+// Limpa o array de parâmetros usado durante o 
+// tratamento de escape sequencies.
+    for (i=0; i<NPAR; i++){
+        par[i]=0;
+    };
+
+    unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
+    unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
+
+// -----------------------------
+// c0 console: --> INIT.BIN
+// Default kernel console.
+    bg_colors[0] = (unsigned int) COLOR_BLUE;
+    fg_colors[0] = (unsigned int) COLOR_WHITE;
+// -----------------------------
+// c1 console: --> GRAMLAND.BIN
+    bg_colors[1] = (unsigned int) COLOR_BLUE;
+    fg_colors[1] = (unsigned int) COLOR_YELLOW;
+// -----------------------------
+// c2 console: --> NICCTLD.BIN
+// Warning console.
+    bg_colors[2] = (unsigned int) COLOR_ORANGE;
+    fg_colors[2] = (unsigned int) COLOR_WHITE;
+// -----------------------------
+// c3 console: --> NETCTLD.BIN
+// Danger console.
+    bg_colors[3] = (unsigned int) COLOR_RED;
+    fg_colors[3] = (unsigned int) COLOR_YELLOW;
+
+
+    for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
+    {
+        // IN: console index, bg color, fg color
+        DDINIT_console(
+            i,
+            bg_colors[i],
+            fg_colors[i] );
+
+        //#todo
+        // We need to register all the tty device.
+        //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
+        // Register tty device.
+        //devmgr_register_device ( 
+        //    (file *) __file, 
+        //    newname,            // pathname 
+        //    0,                  // class (char, block, network)
+        //    1,                  // type (pci, legacy
+        //    NULL,  // Not a pci device.
+        //    tmp_tty );  // tty device
+    };
+
+// Setup foreground console.
+    jobcontrol_switch_console(0);
+
+// Cursor for the current console.
+// See: system.c
+    set_up_cursor(0,0);
+
+// #hackhack
+// Esse trabalho não nos pertence, pertence ao stdio,
+// mas funciona.
+    stdio_terminalmode_flag = TRUE;
+    stdio_verbosemode_flag = TRUE;
 
     return 0;
-
-fail:
-    return -1;
 }
 
 // DDINIT_console:

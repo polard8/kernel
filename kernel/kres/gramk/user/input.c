@@ -144,9 +144,9 @@ static void do_enter_embedded_shell(int kernel_in_debug_mode)
     if (kernel_in_debug_mode){
         printk("[[ KERNEL IN DEBUG MODE ]]\n");
     }
-    printk("kernel console number %d\n",console_index);
-    printk("Prompt ON: Type something\n");
-    consolePrompt();  // It will refresh the screen.
+    //printk("kernel console number %d\n",console_index);
+    //printk("Prompt ON: Type something\n");
+    //consolePrompt();  // It will refresh the screen.
 // Flag
     ShellFlag = TRUE;
 }

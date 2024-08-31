@@ -187,7 +187,7 @@ console_write (
     const void *buf, 
     size_t count );
 
-void console_write_string(int console_number, char *string);
+ssize_t console_write_string(int console_number, const char *string);
 
 int 
 console_ioctl ( 
@@ -198,7 +198,7 @@ console_ioctl (
 void console_refresh_screen(file *f);
 
 int 
-clear_console (
+console_clear_imp (
     unsigned int bg_color, 
     unsigned int fg_color, 
     int console_number );

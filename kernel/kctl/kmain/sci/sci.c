@@ -2206,13 +2206,16 @@ void *sci2 (
     unsigned int fg_color = COLOR_WHITE;
     if (number == 8003)
     {
-        if (fg_console<0 || fg_console > 3){
+        if (fg_console < 0)
+            return NULL;
+        if (fg_console >= CONSOLETTYS_COUNT_MAX){
             return NULL;
         }
         bg_color = (unsigned int) CONSOLE_TTYS[fg_console].bg_color;
         fg_color = (unsigned int) CONSOLE_TTYS[fg_console].fg_color;
         // IN: bg color, fg color, console number.
-        clear_console( bg_color, fg_color, fg_console );
+        // OUT: Number of bytes written.
+        console_clear_imp( bg_color, fg_color, fg_console );
         return NULL;
     }
 
