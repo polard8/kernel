@@ -3563,8 +3563,8 @@ size_t gets_00(char *buf, size_t buffer_size)
 // This is a work in progress!
 // ok. It's working
 
-    int ch=0;
-    register size_t StringSize = 0;
+    register int ch=0;
+    size_t StringSize = 0;
 
 // Parameters 
     if ((void*) buf == NULL)
@@ -3616,6 +3616,54 @@ size_t gets_00(char *buf, size_t buffer_size)
 // Size
     return (size_t) StringSize;
 }
+
+
+/*
+char *gets0000(const char *buffer);
+char *gets0000(const char *buffer)
+{
+// This is a work in progress.
+
+// #bugbug
+// The buffer size is an issue.
+
+    register int Ch=0;
+	char *p;
+	char *ret_p;
+
+	p=buffer;
+	ret_p=buffer;
+
+    while (1)
+	{
+        Ch = (int) getc(stdin);
+
+		// #test
+		// Is getc able to return '\n'?
+
+		if (Ch == '\n'){
+            break;
+		}
+        if (Ch == VK_RETURN)
+            break;
+		if (Ch == EOF)
+		{
+            if (p == buffer)
+			{
+                ret_p = NULL;
+				goto done;
+			}
+			*p = (char) Ch;
+			p++;
+        }
+    };
+	*p = '\0';
+
+done:
+    return (char*) ret_p;
+}
+*/
+
 
 /*
 int feof(FILE *fp)

@@ -344,12 +344,10 @@
 #include "../kctl/kmain/overall/cali.h"
 
 // cgroups and namespaces
-#include "../kctl/cont/cg.h"
-#include "../kctl/cont/ns.h"
+#include "../kctl/kmain/cont/cg.h"
+#include "../kctl/kmain/cont/ns.h"
 
 // Main kernel controller header.
 #include "../kctl/kctl.h"
-
-
 
 

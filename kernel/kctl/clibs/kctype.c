@@ -1,5 +1,6 @@
 // kctype.c
 // 2018 - Created by Fred Nora.
+
 //      - Linux-style. 
 // see: kctype.h
 

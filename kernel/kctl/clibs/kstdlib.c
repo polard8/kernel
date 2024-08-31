@@ -1,4 +1,3 @@
-
 // kstdlib.c
 // 2015 - Fred Nora.
 
