@@ -150,37 +150,25 @@ struct tty_queue
 // uma janela de terminal virtual.
 */
 
+#define TTY_NAME_SIZE  64
+#define CHARSET_NAME_SIZE  64
 
 struct tty_d
 {
     object_type_t objectType;
     object_class_t objectClass;
+    int used;
+    int magic;
+// Where?
+    int index;
+
 // File pointer:
 // To setup the device.
     file *fp;
-// In the TTYs table?
-    int used;
-    int magic;
-    int index;
 
 // Name support
-    char name[64];
+    char name[TTY_NAME_SIZE];
     size_t Name_len;
-
-// TTY mode.
-    //unsigned short tty_mode;
-
-    int initialized;
-
-// The TTY is blocked by the system,
-// and we can't read or write on it.
-// The TTY can't receive or send data.
-// If a process try to write in a blocked TTY it will be blocked.
-    int is_blocked;
-
-// Ownership
-
-    tid_t __owner_tid;
 
 // type
 //#define TTY_TYPE_CONSOLE    1000 (Kernel Console)
@@ -198,6 +186,19 @@ struct tty_d
 // subtype of tty
     short subtype;
 
+// TTY mode.
+    //unsigned short tty_mode;
+
+// Ownership
+    tid_t __owner_tid;
+
+    int initialized;
+
+// The TTY is blocked by the system,
+// and we can't read or write on it.
+// The TTY can't receive or send data.
+// If a process try to write in a blocked TTY it will be blocked.
+    int is_blocked;
 
 //
 // == Security ============================================
@@ -329,29 +330,15 @@ struct tty_d
     unsigned long cursor_width_in_pixels;
     unsigned long cursor_height_in_pixels;
 
-//------------------------------
+//--------------------------------
 
-//
 // Charset support.
 // See: kbdmap.c, kbdmap.h
-//
+// #todo
+// Maybe we can create a structure for that.
 
 // see:
 // https://man7.org/linux/man-pages/man7/charsets.7.html
-
-// lowercase
-// Normal chars.
-    void *charset_lowercase;
-// uppercase
-// Shift + key.
-    void *charset_uppercase;
-// control + key.
-    void *charset_controlcase;
-
-    size_t charset_size;
-
-    char charset_name[64];
-    size_t charset_name_size;
 
 // id do charset.
     int charset_id;
@@ -361,11 +348,19 @@ struct tty_d
 // English BR for abnt2.
     int charset_lang_id;
 
-//
+    void *charset_lowercase;    // Lowercase
+    void *charset_uppercase;    // Uppercase (Shift + key)
+    void *charset_controlcase;  // (control + key)
+    size_t charset_size;
+
+// Charset name
+    char charset_name[CHARSET_NAME_SIZE];
+    size_t charset_name_size;
+
+//--------------------------------
+
 // Font support
 // see: font.c, char.c
-//
-
     void *font_address;
 
 // Char support.
@@ -373,6 +368,7 @@ struct tty_d
     unsigned int bg_color;
     unsigned int fg_color;
 
+// Is it a fullscreen console?
     int fullscreen_flag;
 
 // Connections:
@@ -415,8 +411,6 @@ tty_write (
 
 int tty_reset_termios (struct tty_d *tty);
 
-struct tty_d *tty_create(short type, short subtype);
-
 struct tty_d *file_tty (file *f);
 int tty_delete ( struct tty_d *tty );
 void tty_flush( struct tty_d *tty );
@@ -434,14 +428,18 @@ tty_sets (
     int options, 
     struct termios_d *termiosp );
 
-int tty_init_module (void);
-
 int 
 tty_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg );
 
-#endif    
+//
+// $
+// CREATE
+//
 
+struct tty_d *tty_create(short type, short subtype);
+
+#endif    
 

@@ -24,6 +24,14 @@ int pci_supported=FALSE;
 int pciListOffset=0;
 //...
 
+struct pci_device_d  *pci_device;
+struct pci_device_d  *current_pci_device;
+
+struct pci_d  PCI;
+
+const char *pci_device_no_name = "pci-device";
+
+
 static void __is_pci_supported(void);
 
 /*
@@ -529,89 +537,6 @@ static void __is_pci_supported(void)
 // --
 }
 
-
-/*
- * init_pci:
- *     Inicializa o módulo PCI em Kernel Mode, dentro do Kernel Base. 
- * todo: 
- *     +Pega informações sobre PCI.
- *     +Pegar as informações e por em estrutura e registro.
- * Obs: 
- *     Essa rotina está incompleta.
- */
-// PCI - Pega informações da PCI.
-// As informaçoes serao salvas em uma lista e usadas depois.
-// por isso temos que sondar agora.
-
-int init_pci(void)
-{
-    register int i=0;
-    int Status = 0;
-    int Max = PCI_DEVICE_LIST_SIZE; 
-
-    PROGRESS("init_pci:\n");
-
-    g_driver_pci_initialized = (int) FALSE; 
-
-// Is PCI supported?
-    __is_pci_supported();
-
-// #todo: 
-// Colocar esse status na estrutura platform->pci_supported.
-// Talvez assim: platform->platform_type.
-
-    //#debug
-    //refresh_screen();
-    //while(1){}
-
-// ==========
-
-// Initialise PCI device list.
-// Initialise the offset.
-
-    for (i=0; i<Max; ++i){
-        pcideviceList[i] = (unsigned long) 0;
-    };
-    pciListOffset = 0;
-
-
-// Devices
-// Encontrar os dispositivos PCI e salvar as informações sobre eles
-// em suas respectivas estruturas.
-// See: pciscan.c
-    
-    Status = (int) pci_setup_devices();
-    if (Status != 0){
-        panic ("init_pci: pci_setup_devices fail\n");
-    }
-
-    // ...
-
-    g_driver_pci_initialized = (int) TRUE; 
-
-    return (int) Status; 
-}
-
-__VOID_IRQ 
-irq_SHARED0 (void)
-{
-}
-
-__VOID_IRQ 
-irq_SHARED1 (void)
-{
-}
-
-__VOID_IRQ 
-irq_SHARED2 (void)
-{
-}
-
-__VOID_IRQ 
-irq_SHARED3 (void)
-{
-}
-
 /*
  * pciHandleDevice
  *    Registra um dispositivo encontrado na sondagem. 
@@ -651,7 +576,7 @@ pciHandleDevice (
 
     if (Vendor == 0xFFFF){
         debug_print ("pciHandleDevice: Illegal vendor\n");
-        return (int) (-1);
+        goto fail;
     }
 
 // Object: pci device.
@@ -673,6 +598,9 @@ pciHandleDevice (
 // Next device.
     D->next = NULL; 
 
+// Name string.
+    D->name = pci_device_no_name;
+
 // Location inside the pci bus.
 // bus, device, function.
     D->bus  = (unsigned char) bus;
@@ -682,9 +610,6 @@ pciHandleDevice (
 // Vendor and device.
     D->Vendor = (unsigned short) Vendor;
     D->Device = (unsigned short) Device;
-
-// Name string.
-    D->name = "pcidevice-noname";
 
     // #debug
     // printk ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
@@ -971,5 +896,108 @@ pciHandleDevice (
 
 // 0 = No error.
     return 0;
+fail:
+    return (int) -1;
+}
+
+
+//
+// $
+// SHARED IRQ HANDLERS
+//
+
+__VOID_IRQ 
+irq_SHARED0 (void)
+{
+}
+
+__VOID_IRQ 
+irq_SHARED1 (void)
+{
+}
+
+__VOID_IRQ 
+irq_SHARED2 (void)
+{
+}
+
+__VOID_IRQ 
+irq_SHARED3 (void)
+{
+}
+
+
+//
+// $
+// INITIALIZATION
+//
+
+/*
+ * init_pci:
+ *     Inicializa o módulo PCI em Kernel Mode, dentro do Kernel Base. 
+ * todo: 
+ *     +Pega informações sobre PCI.
+ *     +Pegar as informações e por em estrutura e registro.
+ * Obs: 
+ *     Essa rotina está incompleta.
+ */
+// PCI - Pega informações da PCI.
+// As informaçoes serao salvas em uma lista e usadas depois.
+// por isso temos que sondar agora.
+
+int init_pci(void)
+{
+    register int i=0;
+    int Status = 0;
+    int Max = PCI_DEVICE_LIST_SIZE; 
+
+    PROGRESS("init_pci:\n");
+
+    g_driver_pci_initialized = (int) FALSE; 
+
+// Is PCI supported?
+    __is_pci_supported();
+
+// #todo: 
+// Colocar esse status na estrutura platform->pci_supported.
+// Talvez assim: platform->platform_type.
+
+    //#debug
+    //refresh_screen();
+    //while(1){}
+
+// ==========
+// Initialize structure for interface information.
+    PCI.used = TRUE;
+    PCI.magic = 1234;
+    PCI.max = Max;
+    PCI.found_devices = 0;
+    PCI.device_list_base_address = (unsigned long) &pcideviceList[0];
+    PCI.initialized = TRUE;
+
+// ==========
+// Initialise PCI device list.
+// Initialise the offset.
+
+    for (i=0; i<Max; ++i){
+        pcideviceList[i] = (unsigned long) 0;
+    };
+    pciListOffset = 0;
+
+
+// Encontrar os dispositivos PCI e salvar as informações sobre eles
+// em suas respectivas estruturas.
+// See: pciscan.c
+    
+    Status = (int) pciscan_probe_devices();
+    if (Status != 0){
+        panic ("init_pci: pciscan_probe_devices fail\n");
+    }
+
+    // ...
+
+    g_driver_pci_initialized = (int) TRUE; 
+
+    return (int) Status; 
 }
 

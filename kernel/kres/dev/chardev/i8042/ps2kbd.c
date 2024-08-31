@@ -10,6 +10,8 @@ struct ps2_keyboard_d  PS2Keyboard;
 static int __prefix=0;
 unsigned char ps2kbd_led_status=0;
 
+const char *device_name_ps2kbd = "PS2KBD";
+
 //
 // == private functions: prototypes ================
 //
@@ -459,7 +461,7 @@ void ps2kbd_initialize_device (void)
 // Registrando o dispositivo.
     devmgr_register_device ( 
         (file *) fp, 
-        "PS2KBD",            // pathname 
+        device_name_ps2kbd,  // name 
         DEVICE_CLASS_CHAR,   // class (char, block, network)
         DEVICE_TYPE_LEGACY,  // type (pci, legacy)
         NULL,                // Not a pci device.

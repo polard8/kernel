@@ -1,4 +1,3 @@
-
 // devmgr.c
 // Created by Fred Nora.
 
@@ -23,6 +22,56 @@ unsigned long nicList[8];
 static int __devmgr_init_device_list(void);
 
 // ------------------------
+
+// Show the itens from the device list
+// that matches with the given object type.
+void devmgr_show_device_list(int object_type)
+{
+    register int i=0;  // Iterator
+    struct device_d  *d;  // Device
+    file *fp;  // Object
+
+    printk("\n");
+    printk("devmgr_show_device_list:\n");
+
+// Get the structure pointer and
+// show the info if it's a valid device structure.
+
+    for (i=0; i<DEVICE_LIST_MAX; ++i)
+    {
+        d = (struct device_d *) deviceList[i];
+        if ((void *) d != NULL)
+        {
+            if ( d->used == TRUE && d->magic == 1234 )
+            {
+                fp = (file *) d->_fp;
+                if ((void*) fp != NULL)
+                {
+                    if (fp->____object == object_type)
+                    {
+
+                        //#debug
+                        //if ( fp->____object == ObjectTypeTTY )
+                        //    printk ("TTY DEVICE: ");
+                        //if ( fp->____object == ObjectTypePciDevice )
+                        //    printk ("PCI DEVICE: ");
+
+                        //#todo: more ...
+                        printk("id=%d class=%d type=%d name={%s} mount_point={%s}\n", 
+                            d->index, 
+                            d->__class,  // char | block | network
+                            d->__type,   // pci  | legacy
+                            d->name,
+                            d->mount_point );  //#todo
+                    }
+                }
+            }
+            //printk (".");
+        }
+    };
+
+    printk("Done\n");
+}
 
 // devmgr_search_in_dev_list:
 //     Search a name into the device list.
@@ -87,68 +136,6 @@ file *devmgr_search_in_dev_list(char *path)
     };
 
     return NULL;
-}
-
-// Initialize the list.
-static int __devmgr_init_device_list(void)
-{
-    register int i=0;
-
-    debug_print ("__devmgr_init_device_list:\n");
-    for (i=0; i<DEVICE_LIST_MAX; i++){
-        deviceList[i] = 0;
-    };
-    return 0;
-}
-
-// Show the itens from the device list
-// that matches with the given object type.
-void devmgr_show_device_list(int object_type)
-{
-    register int i=0;  // Iterator
-    struct device_d  *d;  // Device
-    file *fp;  // Object
-
-    printk("\n");
-    printk("devmgr_show_device_list:\n");
-
-// Get the structure pointer and
-// show the info if it's a valid device structure.
-
-    for (i=0; i<DEVICE_LIST_MAX; ++i)
-    {
-        d = (struct device_d *) deviceList[i];
-        if ((void *) d != NULL)
-        {
-            if ( d->used == TRUE && d->magic == 1234 )
-            {
-                fp = (file *) d->_fp;
-                if ((void*) fp != NULL)
-                {
-                    if (fp->____object == object_type)
-                    {
-
-                        //#debug
-                        //if ( fp->____object == ObjectTypeTTY )
-                        //    printk ("TTY DEVICE: ");
-                        //if ( fp->____object == ObjectTypePciDevice )
-                        //    printk ("PCI DEVICE: ");
-
-                        //#todo: more ...
-                        printk("id=%d class=%d type=%d name={%s} mount_point={%s}\n", 
-                            d->index, 
-                            d->__class,  // char | block | network
-                            d->__type,   // pci  | legacy
-                            d->name,
-                            d->mount_point );  //#todo
-                    }
-                }
-            }
-            //printk (".");
-        }
-    };
-
-    printk("Done\n");
 }
 
 // OUT: 
@@ -295,7 +282,12 @@ devmgr_register_device (
 // Save the file pointer.
     d->_fp  = (file *) f;
 
+//
 // name
+//
+
+    d->name[0] = 0;
+    d->Name_len = 0;
 
 // Clear buffer
     memset( buf, 0, PathSize );
@@ -316,6 +308,13 @@ devmgr_register_device (
         {
             panic("devmgr_register_device: NameSize\n");
         }
+        
+        if (NameSize <= DEVICE_NAME_SIZE)
+        {
+            ksprintf( d->name, "%s", name );
+            d->Name_len = NameSize;
+        }
+
         //ksprintf( buf, name );
         // #todo: Copy n bytes using strncpy.
         //strcpy( new_mount_point, buf );
@@ -326,10 +325,7 @@ devmgr_register_device (
 // /dev/tty0
     d->mount_point = (char *) new_mount_point;
     // DEV_8086_8086
-    //d->name ??
-    //#todo
-    //d->name[0] = 'x';
-    d->name[0] = 0;
+
 // pci device
     d->pci_device = (struct pci_device_d *) pci_device;
 // tty device
@@ -338,6 +334,24 @@ devmgr_register_device (
     // ...
     return 0;
 }
+
+
+// Initialize the list.
+static int __devmgr_init_device_list(void)
+{
+    register int i=0;
+
+    debug_print ("__devmgr_init_device_list:\n");
+    for (i=0; i<DEVICE_LIST_MAX; i++){
+        deviceList[i] = 0;
+    };
+    return 0;
+}
+
+//
+// $
+// INITIALIZATION
+//
 
 // devmgr_initialize:
 // Called by I_initKernelComponents() in x64init.c.

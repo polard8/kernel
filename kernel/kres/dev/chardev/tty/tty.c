@@ -605,266 +605,6 @@ int tty_reset_termios(struct tty_d *tty)
     return 0;
 }
 
-/*
- * tty_create: 
- *    Create a tty structure.
- * OUT:
- *     pointer.
- */
-// #test
-// We are including a pointer to the RIT. raw input thread.
-// This is the control thread of the window with focus on kgws.
-// See: tty.h
-
-struct tty_d *tty_create(short type, short subtype)
-{
-    file *__file;
-    struct tty_d  *__tty;
-    char __tmpname[64];
-    register int i=0;
-
-// #todo
-// The parameters.
-
-// Create structure.
-    __tty = (struct tty_d *) kmalloc( sizeof(struct tty_d) );
-    if ((void *) __tty == NULL){
-        panic ("tty_create: __tty\n");   
-    }
-    memset( __tty, 0, sizeof(struct tty_d) );
-
-    __tty->objectType = ObjectTypeTTY;
-    __tty->objectClass = ObjectClassKernelObject;
-    __tty->used = TRUE;
-    __tty->magic = 1234;
-
-// Type/subtype
-    __tty->type = type;
-    __tty->subtype = subtype;
-
-// Uninitialized.
-    __tty->__owner_tid = (int) -1;
-
-// Index
-    __tty->index = (int) (new_tty_index & 0xFFFF);
-    new_tty_index++;
-
-//
-// Linked
-//
-
-    __tty->link = NULL;
-    __tty->is_linked = FALSE;
-
-// No thread for now.
-// ?? What thread we need to use here?
-    //__tty->control = NULL;
-// No user logged yet.
-    __tty->user_info = NULL;
-
-// #bugbug
-// Security stuff.
-// Maybe it will change when a user login into a terminal.
-// Nao sei se essas estruturas estao prontas para isso nesse momento
-// ou se esses ponteiros sao nulos.
-
-    __tty->user_session = NULL;  // #todo: Use current user session;
-    __tty->cgroup = NULL;        // #todo: Use current cgroup.
-
-// The kernel can print string into the display device.
-    __tty->vc_mode = (int) VC_MODE_KERNEL_VERBOSER;
-
-// file pointer
-// this file handles this tty object
-// isso sera tratado la em baixo.
-        //__tty->fp
-// tty name
-// isso sera tratado la em baixo.
-        //__tty->name[?] 
-    __tty->Name_len = 0;  //initialized
-//#todo: Indice do dispositivo.
-    // __tty->device = 0;   // initialized.
-    __tty->driver = NULL;  //driver struct
-    __tty->ldisc  = NULL;  //line discipline struct
-// termios struct (not a pointer)
-    tty_reset_termios(__tty);
-
-// process group.
-    //__tty->gid = current_group;
-// ??
-// Quantos processos estao usando essa tty.
-    //__tty->pid_count=0;
-    
-    __tty->flags = 0;
-// not blocked
-    __tty->is_blocked = FALSE;
-// process
-    // __tty->process = KernelProcess;
-// thread
-    // __tty->thread  = ?
-// Qual terminal virtual esta usando essa tty.
-    __tty->virtual_terminal_pid = 0;
-// Window.
-// When we are using the kgws.
-    //__tty->window = NULL;
-
-// == buffers ===========================
-
-// YES, We are using buffer.
-    __tty->nobuffers = FALSE;
-
-// queues
-
-// raw queue
-    __tty->raw_queue.cnt = 0;
-    __tty->raw_queue.head = 0;
-    __tty->raw_queue.tail = 0;
-    __tty->raw_queue.buffer_size = TTY_BUF_SIZE;
-    for(i=0; i<TTY_BUF_SIZE; i++){ __tty->raw_queue.buf[i] = 0; }
-// canonical queue
-    __tty->canonical_queue.cnt = 0;
-    __tty->canonical_queue.head = 0;
-    __tty->canonical_queue.tail = 0;
-    __tty->canonical_queue.buffer_size = TTY_BUF_SIZE;
-    for(i=0; i<TTY_BUF_SIZE; i++){ __tty->canonical_queue.buf[i] = 0; }
-// output queue
-    __tty->output_queue.cnt = 0;
-    __tty->output_queue.head = 0;
-    __tty->output_queue.tail = 0;
-    __tty->output_queue.buffer_size = TTY_BUF_SIZE;
-    for(i=0; i<TTY_BUF_SIZE; i++){ __tty->output_queue.buf[i] = 0; }
-
-// system metrics.
-
-// cursor dimentions in pixels.
-// #bugbug: determined.
-    __tty->cursor_width_in_pixels = 8;
-    __tty->cursor_height_in_pixels = 8;
-//#todo
-// it needs to be 'unsigned int'
-    __tty->bg_color = COLOR_BLACK;
-    __tty->fg_color = COLOR_WHITE;
-// cursor position in chars.
-    __tty->cursor_x = 0;
-    __tty->cursor_y = 0;
-// cursor margin.
-    __tty->cursor_left = 0;
-    __tty->cursor_top  = 0;
-
-// #bugbug: 
-// Constant cursor size.
-// cursor limits.
-    __tty->cursor_right  = 0+(gSavedX/8) -1;  // (screen width / char width)
-    __tty->cursor_bottom = 0+(gSavedY/8) -1;  // (screen height/ char height)
-
-// #bugbug
-// Temos que completar as estruturas.
-// São muitos elementos ...
-// ...
-
-    // goto __ok_register;
-    //return (struct tty_d *) __tty;
-
-    //panic ("tty_create: Crazy error!\n");
-    //return NULL;
-
-// ==========================================
-//__ok_register:
-
-    if ((void *) __tty == NULL){
-        panic("tty_create: __tty\n");
-    }
-
-// mount point. 
-// pathname.
-
-// #test
-// Isso é o ponto de montagem.
-    int Index = (int) (__tty->index & 0xFFFF);
-// clear buffer
-    memset( __tmpname, 0, 64 );
-    ksprintf( __tmpname, "TTY%d", Index );
-
-    //size_t NameSize = (size_t) strlen(__tmpname);
-// ----
-    char *newname = (char *) kmalloc(64);
-    if ((void*) newname == NULL){
-        panic("tty_create: newname\n");
-    }
-// clear buffer
-    memset( newname, 0, 64 );
-    strcpy(newname,__tmpname);
-
-// File pointer.
-// Agora registra o dispositivo pci na lista genérica
-// de dispositivos.
-// #importante: 
-// Ele precisa de um arquivo 'file'.
-    
-    __file = (file *) kmalloc( sizeof(file) );
-    if ((void *) __file == NULL){
-        panic("tty_create: __file\n");
-    }
-    memset ( __file, 0, sizeof(file) );
-    __file->used = TRUE;
-    __file->magic = 1234;
-    __file->____object = ObjectTypeTTY;
-    __file->isDevice = TRUE;
-// #todo
-    __file->dev_major = 0;
-    __file->dev_minor = 0;
-// A estrutura de tty associada com esse arquivo.
-    __file->tty = __tty;
-// Esse é o arquivo que aponta para essa estrutura.
-    __tty->fp = __file;
-// sync
-    __file->sync.sender_pid = (pid_t) -1;
-    __file->sync.receiver_pid = (pid_t) -1;
-    __file->sync.action = ACTION_NULL;
-    __file->sync.can_read = TRUE;
-    __file->sync.can_write = TRUE;
-    __file->sync.can_execute = FALSE;
-// tty is not a socket.
-// Do not accet and do not connect.
-    __file->sync.can_accept = FALSE;
-    __file->sync.can_connect = FALSE;
-
-    //Todo: create the file name.
-    //__file->_tmpfname = "TTYX    TTY";
-    //ksprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
-    //strcpy (?,__file->_tmpfname);
-
-// #todo
-// precisamos pegar um slot livre na lista de objetos abertos pelo processo.
-// O indice da tty é fd do arquivo que aponta para a tty.
-    //__tty->index = __file->_file;
-    //__tty->index = -1;
-
-// Register device:
-// #importante
-// Essa é a tabela de montagem de dispositivos.
-// O nome do dispositivo deve ser um pathname.
-// Mas podemos ter mais de um nome.
-// vamos criar uma string aqui usando sprint e depois duplicala.
-// See: devmgr.c
-
-    devmgr_register_device ( 
-        (file *) __file,     // file 
-        newname,             // pathname 
-        DEVICE_CLASS_CHAR,   // class (char, block, network)
-        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
-        NULL,                // Not a pci device.
-        __tty );             // This is a tty device.
-
-// ==========================================
-// last check.
-    if ((void *) __tty == NULL){
-        panic("tty_create: [FAIL] __tty\n");
-    }
-// ok.
-    return (struct tty_d *) __tty;
-}
-
 // file to tty.
 // OUT: tty pointer.
 struct tty_d *file_tty (file *f)
@@ -1033,14 +773,6 @@ tty_sets (
     return (int) ret;
 fail:
     return (int) -1;
-}
-
-int tty_init_module (void)
-{
-    // Nothing for now!
-    debug_print ("tty_init_module:\n");
-    // ...
-    return 0;
 }
 
 // tty_ioctl:
@@ -1265,9 +997,280 @@ tty_ioctl (
         break;
     };
 
-
 fail:
     return (int) -1;
+}
+
+
+
+//
+// $
+// CREATE
+//
+
+/*
+ * tty_create: 
+ *    Create a tty structure.
+ * OUT:
+ *     pointer.
+ */
+// #test
+// We are including a pointer to the RIT. raw input thread.
+// This is the control thread of the window with focus on kgws.
+// See: tty.h
+
+struct tty_d *tty_create(short type, short subtype)
+{
+    file *__file;
+    struct tty_d  *__tty;
+    char __tmpname[64];
+    register int i=0;
+
+// #todo
+// The parameters.
+
+// Create structure.
+    __tty = (struct tty_d *) kmalloc( sizeof(struct tty_d) );
+    if ((void *) __tty == NULL){
+        panic ("tty_create: __tty\n");   
+    }
+    memset( __tty, 0, sizeof(struct tty_d) );
+
+    __tty->objectType = ObjectTypeTTY;
+    __tty->objectClass = ObjectClassKernelObject;
+    __tty->used = TRUE;
+    __tty->magic = 1234;
+    __tty->initialized = FALSE;
+
+// Clear name info for now.
+    memset( __tty->name, 0, TTY_NAME_SIZE );
+    __tty->Name_len = 0;
+
+// Type/subtype
+    __tty->type = type;
+    __tty->subtype = subtype;
+
+// #bugbug
+// Threads can be uninitialized at the kernel initialization.
+    __tty->__owner_tid = (int) -1;
+
+// Index
+    __tty->index = (int) (new_tty_index & 0xFFFF);
+    new_tty_index++;
+
+//
+// Linked
+//
+
+    __tty->link = NULL;
+    __tty->is_linked = FALSE;
+
+// No thread for now.
+// ?? What thread we need to use here?
+    //__tty->control = NULL;
+// No user logged yet.
+    __tty->user_info = NULL;
+
+// #bugbug
+// Security stuff.
+// Maybe it will change when a user login into a terminal.
+// Nao sei se essas estruturas estao prontas para isso nesse momento
+// ou se esses ponteiros sao nulos.
+
+    __tty->user_session = NULL;  // #todo: Use current user session;
+    __tty->cgroup = NULL;        // #todo: Use current cgroup.
+
+// The kernel can print string into the display device.
+    __tty->vc_mode = (int) VC_MODE_KERNEL_VERBOSER;
+
+//#todo: Indice do dispositivo.
+    // __tty->device = 0;   // initialized.
+    __tty->driver = NULL;  //driver struct
+    __tty->ldisc  = NULL;  //line discipline struct
+// termios struct (not a pointer)
+    tty_reset_termios(__tty);
+
+// process group.
+    //__tty->gid = current_group;
+// ??
+// Quantos processos estao usando essa tty.
+    //__tty->pid_count=0;
+    
+    __tty->flags = 0;
+// not blocked
+    __tty->is_blocked = FALSE;
+// process
+    // __tty->process = KernelProcess;
+// thread
+    // __tty->thread  = ?
+// Qual terminal virtual esta usando essa tty.
+    __tty->virtual_terminal_pid = 0;
+// Window.
+// When we are using the kgws.
+    //__tty->window = NULL;
+
+// == buffers ===========================
+
+// YES, We are using buffer.
+    __tty->nobuffers = FALSE;
+
+// queues
+
+// raw queue
+    __tty->raw_queue.cnt = 0;
+    __tty->raw_queue.head = 0;
+    __tty->raw_queue.tail = 0;
+    __tty->raw_queue.buffer_size = TTY_BUF_SIZE;
+    for(i=0; i<TTY_BUF_SIZE; i++){ __tty->raw_queue.buf[i] = 0; }
+// canonical queue
+    __tty->canonical_queue.cnt = 0;
+    __tty->canonical_queue.head = 0;
+    __tty->canonical_queue.tail = 0;
+    __tty->canonical_queue.buffer_size = TTY_BUF_SIZE;
+    for(i=0; i<TTY_BUF_SIZE; i++){ __tty->canonical_queue.buf[i] = 0; }
+// output queue
+    __tty->output_queue.cnt = 0;
+    __tty->output_queue.head = 0;
+    __tty->output_queue.tail = 0;
+    __tty->output_queue.buffer_size = TTY_BUF_SIZE;
+    for(i=0; i<TTY_BUF_SIZE; i++){ __tty->output_queue.buf[i] = 0; }
+
+// system metrics.
+
+// cursor dimentions in pixels.
+// #bugbug: determined.
+    __tty->cursor_width_in_pixels = 8;
+    __tty->cursor_height_in_pixels = 8;
+//#todo
+// it needs to be 'unsigned int'
+    __tty->bg_color = COLOR_BLACK;
+    __tty->fg_color = COLOR_WHITE;
+// cursor position in chars.
+    __tty->cursor_x = 0;
+    __tty->cursor_y = 0;
+// cursor margin.
+    __tty->cursor_left = 0;
+    __tty->cursor_top  = 0;
+
+// #bugbug: 
+// Constant cursor size.
+// cursor limits.
+    __tty->cursor_right  = 0+(gSavedX/8) -1;  // (screen width / char width)
+    __tty->cursor_bottom = 0+(gSavedY/8) -1;  // (screen height/ char height)
+
+// #bugbug
+// Temos que completar as estruturas.
+// São muitos elementos ...
+// ...
+
+    // goto __ok_register;
+    //return (struct tty_d *) __tty;
+
+    //panic ("tty_create: Crazy error!\n");
+    //return NULL;
+
+// ==========================================
+//__ok_register:
+
+    if ((void *) __tty == NULL){
+        panic("tty_create: __tty\n");
+    }
+
+// mount point. 
+// pathname.
+
+// #test
+// Isso é o ponto de montagem.
+    int Index = (int) (__tty->index & 0xFFFF);
+// clear buffer
+    memset( __tmpname, 0, TTY_NAME_SIZE );
+    ksprintf( __tmpname, "TTY%d", Index );
+
+    //size_t NameSize = (size_t) strlen(__tmpname);
+// ----
+    char *newname = (char *) kmalloc(TTY_NAME_SIZE);
+    if ((void*) newname == NULL){
+        panic("tty_create: newname\n");
+    }
+// clear buffer
+    memset( newname, 0, TTY_NAME_SIZE );
+// Copy name
+    strcpy(newname,__tmpname);
+    //memcpy(__tty->name,__tmpname,64);
+
+// File pointer.
+// Agora registra o dispositivo pci na lista genérica
+// de dispositivos.
+// #importante: 
+// Ele precisa de um arquivo 'file'.
+    
+    __file = (file *) kmalloc( sizeof(file) );
+    if ((void *) __file == NULL){
+        panic("tty_create: __file\n");
+    }
+    memset ( __file, 0, sizeof(file) );
+    __file->used = TRUE;
+    __file->magic = 1234;
+    __file->____object = ObjectTypeTTY;
+    __file->isDevice = TRUE;
+// #todo
+    __file->dev_major = 0;
+    __file->dev_minor = 0;
+// A estrutura de tty associada com esse arquivo.
+    __file->tty = __tty;
+// Esse é o arquivo que aponta para essa estrutura.
+    __tty->fp = __file;
+// sync
+    __file->sync.sender_pid = (pid_t) -1;
+    __file->sync.receiver_pid = (pid_t) -1;
+    __file->sync.action = ACTION_NULL;
+    __file->sync.can_read = TRUE;
+    __file->sync.can_write = TRUE;
+    __file->sync.can_execute = FALSE;
+// tty is not a socket.
+// Do not accet and do not connect.
+    __file->sync.can_accept = FALSE;
+    __file->sync.can_connect = FALSE;
+
+    //Todo: create the file name.
+    //__file->_tmpfname = "TTYX    TTY";
+    //ksprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
+    //strcpy (?,__file->_tmpfname);
+
+// #todo
+// precisamos pegar um slot livre na lista de objetos abertos pelo processo.
+// O indice da tty é fd do arquivo que aponta para a tty.
+    //__tty->index = __file->_file;
+    //__tty->index = -1;
+
+// Register device:
+// #importante
+// Essa é a tabela de montagem de dispositivos.
+// O nome do dispositivo deve ser um pathname.
+// Mas podemos ter mais de um nome.
+// vamos criar uma string aqui usando sprint e depois duplicala.
+// See: devmgr.c
+
+// #todo
+// Maybe we need a return value here.
+
+    devmgr_register_device ( 
+        (file *) __file,     // file 
+        newname,             // pathname 
+        DEVICE_CLASS_CHAR,   // class (char, block, network)
+        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
+        NULL,                // Not a pci device.
+        __tty );             // This is a tty device.
+
+// ==========================================
+// last check.
+    if ((void *) __tty == NULL){
+        panic("tty_create: [FAIL] __tty\n");
+    }
+
+// ok
+    __tty->initialized = TRUE;
+    return (struct tty_d *) __tty;
 }
 
 //

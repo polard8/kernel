@@ -76,11 +76,9 @@ extern int ShellFlag;
 
 struct virtual_console_login_d
 {
-    int id;
-
     int used;
     int magic;
-
+    int id;
 
     // Index in the list CONSOLE[i].
     // See: tty.h
@@ -90,10 +88,10 @@ struct virtual_console_login_d
     // 1 = 'x-server'
     int mode;
     
-    struct user_info_d *user_info;
-    struct usession_d *usession;
-
     struct cgroup_d  *cgroup;
+
+    struct usession_d *usession;
+    struct user_info_d *user_info;
 };
 
 //

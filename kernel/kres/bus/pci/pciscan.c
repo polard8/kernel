@@ -5,7 +5,7 @@
 
 // Encontrar os dispositivos PCI e salvar as informações sobre eles
 // em suas respectivas estruturas.
-int pci_setup_devices (void)
+int pciscan_probe_devices (void)
 {
 
 // Offset 0 and 2.

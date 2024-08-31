@@ -42,17 +42,19 @@ struct device_class_d
     int device_subclass;    
 };
 
+#define DEVICE_NAME_SIZE  64
+
 // Device structure.
 struct device_d 
 {
     object_type_t objectType;
     object_class_t objectClass;
-    int index;
     int used;
     int magic;
+    int index;
 
     //name for pci devices: "/DEV_8086_8086"  
-    char name[64];
+    char name[DEVICE_NAME_SIZE];
     size_t Name_len;
     // #todo: merge.
 
@@ -151,8 +153,8 @@ extern unsigned long deviceList[DEVICE_LIST_MAX];
 // == Prototypes ==============
 //
 
-file *devmgr_search_in_dev_list(char *path);
 void devmgr_show_device_list(int object_type);
+file *devmgr_search_in_dev_list(char *path);
 
 struct device_d *devmgr_device_object(void);
 
@@ -168,6 +170,4 @@ devmgr_register_device (
 void devmgr_initialize(void);
 
 #endif    
-
-
 

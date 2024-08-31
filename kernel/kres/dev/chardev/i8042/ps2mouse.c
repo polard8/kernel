@@ -8,6 +8,8 @@
 // see: ps2mouse.h
 struct ps2_mouse_d  PS2Mouse;
 
+const char *device_name_ps2mouse = "PS2MOUSE";
+
 /*
  #todo
  enable mouse?
@@ -652,11 +654,11 @@ void ps2mouse_initialize_device(void)
 // Register the device.
     devmgr_register_device ( 
         (file *) fp, 
-        "PS2-MOUSE",         // pathname 
-        DEVICE_CLASS_CHAR,   // class (char, block, network)
-        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
-        NULL,                // Not a pci device.
-        NULL );              // Not a tty device. (not for now)
+        device_name_ps2mouse,  // name 
+        DEVICE_CLASS_CHAR,     // class (char, block, network)
+        DEVICE_TYPE_LEGACY,    // type (pci, legacy)
+        NULL,                  // Not a pci device.
+        NULL );                // Not a tty device. (not for now)
 //====================================
 
 // Pointer

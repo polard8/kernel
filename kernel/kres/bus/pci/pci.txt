@@ -1,0 +1,241 @@
+
+/*
+ * PCI Configuration Space Header:
+   ===============================
+The following field descriptions are common to all Header Types:
+
+Device ID: 
+Identifies the particular device. 
+Where valid IDs are allocated by the vendor.
+
+Vendor ID: 
+Identifies the manufacturer of the device. 
+Where valid IDs are allocated by PCI-SIG to ensure uniqueness and 
+0xFFFF is an invalid value that will be returned on 
+read accesses to Configuration Space registers of non-existent devices.
+
+Status: 
+A register used to record status information for PCI bus related events.
+
+Command: 
+Provides control over a device's ability to generate and 
+respond to PCI cycles. 
+Where the only functionality guaranteed to be supported by all devices is, 
+when a 0 is written to this register, 
+the device is disconnected from the PCI bus for all accesses 
+except Configuration Space access.
+
+Class Code: 
+A read-only register that specifies the type of function the device performs.
+
+Subclass: 
+A read-only register that specifies the specific function the device performs.
+
+Prog IF: 
+A read-only register that specifies a register-level programming interface 
+the device has, if it has any at all.
+
+Revision ID: 
+Specifies a revision identifier for a particular device. 
+Where valid IDs are allocated by the vendor.
+
+BIST: 
+Represents that status and allows control of a devices BIST (built-in self test).
+
+Header Type: 
+Identifies the layout of the rest of the header beginning at byte 0x10 of the header 
+and also specifies whether or not the device has multiple functions. 
+Where a value of 0x00 specifies a general device, 
+a value of 0x01 specifies a PCI-to-PCI bridge, 
+and a value of 0x02 specifies a CardBus bridge. 
+If bit 7 of this register is set, the device has multiple functions; 
+otherwise, it is a single function device.
+
+Latency Timer: 
+Specifies the latency timer in units of PCI bus clocks.
+
+Cache Line Size: 
+Specifies the system cache line size in 32-bit units. 
+A device can limit the number of cacheline sizes it can support, 
+if a unsupported value is written to this field, 
+the device will behave as if a value of 0 was written. 
+ 
+The following field descriptions apply if the Header Type is 0x00:
+
+CardBus CIS Pointer: 
+Points to the Card Information Structure and is used by 
+devices that share silicon between CardBus and PCI.
+
+Interrupt Line: 
+Specifies which input of the system interrupt controllers 
+the device's interrupt pin is connected to and 
+is implemented by any device that makes use of an interrupt pin. 
+For the x86 architecture this register corresponds to 
+the PIC IRQ numbers 0-15 (and not I/O APIC IRQ numbers) and 
+a value of 0xFF defines no connection.
+
+Interrupt Pin: 
+Specifies which interrupt pin the device uses. 
+Where a value of 0x01 is INTA#, 0x02 is INTB#, 
+0x03 is INTC#, 0x04 is INTD#, and 
+0x00 means the device does not use an interrupt pin.
+
+Max Latency: 
+A read-only register that specifies how often the device 
+needs access to the PCI bus (in 1/4 microsecond units).
+
+Min Grant: 
+A read-only register that specifies the burst period length, 
+in 1/4 microsecond units, 
+that the device needs (assuming a 33 MHz clock rate).
+
+Capabilities Pointer: 
+Points to a linked list of new capabilities implemented by the device. 
+Used if bit 4 of the status register (Capabilities List bit) is set to 1. 
+The bottom two bits are reserved and should be masked before 
+the Pointer is used to access the Configuration Space.
+ 
+*/ 
+
+/*
+    PCI i/o port:
+    ============ 
+    How do you determine the I/O port of a PCI device in x86 assembly?
+    You simply have to know what I/O ports that a 
+	particular PCI device will use.  
+	In each device's PCI config space, 
+	there should be IOBARs (I/O base address registers) 
+	that are configurable, or else 
+	the device isn't plug and play.  
+    Most modern PCI devices will use memory-mapped I/O.  
+	MMIO address are mapped at boot-time by the BIOS, 
+	and are readable from PCI config space.
+
+	PCI Address Domain:
+	==================
+	The PCI address domain consists of three distinct address spaces: 
+	configuration, memory, and I/O space.
+
+    Base address Registers (or BARs) can be used to 
+	hold memory addresses used by the device, or 
+	offsets for port addresses. 
+	Typically, memory address BARs need to be located in physical ram 
+	while I/O space BARs can reside at any memory address 
+	(even beyond physical memory).`
+ */
+
+//Find an AHCI controller:
+//========================
+//An AHCI controller can be found by enumerating the PCI bus. It has a 
+//class id 0x01 (mass storage device) and normally a subclass id 0x06 
+//(serial ATA). The vendor id and device id should also be checked to 
+//ensure it?s really an AHCI controller.
+
+//AHCI Registers and Memory Structures:
+//As mentioned above, host communicates with the AHCI controller through 
+//system memory and memory mapped registers. The last PCI base address 
+//register (BAR[5], header offset 0x24) points to the AHCI base memory, 
+//it?s called ABAR (AHCI Base Memory Register). All AHCI registers and 
+//memories can be located through ABAR. The other PCI base address 
+//registers act same as a traditional IDE controller. Some AHCI 
+//controller can be configured to simulate a legacy IDE one.
+
+// list: 
+// vendor 0x10EC Realtek Semiconductor Corp.
+// Vendor: pci 0x1969 "Atheros Communications Inc."
+// Device: pci 0xe0a1
+//
+// 8086, 1237  //PCI & Memory.
+// 8086, 7000  //PIIX3 PCI-to-ISA Bridge (Triton II).
+// 1022, 2000  //Advanced Micro Devices, PCnet LANCE PCI Ethernet Controller.
+// 8086, 7113  //PIIX4/4E/4M Power Management Controller.
+// 8086, 2829  //Intel(R) ICH8M SATA AHCI Controller.
+// 
+//PCI devices on oracle virtual box.
+// 0xBEEF	VirtualBox Graphics Adapter	0x80EE	Oracle Corporation - InnoTek Systemberatung GmbH
+//{0x8086, 0x1237, "82441FX"},
+// {0x8086, 0x7000, "82371SB_ISA"},
+// {0x8086, 0x7113, "82371AB/EB/MB_ACPI"}
+// 0x2668	82801FB (ICH6) High Definition Audio Controller	0x8086	Intel Corporation
+// { 0x1022, 0x2000, "AMD Lance/PCI" },
+// {0x106b, 0x003f,  kErrataDisableOvercurrent | kErrataNeedsWatchdogTimer},	// Apple Intrepid, all revs  USB Root Hub
+// 0x106b	0x003f	"usb-ohci"	"Apple Computer Inc.|KeyLargo/Intrepid USB" 
+// 0x106b	0x003f	"ohci-hcd"	"Apple Computer Inc.|KeyLargo/Intrepid USB"
+//  
+
+// VIA CN896 - North bridge.
+// 1106 c364 CN896/VN896/P4M900 PCI to PCI Bridge Controller
+// 1106 7364 CN896/VN896/P4M900 Host Bridge
+// 1106 6364 CN896/VN896/P4M900 Security Device
+
+// VIA VT8237 - South bridge
+// 1106 287e  VT8237/8251 Ultra VLINK Controller
+// 1106 b198  VT8237/VX700 PCI Bridge
+// 1106 337b  VT8237A Host Bridge
+// 1106 3337  VT8237A PCI to ISA Bridge
+// 1106 337a  VT8237A PCI to PCI Bridge
+// 1106 5372  VT8237/8251 Serial ATA Controller
+// 1106 0591  VT8237A SATA 2-Port Controller
+
+// 1106 VIA Technologies, 
+//      Inc. 0571 
+//      VT82C586A/B/VT82C686/A/B/VT823x/A/C PIPC Bus Master IDE
+
+//
+//0x27B9, Intel(R) ICH7M/U LPC Interface Controller	0x8086.
+//(Intel)Only the following class of devices may be connected to the LPC interface:
+//? Super I/O (FDC, SP, PP, IR, KBC) => I/O slave, DMA, Bus Master (for IR, PP)
+//? Audio, including AC'97 style design => I/O slave, DMA, Bus Master
+//? Generic Application Memory, including BIOS => Memory Slave
+//? BIOS Firmware Memory => Firmware Memory Slave
+//? Embedded Controller => I/O slave, Bus Master
+// (Flash bios, super i/o, embedded controller)
+//super i/o = {keybaord, mouse, serial port, parallel port, fdc}.
+// 
+
+/*
+ Class Codes:
+ ===========
+Class Description
+0x00  Devices built before class codes (i.e. pre PCI 2.0)
+0x01  Mass storage controller *
+0x02  Network controller
+0x03  Display controller
+0x04  Multimedia device
+0x05  Memory Controller
+0x06  Bridge Device
+0x07  Simple communications controllers
+0x08  Base system peripherals
+0x09  Inupt devices
+0x0A  Docking Stations
+0x0B  Processorts
+0x0C  Serial bus controllers
+0x0D-0xFE  Reserved
+0xFF  Misc
+*/
+
+/*
+ OSDEV.ORG
+Class Code	Description
+0x00	Device was built prior definition of the class code field
+0x01	Mass Storage Controller
+0x02	Network Controller
+0x03	Display Controller
+0x04	Multimedia Controller
+0x05	Memory Controller
+0x06	Bridge Device
+0x07	Simple Communication Controllers
+0x08	Base System Peripherals
+0x09	Input Devices
+0x0A	Docking Stations
+0x0B	Processors
+0x0C	Serial Bus Controllers
+0x0D	Wireless Controllers
+0x0E	Intelligent I/O Controllers
+0x0F	Satellite Communication Controllers
+0x10	Encryption/Decryption Controllers
+0x11	Data Acquisition and Signal Processing Controllers
+0x12 - 0xFE	Reserved
+0xFF	Device does not fit any defined class.
+*/
+
