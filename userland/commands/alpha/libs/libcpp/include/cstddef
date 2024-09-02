@@ -1,0 +1,25 @@
+
+// <cstddef> implementation for Gramado OS libcpp.
+// 2024 - Created by Fred Nora.
+
+#pragma once 
+
+#define NULL  ((void *) 0)    
+
+
+//#test
+//Credits: https://hackernoon.com/what-exactly-is-nullptr-in-c-94d63y6t
+/*
+struct nullptr_t 
+{
+    void operator&() const = delete;  // Can't take address of nullptr
+
+    template<class T>
+    inline operator T*() const { return 0; }
+
+    template<class C, class T>
+    inline operator T C::*() const { return 0; }
+};
+nullptr_t nullptr;
+*/
+

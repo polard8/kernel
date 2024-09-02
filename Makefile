@@ -9,10 +9,6 @@ BASE = your/base
 DEP_L1  = ../de/ds
 # Client-side GUI applications
 DEP_L2  = ../de/apps
-# Posix-commands
-DEP_L3  = ../de/extra/commands
-# 3D demos
-DEP_L4  = ../de/extra/aurora
 
 # Make variables (CC, etc...)
 AS      = as
@@ -147,6 +143,7 @@ build-gramado-os:
 # Copy the init process.
 # We can't survive without this one. (Only this one).
 	$(Q)$(MAKE) -C userland/
+	$(Q)$(MAKE) -C userland/commands/
 
 # Copy
 	cp userland/bin/INIT.BIN      $(BASE)/
@@ -158,6 +155,24 @@ build-gramado-os:
 	-cp userland/bin/NET.BIN      $(BASE)/
 	-cp userland/bin/TASCII.BIN   $(BASE)/GRAMADO/
 	-cp userland/bin/TPRINTF.BIN  $(BASE)/GRAMADO/
+
+    # Well consolidated applications
+	-cp userland/commands/base/bin/CAT.BIN       $(BASE)/
+	-cp userland/commands/base/bin/REBOOT.BIN    $(BASE)/
+	-cp userland/commands/base/bin/SHUTDOWN.BIN  $(BASE)/
+	-cp userland/commands/base/bin/UNAME.BIN     $(BASE)/
+	-cp userland/commands/sdk/bin/GRAMCNF.BIN    $(BASE)/
+    # Experimental applications
+    # These need the '@' prefix.
+	-cp userland/commands/base/bin/FALSE.BIN      $(BASE)/GRAMADO/
+	-cp userland/commands/base/bin/TRUE.BIN       $(BASE)/GRAMADO/
+	-cp userland/commands/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
+	-cp userland/commands/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
+	-cp userland/commands/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
+#-cp userland/commands/sdk/bin/N9.BIN         $(BASE)/GRAMADO/
+#-cp userland/commands/sdk/bin/N10.BIN        $(BASE)/GRAMADO/
+#-cp userland/commands/sdk/bin/N11.BIN        $(BASE)/GRAMADO/
+#-cp userland/commands/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
 
 # Install BMPs from cali assets.
 # Copy the assets/
@@ -199,33 +214,6 @@ copy-extras:
     # These need the '@' prefix.
 	-cp $(DEP_L2)/browser/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
 
-# ------------------------
-# LEVEL 3: (extra/commands/)  Posix comands.
-
-    # Well consolidated applications
-	-cp $(DEP_L3)/base/bin/CAT.BIN       $(BASE)/
-	-cp $(DEP_L3)/base/bin/REBOOT.BIN    $(BASE)/
-	-cp $(DEP_L3)/base/bin/SHUTDOWN.BIN  $(BASE)/
-	-cp $(DEP_L3)/base/bin/UNAME.BIN     $(BASE)/
-	-cp $(DEP_L3)/sdk/bin/GRAMCNF.BIN    $(BASE)/
-    # Experimental applications
-    # These need the '@' prefix.
-	-cp $(DEP_L3)/base/bin/FALSE.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_L3)/base/bin/TRUE.BIN       $(BASE)/GRAMADO/
-	-cp $(DEP_L3)/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
-	-cp $(DEP_L3)/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
-	-cp $(DEP_L3)/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
-#-cp $(DEP_L3)/sdk/bin/N9.BIN         $(BASE)/GRAMADO/
-#-cp $(DEP_L3)/sdk/bin/N10.BIN        $(BASE)/GRAMADO/
-#-cp $(DEP_L3)/sdk/bin/N11.BIN        $(BASE)/GRAMADO/
-#-cp $(DEP_L3)/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
-
-
-# ------------------------
-# LEVEL 4: (aurora/) 3D demos.
-    # Well consolidated applications
-	-cp $(DEP_L4)/bin/DEMO00.BIN  $(BASE)/
-	-cp $(DEP_L4)/bin/DEMO01.BIN  $(BASE)/
 
 	@echo "~ copy-extras"
 
@@ -330,6 +318,9 @@ clean-all: clean
 	-rm userland/netd/client/*.BIN
 	-rm userland/netd/server/*.o
 	-rm userland/netd/server/*.BIN 
+
+	-rm userland/commands/bin/*.BIN
+	-rm userland/commands/init/*.o
 
 # ==================
 # Clear the disk cache
