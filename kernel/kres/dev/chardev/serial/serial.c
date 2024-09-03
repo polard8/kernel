@@ -318,20 +318,32 @@ int DDINIT_serial(void)
 
 // Initialize 4 legacy COM ports.
 
+// #bugbug
+// We can't abort the initialization just because a
+// single port is faulty. We can survive without them in some cases.
+
     Status = __serial_init_port(COM1_PORT,DefaultDivisor);
-    if (Status != TRUE){
+    if (Status != TRUE)
+    {
+        //SerialPortInfo.com1.initialized = FALSE;
         goto fail;
     }
     Status = __serial_init_port(COM2_PORT,DefaultDivisor);
-    if (Status != TRUE){
+    if (Status != TRUE)
+    {
+        //SerialPortInfo.com2.initialized = FALSE;
         goto fail;
     }
     Status = __serial_init_port(COM3_PORT,DefaultDivisor);
-    if (Status != TRUE){
+    if (Status != TRUE)
+    {
+        //SerialPortInfo.com3.initialized = FALSE;
         goto fail;
     }
     Status = __serial_init_port(COM4_PORT,DefaultDivisor);
-    if (Status != TRUE){
+    if (Status != TRUE)
+    {
+        //SerialPortInfo.com4.initialized = FALSE;
         goto fail;
     }
 
