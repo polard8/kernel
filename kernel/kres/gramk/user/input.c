@@ -296,6 +296,7 @@ static int __CompareStrings(void)
         goto exit_cmp;
     }
 
+// Testing string functions.
     if ( kstrncmp(prompt,"str",3) == 0 )
     {
         console_print_indent(4,fg_console);
@@ -315,9 +316,11 @@ static int __CompareStrings(void)
 
 // dir:
 // List the files in a given directory.
-// root dir. Same as '/'.
-    if ( kstrncmp(prompt,"dir",3) == 0 ){
-        fsList("[");
+    if ( kstrncmp(prompt,"dir",3) == 0 )
+    {
+        fsList("[");  // root dir. Same as '/'.
+        //fsList("GRAMADO");
+        //fsList("GRAMRE");
         goto exit_cmp;
     }
 
@@ -338,16 +341,19 @@ static int __CompareStrings(void)
     }
 */
 
-// mm1: Show paged memory list.
+// mm1: 
+// Show paged memory list.
+// #todo: Explain it better.
 // IN: max index.
     if ( kstrncmp(prompt,"mm1",3) == 0 ){
         mmShowPagedMemoryList(512); 
         goto exit_cmp;
     }
 
-// mm2: show the blocks allocated by the kernel allocator.
-// inside the kernel heap.
-// IN: max index.
+// mm2: 
+// Show the blocks allocated by the kernel allocator.
+// It is inside the kernel heap.
+// #todo: Explain it better.
     if ( kstrncmp(prompt,"mm2",3) == 0 ){
         mmShowMemoryBlocksForTheKernelAllocator(); 
         goto exit_cmp;
@@ -560,8 +566,10 @@ static int __CompareStrings(void)
             SerialPortInfo.com1.divisorLoByte);
         printk("com1.divisorHiByte: %d\n",
             SerialPortInfo.com1.divisorHiByte);
-        printk("com1.baudrate:      %d\n",
-            SerialPortInfo.com1.baudrate);
+        printk("com1.baud_rate:      %d\n",
+            SerialPortInfo.com1.baud_rate);
+        printk("com1.is_faulty:      %d\n",
+            SerialPortInfo.com1.is_faulty);
         goto exit_cmp;
     }
 
