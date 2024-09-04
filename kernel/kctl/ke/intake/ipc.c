@@ -1,4 +1,4 @@
-// msg.c
+// ipc.c
 // System message support.
 // Messages using the circular queue into the thread structure.
 // Created by Fred Nora.
@@ -12,7 +12,7 @@
 //struct msg_d *last_msg;
 
 int
-post_message_to_tid2 ( 
+ipc_post_message_to_tid2 ( 
     tid_t sender_tid,
     tid_t receiver_tid,
     int msg, 
@@ -45,19 +45,19 @@ post_message_to_tid2 (
 
 // tid
     if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
-        panic("post_message_to_tid2: dst_tid\n");
+        panic("ipc_post_message_to_tid2: dst_tid\n");
         //goto fail;
     }
 // structure
     t = (struct thread_d *) threadList[dst_tid];
     if ((void *) t == NULL){
-        panic ("post_message_to_tid2: t\n");
+        panic ("ipc_post_message_to_tid2: t\n");
     }
     if ( t->used != TRUE || t->magic != 1234 ){
-        panic ("post_message_to_tid2: t validation\n");
+        panic ("ipc_post_message_to_tid2: t validation\n");
     }
     if (t->tid != dst_tid){
-        panic("post_message_to_tid2: t->tid != dst_tid\n");
+        panic("ipc_post_message_to_tid2: t->tid != dst_tid\n");
     }
 
 //
@@ -95,10 +95,10 @@ post_message_to_tid2 (
 // Get the pointer for the next entry.
     m = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
     if ((void*) m == NULL){
-        panic ("post_message_to_tid2: m\n");
+        panic ("ipc_post_message_to_tid2: m\n");
     }
     if ( m->used != TRUE || m->magic != 1234 ){
-        panic ("post_message_to_tid2: m validation\n");
+        panic ("ipc_post_message_to_tid2: m validation\n");
     }
 
 // -------------------------
@@ -151,7 +151,7 @@ fail:
 // Post message.
 // Async
 int
-post_message_to_tid ( 
+ipc_post_message_to_tid ( 
     tid_t sender_tid,
     tid_t receiver_tid,
     int msg, 
@@ -182,19 +182,19 @@ post_message_to_tid (
     }
 // tid
     if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
-        panic("post_message_to_tid: dst_tid\n");
+        panic("ipc_post_message_to_tid: dst_tid\n");
         //goto fail;
     }
 // structure
     t = (struct thread_d *) threadList[dst_tid];
     if ((void *) t == NULL){
-        panic ("post_message_to_tid: t\n");
+        panic ("ipc_post_message_to_tid: t\n");
     }
     if ( t->used != TRUE || t->magic != 1234 ){
-        panic("post_message_to_tid: t validation\n");
+        panic("ipc_post_message_to_tid: t validation\n");
     }
     if (t->tid != dst_tid){
-        panic("post_message_to_tid: t->tid != dst_tid\n");
+        panic("ipc_post_message_to_tid: t->tid != dst_tid\n");
     }
 
 // #test
@@ -232,10 +232,10 @@ post_message_to_tid (
 // Get the pointer for the next entry.
     m = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
     if ((void*) m == NULL){
-        panic ("post_message_to_tid: m\n");
+        panic ("ipc_post_message_to_tid: m\n");
     }
     if ( m->used != TRUE || m->magic != 1234 ){
-        panic ("post_message_to_tid: m validation\n");
+        panic ("ipc_post_message_to_tid: m validation\n");
     }
 
 // --------------------------
@@ -279,85 +279,46 @@ fail:
     return (int) -1;
 }
 
-// Service 112
-// Post message to tid.
-// Asynchronous.
-unsigned long
-sys_post_message_to_tid( 
-    int tid, 
-    unsigned long message_buffer )
-{
-    tid_t src_tid = (tid_t) current_thread;   // caller's tid.
-    tid_t dst_tid = (tid_t) tid;              // targt tid.
-
-// Invalid target tid.
-    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
-        return 0;
-    }
-// Message buffer
-// Buffer in ring3.
-    if (message_buffer == 0){
-        return 0;
-    }
-    unsigned long *ubuf = (unsigned long *) message_buffer;
-// Message code
-    int MessageCode = (int) ( ubuf[1] & 0xFFFFFFFF );
-
-// Post message.
-// Asynchronous.
-// IN: target tid, opaque struct pointer, msg code, data1, data2.
-// #todo: get the return value?
-
-    // #ps: Old implementation
-    /*
-    post_message_to_tid(
-        (tid_t) src_tid,    // sender tid
-        (tid_t) dst_tid,    // receiver tid
-        (int) MessageCode,
-        (unsigned long) ubuf[2],
-        (unsigned long) ubuf[3] );
-    */
-
-    // #ps: Newm implementation. Sending more data.
-    post_message_to_tid2(
-        (tid_t) src_tid,    // sender tid
-        (tid_t) dst_tid,    // receiver tid
-        (int) MessageCode,
-        (unsigned long) ubuf[2],
-        (unsigned long) ubuf[3],
-        (unsigned long) ubuf[4],
-        (unsigned long) ubuf[5] );
-
-// Let's notify the scheduler
-// that we need some priority for the receiver in this case.
-
-    return 0;
-}
-
 // Post message to the foreground thread.
 int
-post_message_to_foreground_thread ( 
+ipc_post_message_to_foreground_thread ( 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
 {
-    if ( foreground_thread < 0 || foreground_thread >= THREAD_COUNT_MAX ){
-        return -1;
+    int RetValue=0;
+// #todo: 
+// Sender?
+    tid_t SenderTID = 0;
+    tid_t ReceiverTID = foreground_thread;
+
+// Target thread
+    if ( ReceiverTID < 0 || 
+         ReceiverTID >= THREAD_COUNT_MAX )
+    {
+        goto fail;
     }
-    if (msg<0){
-        return -1;
+ 
+ // Parameter:
+    if (msg < 0){
+        goto fail;
     }
-// #todo: Sender?
-    return (int) post_message_to_tid(
-                     (tid_t) 0, 
-                     (tid_t) foreground_thread,
+
+    RetValue = (int) ipc_post_message_to_tid(
+                     (tid_t) SenderTID, 
+                     (tid_t) ReceiverTID,
                      (int) msg, 
                      (unsigned long) long1,
                      (unsigned long) long2 );
+
+    return (int) RetValue;
+
+fail:
+    return (int) -1;
 }
 
 int
-post_message_to_ws ( 
+ipc_post_message_to_init ( 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -371,59 +332,18 @@ post_message_to_ws (
 // using control + c.
 // It is because the thread will have an invalid pointer.
     // #test: KERNEL_MESSAGE_TID
-    tid_t src_tid = 0;   // sender tid #todo
-    tid_t dst_tid = -1;  // receiver tid
-
-    if (WindowServerInfo.initialized != TRUE){
-        return -1;
-    }
-    dst_tid = (tid_t) WindowServerInfo.tid;
-    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
-        return -1;
-    }
-
-    //if(msg == MSG_MOUSEMOVE){
-    //    printk ("x:%d y:%d\n",long1, long2);
-    //    refresh_screen();
-    //}
-
-// #todo
-// precisamos de uma flag que indique que isso deve ser feito.
-// See: tlib.c
-// IN: tid, window pointer, msgcode, data1, data2.
-
-    post_message_to_tid(
-        (tid_t) src_tid,  // sender tid
-        (tid_t) dst_tid,  // receiver tid
-        (int) msg,
-        (unsigned long) long1,
-        (unsigned long) long2 );
-
-   return 0;
-}
-
-int
-post_message_to_init ( 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 )
-{
-//  Post msg to the display server's tid.
-
-// #bugbug
-// We can't send messages to the display server
-// when the server was closed.
-// Ex: Right after we close the demo ENG.BIN
-// using control + c.
-// It is because the thread will have an invalid pointer.
-    // #test: KERNEL_MESSAGE_TID
-    tid_t src_tid = KERNEL_MESSAGE_TID;   // sender tid #todo
-    tid_t dst_tid = INIT_TID;  // receiver tid
+    tid_t SenderTID = KERNEL_MESSAGE_TID;   // sender tid #todo
+    tid_t ReceiverTID = INIT_TID;  // receiver tid
 
 // Is this a valid destination?
-    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
-        return -1;
+    if ( ReceiverTID < 0 || 
+         ReceiverTID >= THREAD_COUNT_MAX )
+    {
+        goto fail;
     }
+
+    if (msg < 0)
+        goto fail;
 
     //if(msg == MSG_MOUSEMOVE){
     //    printk ("x:%d y:%d\n",long1, long2);
@@ -435,44 +355,69 @@ post_message_to_init (
 // See: tlib.c
 // IN: tid, window pointer, msgcode, data1, data2.
 
-    post_message_to_tid(
-        (tid_t) src_tid,  // sender tid
-        (tid_t) dst_tid,  // receiver tid
+    ipc_post_message_to_tid(
+        (tid_t) SenderTID,  // sender tid
+        (tid_t) ReceiverTID,  // receiver tid
         (int) msg,
         (unsigned long) long1,
         (unsigned long) long2 );
 
    return 0;
+fail:
+    return (int) -1;
 }
 
-
-int 
-cali_post( 
-    tid_t sender_tid,
-    tid_t receiver_tid,
-    struct msg_d *message )
+int
+ipc_post_message_to_ds ( 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
-// #todo: Not tested yet.
-// #todo: Explain this routine.
+//  Post msg to the display server's tid.
 
-    if (sender_tid<0){
-        return -1;
+// #bugbug
+// We can't send messages to the display server
+// when the server was closed.
+// Ex: Right after we close the demo ENG.BIN
+// using control + c.
+// It is because the thread will have an invalid pointer.
+    // #test: KERNEL_MESSAGE_TID
+    tid_t SenderTID = 0;   // sender tid #todo
+    tid_t ReceiverTID = -1;  // receiver tid
+
+    if (WindowServerInfo.initialized != TRUE){
+        goto fail;
     }
-    if (receiver_tid<0){
-        return -1;
+    ReceiverTID = (tid_t) WindowServerInfo.tid;
+    if ( ReceiverTID < 0 || 
+         ReceiverTID >= THREAD_COUNT_MAX )
+    {
+        goto fail;
     }
-    if ((void*) message == NULL){
-        return -1;
-    }
-    message->sender_tid   = (tid_t) sender_tid;
-    message->receiver_tid = (tid_t) receiver_tid;
-// Post
-    return (int) post_message_to_tid( 
-                     (tid_t) sender_tid,
-                     (tid_t) receiver_tid,
-                     (int) message->msg,
-                     (unsigned long) message->long1,
-                     (unsigned long) message->long2 );
+
+    if (msg < 0)
+        goto fail;
+
+    //if(msg == MSG_MOUSEMOVE){
+    //    printk ("x:%d y:%d\n",long1, long2);
+    //    refresh_screen();
+    //}
+
+// #todo
+// precisamos de uma flag que indique que isso deve ser feito.
+// See: tlib.c
+// IN: tid, window pointer, msgcode, data1, data2.
+
+    ipc_post_message_to_tid(
+        (tid_t) SenderTID,  // sender tid
+        (tid_t) ReceiverTID,  // receiver tid
+        (int) msg,
+        (unsigned long) long1,
+        (unsigned long) long2 );
+
+   return 0;
+fail:
+    return (int) -1;
 }
 
 /*
@@ -758,5 +703,60 @@ fail0:
         }
     }
     return NULL;
+}
+
+// Service 112
+// Post message to tid.
+// Asynchronous.
+unsigned long
+sys_post_message_to_tid( 
+    int tid, 
+    unsigned long message_buffer )
+{
+    tid_t src_tid = (tid_t) current_thread;   // caller's tid.
+    tid_t dst_tid = (tid_t) tid;              // targt tid.
+
+// Invalid target tid.
+    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
+        return 0;
+    }
+// Message buffer
+// Buffer in ring3.
+    if (message_buffer == 0){
+        return 0;
+    }
+    unsigned long *ubuf = (unsigned long *) message_buffer;
+// Message code
+    int MessageCode = (int) ( ubuf[1] & 0xFFFFFFFF );
+
+// Post message.
+// Asynchronous.
+// IN: target tid, opaque struct pointer, msg code, data1, data2.
+// #todo: get the return value?
+
+    // #ps: Old implementation
+    /*
+    post_message_to_tid(
+        (tid_t) src_tid,    // sender tid
+        (tid_t) dst_tid,    // receiver tid
+        (int) MessageCode,
+        (unsigned long) ubuf[2],
+        (unsigned long) ubuf[3] );
+    */
+
+    // #ps: Newm implementation. Sending more data.
+    ipc_post_message_to_tid2(
+        (tid_t) src_tid,    // sender tid
+        (tid_t) dst_tid,    // receiver tid
+        (int) MessageCode,
+        (unsigned long) ubuf[2],
+        (unsigned long) ubuf[3],
+        (unsigned long) ubuf[4],
+        (unsigned long) ubuf[5] );
+
+// Let's notify the scheduler
+// that we need some priority for the receiver in this case.
+
+    return 0;
 }
 

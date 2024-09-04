@@ -736,7 +736,7 @@ int keCloseInitProcess(void)
     refresh_screen();
 
 // Send
-    post_message_to_tid(
+    ipc_post_message_to_tid(
         (tid_t) 0,                //sender tid. #todo
         (tid_t) InitThread->tid,  //receiver tid.
         (int) MSG_CLOSE,          //msg code

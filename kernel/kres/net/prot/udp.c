@@ -731,7 +731,7 @@ network_handle_udp(
             // #test
             // System message
             // Send a command to the init process.
-            //post_message_to_init(77888, 1234, 5678);
+            //ipc_post_message_to_init(77888, 1234, 5678);
 
             __handle_gprotocol(sport,dport);
         };

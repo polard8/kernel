@@ -74,9 +74,9 @@ KERNEL_INCLUDE := -I $(INCLUDE)
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
 # Everything is a file.
-OBJS = process.o plib.o thread.o tlib.o \
-msg.o \
+OBJS = thread.o tlib.o process.o plib.o \
 create.o clone.o \
+ipc.o \
 detect.o \
 ke.o \
 hal.o \
@@ -94,13 +94,17 @@ all:
 # intake/  (The MICROKERNEL)
 # process, thread, dispatcher and scheduler.
 
-	$(CC) -c intake/msg.c      $(KERNEL_INCLUDE) $(CFLAGS) -o msg.o
-	$(CC) -c intake/process.c  $(KERNEL_INCLUDE) $(CFLAGS) -o process.o
-	$(CC) -c intake/plib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o plib.o
 	$(CC) -c intake/thread.c   $(KERNEL_INCLUDE) $(CFLAGS) -o thread.o
 	$(CC) -c intake/tlib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o tlib.o
+
+	$(CC) -c intake/process.c  $(KERNEL_INCLUDE) $(CFLAGS) -o process.o
+	$(CC) -c intake/plib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o plib.o
+
 	$(CC) -c intake/create.c   $(KERNEL_INCLUDE) $(CFLAGS) -o create.o
 	$(CC) -c intake/clone.c    $(KERNEL_INCLUDE) $(CFLAGS) -o clone.o
+
+	$(CC) -c intake/ipc.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ipc.o
+
 
 	$(CC) -c intake/disp/ts.c              $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
 	$(CC) -c intake/disp/dispatch.c        $(KERNEL_INCLUDE)  $(CFLAGS) -o dispatch.o  

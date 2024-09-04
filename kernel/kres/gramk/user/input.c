@@ -191,7 +191,7 @@ static void do_launch_app_via_initprocess(int index)
         return;
     }
 
-    post_message_to_tid(
+    ipc_post_message_to_tid(
         (tid_t) src_tid,        // sender tid
         (tid_t) dst_tid,        // receiver tid
         (int) MSG_COMMAND,      // msg code
@@ -644,25 +644,25 @@ __ProcessExtendedKeyboardKeyStroke(
     switch (scancode)
     {
         case 0x1D: //pause, r-control
-            //post_message_to_ws( MSG_INSERT, 0, scancode );
+            //ipc_post_message_to_ds( MSG_INSERT, 0, scancode );
             break;
         case 0x52: //ins
-            post_message_to_ws( MSG_INSERT, 0, scancode );
+            ipc_post_message_to_ds( MSG_INSERT, 0, scancode );
             break;
         case 0x53:  //del
-            post_message_to_ws( MSG_CLEAR, 0, scancode );
+            ipc_post_message_to_ds( MSG_CLEAR, 0, scancode );
             break;
         case 0x47:  //home
-            //post_message_to_ws( MSG_INSERT, 0, scancode );
+            //ipc_post_message_to_ds( MSG_INSERT, 0, scancode );
             break;
         case 0x49:  //pgup
-            //post_message_to_ws( MSG_INSERT, 0, scancode );
+            //ipc_post_message_to_ds( MSG_INSERT, 0, scancode );
             break;
         case 0x51:  //pgdn
-            //post_message_to_ws( MSG_INSERT, 0, scancode );
+            //ipc_post_message_to_ds( MSG_INSERT, 0, scancode );
             break;
         case 0x4F:  //end
-            //post_message_to_ws( MSG_INSERT, 0, scancode );
+            //ipc_post_message_to_ds( MSG_INSERT, 0, scancode );
             break;
 
         //#bugbug
@@ -671,31 +671,31 @@ __ProcessExtendedKeyboardKeyStroke(
 
         case 0x4D:  //right
             if (ctrl_status == TRUE){
-                post_message_to_ws( MSG_CONTROL_ARROW_RIGHT, VK_RIGHT, scancode );
+                ipc_post_message_to_ds( MSG_CONTROL_ARROW_RIGHT, VK_RIGHT, scancode );
                 return 0;
             }
-            //post_message_to_ws( MSG_KEYDOWN, VK_RIGHT, scancode );
+            //ipc_post_message_to_ds( MSG_KEYDOWN, VK_RIGHT, scancode );
             break;
         case 0x48:  //up
             if (ctrl_status == TRUE){
-                post_message_to_ws( MSG_CONTROL_ARROW_UP, VK_UP, scancode );
+                ipc_post_message_to_ds( MSG_CONTROL_ARROW_UP, VK_UP, scancode );
                 return 0;
             }
-            //post_message_to_ws( MSG_KEYDOWN, VK_UP, scancode );
+            //ipc_post_message_to_ds( MSG_KEYDOWN, VK_UP, scancode );
             break;
         case 0x50:  //down
             if (ctrl_status == TRUE){
-                post_message_to_ws( MSG_CONTROL_ARROW_DOWN, VK_DOWN, scancode );
+                ipc_post_message_to_ds( MSG_CONTROL_ARROW_DOWN, VK_DOWN, scancode );
                 return 0;
             }
-            //post_message_to_ws( MSG_KEYDOWN, VK_DOWN, scancode );
+            //ipc_post_message_to_ds( MSG_KEYDOWN, VK_DOWN, scancode );
             break;
         case 0x4B:  //left
             if (ctrl_status == TRUE){
-                post_message_to_ws( MSG_CONTROL_ARROW_LEFT, VK_LEFT, scancode );
+                ipc_post_message_to_ds( MSG_CONTROL_ARROW_LEFT, VK_LEFT, scancode );
                 return 0;
             }
-            //post_message_to_ws( MSG_KEYDOWN, VK_LEFT, scancode );
+            //ipc_post_message_to_ds( MSG_KEYDOWN, VK_LEFT, scancode );
             break;
 
         case 0x5D:  //sysmenu (app)
@@ -853,43 +853,43 @@ __ProcessKeyboardInput (
             {
                 // ^c
                 if (ctrl_status == TRUE && long1 == ASCII_ETX){
-                    post_message_to_ws( MSG_COPY, long1, long2 );
+                    ipc_post_message_to_ds( MSG_COPY, long1, long2 );
                     return 0;
                 }
 
                 // ^v
                 if (ctrl_status == TRUE && long1 == ASCII_SYN){
-                    post_message_to_ws( MSG_PASTE, long1, long2 );
+                    ipc_post_message_to_ds( MSG_PASTE, long1, long2 );
                     return 0;
                 }
 
                 // ^x
                 if (ctrl_status == TRUE && long1 == ASCII_CAN){
-                    post_message_to_ws( MSG_CUT, long1, long2 );
+                    ipc_post_message_to_ds( MSG_CUT, long1, long2 );
                     return 0;
                 }
 
                 // ^z
                 if (ctrl_status == TRUE && long1 == ASCII_SUB){
-                    post_message_to_ws( MSG_UNDO, long1, long2 );
+                    ipc_post_message_to_ds( MSG_UNDO, long1, long2 );
                     return 0;
                 }
 
                 // ^a
                 if (ctrl_status == TRUE && long1 == ASCII_SOH){
-                    post_message_to_ws( MSG_SELECT_ALL, long1, long2 );
+                    ipc_post_message_to_ds( MSG_SELECT_ALL, long1, long2 );
                     return 0;
                 }
 
                 // ^f
                 if (ctrl_status == TRUE && long1 == ASCII_ACK){
-                    post_message_to_ws( MSG_FIND, long1, long2 );
+                    ipc_post_message_to_ds( MSG_FIND, long1, long2 );
                     return 0;
                 }
 
                 // ^s
                 if (ctrl_status == TRUE && long1 == ASCII_DC3){
-                    post_message_to_ws( MSG_SAVE, long1, long2 );
+                    ipc_post_message_to_ds( MSG_SAVE, long1, long2 );
                     return 0;
                 }
 
@@ -899,7 +899,7 @@ __ProcessKeyboardInput (
                 // No caso da combinação não ter sido tratada na rotina acima.
                 // Enviamos combinação de [shift + tecla] de digitaçao.
                 // Teclas de digitaçao sao processadas no tratador de keystrokes.
-                post_message_to_ws( msg, long1, long2 );
+                ipc_post_message_to_ds( msg, long1, long2 );
                 // return 0;
 
                 // Send it to the window server.
@@ -978,11 +978,11 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77101, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77101, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(0);
-                    //post_message_to_ws( (int) 88101, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88101, 0, 0 );
                 }
                 return 0;
                 break;
@@ -993,11 +993,11 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77102, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77102, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(1);
-                    //post_message_to_ws( (int) 88102, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88102, 0, 0 );
                 }
                 return 0;
                 break;
@@ -1008,11 +1008,11 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77103, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77103, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(2);
-                    //post_message_to_ws( (int) 88103, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88103, 0, 0 );
                 }
                 return 0;
                 break;
@@ -1025,12 +1025,12 @@ __ProcessKeyboardInput (
                 // alt+f4: The vm handle this combination.
                 // We can't use it on vms.
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77104, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77104, 0, 0 );
                     return 0;
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(3);
-                    //post_message_to_ws( (int) 88104, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88104, 0, 0 );
                 }
                 return 0;
                 break;
@@ -1039,15 +1039,15 @@ __ProcessKeyboardInput (
             case VK_F5:
                 if (ctrl_status == TRUE){
                     //do_launch_app_via_initprocess(4005);
-                    //post_message_to_ws( 33888, 0, 0 ); //#TEST
+                    //ipc_post_message_to_ds( 33888, 0, 0 ); //#TEST
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77105, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77105, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( (int) 88105, 0, 0 );
-                    //post_message_to_foreground_thread(
+                    //ipc_post_message_to_ds( (int) 88105, 0, 0 );
+                    //ipc_post_message_to_foreground_thread(
                     //   ??, 1234, 1234 );
                 }
                 return 0;
@@ -1061,10 +1061,10 @@ __ProcessKeyboardInput (
                     return 0; 
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77106, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77106, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( (int) 88106, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88106, 0, 0 );
                 }
                 return 0;
                 break;
@@ -1076,10 +1076,10 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77107, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77107, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( (int) 88107, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88107, 0, 0 );
                 }
                 return 0;
                 break;
@@ -1090,12 +1090,12 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77108, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77108, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( (int) 88108, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88108, 0, 0 );
                     // MSG_HOTKEY=8888 | 1 = Hotkey id 1.
-                    post_message_to_ws( (int) MSG_HOTKEY, 1, 0 );
+                    ipc_post_message_to_ds( (int) MSG_HOTKEY, 1, 0 );
                 }
                 return 0;
                 break;
@@ -1107,7 +1107,7 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77109, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77109, 0, 0 );
                 }
                 // [Shift+F9] - Reboot
                 if (shift_status == TRUE){
@@ -1123,13 +1123,13 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77110, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77110, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     displayInitializeBackground(COLOR_KERNEL_BACKGROUND,TRUE);
                     show_slots();   //See: tlib.c
                     //pages_calc_mem();
-                    //post_message_to_ws( (int) 88110, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 88110, 0, 0 );
                     refresh_screen();
                 }
                 return 0;
@@ -1142,7 +1142,7 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77111, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77111, 0, 0 );
                 }
                 // [Shift+F11] - Safe reboot
                 if (shift_status == TRUE){
@@ -1158,14 +1158,14 @@ __ProcessKeyboardInput (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( (int) 77112, 0, 0 );
+                    //ipc_post_message_to_ds( (int) 77112, 0, 0 );
                 }
 
                 // [SHIFT + F12]
                 // Update all windows and show the mouse pointer.
                 // IN: window, msg code, data1, data2.
                 if (shift_status == TRUE){
-                    post_message_to_ws( (int) 88112, 0, 0 );
+                    ipc_post_message_to_ds( (int) 88112, 0, 0 );
                 }
                 return 0;
                 break;
@@ -1255,7 +1255,7 @@ wmMouseEvent(
     if ( event_id == MSG_MOUSEPRESSED || 
          event_id == MSG_MOUSERELEASED )
     {
-        post_message_to_ws( event_id, button_number, button_number );
+        ipc_post_message_to_ds( event_id, button_number, button_number );
         return 0;
     }
 
@@ -1293,7 +1293,7 @@ wmMouseEvent(
         // na mensagem ja postada, ao invés de postar uma nova.
         // O window server ficaria apenas com a posição atual.
 
-        post_message_to_ws(
+        ipc_post_message_to_ds(
             event_id, 
             (unsigned long) long1, 
             (unsigned long) long2 );
@@ -1938,7 +1938,7 @@ done:
             // queue:: regular keys, not combinations.
             if (InputTargets.target_thread_queue == TRUE)
             {
-                post_message_to_ws(
+                ipc_post_message_to_ds(
                     Event_Message, 
                     Event_LongASCIICode,
                     Event_LongRawByte );
@@ -1992,7 +1992,7 @@ int wmTimerEvent(int signature)
 // Master timer.
 // After 1 Sec.
     if ( (jiffies % JIFFY_FREQ) == 0 ){
-        post_message_to_ws( MSG_TIMER, 1234, jiffies );
+        ipc_post_message_to_ds( MSG_TIMER, 1234, jiffies );
     }
 
     //return 0;

@@ -308,9 +308,11 @@
 #include "../kctl/ke/intake/queue.h"
 #include "../kctl/ke/intake/intake.h"
 #include "../kctl/ke/intake/disp/dispatch.h"
-#include "../kctl/ke/intake/msg.h"
+
 #include "../kctl/ke/intake/thread.h"
 #include "../kctl/ke/intake/process.h"
+#include "../kctl/ke/intake/ipc.h"
+
 #include "../kctl/ke/intake/sched/sched.h"
 #include "../kctl/ke/intake/sched/schedq.h"
 

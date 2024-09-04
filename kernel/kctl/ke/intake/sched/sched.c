@@ -74,11 +74,10 @@ static void __sched_notify_parent(struct thread_d *thread, int event_number)
     if (p_parent->magic != 1234)
         return;
 
-
 // Get target thread.
     struct thread_d *target_thread;
     target_thread = (struct thread_d *) p_parent->control;
-    if ( (void*) target_thread == NULL )
+    if ((void*) target_thread == NULL)
         return;
     if (target_thread->magic != 1234)
         return;
@@ -88,7 +87,7 @@ static void __sched_notify_parent(struct thread_d *thread, int event_number)
 // the parent process.
     tid_t Sender   = thread->tid; 
     tid_t Receiver = target_thread->tid;
-    post_message_to_tid (
+    ipc_post_message_to_tid (
         Sender,
         Receiver,
         MSG_NOTIFY_PARENT,

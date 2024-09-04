@@ -222,6 +222,14 @@ void die(void);
 #define DIE    die 
 
 // ------------------------
+
+
+int 
+cali_post( 
+    tid_t sender_tid,
+    tid_t receiver_tid,
+    struct msg_d *message );
+
 void cali_reboot(void);
 void cali_shutdown(int how);
 void cali_die(void);

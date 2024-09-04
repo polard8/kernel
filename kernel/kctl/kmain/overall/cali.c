@@ -5,6 +5,37 @@
 
 #include <kernel.h>
 
+
+// IPC stuff
+int 
+cali_post( 
+    tid_t sender_tid,
+    tid_t receiver_tid,
+    struct msg_d *message )
+{
+// #todo: Not tested yet.
+// #todo: Explain this routine.
+
+    if (sender_tid<0){
+        return -1;
+    }
+    if (receiver_tid<0){
+        return -1;
+    }
+    if ((void*) message == NULL){
+        return -1;
+    }
+    message->sender_tid   = (tid_t) sender_tid;
+    message->receiver_tid = (tid_t) receiver_tid;
+// Post
+    return (int) ipc_post_message_to_tid( 
+                     (tid_t) sender_tid,
+                     (tid_t) receiver_tid,
+                     (int) message->msg,
+                     (unsigned long) message->long1,
+                     (unsigned long) message->long2 );
+}
+
 void cali_reboot(void)
 {
     keReboot();
