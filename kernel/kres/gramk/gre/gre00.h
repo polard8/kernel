@@ -1,5 +1,6 @@
+// gre00.h
+// Created by Fred Nora.
 
-// ws2.h
 // Window system support.
 // ring0, kernel base.
 // #todo
@@ -9,11 +10,9 @@
 // pois vamos dar suporte ao conceito de 'surfaces',
 // que serao areas de memoria compartilhadas entre o painter-client side 
 // e o compositor, server-side. 
-// Created by Fred Nora.
 
-#ifndef __DISPLAY_WS2_H
-#define __DISPLAY_WS2_H    1
-
+#ifndef __GRE_GRE00_H
+#define __GRE_GRE00_H    1
 
 // 
 // Window type
@@ -51,54 +50,6 @@
 #define WINDOW_STATUS_ACTIVE       1
 #define WINDOW_STATUS_INACTIVE     0
 //...
-
-/*
- * rect_d:
- *     Estrutura para gerenciamento de retângulos.
- *     Um retângulo pertence à uma janela.
- */
-// #todo
-// Usar isso para lidar com dirty rectangles.
-
-struct rect_d 
-{
-    object_type_t  objectType;
-    object_class_t objectClass;
-    int used;
-    int magic;
-
-// Invalidate
-// Sujo de tinta.
-// If the rectangle is dirty, so it needs to be flushed into 
-// the framebuffer.
-// When we draw a window it needs to be invalidated.
-    int dirty;
-
-    int flag;
-// Estilo de design
-    int style;
-
-//dimensoes
-    unsigned long x;
-    unsigned long y;
-    unsigned long cx;
-    unsigned long cy;
-
-//margins
-    unsigned long left;
-    unsigned long top;
-    unsigned long width;
-    unsigned long height;
-
-    unsigned long right;
-    unsigned long bottom;
-
-    // 32 bit
-    unsigned int bg_color; 
-
-    struct rect_d *next;
-};
-
 
 /* rgba */
 struct tagRGBA
@@ -197,119 +148,6 @@ extern struct gui_d  *gui;
 //
 // == prototypes ================
 //
-
-//
-// pixel
-//
-
-
-int 
-backbuffer_putpixel ( 
-    unsigned int  _color,
-    unsigned long _x, 
-    unsigned long _y, 
-    unsigned long _rop_flags );
-
-int 
-frontbuffer_putpixel ( 
-    unsigned int  _color,
-    unsigned long _x, 
-    unsigned long _y, 
-    unsigned long _rop_flags );
-
-//
-// char
-//
-
-void set_char_width ( int width );
-void set_char_height (int height);
-int get_char_width (void);
-int get_char_height (void);
-
-void 
-d_draw_char ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long c,
-    unsigned int fgcolor,
-    unsigned int bgcolor );
-
-void 
-d_drawchar_transparent ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned int color, 
-    unsigned long c );
-
-//
-// string
-//    
-
-void 
-draw_string ( 
-    unsigned long x,
-    unsigned long y,
-    unsigned int color,
-    char *string ); 
-
-//
-// line
-//
-
-int 
-backbuffer_draw_horizontal_line ( 
-    unsigned long x1,
-    unsigned long y, 
-    unsigned long x2, 
-    unsigned int color,
-    unsigned long rop_flags );
-
-int 
-frontbuffer_draw_horizontal_line ( 
-    unsigned long x1,
-    unsigned long y, 
-    unsigned long x2, 
-    unsigned int color,
-    unsigned long rop_flags );
-
-// Draw rectangle into the backbuffer.
-int 
-backbuffer_draw_rectangle( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height, 
-    unsigned int color,
-    unsigned long rop_flags );
-
-int 
-frontbuffer_draw_rectangle( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height, 
-    unsigned int color,
-    unsigned long rop_flags );
-
-void 
-refresh_rectangle ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height );
-
-void scroll_screen_rect (void);
-
-
-// see: bitblt.c
-int 
-bitblt(
-    struct rect_d *src_rect,
-    struct rect_d *dst_rect,
-    unsigned long rop );
-
-
-// ==========
 
 #endif    
 

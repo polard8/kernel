@@ -1,9 +1,8 @@
-
-
 // callback.h
+// Created by Fred Nora.
 
-#ifndef __CALLBACK_H
-#define __CALLBACK_H    1
+#ifndef __USER_CALLBACK_H
+#define __USER_CALLBACK_H    1
 
 extern unsigned long asmflagDoCallbackAfterCR3;
 
@@ -28,7 +27,9 @@ struct ws_callback_info_d
 
 extern struct ws_callback_info_d  ws_callback_info;
 
-// -------------
+//
+// ==========================================
+//
 
 void initialize_ws_callback_info(void);
 

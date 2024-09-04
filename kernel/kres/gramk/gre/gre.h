@@ -1,6 +1,7 @@
-
 // gre.h
 // Graphics Engine
+// Environment: ring 0.
+// Created by Fred Nora.
 
 #ifndef __GRAMK_GRE_H
 #define __GRAMK_GRE_H    1
@@ -66,6 +67,12 @@ int kgwsRegisterWindowServer(pid_t pid);
 
 int windowLoadGramadoIcons(void);
 void *ui_get_system_icon(int n);
+
+
+//
+// $
+// INITIALIZATION
+//
 
 int gre_initialize(void);
 

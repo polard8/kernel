@@ -62,24 +62,16 @@ int kgws_status;
 pid_t kgws_ws_PID;
 int kgws_ws_status;
 
-
 //see: ws.h
 struct ws_info_d  WindowServerInfo;
+
+
+//=================================
 
 static int __gre_initialize_globals(void);
 
 //=================================
 
-
-// called by ke.c
-// #todo
-// Maybe we can use some parametes here.
-int gre_initialize(void)
-{
-    __gre_initialize_globals();
-    // ...
-    return 0;
-}
 
 void kgws_enable(void)
 {
@@ -590,27 +582,6 @@ void demo0(void)
     //refresh_screen();
 }
 
-static int __gre_initialize_globals(void)
-{
-// Called by gre_initialize().
-
-// Device
-    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
-    unsigned long deviceHeight = (unsigned long) screenGetHeight();
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
-        debug_print("__gre_initialize_globals: w h\n");
-        // #bugbug
-        // We don't know if 'panic' is working at this moment.
-        panic      ("__gre_initialize_globals: w h\n");
-    }
-
-// Hotspot for 3D stuff.
-    HotSpotX = (deviceWidth>>1);
-    HotSpotY = (deviceHeight>>1);
-    return 0;
-}
-
 // ?? Not used yet ??
 // Registrar um window server.
 // See: register_ws_process
@@ -652,6 +623,43 @@ int register_ws_process(pid_t pid)
         return (int) -1;
     }
     __gpidWindowServer = (pid_t) pid;
+    return 0;
+}
+
+
+static int __gre_initialize_globals(void)
+{
+// Called by gre_initialize().
+
+// Device
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print("__gre_initialize_globals: w h\n");
+        // #bugbug
+        // We don't know if 'panic' is working at this moment.
+        panic      ("__gre_initialize_globals: w h\n");
+    }
+
+// Hotspot for 3D stuff.
+    HotSpotX = (deviceWidth>>1);
+    HotSpotY = (deviceHeight>>1);
+    return 0;
+}
+
+//
+// $
+// INITIALIZATION
+//
+
+// called by ke.c
+// #todo
+// Maybe we can use some parametes here.
+int gre_initialize(void)
+{
+    __gre_initialize_globals();
+    // ...
     return 0;
 }
 

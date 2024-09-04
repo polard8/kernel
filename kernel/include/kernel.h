@@ -195,11 +195,19 @@
 // ==================================
 // gramk/
 
-#include "../kres/gramk/ws2.h"
+#include "../kres/gramk/gre/pixel.h"
+#include "../kres/gramk/gre/char.h"
+#include "../kres/gramk/gre/text.h"
+#include "../kres/gramk/gre/line.h"
+#include "../kres/gramk/gre/rect.h"
+#include "../kres/gramk/gre/bitblt.h"
+#include "../kres/gramk/gre/gre00.h"
+#include "../kres/gramk/gre/gre01.h"
 #include "../kres/gramk/gre/gre.h"
-#include "../kres/gramk/ws.h"
+
+#include "../kres/gramk/user/dispsrv.h"
 #include "../kres/gramk/user/input.h"
-#include "../kres/gramk/callback.h"
+#include "../kres/gramk/user/callback.h"
 
 // ==================================
 // dev/

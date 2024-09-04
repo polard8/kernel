@@ -621,11 +621,13 @@ void console_scroll(int console_number)
     unsigned long OldBottom=0;
 
     if (VideoBlock.useGui != TRUE){
-        debug_print("console_scroll: no GUI\n");
-        panic      ("console_scroll: no GUI\n");
+        panic ("console_scroll: no GUI\n");
     }
 
-    if ( console_number < 0 || console_number >= CONSOLETTYS_COUNT_MAX ){
+// Parameter:
+    if ( console_number < 0 || 
+         console_number >= CONSOLETTYS_COUNT_MAX )
+    {
         panic ("console_scroll: console_number\n");
     }
 
@@ -701,7 +703,6 @@ void console_scroll(int console_number)
 
     refresh_screen();
 }
-
 
 // worker
 // __ConsoleDraw_Outbyte:

@@ -10,7 +10,7 @@ draw_string (
     unsigned long x,
     unsigned long y,
     unsigned int color,
-    char *string )
+    const char *string )
 {
     register int Index=0;
 
