@@ -10,7 +10,7 @@
 
 // ===============================================================
 
-struct ws_info_d
+struct ds_info_d
 {
     int initialized;
 
@@ -22,7 +22,7 @@ struct ws_info_d
     tid_t tid;
 };
 // see: graphics.c
-extern struct ws_info_d  WindowServerInfo;
+extern struct ds_info_d  DisplayServerInfo;
 
 // ===============================================================
 

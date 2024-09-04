@@ -26,6 +26,9 @@ char WindowServer_name[64];
 // the virtual console used by this window server.
 int WindowServer_virtual_console=0;
 
+//see: dispsrv.h
+struct ds_info_d DisplayServerInfo;
+
 
 // ===============================================
 

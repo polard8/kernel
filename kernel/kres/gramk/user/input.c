@@ -187,7 +187,7 @@ static void do_launch_app_via_initprocess(int index)
 // but the message is about launching a client-side 
 // gui application. So, we need a window server up and running.
 
-    if (WindowServerInfo.initialized != TRUE){
+    if (DisplayServerInfo.initialized != TRUE){
         return;
     }
 

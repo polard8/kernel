@@ -1869,20 +1869,20 @@ void *sci1 (
     }
 
 // The display server was not initialized yet.
-    if (WindowServerInfo.initialized != TRUE){
+    if (DisplayServerInfo.initialized != TRUE){
         return 4321;
     }
 
 // #test
 // Only the display server can access this service.
-    if (current_thread != WindowServerInfo.tid)
+    if (current_thread != DisplayServerInfo.tid)
     {
         // OUT: Access denied.
         return 4321;
     }
 // #test
 // Only the display server can access this service.
-    if (p->pid != WindowServerInfo.pid)
+    if (p->pid != DisplayServerInfo.pid)
     {
         // OUT: Access denied.
         return 4321;
@@ -2694,20 +2694,20 @@ void *sci3 (
     }
 
 // The display server was not initialized yet.
-    if (WindowServerInfo.initialized != TRUE){
+    if (DisplayServerInfo.initialized != TRUE){
         return 4321;
     }
 
 // #test
 // Only the display server can access this service.
-    if (current_thread != WindowServerInfo.tid)
+    if (current_thread != DisplayServerInfo.tid)
     {
         // OUT: Access denied.
         return 4321;
     }
 // #test
 // Only the display server can access this service.
-    if (p->pid != WindowServerInfo.pid)
+    if (p->pid != DisplayServerInfo.pid)
     {
         // OUT: Access denied.
         return 4321;

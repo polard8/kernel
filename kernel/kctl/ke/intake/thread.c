@@ -568,13 +568,16 @@ void *GetForegroundThread(void)
     return (void*) GetThreadByTID(foreground_thread);
 }
 
+// Display server
+// #todo: Rename function.
 void *GetWSThread(void)
 {
     tid_t ws_tid = -1;
-    if (WindowServerInfo.initialized != TRUE){
+
+    if (DisplayServerInfo.initialized != TRUE){
         return NULL;
     }
-    ws_tid = (tid_t) WindowServerInfo.tid;
+    ws_tid = (tid_t) DisplayServerInfo.tid;
     return (void*) GetThreadByTID(ws_tid);
 }
 

@@ -385,10 +385,11 @@ ipc_post_message_to_ds (
     tid_t SenderTID = 0;   // sender tid #todo
     tid_t ReceiverTID = -1;  // receiver tid
 
-    if (WindowServerInfo.initialized != TRUE){
+// see: dispsrv.h in user/.
+    if (DisplayServerInfo.initialized != TRUE){
         goto fail;
     }
-    ReceiverTID = (tid_t) WindowServerInfo.tid;
+    ReceiverTID = (tid_t) DisplayServerInfo.tid;
     if ( ReceiverTID < 0 || 
          ReceiverTID >= THREAD_COUNT_MAX )
     {

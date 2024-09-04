@@ -360,10 +360,10 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // or the init process.
                 
                 // Unregister the window server.
-                if (WindowServerInfo.initialized == TRUE)
+                if (DisplayServerInfo.initialized == TRUE)
                 {
-                    if (TmpThread->tid == WindowServerInfo.tid){
-                        WindowServerInfo.initialized = FALSE;
+                    if (TmpThread->tid == DisplayServerInfo.tid){
+                        DisplayServerInfo.initialized = FALSE;
                     }
                 }
                 
@@ -438,8 +438,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                     TmpThread->quantum = QUANTUM_NORMAL_TIME_CRITICAL;
                 }
                 // Display server: (High)(Most responsive)
-                if (WindowServerInfo.initialized == TRUE){
-                    if (TmpThread->tid == WindowServerInfo.tid){
+                if (DisplayServerInfo.initialized == TRUE){
+                    if (TmpThread->tid == DisplayServerInfo.tid){
                         TmpThread->quantum = QUANTUM_SYSTEM_TIME_CRITICAL;
                     }
                 }

@@ -47,7 +47,7 @@ static void __maximize_ws_priority(pid_t pid);
 // ====================================================
 
 
-// Setup WindowServerInfo global structure.
+// Setup DisplayServerInfo global structure.
 static void __initialize_ws_info(pid_t pid)
 {
     struct process_d *p;
@@ -57,10 +57,10 @@ static void __initialize_ws_info(pid_t pid)
     //debug_print ("__initialize_ws_info:\n");
 
 // Maybe we can just emit an error message and return.
-    if (WindowServerInfo.initialized == TRUE){
+    if (DisplayServerInfo.initialized == TRUE){
         panic("__initialize_ws_info: Another display server is on\n");
     }
-    WindowServerInfo.initialized = FALSE;
+    DisplayServerInfo.initialized = FALSE;
 
 // -----------------
 // PID
@@ -79,7 +79,7 @@ static void __initialize_ws_info(pid_t pid)
     if (p->magic != 1234){
         return;
     }
-    WindowServerInfo.pid = (pid_t) pid;
+    DisplayServerInfo.pid = (pid_t) pid;
 
 // -----------------
 // TID
@@ -91,12 +91,12 @@ static void __initialize_ws_info(pid_t pid)
     if (t->magic != 1234){
         return;
     }
-    WindowServerInfo.tid = (tid_t) t->tid;
+    DisplayServerInfo.tid = (tid_t) t->tid;
 
 // ----------------
 // Process Personality
     p->personality = (int) PERSONALITY_GRAMADO;
-    WindowServerInfo.pid_personality = (int) PERSONALITY_GRAMADO;
+    DisplayServerInfo.pid_personality = (int) PERSONALITY_GRAMADO;
 
 // ----------------
 // The environment.
@@ -111,7 +111,7 @@ static void __initialize_ws_info(pid_t pid)
     p->egid = (gid_t) GID_DISPLAY_SERVER;  // effective
     p->sgid = (gid_t) GID_DISPLAY_SERVER;  // saved
 
-    WindowServerInfo.initialized = TRUE;
+    DisplayServerInfo.initialized = TRUE;
 }
 
 
