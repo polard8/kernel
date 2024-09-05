@@ -32,6 +32,8 @@ struct tty_d  *console2_tty;
 struct tty_d  *console3_tty;
 
 
+const char *device_name_nonameconsole = "CON-NONAME";
+
 // 
 // Imports
 //
@@ -175,9 +177,12 @@ __local_gotoxy (
     int new_y, 
     int console_number )
 {
-    if (console_number<0 || console_number > 3){
+
+// Parameter
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
 // Maior que o largura da linha.
     if (new_x > CONSOLE_TTYS[console_number].cursor_right)
@@ -210,9 +215,12 @@ void __local_save_cur(int console_number)
 
 void __local_restore_cur(int console_number)
 {
-    if (console_number<0 || console_number >3){
+
+// Parameter:
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
     CONSOLE_TTYS[console_number].cursor_x = 
         (unsigned long) (saved_x & 0xFFFF);
@@ -226,9 +234,11 @@ void __local_insert_line(int console_number)
     int oldtop = 0;
     int oldbottom = 0;
 
-    if (console_number<0 || console_number >3){
+// Parameter:
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
     oldtop    = CONSOLE_TTYS[console_number].cursor_top;
     oldbottom = CONSOLE_TTYS[console_number].cursor_bottom;
@@ -256,10 +266,11 @@ void __local_delete_line(int console_number)
     int oldtop = 0;
     int oldbottom = 0;
 
-// #todo: max limit
-    if (console_number<0){
+// Parameter:
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
     n = console_number;
 
@@ -359,6 +370,12 @@ void csi_m(void)
 
 void csi_M (int nr, int console_number)
 {
+
+    if (console_number < 0)
+        return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
+
 /*
     if ( nr > CONSOLE_TTYS[console_number].cursor_height )
         nr = CONSOLE_TTYS[console_number].cursor_height;
@@ -372,6 +389,12 @@ void csi_M (int nr, int console_number)
 
 void csi_L (int nr, int console_number)
 {
+
+    if (console_number < 0)
+        return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
+
 /*
 	if (nr > CONSOLE[console_number].cursor_height)
 		nr = CONSOLE[console_number].cursor_height;
@@ -465,10 +488,12 @@ void console_set_current_virtual_console(int console_number)
     if (console_number == fg_console){
         return;
     }
-    if ( console_number < 0 || console_number >= 4 ){
-        debug_print ("console_set_current_virtual_console: Limits\n");
+
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
+
     fg_console = (int) console_number;
 }
 
@@ -592,19 +617,25 @@ unsigned long get_cursor_y(void)
 
 unsigned long get_bg_color(void)
 {
-// In the case of called before console initialization.
-    if (fg_console<0 || fg_console>=CONSOLETTYS_COUNT_MAX){
-        return 0;
-    }
+    unsigned long DefaultLongWhiteColor = (COLOR_WHITE & 0xFFFFFFFF);
+
+    if (fg_console < 0)
+        return DefaultLongWhiteColor;
+    if (fg_console >= CONSOLETTYS_COUNT_MAX)
+        return DefaultLongWhiteColor;
+
     return (unsigned long) CONSOLE_TTYS[fg_console].bg_color;
 }
 
 unsigned long get_fg_color(void)
 {
-// In the case of called before console initialization.
-    if (fg_console<0 || fg_console>=CONSOLETTYS_COUNT_MAX){
-        return 0;
-    }
+    unsigned long DefaultLongBlackColor = (COLOR_BLACK & 0xFFFFFFFF);
+
+    if (fg_console < 0)
+        return DefaultLongBlackColor;
+    if (fg_console >= CONSOLETTYS_COUNT_MAX)
+        return DefaultLongBlackColor;
+
     return (unsigned long) CONSOLE_TTYS[fg_console].fg_color;
 }
 
@@ -625,11 +656,10 @@ void console_scroll(int console_number)
     }
 
 // Parameter:
-    if ( console_number < 0 || 
-         console_number >= CONSOLETTYS_COUNT_MAX )
-    {
-        panic ("console_scroll: console_number\n");
-    }
+    if (console_number < 0)
+        return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
 // Scroll the screen rectangle.
 // See: rect.c
@@ -639,6 +669,30 @@ void console_scroll(int console_number)
 // Valid only for full screen
 
     scroll_screen_rect();
+
+
+// -------------------------------------
+
+// #test
+// Draw the rectangle of the last line.
+
+    unsigned long r_bg_color = CONSOLE_TTYS[console_number].bg_color;
+    unsigned long CharHeight = 8;
+
+    unsigned long rLeft   = 0;
+    unsigned long rTop    = (gSavedY - CharHeight);
+    unsigned long rWidth  = gSavedX;
+    unsigned long rHeight = CharHeight;
+
+    backbuffer_draw_rectangle(
+        rLeft,       // x in pixels
+        rTop,        // y in pixels
+        rWidth,      // width in pixels
+        rHeight,     // height in pixels
+        r_bg_color,  // bg color
+        0 );         // rop
+
+// -------------------------------------
 
 // Clear the last line.
   
@@ -741,11 +795,11 @@ static void __ConsoleDraw_Outbyte (int c, int console_number)
     unsigned int fg_color = COLOR_WHITE;
 
 // Parameter:
-    if ( n < 0 || 
-         n >= CONSOLETTYS_COUNT_MAX )
-    {
-        x_panic ("__ConsoleDraw_Outbyte: n");
-    }
+    if (n < 0)
+        return;
+    if (n >= CONSOLETTYS_COUNT_MAX)
+        return;
+
     if ( cWidth == 0 || cHeight == 0 )
     {
         x_panic ("__ConsoleDraw_Outbyte: fail w h");
@@ -832,11 +886,11 @@ void console_outbyte (int c, int console_number)
     // #debug
     // debug_print ("console_outbyte:\n");
 
-    if ( n < 0 || 
-         n >= CONSOLETTYS_COUNT_MAX )
-    {
-        x_panic ("console_outbyte: n");
-    }
+    if (n < 0)
+        return;
+    if (n >= CONSOLETTYS_COUNT_MAX)
+        return;
+
     if ( __cWidth == 0 || 
          __cHeight == 0 )
     {
@@ -1076,11 +1130,11 @@ void console_outbyte2 (int c, int console_number)
     // #debug
     // debug_print ("console_outbyte2:\n");
 
-    if ( n < 0 || 
-         n >= CONSOLETTYS_COUNT_MAX )
-    {
-        x_panic ("console_outbyte2: n");
-    }
+    if (n < 0)
+        return;
+    if (n >= CONSOLETTYS_COUNT_MAX)
+        return;
+
     if ( __cWidth == 0 || 
          __cHeight == 0 )
     {
@@ -1365,6 +1419,12 @@ void console_putchar(int c, int console_number)
     unsigned long cWidth  = get_char_width();
     unsigned long cHeight = get_char_height();
 
+// Parameter
+    if (console_number < 0)
+        return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
+
     cWidth  = (unsigned long) (cWidth  & 0xFFFF);
     cHeight = (unsigned long) (cHeight & 0xFFFF);
     if (cWidth == 0 || cHeight == 0){
@@ -1373,18 +1433,6 @@ void console_putchar(int c, int console_number)
 
 // flag on.
     stdio_terminalmode_flag = TRUE;
-
-// #todo
-// Check these limits.
-// Console limits
-// CONSOLETTYS_COUNT_MAX
-// See: tty.h
-
-    if ( console_number < 0 || 
-         console_number >= CONSOLETTYS_COUNT_MAX )
-    {
-        panic ("console_putchar: console_number\n");
-    }
 
 // Draw the char into the backbuffer and
 // Copy a small rectangle to the framebuffer.
@@ -1405,17 +1453,22 @@ void console_putchar(int c, int console_number)
     stdio_terminalmode_flag = FALSE; 
 }
 
-
+// Print identation.
 // Print consecutive spaces.
 void console_print_indent(int indent, int console_number)
 {
     register int i=0;
     const int Ch = ' ';
 
-    if (indent<0)
+// What is the max limit?
+    if (indent < 0)
         indent=0;
-    if (console_number<0)
+
+    if (console_number < 0)
         return;
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
+
     for (i=0; i<indent; i++){
         console_putchar(Ch,console_number);
     };
@@ -2351,10 +2404,13 @@ void __local_insert_char(int console_number)
 
 void __local_delete_char(int console_number)
 {
-// #todo: max limit
-    if (console_number<0){
+
+// Parameters:
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
+
 
     console_putchar ( ' ', console_number);
 
@@ -2376,13 +2432,15 @@ void __local_delete_char(int console_number)
 
 }
 
-
+// #todo: Explain the parameters.
 void csi_P (int nr, int console_number)
 {
-// #todo: max limit
-    if (console_number<0){
+
+// Parameters:
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
     if (nr > CONSOLE_TTYS[console_number].cursor_right -1 ){
         nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
@@ -2401,12 +2459,15 @@ void csi_P (int nr, int console_number)
     };
 }
 
+// #todo: Explain the parameters.
 void csi_at (int nr, int console_number)
 {
-// #todo: max limit
-    if ( console_number<0){
+
+// Parameters:
+    if (console_number < 0)
         return;
-    }
+    if (console_number >= CONSOLETTYS_COUNT_MAX)
+        return;
 
     if (nr > CONSOLE_TTYS[console_number].cursor_right -1 ){
         nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
@@ -2488,6 +2549,11 @@ console_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
+// + First, the application opens the console and
+//   get a file descriptor. it needs to be in the range of 0~31.
+// + This API only affects the four kernel consoles.
+// + For now fd=1 (stdout) is allowed to manage the fg_console.
+//
 
 // Get the linked pair.
     //struct tty_d *tty;
@@ -2511,6 +2577,7 @@ console_ioctl (
     {
         //#debug
         panic ("console_ioctl: fd != 1\n");
+        //return (int) -1;
     }
 
     //#debug
@@ -2520,8 +2587,11 @@ console_ioctl (
 // Setup the foreground console.
 // We operate only on the fg_console!
 
-    if (fg_console<0 || fg_console > 3){
+    if ( fg_console < 0 || 
+         fg_console >= CONSOLETTYS_COUNT_MAX ) 
+    {
         panic ("console_ioctl: fg_console\n");
+        //return (int) -1;
     }
 
     switch (request){
@@ -2795,79 +2865,6 @@ fail:
     return (int) -1;
 }
 
-/*
- * console_refresh_screen:
- *     #IMPORTANTE
- *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
- */
-// #todo
-// Change this name. 
-// Do not use stream in the base kernel.
-
-void console_refresh_screen(file *f)
-{
-
-    // #bugbug
-    // This routine is wrong!
-    // This is not a place to draw directly
-    // into the screen device.
-
-    panic("console_refresh_screen: #fixme\n");
-
-/*
-    register int i=0;
-    int j=0;
-    char *ptr;
-
-    debug_print("console_refresh_screen: [FIXME] It is wrong!\n");
-
-// char width and height.
-    int cWidth  = get_char_width();
-    int cHeight = get_char_height();
-    
-    if ( cWidth == 0 || cHeight == 0 ){
-        panic ("console_refresh_screen: [FAIL] char w h\n");
-    }
-
-    j = (80*25);
-
-
-    if ((void *) f == NULL){ 
-        panic("console_refresh_screen: f\n");
-    }
-    if (f->magic != 1234){
-        panic("console_refresh_screen: f falidation\n");
-    }
-
-// Pointer
-    ptr = f->_base;
-
-// #bugbug
-// Tem que checar a validade da estrutura e do ponteiro base.
-    //if ( (void *) c == NULL ){ ? }
-
-// Seleciona o modo terminal.
-
-//++
-    stdio_terminalmode_flag = TRUE; 
-    for ( i=0; i<j; i++ )
-    {
-        printk ("%c", *ptr );
-        // #bugbug
-        // It is very wrong!
-        refresh_rectangle ( 
-            (CONSOLE_TTYS[fg_console].cursor_x * cWidth), 
-            (CONSOLE_TTYS[fg_console].cursor_y * cHeight),  
-            cWidth, 
-            cHeight );
-        ptr++;
-    };
-    stdio_terminalmode_flag = FALSE; 
-//--
-*/
-
-}
-
 // Implementation
 int 
 console_clear_imp (
@@ -2910,123 +2907,31 @@ fail:
     return (int) -1;
 }
 
+// It affects only the fg_console.
 int console_clear(void)
 {
+    int ConsoleID = fg_console;
     unsigned int bg_color = COLOR_BLUE; 
     unsigned int fg_color = COLOR_WHITE;
 
-    if (fg_console < 0)
+    if (ConsoleID < 0)
         goto fail;
-    if (fg_console >= CONSOLETTYS_COUNT_MAX){
+    if (ConsoleID >= CONSOLETTYS_COUNT_MAX){
         goto fail;
     }
-    bg_color = (unsigned int) CONSOLE_TTYS[fg_console].bg_color; 
-    fg_color = (unsigned int) CONSOLE_TTYS[fg_console].fg_color;
+    bg_color = (unsigned int) CONSOLE_TTYS[ConsoleID].bg_color; 
+    fg_color = (unsigned int) CONSOLE_TTYS[ConsoleID].fg_color;
 // IN: bg color, fg color, console number.
-    console_clear_imp( bg_color, fg_color, fg_console );
+    console_clear_imp( bg_color, fg_color, ConsoleID );
     return 0;
 fail:
     return (int) -1;
 }
 
-
-// VirtualConsole_early_initialization:
-// Early initialization of the consoles.
-// It's gonna be reinitializad by __initialize_virtual_consoles()
-// in kstdio.c
-// Intialize the support for virtual consoles.
-// #todo: Explain it better.
-// We have 4 preallocated tty structures for virtual consoles.
-int VirtualConsole_early_initialization(void)
-{
-// Called by zero_initialize_virtual_consoles() in zero.c
-
-    register int i=0;
-
-// Virtual Console:
-// The kernel only have four virtual consoles.
-// If this initialization fail, it will happen again
-
-    // #debug
-    PROGRESS("VirtualConsole_early_initialization: (First time)\n");;
-
-// Console em primeiro plano.
-    fg_console = CONSOLE0;
-// Redirecionador.
-    redirect = NULL;
-
-// No embedded shell for now.
-// No input in prompt[].
-    ShellFlag = FALSE;
-
-    __EscapeSequenceStage=0;
-
-// Limpa o array de parâmetros usado durante o 
-// tratamento de escape sequencies.
-    for (i=0; i<NPAR; i++){
-        par[i]=0;
-    };
-
-    unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
-    unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
-
-// -----------------------------
-// c0 console: --> INIT.BIN
-// Default kernel console.
-    bg_colors[0] = (unsigned int) COLOR_BLUE;
-    fg_colors[0] = (unsigned int) COLOR_WHITE;
-// -----------------------------
-// c1 console: --> GRAMLAND.BIN
-    bg_colors[1] = (unsigned int) COLOR_BLUE;
-    fg_colors[1] = (unsigned int) COLOR_YELLOW;
-// -----------------------------
-// c2 console: --> NICCTLD.BIN
-// Warning console.
-    bg_colors[2] = (unsigned int) COLOR_ORANGE;
-    fg_colors[2] = (unsigned int) COLOR_WHITE;
-// -----------------------------
-// c3 console: --> NETCTLD.BIN
-// Danger console.
-    bg_colors[3] = (unsigned int) COLOR_RED;
-    fg_colors[3] = (unsigned int) COLOR_YELLOW;
-
-
-    for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
-    {
-        // IN: console index, bg color, fg color
-        DDINIT_console(
-            i,
-            bg_colors[i],
-            fg_colors[i] );
-
-        //#todo
-        // We need to register all the tty device.
-        //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
-        // Register tty device.
-        //devmgr_register_device ( 
-        //    (file *) __file, 
-        //    newname,            // pathname 
-        //    0,                  // class (char, block, network)
-        //    1,                  // type (pci, legacy
-        //    NULL,  // Not a pci device.
-        //    tmp_tty );  // tty device
-    };
-
-// Setup foreground console.
-    jobcontrol_switch_console(0);
-
-// Cursor for the current console.
-// See: system.c
-    set_up_cursor(0,0);
-
-// #hackhack
-// Esse trabalho não nos pertence, pertence ao stdio,
-// mas funciona.
-    stdio_terminalmode_flag = TRUE;
-    stdio_verbosemode_flag = TRUE;
-
-    return 0;
-}
+//
+// $
+// INITIALIZATION
+//
 
 // DDINIT_console:
 // Initializar um virtual console.
@@ -3204,6 +3109,9 @@ DDINIT_console(
     CONSOLE_TTYS[ConsoleIndex].cursor_top  = 0;
     CONSOLE_TTYS[ConsoleIndex].cursor_right = screen_width_in_chars;
     CONSOLE_TTYS[ConsoleIndex].cursor_bottom = screen_height_in_chars;
+    //#todo
+    // width in pixels
+    // height in pixels.
 
 // Everyone has the same color.
 // White on black.
@@ -3309,6 +3217,115 @@ DDINIT_console(
     };
 
     CONSOLE_TTYS[ConsoleIndex].initialized = TRUE; 
+}
+
+//
+// $
+// EARLY INITIALIZATION
+//
+
+// VirtualConsole_early_initialization:
+// Early initialization of the consoles.
+// It's gonna be reinitializad by __initialize_virtual_consoles()
+// in kstdio.c
+// Intialize the support for virtual consoles.
+// #todo: Explain it better.
+// We have 4 preallocated tty structures for virtual consoles.
+int VirtualConsole_early_initialization(void)
+{
+// Called by zero_initialize_virtual_consoles() in zero.c
+
+    register int i=0;
+
+// Virtual Console:
+// The kernel only have four virtual consoles.
+// If this initialization fail, it will happen again
+
+    // #debug
+    PROGRESS("VirtualConsole_early_initialization: (First time)\n");;
+
+// Console em primeiro plano.
+    fg_console = CONSOLE0;
+// Redirecionador.
+    redirect = NULL;
+
+// No embedded shell for now.
+// No input in prompt[].
+    ShellFlag = FALSE;
+
+    __EscapeSequenceStage=0;
+
+// Limpa o array de parâmetros usado durante o 
+// tratamento de escape sequencies.
+    for (i=0; i<NPAR; i++){
+        par[i]=0;
+    };
+
+    unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
+    unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
+
+// -----------------------------
+// c0 console: --> INIT.BIN
+// Default kernel console.
+    bg_colors[0] = (unsigned int) COLOR_BLUE;
+    fg_colors[0] = (unsigned int) COLOR_WHITE;
+// -----------------------------
+// c1 console: --> GRAMLAND.BIN
+    bg_colors[1] = (unsigned int) COLOR_BLUE;
+    fg_colors[1] = (unsigned int) COLOR_YELLOW;
+// -----------------------------
+// c2 console: --> NICCTLD.BIN
+// Warning console.
+    bg_colors[2] = (unsigned int) COLOR_ORANGE;
+    fg_colors[2] = (unsigned int) COLOR_WHITE;
+// -----------------------------
+// c3 console: --> NETCTLD.BIN
+// Danger console.
+    bg_colors[3] = (unsigned int) COLOR_RED;
+    fg_colors[3] = (unsigned int) COLOR_YELLOW;
+
+
+    for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
+    {
+        // IN: console index, bg color, fg color
+        DDINIT_console(
+            i,
+            bg_colors[i],
+            fg_colors[i] );
+
+        // #todo
+        // We need to register all the tty devices.
+
+        // #bugbug
+        // At some time in the initialization we're already
+        // linking the console with the 'stdout' file.
+
+        //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
+        
+        // Register tty device.
+        //devmgr_register_device ( 
+        //    (file *) __file,            // #todo: Create file.
+        //    device_name_nonameconsole,  // pathname 
+        //    DEVICE_CLASS_CHAR,          // class (char, block, network)
+        //    DEVICE_TYPE_LEGACY,         // type (pci, legacy
+        //    NULL,    // Not a pci device.
+        //    NULL );  // tty device
+    };
+
+// Setup foreground console.
+    jobcontrol_switch_console(0);
+
+// Cursor for the current console.
+// See: system.c
+    set_up_cursor(0,0);
+
+// #hackhack
+// Esse trabalho não nos pertence, pertence ao stdio,
+// mas funciona.
+    stdio_terminalmode_flag = TRUE;
+    stdio_verbosemode_flag = TRUE;
+
+    return 0;
 }
 
 //

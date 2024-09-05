@@ -193,8 +193,6 @@ console_ioctl (
     unsigned long request, 
     unsigned long arg );
 
-void console_refresh_screen(file *f);
-
 int 
 console_clear_imp (
     unsigned int bg_color, 
