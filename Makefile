@@ -9,6 +9,7 @@ BASE = your/base
 DEP_L1  = ../de/ds
 # Client-side GUI applications
 DEP_L2  = ../de/apps
+DEP_L3  = ../games
 
 # Make variables (CC, etc...)
 AS      = as
@@ -214,6 +215,9 @@ copy-extras:
     # These need the '@' prefix.
 	-cp $(DEP_L2)/browser/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
 
+# 3D demos.
+	-cp $(DEP_L3)/aurora/bin/DEMO00.BIN   $(BASE)
+	-cp $(DEP_L3)/aurora/bin/DEMO01.BIN   $(BASE)
 
 	@echo "~ copy-extras"
 
