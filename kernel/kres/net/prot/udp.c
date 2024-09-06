@@ -88,6 +88,11 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
          udp_payload[2] == '1' )
     {
         //memset(udp_payload, 0, sizeof(udp_payload));
+
+        // #debug
+        printk("[g:1] REPLY\n");
+        refresh_screen();
+
         NoReply = TRUE;
         goto done;
     }
@@ -99,6 +104,11 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
          udp_payload[2] == '2' )
     {
         //memset(udp_payload, 0, sizeof(udp_payload));
+
+        // #debug
+        printk("[g:2] EVENT\n");
+        refresh_screen();
+
         NoReply = TRUE;
         goto done;
     }
@@ -110,6 +120,11 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
          udp_payload[2] == '3' )
     {
         //memset(udp_payload, 0, sizeof(udp_payload));
+
+        // #debug
+        printk("[g:3] ERROR\n");
+        refresh_screen();
+
         NoReply = TRUE;
         goto done;
     }

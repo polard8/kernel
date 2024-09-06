@@ -184,6 +184,19 @@ extern struct network_info_d *NetworkInfo;
 // == Prototypes ====================
 //
 
+// Network interface for keyboard input.
+void 
+network_keyboard_event(
+    unsigned char raw_byte, 
+    int prefix );
+
+// Network interface for mouse input.
+void 
+network_mouse_event( 
+    int event_id, 
+    long data1, 
+    long data2 );
+
 // Register display servver into a given valid cgroup.
 int 
 network_register_ring3_display_server(

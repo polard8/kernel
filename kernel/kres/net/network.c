@@ -46,6 +46,55 @@ static void __maximize_ws_priority(pid_t pid);
 
 // ====================================================
 
+// Network interface for keyboard input.
+void 
+network_keyboard_event(
+    unsigned char raw_byte, 
+    int prefix )
+{
+    unsigned char __raw = raw_byte;
+    int __prefix = (prefix & 0xFF);
+
+// The routine bellow is always posting to the display server.
+// see:
+// user/input.c
+// IN: tid, scancode, prefix.
+    wmKeyEvent( 
+        (unsigned char) __raw,
+        (int) __prefix );
+}
+
+// Network interface for mouse input.
+void 
+network_mouse_event( 
+    int event_id, 
+    long data1, 
+    long data2 )
+{
+    int __event_id = event_id;
+    long __data1 = data1;
+    long __data2 = data2;
+
+// Event validation
+
+    if (event_id < 0)
+        return;
+
+    switch (event_id)
+    {
+        case MSG_MOUSEPRESSED:   break;
+        case MSG_MOUSERELEASED:  break;
+        case MSG_MOUSEMOVE:      break;
+        default:
+            return;
+            break;
+    };
+
+// Sent event to input.c
+    wmMouseEvent( event_id, data1, data2 );
+}
+
+
 
 // Setup DisplayServerInfo global structure.
 static void __initialize_ws_info(pid_t pid)

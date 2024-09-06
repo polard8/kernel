@@ -409,9 +409,7 @@ NormalByte:
     //if ( flag ...
    // put_rawbyte(__raw)
  
-// We don't need this.
-// The routine bellow is always posting 
-// to the windows server.
+// The routine bellow is always posting to the display server.
 // see:
 // user/input.c
 // IN: tid, scancode, prefix.
