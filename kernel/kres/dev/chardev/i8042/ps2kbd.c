@@ -426,6 +426,33 @@ done:
     return;
 }
 
+// #todo ioctl
+int 
+ps2kbd_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("ps2kbd_ioctl: #todo\n");
+
+// Parameters:
+    if ( fd < 0 || fd >= OPEN_MAX ){
+        return (int) (-EBADF);
+    }
+
+    switch (request){
+    //case ?:
+        //break;
+    default:
+        return (int) (-EINVAL);
+        break;
+    };
+
+fail:
+    return (int) -1;
+}
+
+
 
 // #todo: 
 // We need a file structure and the function ps2kbd_ioctl();

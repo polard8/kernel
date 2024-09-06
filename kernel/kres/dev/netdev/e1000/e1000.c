@@ -763,306 +763,6 @@ __mapping_nic1_device_address(
     return (int) mm_map_2mb_region(pa,va);
 }
 
-// ---------------------------------------------
-// DDINIT_e1000:
-// Called by ...
-// Initialize the driver.
-// == NIC Intel. ===================
-// #bugbug
-// Ver em que hora que os buffers são configurados.
-// precisam ser os mesmos encontrados na 
-// infraestrutura de network e usados pelos aplicativos.
-// #todo
-// O driver funciona na virtualbox,
-// se optarmos por PIIX3. Em ICH9 não funciona.
-// Estamos suspendendo porque as interrupçoes
-// geram muito ruido e a inicialização nem consegue
-// terminar. Talvez tenha algo a ver com habilitar
-// as interrupções antes do momento em que o
-// init habilita as interrupções.
-
-int 
-DDINIT_e1000 ( 
-    unsigned char bus, 
-    unsigned char dev, 
-    unsigned char fun, 
-    struct pci_device_d *pci_device )
-{
-// #todo: Describe here the steps for the driver initialization.
-// +
-// +
-// +
-
-    register uint32_t i=0;  // loop
-    uint32_t data=0;        // pci info 
-    unsigned short Vendor=0;
-    unsigned short Device=0;
-    unsigned long phy_address=0;
-    unsigned long virt_address=0;
-    unsigned short tmp16=0;
-    uint32_t Val=0;
-
-    // #debug
-    PROGRESS ("DDINIT_e1000:\n");
-    printk   ("DDINIT_e1000:\n");
-    //printk("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
-    //printk("82540EM Gigabit Ethernet Controller found\n");
-
-    e1000_initialized = FALSE;
-    e1000_tx_counter=0;
-    e1000_rx_counter=0;
-
-// NIC Intel.
-// #importante
-// Devemos falhar antes de alocarmos memória para a estrutura.
-// #todo
-// Fazer uma lista de dispositivos Intel suportados por esse driver.
-// +usar if else.
-
-    data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
-    Vendor = (unsigned short) (data       & 0xffff);
-    Device = (unsigned short) (data >> 16 & 0xffff);
-
-    if ( Vendor != 0x8086 || Device != 0x100E )
-    {
-        debug_print("DDINIT_e1000: Expected 82540EM\n");
-        panic      ("DDINIT_e1000: Expected 82540EM\n");
-    }
-    // #debug
-    printk("Vendor=%x | Device=%x \n", Vendor, Device );
-
-// pci_device structure.
-// pci device struct
-// passado via argumento. 
-
-    if ((void *) pci_device ==  NULL){
-        panic("DDINIT_e1000: pci_device\n");
-    }
-
-    pci_device->used = TRUE;
-    pci_device->magic = 1234;
-    pci_device->bus  = (unsigned char) bus;
-    pci_device->dev  = (unsigned char) dev;
-    pci_device->func = (unsigned char) fun;
-    pci_device->Vendor = (unsigned short) (data       & 0xffff);
-    pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
-
-// #IMPORTANTE
-// #bugbug:
-// Esse driver é para placa Intel, vamos cancelar a inicialização 
-// do driver se a placa não for Intel.
-// 8086:100e | 82540EM Gigabit Ethernet Controller
-// #todo
-// Fazer uma lista de dispositivos Intel suportados por esse driver.
-// +usar if else.
-// já fizemos essa checagem antes.
-
-/*
-    if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
-    {
-        panic ("e1000_init_nic: 82540EM not found\n");
-        // #bugbug: Maybe only return.
-        return (int) (-1);
-    }
-*/
-
-// BARs
-    pci_device->BAR0 = 
-        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
-    pci_device->BAR1 = 
-        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x14 ); 
-    pci_device->BAR2 = 
-        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
-    pci_device->BAR3 = 
-        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
-    pci_device->BAR4 = 
-        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
-    pci_device->BAR5 = 
-        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
-
-// IRQ
-
-// irq
-    pci_device->irq_line = 
-        (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );
-// Those letters.
-    pci_device->irq_pin = 
-        (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D ); 
-
-// PCI-X Register Access Split?
-
-// ---------------------
-// The physical address!
-// #importante:
-// Grab the Base I/O Address of the device
-// Aqui nós pegamos o endereço dos registadores na BAR0,
-// Então, logo abaixo, mapearemos esse endereço físico 
-// para termos um  endereço virtual, para manipularmos os registradores. 
-
-// #bugbug: 
-// size 32bit 64bit?
-
-    phy_address = (unsigned long) (pci_device->BAR0 & 0xFFFFFFF0);
-    if (phy_address == 0){
-        panic("DDINIT_e1000: Invalid phy_address\n");
-    }
-
-    // ...
-
-// ---------------------
-// The virtual address!
-// Base address
-// #importante:
-// Mapeando para obter o endereço virtual que 
-// o kernel pode manipular.
-// pages.c
-// #bugbug: 
-// >> Isso é um improviso. Ainda falta criar rotinas melhores.
-
-    virt_address = NIC_INTEL_E1000_VA;
-
-    int map_status = -1;
-    map_status = 
-        (int) __mapping_nic1_device_address(
-                (unsigned long) phy_address,     // pa
-                (unsigned long) virt_address );  // va
-
-    if (map_status != 0){
-        panic("DDINIT_e1000: on __mapping_nic1_device_address()\n");
-    }
-
-// Endereço base.
-// Preparando a mesma base de duas maneiras.
-// char
-    unsigned char *base_address = 
-        (unsigned char *) virt_address;
-// #bugbug 64bit address
-// #todo: Do we need to change this name?
-    unsigned long *base_address32 = 
-        (unsigned long *) virt_address; 
-
-//
-// == NIC =========================
-//
-
-// #todo: 
-// Checar essa estrutura.
-// see: nicintel.h
-
-    currentNIC = (void *) kmalloc( sizeof(struct intel_nic_info_d) );
-    if ((void *) currentNIC ==  NULL){
-        panic("DDINIT_e1000: currentNIC\n");
-    }
-    currentNIC->used = TRUE;
-    currentNIC->magic = 1234;
-    currentNIC->interrupt_count = 0;
-    currentNIC->pci = (struct pci_device_d *) pci_device;
-
-// The base address for the registers.
-    currentNIC->registers_base_address = 
-        (unsigned long) &base_address[0];
-
-    currentNIC->use_io = FALSE;
-    //currentNIC->io_base = ?;  // i/o base port.
-
-//
-// Get info.
-//
-
-// EEPROM
-// Como ainda não sabemos, vamos dizer que não.
-    currentNIC->has_eeprom = FALSE; 
-// Let's try to discover reading the status field!
-    for ( i=0; 
-          i < 1000 && !currentNIC->has_eeprom; 
-          ++i ) 
-    {
-        Val = (uint32_t) __E1000ReadCommand( currentNIC, 0x14 );
-        // We have? Yes!.
-        if ( (Val & 0x10) == 0x10 ){
-            currentNIC->has_eeprom = TRUE; 
-        }
-    };
-
-// MAC
-// Let's read the MAC Address!
-
-    uint32_t tmp=0;
-    
-// We can use the EEPROM!
-// Get info inside the eeprom memory.
-    if (currentNIC->has_eeprom == TRUE) {
-        tmp = __E1000ReadEEPROM ( currentNIC, 0 );
-        currentNIC->mac_address[0] = (uint8_t)(tmp & 0xFF);
-        currentNIC->mac_address[1] = (uint8_t)(tmp >> 8);
-        tmp = __E1000ReadEEPROM ( currentNIC, 1);
-        currentNIC->mac_address[2] = (uint8_t)(tmp & 0xFF);
-        currentNIC->mac_address[3] = (uint8_t)(tmp >> 8);
-        tmp = __E1000ReadEEPROM ( currentNIC, 2);
-        currentNIC->mac_address[4] = (uint8_t)(tmp & 0xFF);
-        currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
-// We can't use the EEPROM :(
-// Get info inside the registers.
-// MAC - Get the mac address directly in the registers.
-// One byte each per time.
-    } else if (currentNIC->has_eeprom == FALSE){
-        currentNIC->mac_address[0] = (uint8_t) base_address[ 0x5400 +0 ];
-        currentNIC->mac_address[1] = (uint8_t) base_address[ 0x5400 +1 ];
-        currentNIC->mac_address[2] = (uint8_t) base_address[ 0x5400 +2 ];
-        currentNIC->mac_address[3] = (uint8_t) base_address[ 0x5400 +3 ];
-        currentNIC->mac_address[4] = (uint8_t) base_address[ 0x5400 +4 ];
-        currentNIC->mac_address[5] = (uint8_t) base_address[ 0x5400 +5 ];
-    }
-
-// BUS Mastering.
-// Let's enable bus mastering!
-// #define PCI_COMMAND  0x04
-// We really need to do it?
-// Yes, get the cmd, set the bus mastering bit and write back. 
-// ( bus, slot, func, PCI_COMMAND )
-
-    uint16_t cmd=0;
-    cmd = 
-        (uint16_t) pciConfigReadWord ( 
-                       (unsigned char) bus, 
-                       (unsigned char) dev, 
-                       (unsigned char) fun, 
-                       (unsigned char) 0x04 );
-
-    // IN: (bus, slot, func, PCI_COMMAND, cmd);
-    if ( (cmd & 0x04) != 0x04 )
-    {
-        cmd |= 0x04;
-        diskWritePCIConfigAddr ( 
-            (int) bus, (int) dev, (int) fun, 
-            (int) 0x04, (int) cmd ); 
-    }
-
-// irq line:
-    unsigned char irq_line = 
-        (unsigned char) pciGetInterruptLine(bus,dev);
-
-    //#debug
-    //printk("Done irqline %d\n",irq_line);   
-    //refresh_screen();
-
-// irq
-    __e1000_setup_irq(irq_line);
-// Reset the controller.
-    __e1000_reset_controller(currentNIC);
-
-// Flags
-    e1000_initialized = TRUE;
-
-    //#debug
-    //printk ("e1000_init_nic: Test #breakpoint\n");
-    //refresh_screen();
-    //while(1){ asm("hlt"); }
-
-// 0 = no errors
-    return 0;
-}
-
 void 
 e1000_send(
     struct intel_nic_info_d *dev, 
@@ -1374,4 +1074,338 @@ irq_E1000(void)
 // Call the handler.
     DeviceInterface_e1000();
 }
+
+// #todo ioctl
+int 
+e1000_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("e1000_ioctl: #todo\n");
+
+// Parameters:
+    if ( fd < 0 || fd >= OPEN_MAX ){
+        return (int) (-EBADF);
+    }
+
+    switch (request){
+    //case ?:
+        //break;
+    default:
+        return (int) (-EINVAL);
+        break;
+    };
+
+fail:
+    return (int) -1;
+}
+
+
+
+//
+// $
+// INITIALIZATION
+//
+
+// ---------------------------------------------
+// DDINIT_e1000:
+// Called by ...
+// Initialize the driver.
+// == NIC Intel. ===================
+// #bugbug
+// Ver em que hora que os buffers são configurados.
+// precisam ser os mesmos encontrados na 
+// infraestrutura de network e usados pelos aplicativos.
+// #todo
+// O driver funciona na virtualbox,
+// se optarmos por PIIX3. Em ICH9 não funciona.
+// Estamos suspendendo porque as interrupçoes
+// geram muito ruido e a inicialização nem consegue
+// terminar. Talvez tenha algo a ver com habilitar
+// as interrupções antes do momento em que o
+// init habilita as interrupções.
+
+int 
+DDINIT_e1000 ( 
+    unsigned char bus, 
+    unsigned char dev, 
+    unsigned char fun, 
+    struct pci_device_d *pci_device )
+{
+// #todo: Describe here the steps for the driver initialization.
+// +
+// +
+// +
+
+    register uint32_t i=0;  // loop
+    uint32_t data=0;        // pci info 
+    unsigned short Vendor=0;
+    unsigned short Device=0;
+    unsigned long phy_address=0;
+    unsigned long virt_address=0;
+    unsigned short tmp16=0;
+    uint32_t Val=0;
+
+    // #debug
+    PROGRESS ("DDINIT_e1000:\n");
+    printk   ("DDINIT_e1000:\n");
+    //printk("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
+    //printk("82540EM Gigabit Ethernet Controller found\n");
+
+    e1000_initialized = FALSE;
+    e1000_tx_counter=0;
+    e1000_rx_counter=0;
+
+// NIC Intel.
+// #importante
+// Devemos falhar antes de alocarmos memória para a estrutura.
+// #todo
+// Fazer uma lista de dispositivos Intel suportados por esse driver.
+// +usar if else.
+
+    data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
+    Vendor = (unsigned short) (data       & 0xffff);
+    Device = (unsigned short) (data >> 16 & 0xffff);
+
+    if ( Vendor != 0x8086 || Device != 0x100E )
+    {
+        debug_print("DDINIT_e1000: Expected 82540EM\n");
+        panic      ("DDINIT_e1000: Expected 82540EM\n");
+    }
+    // #debug
+    printk("Vendor=%x | Device=%x \n", Vendor, Device );
+
+// pci_device structure.
+// pci device struct
+// passado via argumento. 
+
+    if ((void *) pci_device ==  NULL){
+        panic("DDINIT_e1000: pci_device\n");
+    }
+
+    pci_device->used = TRUE;
+    pci_device->magic = 1234;
+    pci_device->bus  = (unsigned char) bus;
+    pci_device->dev  = (unsigned char) dev;
+    pci_device->func = (unsigned char) fun;
+    pci_device->Vendor = (unsigned short) (data       & 0xffff);
+    pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
+
+// #IMPORTANTE
+// #bugbug:
+// Esse driver é para placa Intel, vamos cancelar a inicialização 
+// do driver se a placa não for Intel.
+// 8086:100e | 82540EM Gigabit Ethernet Controller
+// #todo
+// Fazer uma lista de dispositivos Intel suportados por esse driver.
+// +usar if else.
+// já fizemos essa checagem antes.
+
+/*
+    if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
+    {
+        panic ("e1000_init_nic: 82540EM not found\n");
+        // #bugbug: Maybe only return.
+        return (int) (-1);
+    }
+*/
+
+// BARs
+    pci_device->BAR0 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
+    pci_device->BAR1 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x14 ); 
+    pci_device->BAR2 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
+    pci_device->BAR3 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
+    pci_device->BAR4 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
+    pci_device->BAR5 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
+
+// IRQ
+
+// irq
+    pci_device->irq_line = 
+        (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );
+// Those letters.
+    pci_device->irq_pin = 
+        (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D ); 
+
+// PCI-X Register Access Split?
+
+// ---------------------
+// The physical address!
+// #importante:
+// Grab the Base I/O Address of the device
+// Aqui nós pegamos o endereço dos registadores na BAR0,
+// Então, logo abaixo, mapearemos esse endereço físico 
+// para termos um  endereço virtual, para manipularmos os registradores. 
+
+// #bugbug: 
+// size 32bit 64bit?
+
+    phy_address = (unsigned long) (pci_device->BAR0 & 0xFFFFFFF0);
+    if (phy_address == 0){
+        panic("DDINIT_e1000: Invalid phy_address\n");
+    }
+
+    // ...
+
+// ---------------------
+// The virtual address!
+// Base address
+// #importante:
+// Mapeando para obter o endereço virtual que 
+// o kernel pode manipular.
+// pages.c
+// #bugbug: 
+// >> Isso é um improviso. Ainda falta criar rotinas melhores.
+
+    virt_address = NIC_INTEL_E1000_VA;
+
+    int map_status = -1;
+    map_status = 
+        (int) __mapping_nic1_device_address(
+                (unsigned long) phy_address,     // pa
+                (unsigned long) virt_address );  // va
+
+    if (map_status != 0){
+        panic("DDINIT_e1000: on __mapping_nic1_device_address()\n");
+    }
+
+// Endereço base.
+// Preparando a mesma base de duas maneiras.
+// char
+    unsigned char *base_address = 
+        (unsigned char *) virt_address;
+// #bugbug 64bit address
+// #todo: Do we need to change this name?
+    unsigned long *base_address32 = 
+        (unsigned long *) virt_address; 
+
+//
+// == NIC =========================
+//
+
+// #todo: 
+// Checar essa estrutura.
+// see: nicintel.h
+
+    currentNIC = (void *) kmalloc( sizeof(struct intel_nic_info_d) );
+    if ((void *) currentNIC ==  NULL){
+        panic("DDINIT_e1000: currentNIC\n");
+    }
+    currentNIC->used = TRUE;
+    currentNIC->magic = 1234;
+    currentNIC->interrupt_count = 0;
+    currentNIC->pci = (struct pci_device_d *) pci_device;
+
+// The base address for the registers.
+    currentNIC->registers_base_address = 
+        (unsigned long) &base_address[0];
+
+    currentNIC->use_io = FALSE;
+    //currentNIC->io_base = ?;  // i/o base port.
+
+//
+// Get info.
+//
+
+// EEPROM
+// Como ainda não sabemos, vamos dizer que não.
+    currentNIC->has_eeprom = FALSE; 
+// Let's try to discover reading the status field!
+    for ( i=0; 
+          i < 1000 && !currentNIC->has_eeprom; 
+          ++i ) 
+    {
+        Val = (uint32_t) __E1000ReadCommand( currentNIC, 0x14 );
+        // We have? Yes!.
+        if ( (Val & 0x10) == 0x10 ){
+            currentNIC->has_eeprom = TRUE; 
+        }
+    };
+
+// MAC
+// Let's read the MAC Address!
+
+    uint32_t tmp=0;
+    
+// We can use the EEPROM!
+// Get info inside the eeprom memory.
+    if (currentNIC->has_eeprom == TRUE) {
+        tmp = __E1000ReadEEPROM ( currentNIC, 0 );
+        currentNIC->mac_address[0] = (uint8_t)(tmp & 0xFF);
+        currentNIC->mac_address[1] = (uint8_t)(tmp >> 8);
+        tmp = __E1000ReadEEPROM ( currentNIC, 1);
+        currentNIC->mac_address[2] = (uint8_t)(tmp & 0xFF);
+        currentNIC->mac_address[3] = (uint8_t)(tmp >> 8);
+        tmp = __E1000ReadEEPROM ( currentNIC, 2);
+        currentNIC->mac_address[4] = (uint8_t)(tmp & 0xFF);
+        currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
+// We can't use the EEPROM :(
+// Get info inside the registers.
+// MAC - Get the mac address directly in the registers.
+// One byte each per time.
+    } else if (currentNIC->has_eeprom == FALSE){
+        currentNIC->mac_address[0] = (uint8_t) base_address[ 0x5400 +0 ];
+        currentNIC->mac_address[1] = (uint8_t) base_address[ 0x5400 +1 ];
+        currentNIC->mac_address[2] = (uint8_t) base_address[ 0x5400 +2 ];
+        currentNIC->mac_address[3] = (uint8_t) base_address[ 0x5400 +3 ];
+        currentNIC->mac_address[4] = (uint8_t) base_address[ 0x5400 +4 ];
+        currentNIC->mac_address[5] = (uint8_t) base_address[ 0x5400 +5 ];
+    }
+
+// BUS Mastering.
+// Let's enable bus mastering!
+// #define PCI_COMMAND  0x04
+// We really need to do it?
+// Yes, get the cmd, set the bus mastering bit and write back. 
+// ( bus, slot, func, PCI_COMMAND )
+
+    uint16_t cmd=0;
+    cmd = 
+        (uint16_t) pciConfigReadWord ( 
+                       (unsigned char) bus, 
+                       (unsigned char) dev, 
+                       (unsigned char) fun, 
+                       (unsigned char) 0x04 );
+
+    // IN: (bus, slot, func, PCI_COMMAND, cmd);
+    if ( (cmd & 0x04) != 0x04 )
+    {
+        cmd |= 0x04;
+        diskWritePCIConfigAddr ( 
+            (int) bus, (int) dev, (int) fun, 
+            (int) 0x04, (int) cmd ); 
+    }
+
+// irq line:
+    unsigned char irq_line = 
+        (unsigned char) pciGetInterruptLine(bus,dev);
+
+    //#debug
+    //printk("Done irqline %d\n",irq_line);   
+    //refresh_screen();
+
+// irq
+    __e1000_setup_irq(irq_line);
+// Reset the controller.
+    __e1000_reset_controller(currentNIC);
+
+// Flags
+    e1000_initialized = TRUE;
+
+    //#debug
+    //printk ("e1000_init_nic: Test #breakpoint\n");
+    //refresh_screen();
+    //while(1){ asm("hlt"); }
+
+// 0 = no errors
+    return 0;
+}
+
 

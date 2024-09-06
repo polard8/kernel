@@ -10,8 +10,13 @@ extern struct pci_device_d *PCIDeviceQemuDisplay;
 // ======================================================
 //
 
+int 
+qemudisp_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
 
-int qemu_display_initialize(void);
+int qemudisp_initialize(void);
 
 #endif  
 

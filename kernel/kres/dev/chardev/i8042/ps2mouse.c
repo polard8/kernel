@@ -593,6 +593,39 @@ void DeviceInterface_PS2Mouse(void)
    //write_packet(mousefp,...)
 }
 
+
+// #todo ioctl
+int 
+ps2mouse_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("ps2mouse_ioctl: #todo\n");
+
+// Parameters:
+    if ( fd < 0 || fd >= OPEN_MAX ){
+        return (int) (-EBADF);
+    }
+
+    switch (request){
+    //case ?:
+        //break;
+    default:
+        return (int) (-EINVAL);
+        break;
+    };
+
+fail:
+    return (int) -1;
+}
+
+
+//
+// $
+// INITIALIZATION
+//
+
 // ps2mouse_initialize_device:
 //     Initialize the device.
 /*

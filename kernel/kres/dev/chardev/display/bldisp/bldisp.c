@@ -654,80 +654,6 @@ int screenInit(void)
     return 0;
 }
 
-//==============================
-
-// DDINIT_bldisp:
-// Device driver initialization
-// Initialize the device driver for the bootloader display device.
-int DDINIT_bldisp(void)
-{
-// Called by keInitialize() in ke.c.
-
-    PROGRESS("DDINIT_bldisp:\n");
-
-// Memory allocation for Display device structure.
-    bl_display_device = 
-        (struct display_device_d *) kmalloc( sizeof(struct display_device_d) ); 
-    if ((void*) bl_display_device == NULL){
-        x_panic ("Error: 0x05");
-    }
-    memset ( bl_display_device, 0, sizeof(struct display_device_d) );
-
-// xBootBlock was initialized by init.c
-    if (xBootBlock.initialized != TRUE){
-        x_panic ("DDINIT_bldisp: xBootBlock");
-    }
-
-// Structure initialization.
-    bl_display_device->initialized = FALSE;
-    bl_display_device->owner_pid = (pid_t) GRAMADO_PID_KERNEL;
-
-// framebuffer address.
-    bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
-    bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
-
-// w, h, bpp.
-    bl_display_device->framebuffer_width  = 
-        (unsigned long) xBootBlock.deviceWidth;
-    bl_display_device->framebuffer_height = 
-        (unsigned long) xBootBlock.deviceHeight;
-    bl_display_device->framebuffer_bpp = 
-        (unsigned long) xBootBlock.bpp;
-// Pitch
-// Ex: ((32/8)*800)
-    bl_display_device->framebuffer_pitch = 
-        (unsigned long) ( (xBootBlock.bpp/8) * xBootBlock.deviceWidth);
-
-// Screen size in bytes.
-    bl_display_device->framebuffer_size_in_bytes =
-        (unsigned long) ( bl_display_device->framebuffer_height * 
-                          bl_display_device->framebuffer_pitch );
-
-// Screen size in KB.
-    bl_display_device->framebuffer_size_in_kb =
-        (unsigned long) (bl_display_device->framebuffer_size_in_bytes / 1024);
-
-// #test
-// The main virtual screen for this device.
-// Relative values.
-    bl_display_device->virtual_screen.left = (unsigned long) 0;
-    bl_display_device->virtual_screen.top  = (unsigned long) 0;
-    bl_display_device->virtual_screen.width = 
-        (unsigned long) bl_display_device->framebuffer_width;
-    bl_display_device->virtual_screen.height = 
-        (unsigned long) bl_display_device->framebuffer_height;
-
-    bl_display_device->next = NULL;
-
-// validation
-    bl_display_device->used = TRUE;
-    bl_display_device->magic = 1234;
-// Structure initialization.
-    bl_display_device->initialized = TRUE;
-
-    return 0;
-}
-
 void bldisp_show_info(void)
 {
 // #todo
@@ -747,60 +673,6 @@ void bldisp_show_info(void)
         bl_display_device->framebuffer_bpp );
     printk ("Screen size: %d KB\n",
         bl_display_device->framebuffer_size_in_kb );
-}
-
-static int __videoInit(void)
-{
-    int Status=0;
-
-// Se o modo de video nao esta habilitado
-// Can we use the panic function?
-// No we can't.
-    if (VideoBlock.useGui != TRUE)
-    {
-        debug_print("__videoInit:\n");
-        //panic("videoInit:\n");
-        soft_die();
-    }
-    VideoBlock.useGui = TRUE;
-
-
-// Frontbuffer (LFB)
-    __frontbuffer_pa = (unsigned long) gSavedLFB;
-    __frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
-    g_frontbuffer_pa = (unsigned long) __frontbuffer_pa; 
-    g_frontbuffer_va = (unsigned long) __frontbuffer_va;
-
-// Backbuffer
-     g_backbuffer_va  = (unsigned long) BACKBUFFER_VA;
-
-// Device screen sizes. 
-// (herdadas do boot loader.)
-// See: 
-// admin/config/superv/gdevice.h
-    g_device_screen_width  = (unsigned long) gSavedX;
-    g_device_screen_height = (unsigned long) gSavedY;
-    g_device_screen_bpp    = (unsigned long) gSavedBPP;
-
-    // gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );
-
-// #todo: 
-// Usar a função que configura essas variáveis.
-    FontInitialization.width  = VIDEO_BIOS_FONT8X8_WIDTH;
-    FontInitialization.height = VIDEO_BIOS_FONT8X8_HEIGHT;
-    FontInitialization.font_size = FONT8X8;
-
-    return 0;
-    //return (int) Status;    
-}
-
-int Video_initialize(void)
-{
-    g_driver_video_initialized = FALSE;
-    __videoInit();
-    // ...
-    g_driver_video_initialized = TRUE;
-    return 0;
 }
 
 /*
@@ -911,6 +783,174 @@ void videoSetupCGAStartAddress (unsigned long address)
     g_current_vm = (unsigned long) address;
     //g_current_cga_address
 }
+
+
+// #todo ioctl
+int 
+bldisp_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("bldisp_ioctl: #todo\n");
+
+// Parameters:
+    if ( fd < 0 || fd >= OPEN_MAX ){
+        return (int) (-EBADF);
+    }
+
+    switch (request){
+    //case ?:
+        //break;
+    default:
+        return (int) (-EINVAL);
+        break;
+    };
+
+fail:
+    return (int) -1;
+}
+
+
+static int __videoInit(void)
+{
+    int Status=0;
+
+// Se o modo de video nao esta habilitado
+// Can we use the panic function?
+// No we can't.
+    if (VideoBlock.useGui != TRUE)
+    {
+        debug_print("__videoInit:\n");
+        //panic("videoInit:\n");
+        soft_die();
+    }
+    VideoBlock.useGui = TRUE;
+
+
+// Frontbuffer (LFB)
+    __frontbuffer_pa = (unsigned long) gSavedLFB;
+    __frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
+    g_frontbuffer_pa = (unsigned long) __frontbuffer_pa; 
+    g_frontbuffer_va = (unsigned long) __frontbuffer_va;
+
+// Backbuffer
+     g_backbuffer_va  = (unsigned long) BACKBUFFER_VA;
+
+// Device screen sizes. 
+// (herdadas do boot loader.)
+// See: 
+// admin/config/superv/gdevice.h
+    g_device_screen_width  = (unsigned long) gSavedX;
+    g_device_screen_height = (unsigned long) gSavedY;
+    g_device_screen_bpp    = (unsigned long) gSavedBPP;
+
+    // gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );
+
+// #todo: 
+// Usar a função que configura essas variáveis.
+    FontInitialization.width  = VIDEO_BIOS_FONT8X8_WIDTH;
+    FontInitialization.height = VIDEO_BIOS_FONT8X8_HEIGHT;
+    FontInitialization.font_size = FONT8X8;
+
+    return 0;
+    //return (int) Status;    
+}
+
+//
+// $
+// INITIALIZATION
+//
+
+int Video_initialize(void)
+{
+    g_driver_video_initialized = FALSE;
+    __videoInit();
+    // ...
+    g_driver_video_initialized = TRUE;
+    return 0;
+}
+
+//==============================
+
+//
+// $
+// INITIALIZATION
+//
+
+
+// DDINIT_bldisp:
+// Device driver initialization
+// Initialize the device driver for the bootloader display device.
+int DDINIT_bldisp(void)
+{
+// Called by keInitialize() in ke.c.
+
+    PROGRESS("DDINIT_bldisp:\n");
+
+// Memory allocation for Display device structure.
+    bl_display_device = 
+        (struct display_device_d *) kmalloc( sizeof(struct display_device_d) ); 
+    if ((void*) bl_display_device == NULL){
+        x_panic ("Error: 0x05");
+    }
+    memset ( bl_display_device, 0, sizeof(struct display_device_d) );
+
+// xBootBlock was initialized by init.c
+    if (xBootBlock.initialized != TRUE){
+        x_panic ("DDINIT_bldisp: xBootBlock");
+    }
+
+// Structure initialization.
+    bl_display_device->initialized = FALSE;
+    bl_display_device->owner_pid = (pid_t) GRAMADO_PID_KERNEL;
+
+// framebuffer address.
+    bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
+    bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
+
+// w, h, bpp.
+    bl_display_device->framebuffer_width  = 
+        (unsigned long) xBootBlock.deviceWidth;
+    bl_display_device->framebuffer_height = 
+        (unsigned long) xBootBlock.deviceHeight;
+    bl_display_device->framebuffer_bpp = 
+        (unsigned long) xBootBlock.bpp;
+// Pitch
+// Ex: ((32/8)*800)
+    bl_display_device->framebuffer_pitch = 
+        (unsigned long) ( (xBootBlock.bpp/8) * xBootBlock.deviceWidth);
+
+// Screen size in bytes.
+    bl_display_device->framebuffer_size_in_bytes =
+        (unsigned long) ( bl_display_device->framebuffer_height * 
+                          bl_display_device->framebuffer_pitch );
+
+// Screen size in KB.
+    bl_display_device->framebuffer_size_in_kb =
+        (unsigned long) (bl_display_device->framebuffer_size_in_bytes / 1024);
+
+// #test
+// The main virtual screen for this device.
+// Relative values.
+    bl_display_device->virtual_screen.left = (unsigned long) 0;
+    bl_display_device->virtual_screen.top  = (unsigned long) 0;
+    bl_display_device->virtual_screen.width = 
+        (unsigned long) bl_display_device->framebuffer_width;
+    bl_display_device->virtual_screen.height = 
+        (unsigned long) bl_display_device->framebuffer_height;
+
+    bl_display_device->next = NULL;
+
+// validation
+    bl_display_device->used = TRUE;
+    bl_display_device->magic = 1234;
+// Structure initialization.
+    bl_display_device->initialized = TRUE;
+
+    return 0;
+}
+
 
 //
 // End

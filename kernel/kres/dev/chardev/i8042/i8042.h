@@ -1,7 +1,7 @@
-
 // i8042.h
 // Intel 8042 keyboard/mouse controller.
 // Created by Fred Nora.
+
 
 #ifndef __CHARDEV_I8042_H
 #define __CHARDEV_I8042_H  1
@@ -236,12 +236,8 @@ void prepare_for_output (void);
 unsigned char wait_then_read (int port);
 void wait_then_write ( int port, int data );
 
-
-
 void ps2kbd_initialize_device (void);
 void ps2mouse_initialize_device (void);
-
-int ps2_ioctl ( int fd, unsigned long request, unsigned long arg );
 
 // ================
 // Early initialization

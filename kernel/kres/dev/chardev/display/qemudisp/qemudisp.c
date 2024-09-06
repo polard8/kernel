@@ -8,7 +8,32 @@
 
 struct pci_device_d *PCIDeviceQemuDisplay;
 
-int qemu_display_initialize(void)
+
+
+
+
+// #todo ioctl
+int 
+qemudisp_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("qemudisp_ioctl: #todo\n");
+    if(fd<0){
+        return -1;
+    }
+    return -1;
+}
+
+
+//
+// $
+// INITIALIZATION
+//
+
+
+int qemudisp_initialize(void)
 {
     int Status = -1;
 
@@ -32,12 +57,12 @@ int qemu_display_initialize(void)
                                     (unsigned char) PCI_SUBCLASS_NONVGA );
 
     if ((void *) PCIDeviceQemuDisplay == NULL){
-        printk("qemu_display_initialize: PCIDeviceQemuDisplay\n");
+        printk("qemudisp_initialize: PCIDeviceQemuDisplay\n");
         Status = (int) -1;
         goto fail;
     }
     if ( PCIDeviceQemuDisplay->used != TRUE || PCIDeviceQemuDisplay->magic != 1234 ){
-        printk ("qemu_display_initialize: PCIDeviceQemuDisplay validation\n");
+        printk ("qemudisp_initialize: PCIDeviceQemuDisplay validation\n");
         Status = (int) -1;
         goto fail;
     }

@@ -258,6 +258,11 @@ e1000_send(
     size_t len, 
     const char *data );
 
+int 
+e1000_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
 
 // Driver initialization
 int 

@@ -154,15 +154,6 @@ void wait_then_write( int port, int data )
     out8( port, data );
 }
 
-// #todo
-// ioctl
-int ps2_ioctl( int fd, unsigned long request, unsigned long arg )
-{
-    debug_print("ps2_ioctl: [TODO]\n");
-    return -1;
-}
-
-
 // Early initialization
 // + Only keyboard.
 // + No mouse initialization.

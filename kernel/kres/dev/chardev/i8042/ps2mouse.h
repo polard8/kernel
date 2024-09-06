@@ -127,5 +127,11 @@ void i8042_mouse_expect_ack (void);
 
 void DeviceInterface_PS2Mouse(void);
 
+int 
+ps2mouse_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
 #endif   
 

@@ -174,5 +174,11 @@ int get_shift_status (void);
 
 void DeviceInterface_PS2Keyboard(void); 
 
+int 
+ps2kbd_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
 #endif    
 

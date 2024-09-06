@@ -137,6 +137,13 @@ unsigned long videoGetMode (void);
 void videoSetMode (unsigned long mode);
 void videoSetupCGAStartAddress (unsigned long address);
 
+// #todo ioctl
+int 
+bldisp_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
 int Video_initialize(void);
 
 // Device driver initialization
