@@ -174,6 +174,9 @@ void DeviceInterface_PIT(void)
 // The pit handler.
 // Called by irq0_TIMER().
 
+    if (PITInfo.initialized != TRUE)
+        return;
+
 // Increment tick counter.
     jiffies++;
 
