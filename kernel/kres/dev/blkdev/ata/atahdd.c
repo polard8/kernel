@@ -1,11 +1,16 @@
-
 // atahdd.c
 // Low level routines for ata devices.
 // Wrappers: 
-// ataReadSector, ataWriteSector, pio_rw_sector.
+// ataReadSector, ataWriteSector
 // Created by Fred Nora.
 
 #include <kernel.h>  
+
+
+// Internal
+#define __OPERATION_PIO_READ  1000
+#define __OPERATION_PIO_WRITE  2000
+
 
 //
 // Private functions: prototypes.
@@ -35,6 +40,16 @@ __hdd_ata_pio_write (
     unsigned int port_index, 
     void *buffer, 
     int bytes );
+
+
+// Read and write via pio mode.
+static int 
+__pio_rw_sector ( 
+    unsigned long buffer, 
+    unsigned int _lba, 
+    int operation_number, 
+    unsigned int port_index );
+
 
 // -----------------------------------------
 
@@ -269,7 +284,7 @@ __hdd_ata_pio_write (
 // -----------------------------------------
 
 /*
- * pio_rw_sector:
+ * __pio_rw_sector:
  * IN:
  *   buffer - Buffer address. ??? virtual address ??
  *   lba - LBA number 
@@ -280,11 +295,11 @@ __hdd_ata_pio_write (
  */
 // Read and write via pio mode.
 // Low level routine.
-int 
-pio_rw_sector ( 
+static int 
+__pio_rw_sector ( 
     unsigned long buffer, 
     unsigned int _lba, 
-    int rw, 
+    int operation_number, 
     unsigned int port_index )
 {
     unsigned short port=0;
@@ -292,16 +307,17 @@ pio_rw_sector (
     unsigned int lba = (unsigned int) _lba;
 
 // Fail
-    if ( rw != 0x20 && 
-         rw != 0x30 )
+    if ( operation_number != __OPERATION_PIO_READ && 
+         operation_number != __OPERATION_PIO_WRITE )
     {
+        return (int) -1;
     }
 
 // 0~3
 // We only support 4 ports.
     port_index = (unsigned int) (port_index & 0xFF);
     if (port_index > 3){
-        panic ("pio_rw_sector: We only support 4 ata ports.\n");
+        panic ("__pio_rw_sector: We only support 4 ata ports.\n");
     }
 
 // #todo
@@ -345,7 +361,7 @@ pio_rw_sector (
     }
     // Not master, nor slave!
     if ( value != ATA_MASTER && value != ATA_SLAVE ){
-        panic("pio_rw_sector: value?\n");
+        panic("__pio_rw_sector: value?\n");
     }
 
 // -----------------
@@ -353,19 +369,27 @@ pio_rw_sector (
 // no bit 4.
 // 0 = master 
 // 1 = slave
+//------------
 // master. bit 4 = 0
 // 1110 0000b;
-// slave. bit 4 = 1
+//------------
+// slave.  bit 4 = 1
 // 1111 0000b;
+//------------
+
 // Not slave
     if (is_slave == FALSE){ 
-        lba = (unsigned int) (lba | 0x000000E0);
+        lba = (unsigned int) (lba | 0x000000E0);  // not slave
     }
 // Slave
     if (is_slave == TRUE){
-        lba = (unsigned int) (lba | 0x000000F0);
+        lba = (unsigned int) (lba | 0x000000F0);  // slave
     }
-    port = (unsigned short) (ide_ports[port_index].base_port + 6);
+
+// Drive/Head Register 
+// Used to select a drive and/or head. 
+// Supports extra address/flag bits.
+    port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_DEVSEL);
     out8 ( 
         (unsigned short) port, 
         (unsigned char) lba );
@@ -373,19 +397,25 @@ pio_rw_sector (
 // =================================================
 // 0x01F2: 
 // Port to send, number of sectors
-    
-    port = (unsigned short) (ide_ports[port_index].base_port + 2);
-    out8 ( 
-        (unsigned short) port, 
-        (unsigned char) 1 );
+// ATA_REG_SECCOUNT
+// Sector Count Register
+// Number of sectors to read/write (0 is a special value).
+    port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_SECCOUNT);
+
+// #bugbug: Not working on qemu.
+// ATA_REG_SECCOUNT1
+    //port = (unsigned short) (ide_ports[port_index].base_port + 0x08);
+
+    out8 ( (unsigned short) port, (unsigned char) 1 );
 
 // =================================================
 // 0x1F3: 
 // Port to send, bit 0 - 7 of LBA
+// Sector Number Register (LBAlo) This is CHS / LBA28 / LBA48 specific.
 
     lba = (unsigned int) _lba;
     lba = (unsigned int) (lba & 0x000000FF);
-    port = (unsigned short) (ide_ports[port_index].base_port + 3); 
+    port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_LBA0); 
     out8 ( 
         (unsigned short) port, 
         (unsigned char) lba );
@@ -394,36 +424,62 @@ pio_rw_sector (
 // =================================================
 // 0x1F4: 
 // Port to send, bit 8 - 15 of LBA
+// Cylinder Low Register / (LBAmid)	Partial Disk Sector address.
 
     lba = (unsigned int) _lba;
     lba = (unsigned int) (lba >> 8);
     lba = (unsigned int) (lba & 0x000000FF);
-    port = (unsigned short) (ide_ports[port_index].base_port + 4); 
+    port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_LBA1); 
     out8 ( 
         (unsigned short) port, 
         (unsigned char) lba );
 
 // =================================================
 // 0x1F5  ; Port to send, bit 16 - 23 of LBA
+// Cylinder High Register / (LBAhi)	Partial Disk Sector address.
 
     lba = (unsigned int) _lba;
     lba = (unsigned int) (lba >> 16);
     lba = (unsigned int) (lba & 0x000000FF);
-    port = (unsigned short) (ide_ports[port_index].base_port + 5); 
+    port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_LBA2); 
     out8 ( 
         (unsigned short) port, 
         (unsigned char) lba );
 
 // =================================================
+
+    /*
+    if (_lba >= 0x10000000) 
+    {
+        port = (unsigned short) (ide_ports[port_index].base_port);  // Base port 
+		out8 (port + ATA_REG_SECCOUNT, 0);																// Yes, so setup 48-bit addressing mode
+		out8 (port + ATA_REG_LBA3, ((_lba & 0xFF000000) >> 24));
+		out8 (port + ATA_REG_LBA4, 0);
+		out8 (port + ATA_REG_LBA5, 0);
+    }
+    */
+
+// =================================================
 // 0x1F7; Command port
-// rw
+// Operation: read or write
 
-    rw = (int) (rw & 0x000000FF);
-    port = (unsigned short) (ide_ports[port_index].base_port + 7); 
-    out8 ( 
-        (unsigned short) port, 
-        (unsigned char) rw );
+    port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_CMD); 
 
+    //if (lba >= 0x10000000) {
+    //    if (operation_number == __OPERATION_PIO_READ){
+    //        out8 ( (unsigned short) port, (unsigned char) 0x24 );
+    //    }
+    //    if (operation_number == __OPERATION_PIO_WRITE){
+    //        out8 ( (unsigned short) port, (unsigned char) 0x34 );
+    //    }
+    //} else {
+        if (operation_number == __OPERATION_PIO_READ){
+            out8 ( (unsigned short) port, (unsigned char) 0x20 );
+        }
+        if (operation_number == __OPERATION_PIO_WRITE){
+            out8 ( (unsigned short) port, (unsigned char) 0x30 );
+        }
+    //}
 
 // PIO or DMA ??
 // If the command is going to use DMA, 
@@ -466,10 +522,10 @@ again:
 
 // Read or write.
 
-    switch (rw){
+    switch (operation_number){
 
 // Read
-    case 0x20:
+    case __OPERATION_PIO_READ:
         __hdd_ata_pio_read ( 
             (unsigned int) port_index, 
             (void *) buffer, 
@@ -478,7 +534,7 @@ again:
         break;
 
 // Write
-    case 0x30:
+    case __OPERATION_PIO_WRITE:
         // write
         __hdd_ata_pio_write ( 
             (unsigned int) port_index, 
@@ -486,10 +542,17 @@ again:
             (int) 512 );
 
         //Flush Cache
-        __hdd_ata_cmd_write ( 
-            (unsigned short) port_index, 
-            (unsigned char) ATA_CMD_FLUSH_CACHE );
- 
+        
+        //if (lba >= 0x10000000) {
+        //    __hdd_ata_cmd_write ( 
+        //        (unsigned short) port_index, 
+        //        (unsigned char) ATA_CMD_FLUSH_CACHE_EXT );
+        //} else {
+            __hdd_ata_cmd_write ( 
+                (unsigned short) port_index, 
+                (unsigned char) ATA_CMD_FLUSH_CACHE );
+        //}
+
         __hdd_ata_wait_not_busy(port_index);
         if ( __hdd_ata_wait_no_drq(port_index) != 0 )
         {
@@ -500,14 +563,14 @@ again:
         break;
 
     default:
-        panic ("pio_rw_sector: Invalid rw\n");
+        panic ("__pio_rw_sector: Invalid operation\n");
         break; 
     };
 
 fail:
     return (int) (-1);
 failTimeOut:
-    printk ("pio_rw_sector: [FAIL] Timeout\n");
+    printk ("__pio_rw_sector: [FAIL] Timeout\n");
     return (int) (-3);
 }
 
@@ -537,8 +600,9 @@ ataReadSector (
     unsigned long reserved1, 
     unsigned long reserved2 )
 {
+    static int Operation = __OPERATION_PIO_READ;
     int Status=0;
-    static int Operation = 0x20;  // Read
+
 // #bugbug
 // This is the port index, not the channel index.
 // >>> We have 4 valid ports, but only 2 channels.
@@ -589,7 +653,7 @@ ataReadSector (
 // IN:
 // (buffer, lba, rw flag, port number)
     Status = 
-        (int) pio_rw_sector ( 
+        (int) __pio_rw_sector ( 
                   (unsigned long) buffer, 
                   (unsigned long) lba, 
                   (int) Operation,
@@ -615,8 +679,9 @@ ataWriteSector (
     unsigned long reserved1,
     unsigned long reserved2 )
 {
+    static int Operation = __OPERATION_PIO_WRITE;
     int Status=0;
-    static int Operation = 0x30;  // Write
+
 // #bugbug
 // This is the port index, not the channel index.
 // >>> We have 4 valid ports, but only 2 channels.
@@ -647,7 +712,7 @@ ataWriteSector (
 // (buffer, lba, rw flag, port number, master )
 
     Status = 
-        (int) pio_rw_sector ( 
+        (int) __pio_rw_sector ( 
         (unsigned long) buffer, 
         (unsigned long) lba, 
         (int) Operation, 

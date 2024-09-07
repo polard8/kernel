@@ -505,44 +505,35 @@ static int __ide_identify_device(uint8_t nport)
         goto fail;
     }
 
-// #bugbug
-// O que é isso?
-// Se estamos escrevendo em uma porta de input/output
-// então temos que nos certificar que esses valores 
-// são válidos.
-//Reset?
-    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA  7-0
-    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA1,     0 );  // LBA 15-8
-    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA2,     0 );  // LBA 23-16
 
 // Select device
+// 0xA0 or 0xE0 ?
 // #todo:
 // Review the data sent to the port.
     out8( 
         (unsigned short) ( ata_port[nport].cmd_block_base_address + ATA_REG_DEVSEL), 
         (unsigned char) 0xE0 | ata_port[nport].dev_num << 4 );
 
-//
-// Solicitando informações sobre o disco.
-//
+// Sector count
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+
+// Reset values for LBA
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA  7- 0
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA1,     0 );  // LBA 15- 8
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA2,     0 );  // LBA 23-16
+
+
+// Identify
+// Get information
 
 // cmd
     ata_wait(400);
     ata_wait(400);
-    //debug_print("__ide_identify_device: ATA_CMD_IDENTIFY_DEVICE\n");
     ata_cmd_write (nport,ATA_CMD_IDENTIFY_DEVICE); 
+
+// fail?
     ata_wait(400);
-
-    // ata_wait_irq(nport);
-
-// Nunca espere por um IRQ aqui
-// Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
-// Melhor seria fazermos polling
-// Sem unidade no canal.
-
-    //debug_print("__ide_identify_device: ata_status_read(nport)\n");
-
+    ata_wait(400);
     if (ata_status_read(nport) == 0){
         debug_print("__ide_identify_device: ata_status_read(nport)\n");
         goto fail;
@@ -720,7 +711,7 @@ static int __ide_identify_device(uint8_t nport)
     {
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
-        // e eviamos 256 word de dados PIO
+        // e lemos 256 word de dados PIO
 
         ata_wait_drq(nport);
         __ata_pio_read( nport, ata_devinfo_buffer, 512 );
