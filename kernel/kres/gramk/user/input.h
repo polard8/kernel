@@ -1,5 +1,5 @@
-
-//grinput.h
+// grinput.h
+// Created by Fred Nora.
 
 #ifndef __DISPLAY_GRINPUT_H
 #define __DISPLAY_GRINPUT_H    1
@@ -54,15 +54,18 @@ void gramk_enter_kernel_console(void);
 void gramk_exit_kernel_console(void);
 
 
+int 
+wmRawKeyEvent(
+    unsigned char raw_byte,
+    int prefix );
+
+
 //
 // Input events:
 //
 
 int wmMouseEvent(int event_id,long long1, long long2);
-int 
-wmKeyEvent(
-    unsigned char raw_byte,
-    int prefix );
+int wmKeyboardEvent(int event_id,long long1, long long2);
 int wmTimerEvent(int signature);
 
 

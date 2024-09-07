@@ -445,14 +445,16 @@ console_interrupt(
         // data =  raw byte.
         // See: kgws.c
         case CONSOLE_DEVICE_KEYBOARD:
-            //debug_print("console_interrupt: Input from keyboard device\n");
+            // debug_print("console_interrupt: Input from keyboard device\n");
             // In this case the target tid is the window server.
-            // IN: scancode, prefix.
-            // #bugbug: No prefix always. We need a prefix.
-            Status =  (int) wmKeyEvent( Data, (int) 0 );
-            if (Status<0){
-                goto fail;
-            }
+            // This worker is good for device drivers.
+            // IN: 
+            // scancode (raw byte), prefix.
+            // #bugbug: Where is the prefix?
+            //Status =  (int) wmRawKeyEvent( Data, (int) 0 );
+            //if (Status<0){
+                //goto fail;
+            //}
             break;
 
         // COM port

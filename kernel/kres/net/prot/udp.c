@@ -125,6 +125,11 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
         printk("[g:3] ERROR\n");
         refresh_screen();
 
+        // #test
+        // Testing keyboard event
+        // OK, it's working. We can see a x in the client area of editor.bin.
+        // network_keyboard_event(MSG_KEYDOWN, 'x', 'x' );
+
         NoReply = TRUE;
         goto done;
     }

@@ -1190,125 +1190,7 @@ fail:
 }
 
 // ----------------------------------------------
-// wmMouseEvent:
-// This is basically the low level support for the
-// ps2 mouse on Gramado OS.
-// We are called from the embedded ps2 mouse device driver.
-// :: We are called, we do not read data from a file provided
-// by the device driver.
-// We post the message into the stdin file and into the
-// control thread of the widnow server and sometimes
-// we process the input before sending a message.
-// ----------------------------------------------
-// For mouse events, see: window.h
-// #todo: change parameters.
-// we need more information about the mouse event.
-// called by __ps2mouse_parse_data_packet in ps2mouse.c
-//  Post mouse events only to the window server's control thread.
-// #todo
-// Se uma tecla de controle estiver precionada,
-// então podemos enviar o status das teclads de controle
-// atraves do segundo long.
-
-int 
-wmMouseEvent(
-    int event_id,
-    long long1, 
-    long long2 )
-{
-// Called by __ps2mouse_parse_data_packet() in ps2mouse.c.
-// Right after the ps2 mouse interrupt handler.
-
-    int Status = -1;
-    //static long old_x=0;
-    //static long old_y=0;
-
-// data:
-    unsigned long button_number = 
-        (unsigned long) (long1 & 0xFFFF);
-    //unsigned long ? = long2;
-
-    unsigned long deviceWidth = (unsigned long) screenGetWidth();
-    unsigned long deviceHeight = (unsigned long) screenGetHeight();
-    deviceWidth  = (unsigned long) (deviceWidth & 0xFFFF);
-    deviceHeight = (unsigned long) (deviceHeight & 0xFFFF);
-    if (deviceWidth==0 || deviceHeight==0){
-        panic("wmMouseEvent: w h\n");
-    }
-
-// Event id:
-    if (event_id<0){
-        goto fail;
-    }
-
-// ====================================
-// Button events:
-// Buttons:
-// Pressionado ou liberado.
-// Post message.
-// #todo
-// Se uma tecla de controle estiver precionada,
-// então podemos enviar o status das teclads de controle
-// atraves do segundo long.
-// IN: window pointer, event id, button number. button number.
-// #todo: Send control keys status.
-    if ( event_id == MSG_MOUSEPRESSED || 
-         event_id == MSG_MOUSERELEASED )
-    {
-        ipc_post_message_to_ds( event_id, button_number, button_number );
-        return 0;
-    }
-
-// ====================================
-// mouse move events:
-
-    //#debug
-    //printk ("w:%d h:%d\n",deviceWidth, deviceHeight);
-    //printk ("x:%d y:%d\n",long1, long2);
-    //refresh_screen();
-    //while(1){}
-
-// #test
-// Draw rectangle.
-// #todo #bugbug
-// Isso está falhando ...
-// Existe algum problema na rotina de retângulo
-// que gera PF. Provavelmente é alguma coisa na
-// tipagem de algumas variáveis ... pois esse
-// é um código portado da arquitetura de 32bit 
-// para a arquitetura de 64bit.
-// IN: window pointer, event id, x, y.
-
-    if (event_id == MSG_MOUSEMOVE)
-    {
-        if (long1 < 1){ long1=1; }
-        if (long2 < 1){ long2=1; }
-        if (long1 >= deviceWidth) { long1 = (deviceWidth-1);  }
-        if (long2 >= deviceHeight){ long2 = (deviceHeight-1); }
-
-        // #test
-        // No caso de MSG_MOUSEMOVE, podemos checar se
-        // a última mensagem na fila é também um MSG_MOUSEMOVE.
-        // Nesse caso podemos apenas alterar os valores 
-        // na mensagem ja postada, ao invés de postar uma nova.
-        // O window server ficaria apenas com a posição atual.
-
-        ipc_post_message_to_ds(
-            event_id, 
-            (unsigned long) long1, 
-            (unsigned long) long2 );
-
-        return 0;
-    }
-
-done:
-    return 0;
-fail:
-    return -1;
-}
-
-// ----------------------------------------------
-// wmKeyEvent:
+// wmRawKeyEvent:
 // This is basically the low level support for the
 // ps2 keyboard on Gramado OS.
 // We are called from the embedded ps2 keyboard device driver.
@@ -1367,7 +1249,7 @@ fail:
 // target thread, raw byte 
 
 int 
-wmKeyEvent( 
+wmRawKeyEvent( 
     unsigned char raw_byte,
     int prefix )
 {
@@ -1975,6 +1857,142 @@ done:
                   (unsigned long) Event_LongRawByte );
 
     return (int) Status;
+fail:
+    return (int) -1;
+}
+
+// ----------------------------------------------
+// wmMouseEvent:
+// This is basically the low level support for the
+// ps2 mouse on Gramado OS.
+// We are called from the embedded ps2 mouse device driver.
+// :: We are called, we do not read data from a file provided
+// by the device driver.
+// We post the message into the stdin file and into the
+// control thread of the widnow server and sometimes
+// we process the input before sending a message.
+// ----------------------------------------------
+// For mouse events, see: window.h
+// #todo: change parameters.
+// we need more information about the mouse event.
+// called by __ps2mouse_parse_data_packet in ps2mouse.c
+//  Post mouse events only to the window server's control thread.
+// #todo
+// Se uma tecla de controle estiver precionada,
+// então podemos enviar o status das teclads de controle
+// atraves do segundo long.
+
+int 
+wmMouseEvent(
+    int event_id,
+    long long1, 
+    long long2 )
+{
+// Called by __ps2mouse_parse_data_packet() in ps2mouse.c.
+// Right after the ps2 mouse interrupt handler.
+
+    int Status = -1;
+    //static long old_x=0;
+    //static long old_y=0;
+
+// data:
+    unsigned long button_number = 
+        (unsigned long) (long1 & 0xFFFF);
+    //unsigned long ? = long2;
+
+    unsigned long deviceWidth = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+    deviceWidth  = (unsigned long) (deviceWidth & 0xFFFF);
+    deviceHeight = (unsigned long) (deviceHeight & 0xFFFF);
+    if (deviceWidth==0 || deviceHeight==0){
+        panic("wmMouseEvent: w h\n");
+    }
+
+// Event id:
+    if (event_id<0){
+        goto fail;
+    }
+
+// ====================================
+// Button events:
+// Buttons:
+// Pressionado ou liberado.
+// Post message.
+// #todo
+// Se uma tecla de controle estiver precionada,
+// então podemos enviar o status das teclads de controle
+// atraves do segundo long.
+// IN: window pointer, event id, button number. button number.
+// #todo: Send control keys status.
+    if ( event_id == MSG_MOUSEPRESSED || 
+         event_id == MSG_MOUSERELEASED )
+    {
+        ipc_post_message_to_ds( event_id, button_number, button_number );
+        return 0;
+    }
+
+// ====================================
+// mouse move events:
+
+    //#debug
+    //printk ("w:%d h:%d\n",deviceWidth, deviceHeight);
+    //printk ("x:%d y:%d\n",long1, long2);
+    //refresh_screen();
+    //while(1){}
+
+// #test
+// Draw rectangle.
+// #todo #bugbug
+// Isso está falhando ...
+// Existe algum problema na rotina de retângulo
+// que gera PF. Provavelmente é alguma coisa na
+// tipagem de algumas variáveis ... pois esse
+// é um código portado da arquitetura de 32bit 
+// para a arquitetura de 64bit.
+// IN: window pointer, event id, x, y.
+
+    if (event_id == MSG_MOUSEMOVE)
+    {
+        if (long1 < 1){ long1=1; }
+        if (long2 < 1){ long2=1; }
+        if (long1 >= deviceWidth) { long1 = (deviceWidth-1);  }
+        if (long2 >= deviceHeight){ long2 = (deviceHeight-1); }
+
+        // #test
+        // No caso de MSG_MOUSEMOVE, podemos checar se
+        // a última mensagem na fila é também um MSG_MOUSEMOVE.
+        // Nesse caso podemos apenas alterar os valores 
+        // na mensagem ja postada, ao invés de postar uma nova.
+        // O window server ficaria apenas com a posição atual.
+
+        ipc_post_message_to_ds(
+            event_id, 
+            (unsigned long) long1, 
+            (unsigned long) long2 );
+
+        return 0;
+    }
+
+done:
+    return 0;
+fail:
+    return (int) -1;
+}
+
+int wmKeyboardEvent(int event_id, long long1, long long2)
+{
+// It goes directly to the display server.
+// It's not processed by the kernel.
+
+    if (event_id < 0)
+        goto fail;
+
+    ipc_post_message_to_ds(
+            event_id, 
+            (unsigned long) long1, 
+            (unsigned long) long2 );
+
+    return 0;
 fail:
     return (int) -1;
 }

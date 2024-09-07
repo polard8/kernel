@@ -186,9 +186,10 @@ extern struct network_info_d *NetworkInfo;
 
 // Network interface for keyboard input.
 void 
-network_keyboard_event(
-    unsigned char raw_byte, 
-    int prefix );
+network_keyboard_event( 
+    int event_id,
+    long long1, 
+    long long2 );
 
 // Network interface for mouse input.
 void 

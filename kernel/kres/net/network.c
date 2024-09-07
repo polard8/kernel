@@ -48,20 +48,24 @@ static void __maximize_ws_priority(pid_t pid);
 
 // Network interface for keyboard input.
 void 
-network_keyboard_event(
-    unsigned char raw_byte, 
-    int prefix )
+network_keyboard_event( 
+    int event_id,
+    long long1, 
+    long long2 )
 {
-    unsigned char __raw = raw_byte;
-    int __prefix = (prefix & 0xFF);
 
-// The routine bellow is always posting to the display server.
+    if (event_id < 0)
+        goto fail;
+
 // see:
 // user/input.c
-// IN: tid, scancode, prefix.
-    wmKeyEvent( 
-        (unsigned char) __raw,
-        (int) __prefix );
+    wmKeyboardEvent(
+            event_id, 
+            (long) long1, 
+            (long) long2 );
+
+fail:
+    return;
 }
 
 // Network interface for mouse input.

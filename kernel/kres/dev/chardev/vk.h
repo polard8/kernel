@@ -1,6 +1,7 @@
-
 // vk.h
 // Virtual Keys.
+// Created by Fred Nora.
+
 // Teclas virtuais padrão gramado.
 // Inspiradas nos scancodes do teclado abnt2, pt-br.
 

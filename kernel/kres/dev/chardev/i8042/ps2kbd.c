@@ -412,8 +412,10 @@ NormalByte:
 // The routine bellow is always posting to the display server.
 // see:
 // user/input.c
+// input.c is working as a middle-agent capable of handle
+// abnt2 devices.
 // IN: tid, scancode, prefix.
-    wmKeyEvent( 
+    wmRawKeyEvent( 
         (unsigned char) __raw,
         (int) (__prefix & 0xFF) );
 
