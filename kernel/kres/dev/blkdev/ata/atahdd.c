@@ -542,7 +542,7 @@ again:
             (int) 512 );
 
         //Flush Cache
-        
+
         //if (lba >= 0x10000000) {
         //    __hdd_ata_cmd_write ( 
         //        (unsigned short) port_index, 

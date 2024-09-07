@@ -50,6 +50,10 @@ int hddError=0;
 //...
 
 
+#define __OPERATION_PIO_READ  1000
+#define __OPERATION_PIO_WRITE  2000
+
+
 
 static void 
 __libata_pio_read ( 
@@ -70,8 +74,8 @@ static int
 __ata_pio_rw_sector ( 
     unsigned long buffer, 
     unsigned long lba, 
-    int rw, 
-    int port,
+    int operation_number, 
+    int port_index,
     int slave ); 
 
 
@@ -157,23 +161,32 @@ __libata_pio_write (
  *   (IDE PIO)
  */
 // IN:
-// port = We have 4 valid ports.
+// port_index = We have 4 valid ports.
 // slave = slave or not.
 static int 
 __ata_pio_rw_sector ( 
     unsigned long buffer, 
     unsigned long lba, 
-    int rw, 
-    int port,     
+    int operation_number, 
+    int port_index,     
     int slave )  
 {
     unsigned long tmplba = (unsigned long) lba;
+    unsigned short Port;
+
+
+// Invalid operation number.
+    if ( operation_number != __OPERATION_PIO_READ && 
+         operation_number != __OPERATION_PIO_WRITE )
+    {
+        return (int) -1;
+    }
 
 // #bugbug
 // s� funcionaram as portas 0 e 2.
 // para primary e secondary.
 
-    if ( port < 0 || port >= 4 )
+    if ( port_index < 0 || port_index >= 4 )
     {
         // #todo: Message
         return -1;
@@ -209,19 +222,19 @@ __ata_pio_rw_sector (
 // int and long has the same size.
 
     out8( 
-        (int) ( ide_ports[port].base_port + 6 ), 
+        (int) ( ide_ports[port_index].base_port + 6 ), 
         (int) tmplba );
 
 // #test
     //out8( 
-        // (int) ide_ports[port].base_port + 6, 
+        // (int) ide_ports[port_index].base_port + 6, 
         // (int) 0xE0 | (master << 4) | ((tmplba >> 24) & 0x0F));
  
 // 0x01F2
 // Port to send number of sectors.
 
     out8( 
-        (int) ( ide_ports[port].base_port + 2 ), 
+        (int) ( ide_ports[port_index].base_port + 2 ), 
         (int) 1 );
 
 // 0x1F3  
@@ -229,7 +242,7 @@ __ata_pio_rw_sector (
 
     tmplba = lba;
     tmplba = tmplba & 0x000000FF;
-    out8( (int) ide_ports[port].base_port + 3 , (int) tmplba );
+    out8( (int) ide_ports[port_index].base_port + 3 , (int) tmplba );
 
 // 0x1F4
 // Port to send bit 8 - 15 of LBA.
@@ -237,7 +250,7 @@ __ata_pio_rw_sector (
     tmplba = lba;
     tmplba = tmplba >> 8;
     tmplba = tmplba & 0x000000FF;
-    out8( (int) ide_ports[port].base_port + 4 , (int) tmplba );
+    out8( (int) ide_ports[port_index].base_port + 4 , (int) tmplba );
 
 // 0x1F5:
 // Port to send bit 16 - 23 of LBA
@@ -245,14 +258,44 @@ __ata_pio_rw_sector (
     tmplba = lba;
     tmplba = tmplba >> 16;
     tmplba = tmplba & 0x000000FF;
-    out8( (int) ide_ports[port].base_port + 5 , (int) tmplba );
+    out8( (int) ide_ports[port_index].base_port + 5 , (int) tmplba );
 
+// =================================================
+
+    /*
+    if (_lba >= 0x10000000) 
+    {
+        Port = (unsigned short) (ide_ports[port_index].base_port);  // Base port 
+		out8 (Port + ATA_REG_SECCOUNT, 0);																// Yes, so setup 48-bit addressing mode
+		out8 (Port + ATA_REG_LBA3, ((_lba & 0xFF000000) >> 24));
+		out8 (Port + ATA_REG_LBA4, 0);
+		out8 (Port + ATA_REG_LBA5, 0);
+    }
+    */
+
+// =================================================
 // 0x1F7:
 // Command port
-// rw
+// Operation: read or write
 
-    rw = rw & 0x000000FF;
-    out8( (int) ide_ports[port].base_port + 7 , (int) rw );
+    Port = (unsigned short) (ide_ports[port_index].base_port + ATA_REG_CMD); 
+
+    //if (lba >= 0x10000000) {
+    //    if (operation_number == __OPERATION_PIO_READ){
+    //        out8 ( (unsigned short) port, (unsigned char) 0x24 );
+    //    }
+    //    if (operation_number == __OPERATION_PIO_WRITE){
+    //        out8 ( (unsigned short) port, (unsigned char) 0x34 );
+    //    }
+    //} else {
+        if (operation_number == __OPERATION_PIO_READ){
+            out8 ( (unsigned short) Port, (unsigned char) 0x20 );
+        }
+        if (operation_number == __OPERATION_PIO_WRITE){
+            out8 ( (unsigned short) Port, (unsigned char) 0x30 );
+        }
+    //}
+
 
 // PIO or DMA ??
 // If the command is going to use DMA, set the Features Register to 1, otherwise 0 for PIO.
@@ -267,7 +310,7 @@ __ata_pio_rw_sector (
 
 again:
 
-    c = (unsigned char) in8( (int) ide_ports[port].base_port + 7);
+    c = (unsigned char) in8( (int) ide_ports[port_index].base_port + 7);
 
 // Select a bit.
     c = (c & 8);
@@ -291,29 +334,39 @@ again:
 // read or write.
 //
 
-    switch (rw){
+    switch (operation_number){
 
         // read
-        case 0x20:
+        case __OPERATION_PIO_READ:
             __libata_pio_read ( 
-                (int)    port, 
+                (int)    port_index, 
                 (void *) buffer, 
                 (int)    512 );
             return 0;
             break;
 
         // write
-        case 0x30:
+        case __OPERATION_PIO_WRITE:
  
             __libata_pio_write ( 
-                (int)    port, 
+                (int)    port_index, 
                 (void *) buffer, 
                 (int)    512 );
 
             //Flush Cache
-            hdd_ata_cmd_write( (int) port, (int) ATA_CMD_FLUSH_CACHE );
-            hdd_ata_wait_not_busy(port);
-            if ( hdd_ata_wait_no_drq(port) != 0)
+
+            //if (lba >= 0x10000000) {
+            //    hdd_ata_cmd_write ( 
+            //        (unsigned short) port_index, 
+            //        (unsigned char) ATA_CMD_FLUSH_CACHE_EXT );
+            //} else {
+                hdd_ata_cmd_write ( 
+                    (unsigned short) port_index, 
+                    (unsigned char) ATA_CMD_FLUSH_CACHE );
+            //}    
+
+            hdd_ata_wait_not_busy(port_index);
+            if ( hdd_ata_wait_no_drq(port_index) != 0)
             {
                 // #todo: Message.
                 return -1;
@@ -345,7 +398,7 @@ ata_read_sector (
     unsigned long cx, 
     unsigned long dx )
 {
-    static int Operation = 0x20;  // Read
+    static int Operation = __OPERATION_PIO_READ;  //0x20;  // Read
 
     // Channel and device number
     int ideChannel = g_current_ide_channel;
@@ -405,7 +458,7 @@ ata_write_sector (
     unsigned long cx, 
     unsigned long dx )
 {
-    static int Operation = 0x30;  // Read
+    static int Operation = __OPERATION_PIO_WRITE; //0x30;  // Read
 
     // Channel and device number
     int ideChannel = g_current_ide_channel;
