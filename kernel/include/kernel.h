@@ -318,6 +318,8 @@
 
 #include "../kctl/ke/intake/thread.h"
 #include "../kctl/ke/intake/process.h"
+#include "../kctl/ke/intake/ithread.h"
+#include "../kctl/ke/intake/clone.h"
 #include "../kctl/ke/intake/ipc.h"
 
 #include "../kctl/ke/intake/sched/sched.h"

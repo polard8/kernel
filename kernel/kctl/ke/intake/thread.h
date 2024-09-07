@@ -792,16 +792,15 @@ extern unsigned long threadList[THREAD_COUNT_MAX];
 // == prototypes ===========================
 //
 
-int init_threads(void);
+// From tlib.c
+void show_slot(int tid);
+void show_slots(void);
+void show_reg(int tid);
+void show_thread_information (void);
+
 
 // See: main.c
 void keEarlyRing0IdleThread(void);
-
-// Create the init thread.
-// This is the first thread ever.
-// See: create.c
-
-struct thread_d *create_init_thread(void); 
 
 // From thread.c
 
@@ -821,11 +820,6 @@ void *GetCurrentThread(void);
 void *GetForegroundThread(void);
 void *GetWSThread(void);
 
-// From threadi.c
-void show_slot(int tid);
-void show_slots(void);
-void show_reg(int tid);
-
 void 
 set_thread_priority ( 
     struct thread_d *t, 
@@ -841,8 +835,6 @@ void SelectForExecution ( struct thread_d *Thread );
 
 unsigned long 
 thread_get_profiler_percentage (struct thread_d *thread);
-
-void show_thread_information (void);
 
 void thread_show_profiler_info(void);
 int thread_profiler(int service);
@@ -862,14 +854,6 @@ unlink_two_threads(
 //
 
 struct thread_d *copy_thread_struct(struct thread_d *thread);
-
-struct thread_d *create_thread ( 
-    struct cgroup_d  *cg,
-    unsigned long init_rip, 
-    unsigned long init_stack, 
-    pid_t pid, 
-    char *name,
-    unsigned int cpl );
 
 // =====
 
@@ -904,6 +888,26 @@ void spawn_reset_eoi_state(void);
 
 void psSpawnThreadByTID(tid_t tid);
 
+
+//
+// $
+// CREATE THREAD
+//
+
+struct thread_d *create_thread ( 
+    struct cgroup_d  *cg,
+    unsigned long init_rip, 
+    unsigned long init_stack, 
+    pid_t pid, 
+    const char *name,
+    unsigned int cpl );
+
+//
+// $
+// INITIALIZATION
+//
+
+int init_threads(void);
 
 #endif    
 

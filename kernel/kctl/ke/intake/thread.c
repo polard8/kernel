@@ -54,7 +54,10 @@ __ps_setup_x64_context (
     unsigned long init_stack,
     unsigned long init_rip );
 
-//===================
+
+//
+// =========================================================
+//
 
 // worker
 static void 
@@ -462,77 +465,6 @@ int GetThreadType (struct thread_d *thread)
     return (int) thread->type;
 }
 
-/*
- * init_threads:
- *     Inicializa o thread manager.
- *     Inicializa as estruturas e vari�veis 
- *     que lidam com threads.
- */
-// Called by init_microkernel in mk.c
-
-int init_threads(void)
-{
-    register int i=0;
-
-    debug_print("init_threads:\n");
-
-// Globais
-    current_thread=0;  //tid.
-// Número de threads no processador.
-    //ProcessorBlock.threads_counter = 0;
-    UPProcessorBlock.threads_counter = (int) 0;
-
-// #todo: outdated.
-    //forkid = 0;                      //
-    task_count = (unsigned long) 0;  //Zera o contador de tarefas criadas.
-   //...
-
-// #todo: 
-// Porque essas variáveis usam o termo 'task'?
-// task é sinonimo de process.
-
-// Variáveis usadas na inicialização de uma nova tarefa.
-
-// Se há uma nova tarefa.
-    start_new_task_status  = (unsigned long) 0;
-// Id dá nova tarefa.
-    start_new_task_id = (int) 0;
-//Endereção da nova tarefa.
-    start_new_task_address = (unsigned long) 0;
-
-// #todo: 
-// Há mais variáveis para serem inicializadas??!!
-
-//
-// Clear thread lists.
-//
-
-// normal threads
-    i=0;
-    while (i < THREAD_COUNT_MAX){
-        threadList[i] = (unsigned long) 0; 
-        i++;
-    };
-
-// i/o threads
-    //i=0;
-    //while ( i < THREAD_COUNT_MAX ){
-    //    io_threadList[i] = (unsigned long) 0; 
-    //    i++;
-    //};
-
-// interactive threads
-    //i=0;
-    //while ( i < THREAD_COUNT_MAX ){
-    //    interactive_threadList[i] = (unsigned long) 0; 
-    //    i++;
-    //};
-
-    // ...
-
-    return 0;
-}
-
 // Set the current TID.
 void SetCurrentTID(tid_t tid)
 {
@@ -674,43 +606,6 @@ thread_get_profiler_percentage (struct thread_d *thread)
     return (unsigned long) thread->profiler_percentage_running;
 }
 
-// threads
-void show_thread_information (void)
-{
-    struct thread_d  *Idle;
-    struct thread_d  *Current;
-
-    printk ("show_thread_information:\n");
-
-// =================================
-// Idle thread
-    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
-    if ((void *) Idle != NULL)
-    {
-        if (Idle->magic == 1234){
-            printk ("Idle->tid = %d\n", Idle->tid );
-        }
-    }
-
-// =================================
-// Current thread
-    Current = (void *) GetCurrentThread();
-    if ((void *) Current != NULL)
-    {
-        if (Current->magic == 1234){
-            printk ("Current->tid   = %d\n", Current->tid );
-            printk ("current_thread = %d\n", current_thread );
-        }
-    }
-
-// Show all the slots
-// see: threadi.c
-    show_slots(); 
-
-    printk("Done\n");
-    refresh_screen();
-}
-
 // ??
 // Chamada pelo timer.c
 int thread_profiler(int service)
@@ -812,458 +707,6 @@ int thread_profiler(int service)
 // a thread rodou durante o período.
 
     return -1;
-}
-
-/*
- * create_thread:
- *     Create a thread.
- * #todo: 
- * O processo ao qual o thread vai ser atribu�do deve ser passado 
- * via argumento, se o argumento for nulo, ent�o usa-se o 
- * processo atual como dono do thread.
- * Obs: Essa rotina deve fazer a inicializa��o da parte independente
- * da arquitetura e chamar as rotinas referentes � inicializa���es
- * dependentes da arquitetura, que ficar�o em outro diret�rio.
- * IN:
- *     @todo: Esses argumentos presisam ser melhorados.
- * OUT:
- *     Retorno do tipo ponteiro de estrutura.
- *     Retorna o endere�o da estrutura da thread.
- *     Retorna NULL se der errado.
- * 2015 - Created by Fred Nora.
- * 2021 - 64bit version
- */
-// #todo
-// Incluir o 'ring' como parâmetro.
-// Isso vai ajudar a função decidir quais seletores de segmento usar.
-// #todo
-// This is gonna be the wrapper for this routine.
-// This wrapper will call two workers:
-// The first routine will create the objet itself and
-// setup all the machine independent elements.
-// The second one will setup all the machine dependent elements.
-
-struct thread_d *create_thread ( 
-    struct cgroup_d  *cg,
-    unsigned long init_rip, 
-    unsigned long init_stack, 
-    pid_t pid, 
-    char *name,
-    unsigned int cpl )
-{
-// Create a thread.
-
-    struct process_d *Process;
-    struct thread_d  *Thread;
-// Empty slot
-    struct thread_d *Empty;
-    pid_t ProcessID = -1;
-// Counter
-// see: thread.h
-    int i = (int) USER_THRESHOLD_TID;
-    struct rect_d *r;
-
-// #debug
-    debug_print ("create_thread: #todo\n");
-    //printk ("create_thread: #todo\n");
-
-//======================================
-// check parameters.
-
-    // cgroup
-    if ((void*) cg == NULL){
-        debug_print ("create_thread: cg\n");
-    }
-
-// #bugbug
-// Nao podemos usar isso aqui porque a rotina declonagem
-// chama essa funçao mas reconfigura esse valor logo em seguida.
-
-    //if( init_rip == 0 ){
-    //    panic ("create_thread: [ERROR] init_rip\n");
-    //}
-
-// #bugbug
-// Nao podemos usar isso aqui porque a rotina de clonagem
-// chama essa funçao mas reconfigura esse valor logo em seguida.
-
-    //if( init_stack == 0 ){
-    //    panic ("create_thread: [ERROR] init_stack\n");
-    //}
-
-// PID
-    if (pid < 0){
-        panic ("create_thread: [ERROR] pid\n");
-    }
-
-// name
-    if ((void*) name == NULL){
-        panic ("create_thread: [ERROR] name\n");
-    }
-    if ( *name == 0 ){
-        panic ("create_thread: [ERROR] *name\n");
-    }
-// cpl
-    if ( cpl != RING0 && cpl != RING3 ){
-        panic ("create_thread: [ERROR] Invalid cpl\n");
-    }
-
-//======================================
-// Limits da thread atual.
-// #bugbug: 
-// Não sei pra que isso. 
-// Pois a thread atual não importa.
-// @todo: deletar isso. 
-
-    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
-    {
-        debug_print ("create_thread: current_thread fail\n");
-        printk      ("create_thread: current_thread fail\n");
-        goto fail;
-    }
-
-// #todo
-// Filtrar o processo ao qual a thread pertence.
-// #bugbug:
-// Não sabemos a condição do processo atual para 
-// permitirmos que ele seja o dono da thread.
-
-    ProcessID = (pid_t) pid;
-    if ( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX )
-    {
-        //#bugbug: Isso pode ser um problemão.
-        panic("create_thread: ProcessID");
-        //ProcessID = current_process;
-    }
-
-//
-// Process
-//
-
-// Ja temos um PID para o processo que eh dono da thread.
-
-    Process = (void *) processList[ProcessID]; 
-    if ((void *) Process == NULL){
-        panic ("create_thread: Process\n");
-    }
-    if (Process->used != TRUE){
-        panic ("create_thread: Process->used\n");
-    }
-    if (Process->magic != 1234){
-        panic ("create_thread: Process->magic\n");
-    }
-
-//
-// Thread
-//
-
-// Alocando memória para a estrutura da thread.
-// Obs: Estamos alocando memória dentro do heap do kernel.
-
-    Thread = (void *) kmalloc(sizeof(struct thread_d));
-    if ((void *) Thread == NULL){
-        panic("create_thread: Thread\n");
-    }
-    memset( Thread, 0, sizeof(struct thread_d) );
-
-// The kernel console associated with this thread.
-// 0~3
-    Thread->__console_id = (int) CONSOLE0;
-
-    Thread->link = NULL;
-    Thread->is_linked = FALSE;
-
-    Thread->exit_in_progress = FALSE;
-
-// Belongs to this process.
-    Thread->owner_process = (void *) Process;
-    Thread->owner_pid = (pid_t)  ProcessID;
-
-// Paging
-    Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;
-    Thread->pml4_PA  = (unsigned long ) Process->pml4_PA;
-    Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
-    Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
-    Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
-    Thread->pd0_PA   = (unsigned long ) Process->pd0_PA; 
-
-// Page fault information.
-    Thread->PF.in_pf = FALSE;  // Not in a pf routine.
-    Thread->PF.pf_counter = 0;
-
-//
-// Security
-//
-
-// #todo
-// Include these element into the thread structure.
-
-// ====
-
-// #todo
-// The parameters needs to provide us this information.
-
-    Thread->type = THREAD_TYPE_SYSTEM; 
-    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //static
-    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //dynamic
-
-    Thread->plane = FOREGROUND_THREAD;
-
-// ==============
-// Surface rectangle.
-
-    r = (struct rect_d *) kmalloc ( sizeof(struct rect_d) );
-    if ((void*) r == NULL){
-        panic("create_thread: r\n");
-    }
-    memset( r, 0, sizeof(struct rect_d) );
-
-    r->left = 0;
-    r->top  = 0;
-    r->width  = 50; 
-    r->height = 50;
-    r->dirty = FALSE; 
-    r->used = TRUE;
-    r->magic = 1234;
-    Thread->surface_rect = r;
-
-// ==============
-// local worker
-// Initializing the common basic elements.
-    __ps_initialize_thread_common_elements( (struct thread_d *) Thread );
-
-// Input model
-    Thread->input_mode = IM_MESSAGE_INPUT;
-
-// ??
-// Explain it better.
-    Thread->_protected = FALSE;
-
-// Thread name.
-
-    Thread->name_address = (unsigned long) name;
-    //#todo: Usar Thread->name. 
-    //#todo: Thread->cmd.
-    //#test 64 bytes max.
-    strcpy( Thread->__threadname, (const char *) name );
-
-// This thread can be preempted.
-    Thread->is_preemptable = PREEMPTABLE;
-
-    // ...
-
-    // Nothing
-
-// Loop.
-// Vamos gerar um TID válido.
-
-    i = (int) USER_THRESHOLD_TID;  // começa na base.
-    int Cycle=0;
-
-try_next_slot:
-
-    // 3 tentativas.
-    if (Cycle >= 3){
-        panic ("create_thread: [FAIL] No more slots\n");
-        //return NULL;
-    }
-
-// Get empty thread structure pointer.
-// Not empty
-// Voltamos.
-
-    Empty = (void *) threadList[i];
-
-    if ((void *) Empty != NULL)
-    {
-        // Recomeça o loop na base para id de usuarios.
-        i++;
-        if (i >= THREAD_COUNT_MAX)
-        {
-            i = (int) USER_THRESHOLD_TID;  
-           Cycle++; 
-        }
-        
-        goto try_next_slot;
-    }
-
-// ======================================
-// Index Ok.
-// Now we have an index number.
-    Thread->tid = (tid_t) i;
-
-//
-// == Time support ============
-//
-
-// Temporizadores. 
-
-// step:
-// Quantas vezes ela usou o processador no total. 
-// Quantas vezes ela já rodou no total.
-// How many jiffies. total_jiffies.
-
-    Thread->step = 0;
-
-// Credits:
-// O acumulo de creditos gera incremento de quantum.
-    Thread->credits = 0;
-
-// Quantum.
-    Thread->quantum           = QUANTUM_NORMAL_THRESHOLD;
-    Thread->quantum_limit_min = QUANTUM_MIN; 
-    Thread->quantum_limit_max = QUANTUM_MAX; 
-
-    Thread->standbyCount = 0;
-
-    Thread->runningCount = 0;
-    Thread->runningCount_ms = 0;
-
-    Thread->readyCount  = 0; 
-    Thread->ready_limit = QUANTUM_MAX;
-
-    Thread->waitingCount  = 0;
-    Thread->waiting_limit = QUANTUM_MAX;
-
-    Thread->blockedCount  = 0; 
-    Thread->blocked_limit = QUANTUM_MAX;
-
-    Thread->yield_in_progress = FALSE;
-    Thread->sleep_in_progress = FALSE;
-    Thread->desired_sleep_ms = 0;
-
-// How many times it was scheduled.
-    Thread->scheduledCount=0;
-
-// Not used now. But it works fine.
-    Thread->ticks_remaining = 1000; 
-
-    Thread->initial_time_ms = get_systime_ms();
-    Thread->total_time_ms = 0;
-
-// ===================================
-
-// Transition counter.
-    Thread->transition_counter.to_supervisor = 0;
-    Thread->transition_counter.to_user = 0;
-
-//
-// == Context support ================
-//
-
-// Call the second worker to setup all the machine dependent elements.
-// Just like the context et al.
-// The contexts needs its own structure.
-
-// ring 0
-    if (cpl == RING0)
-    {
-        // iopl 0 for threads in ring 0.
-        // cpl = iopl
-        Thread->rflags_initial_iopl = (unsigned int) 0;
-        Thread->rflags_current_iopl = (unsigned int) 0;
-
-        __ps_setup_x64_context( 
-            (struct thread_d *) Thread,
-            RING0,
-            (unsigned long) init_stack,
-            (unsigned long) init_rip );
-    }
-
-// ring 3
-    if (cpl == RING3)
-    {
-        // weak protection
-        // iopl 3 for threads in ring 3.
-        Thread->rflags_initial_iopl = (unsigned int) 3;
-        Thread->rflags_current_iopl = (unsigned int) 3;
-
-        __ps_setup_x64_context( 
-            (struct thread_d *) Thread,
-            RING3,
-            (unsigned long) init_stack,
-            (unsigned long) init_rip );
-    }
-
-//cpu.
-    //Thread->cpuID = 0;
-    //Thread->confined = 0;
-    //Thread->CurrentProcessor = 0;
-    //Thread->NextProcessor = 0;
-
-//ServiceTable ..
-//Ticks ...
-//DeadLine ... 
-
-    //Thread->PreviousMode  //ring???
-    //Thread->idealprocessornumber
-    //Thread->event
-
-// ORDEM: 
-// O que segue � referenciado com pouca frequ�ncia.
-
-//
-// Finalization
-//
-
-//@todo:
-//herdar o quantum do processo.
-//herdar a afinidade do processo.(cpu affinity) 
-
-// #todo: 
-// Incrementar a contagem de threads no processo.
-    //Process->threadCount++;
-
-// Navigation.
-    Thread->next = NULL;
-
-// Coloca na lista.
-// #bugbug: Check overflow again.
-    threadList[ Thread->tid ] = (unsigned long) Thread;
-
-    Thread->state = INITIALIZED;  
-
-// Validation
-    Thread->used = TRUE;
-    Thread->magic = THREAD_MAGIC;
-// ===================================================
-
-//
-// Thread counter
-//
-
-// #importante
-// Contador de threads
-// Vamos atualizar o contador de threads, 
-// pois mais uma thread existe, mesmo que n�o esteja rodando ainda.
-
-    //ProcessorBlock.threads_counter++;
-    UPProcessorBlock.threads_counter++;
-
-// limits 
-
-    //if ( ProcessorBlock.threads_counter >= THREAD_COUNT_MAX )
-    if (UPProcessorBlock.threads_counter >= THREAD_COUNT_MAX){
-        panic ("create_thread: [FAIL] UPProcessorBlock.threads_counter \n");
-    }
-
-//done:
-
-    // #debug
-    //debug_print ("create_thread: Done\n");
-    //printk ("create_thread: Done\n");
-
-// Warning !!! 
-// ( NÃO COLOCAR PARA EXECUÇÃO, 
-// OUTRA FUNÇÃO DEVE COLOCAR ISSO PARA EXECUÇÃO )
-
-// MOVEMENT 1 (Initialized ---> Standby)
-    //SelectForExecution(t);
-
-// Return the pointer.
-    return (void *) Thread;
-fail:
-    return NULL;
 }
 
 /*
@@ -1731,6 +1174,540 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     
 // Returning the pointer for the clone.
     return (struct thread_d *) clone;
+}
+
+
+//
+// $
+// CREATE THREAD
+//
+
+/*
+ * create_thread:
+ *     Create a thread.
+ * #todo: 
+ * O processo ao qual o thread vai ser atribu�do deve ser passado 
+ * via argumento, se o argumento for nulo, ent�o usa-se o 
+ * processo atual como dono do thread.
+ * Obs: Essa rotina deve fazer a inicializa��o da parte independente
+ * da arquitetura e chamar as rotinas referentes � inicializa���es
+ * dependentes da arquitetura, que ficar�o em outro diret�rio.
+ * IN:
+ *     @todo: Esses argumentos presisam ser melhorados.
+ * OUT:
+ *     Retorno do tipo ponteiro de estrutura.
+ *     Retorna o endere�o da estrutura da thread.
+ *     Retorna NULL se der errado.
+ * 2015 - Created by Fred Nora.
+ * 2021 - 64bit version
+ */
+// #todo
+// Incluir o 'ring' como parâmetro.
+// Isso vai ajudar a função decidir quais seletores de segmento usar.
+// #todo
+// This is gonna be the wrapper for this routine.
+// This wrapper will call two workers:
+// The first routine will create the objet itself and
+// setup all the machine independent elements.
+// The second one will setup all the machine dependent elements.
+
+struct thread_d *create_thread ( 
+    struct cgroup_d  *cg,
+    unsigned long init_rip, 
+    unsigned long init_stack, 
+    pid_t pid, 
+    const char *name,
+    unsigned int cpl )
+{
+// Create a thread.
+
+    struct process_d *Process;
+    struct thread_d  *Thread;
+// Empty slot
+    struct thread_d *Empty;
+    pid_t ProcessID = -1;
+// Counter
+// see: thread.h
+    int i = (int) USER_THRESHOLD_TID;
+    struct rect_d *r;
+
+// #debug
+    debug_print ("create_thread: #todo\n");
+    //printk ("create_thread: #todo\n");
+
+//======================================
+// check parameters.
+
+    // cgroup
+    if ((void*) cg == NULL){
+        debug_print ("create_thread: cg\n");
+    }
+
+// #bugbug
+// Nao podemos usar isso aqui porque a rotina declonagem
+// chama essa funçao mas reconfigura esse valor logo em seguida.
+
+    //if( init_rip == 0 ){
+    //    panic ("create_thread: [ERROR] init_rip\n");
+    //}
+
+// #bugbug
+// Nao podemos usar isso aqui porque a rotina de clonagem
+// chama essa funçao mas reconfigura esse valor logo em seguida.
+
+    //if( init_stack == 0 ){
+    //    panic ("create_thread: [ERROR] init_stack\n");
+    //}
+
+// PID
+    if (pid < 0){
+        panic ("create_thread: [ERROR] pid\n");
+    }
+
+// name
+    if ((void*) name == NULL){
+        panic ("create_thread: [ERROR] name\n");
+    }
+    if ( *name == 0 ){
+        panic ("create_thread: [ERROR] *name\n");
+    }
+// cpl
+    if ( cpl != RING0 && cpl != RING3 ){
+        panic ("create_thread: [ERROR] Invalid cpl\n");
+    }
+
+//======================================
+// Limits da thread atual.
+// #bugbug: 
+// Não sei pra que isso. 
+// Pois a thread atual não importa.
+// @todo: deletar isso. 
+
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        debug_print ("create_thread: current_thread fail\n");
+        printk      ("create_thread: current_thread fail\n");
+        goto fail;
+    }
+
+// #todo
+// Filtrar o processo ao qual a thread pertence.
+// #bugbug:
+// Não sabemos a condição do processo atual para 
+// permitirmos que ele seja o dono da thread.
+
+    ProcessID = (pid_t) pid;
+    if ( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX )
+    {
+        //#bugbug: Isso pode ser um problemão.
+        panic("create_thread: ProcessID");
+        //ProcessID = current_process;
+    }
+
+//
+// Process
+//
+
+// Ja temos um PID para o processo que eh dono da thread.
+
+    Process = (void *) processList[ProcessID]; 
+    if ((void *) Process == NULL){
+        panic ("create_thread: Process\n");
+    }
+    if (Process->used != TRUE){
+        panic ("create_thread: Process->used\n");
+    }
+    if (Process->magic != 1234){
+        panic ("create_thread: Process->magic\n");
+    }
+
+//
+// Thread
+//
+
+// Alocando memória para a estrutura da thread.
+// Obs: Estamos alocando memória dentro do heap do kernel.
+
+    Thread = (void *) kmalloc(sizeof(struct thread_d));
+    if ((void *) Thread == NULL){
+        panic("create_thread: Thread\n");
+    }
+    memset( Thread, 0, sizeof(struct thread_d) );
+
+// The kernel console associated with this thread.
+// 0~3
+    Thread->__console_id = (int) CONSOLE0;
+
+    Thread->link = NULL;
+    Thread->is_linked = FALSE;
+
+    Thread->exit_in_progress = FALSE;
+
+// Belongs to this process.
+    Thread->owner_process = (void *) Process;
+    Thread->owner_pid = (pid_t)  ProcessID;
+
+// Paging
+    Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;
+    Thread->pml4_PA  = (unsigned long ) Process->pml4_PA;
+    Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
+    Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
+    Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
+    Thread->pd0_PA   = (unsigned long ) Process->pd0_PA; 
+
+// Page fault information.
+    Thread->PF.in_pf = FALSE;  // Not in a pf routine.
+    Thread->PF.pf_counter = 0;
+
+//
+// Security
+//
+
+// #todo
+// Include these element into the thread structure.
+
+// ====
+
+// #todo
+// The parameters needs to provide us this information.
+
+    Thread->type = THREAD_TYPE_SYSTEM; 
+    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //static
+    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //dynamic
+
+    Thread->plane = FOREGROUND_THREAD;
+
+// ==============
+// Surface rectangle.
+
+    r = (struct rect_d *) kmalloc ( sizeof(struct rect_d) );
+    if ((void*) r == NULL){
+        panic("create_thread: r\n");
+    }
+    memset( r, 0, sizeof(struct rect_d) );
+
+    r->left = 0;
+    r->top  = 0;
+    r->width  = 50; 
+    r->height = 50;
+    r->dirty = FALSE; 
+    r->used = TRUE;
+    r->magic = 1234;
+    Thread->surface_rect = r;
+
+// ==============
+// local worker
+// Initializing the common basic elements.
+    __ps_initialize_thread_common_elements( (struct thread_d *) Thread );
+
+// Input model
+    Thread->input_mode = IM_MESSAGE_INPUT;
+
+// ??
+// Explain it better.
+    Thread->_protected = FALSE;
+
+// Thread name.
+
+    Thread->name_address = (unsigned long) name;
+    //#todo: Usar Thread->name. 
+    //#todo: Thread->cmd.
+    //#test 64 bytes max.
+    strcpy( Thread->__threadname, (const char *) name );
+
+// This thread can be preempted.
+    Thread->is_preemptable = PREEMPTABLE;
+
+    // ...
+
+    // Nothing
+
+// Loop.
+// Vamos gerar um TID válido.
+
+    i = (int) USER_THRESHOLD_TID;  // começa na base.
+    int Cycle=0;
+
+try_next_slot:
+
+    // 3 tentativas.
+    if (Cycle >= 3){
+        panic ("create_thread: [FAIL] No more slots\n");
+        //return NULL;
+    }
+
+// Get empty thread structure pointer.
+// Not empty
+// Voltamos.
+
+    Empty = (void *) threadList[i];
+
+    if ((void *) Empty != NULL)
+    {
+        // Recomeça o loop na base para id de usuarios.
+        i++;
+        if (i >= THREAD_COUNT_MAX)
+        {
+            i = (int) USER_THRESHOLD_TID;  
+           Cycle++; 
+        }
+        
+        goto try_next_slot;
+    }
+
+// ======================================
+// Index Ok.
+// Now we have an index number.
+    Thread->tid = (tid_t) i;
+
+//
+// == Time support ============
+//
+
+// Temporizadores. 
+
+// step:
+// Quantas vezes ela usou o processador no total. 
+// Quantas vezes ela já rodou no total.
+// How many jiffies. total_jiffies.
+
+    Thread->step = 0;
+
+// Credits:
+// O acumulo de creditos gera incremento de quantum.
+    Thread->credits = 0;
+
+// Quantum.
+    Thread->quantum           = QUANTUM_NORMAL_THRESHOLD;
+    Thread->quantum_limit_min = QUANTUM_MIN; 
+    Thread->quantum_limit_max = QUANTUM_MAX; 
+
+    Thread->standbyCount = 0;
+
+    Thread->runningCount = 0;
+    Thread->runningCount_ms = 0;
+
+    Thread->readyCount  = 0; 
+    Thread->ready_limit = QUANTUM_MAX;
+
+    Thread->waitingCount  = 0;
+    Thread->waiting_limit = QUANTUM_MAX;
+
+    Thread->blockedCount  = 0; 
+    Thread->blocked_limit = QUANTUM_MAX;
+
+    Thread->yield_in_progress = FALSE;
+    Thread->sleep_in_progress = FALSE;
+    Thread->desired_sleep_ms = 0;
+
+// How many times it was scheduled.
+    Thread->scheduledCount=0;
+
+// Not used now. But it works fine.
+    Thread->ticks_remaining = 1000; 
+
+    Thread->initial_time_ms = get_systime_ms();
+    Thread->total_time_ms = 0;
+
+// ===================================
+
+// Transition counter.
+    Thread->transition_counter.to_supervisor = 0;
+    Thread->transition_counter.to_user = 0;
+
+//
+// == Context support ================
+//
+
+// Call the second worker to setup all the machine dependent elements.
+// Just like the context et al.
+// The contexts needs its own structure.
+
+// ring 0
+    if (cpl == RING0)
+    {
+        // iopl 0 for threads in ring 0.
+        // cpl = iopl
+        Thread->rflags_initial_iopl = (unsigned int) 0;
+        Thread->rflags_current_iopl = (unsigned int) 0;
+
+        __ps_setup_x64_context( 
+            (struct thread_d *) Thread,
+            RING0,
+            (unsigned long) init_stack,
+            (unsigned long) init_rip );
+    }
+
+// ring 3
+    if (cpl == RING3)
+    {
+        // weak protection
+        // iopl 3 for threads in ring 3.
+        Thread->rflags_initial_iopl = (unsigned int) 3;
+        Thread->rflags_current_iopl = (unsigned int) 3;
+
+        __ps_setup_x64_context( 
+            (struct thread_d *) Thread,
+            RING3,
+            (unsigned long) init_stack,
+            (unsigned long) init_rip );
+    }
+
+//cpu.
+    //Thread->cpuID = 0;
+    //Thread->confined = 0;
+    //Thread->CurrentProcessor = 0;
+    //Thread->NextProcessor = 0;
+
+//ServiceTable ..
+//Ticks ...
+//DeadLine ... 
+
+    //Thread->PreviousMode  //ring???
+    //Thread->idealprocessornumber
+    //Thread->event
+
+// ORDEM: 
+// O que segue � referenciado com pouca frequ�ncia.
+
+//
+// Finalization
+//
+
+//@todo:
+//herdar o quantum do processo.
+//herdar a afinidade do processo.(cpu affinity) 
+
+// #todo: 
+// Incrementar a contagem de threads no processo.
+    //Process->threadCount++;
+
+// Navigation.
+    Thread->next = NULL;
+
+// Coloca na lista.
+// #bugbug: Check overflow again.
+    threadList[ Thread->tid ] = (unsigned long) Thread;
+
+    Thread->state = INITIALIZED;  
+
+// Validation
+    Thread->used = TRUE;
+    Thread->magic = THREAD_MAGIC;
+// ===================================================
+
+//
+// Thread counter
+//
+
+// #importante
+// Contador de threads
+// Vamos atualizar o contador de threads, 
+// pois mais uma thread existe, mesmo que n�o esteja rodando ainda.
+
+    //ProcessorBlock.threads_counter++;
+    UPProcessorBlock.threads_counter++;
+
+// limits 
+
+    //if ( ProcessorBlock.threads_counter >= THREAD_COUNT_MAX )
+    if (UPProcessorBlock.threads_counter >= THREAD_COUNT_MAX){
+        panic ("create_thread: [FAIL] UPProcessorBlock.threads_counter \n");
+    }
+
+//done:
+
+    // #debug
+    //debug_print ("create_thread: Done\n");
+    //printk ("create_thread: Done\n");
+
+// Warning !!! 
+// ( NÃO COLOCAR PARA EXECUÇÃO, 
+// OUTRA FUNÇÃO DEVE COLOCAR ISSO PARA EXECUÇÃO )
+
+// MOVEMENT 1 (Initialized ---> Standby)
+    //SelectForExecution(t);
+
+// Return the pointer.
+    return (void *) Thread;
+fail:
+    return NULL;
+}
+
+//
+// $
+// INITIALIZATION
+//
+
+/*
+ * init_threads:
+ *     Inicializa o thread manager.
+ *     Inicializa as estruturas e vari�veis 
+ *     que lidam com threads.
+ */
+// Called by keInitializeIntake() in ke.c
+
+int init_threads(void)
+{
+    register int i=0;
+
+    debug_print("init_threads:\n");
+
+// Globais
+    current_thread=0;  //tid.
+// Número de threads no processador.
+    //ProcessorBlock.threads_counter = 0;
+    UPProcessorBlock.threads_counter = (int) 0;
+
+// #todo: outdated.
+    //forkid = 0;                      //
+    task_count = (unsigned long) 0;  //Zera o contador de tarefas criadas.
+   //...
+
+// #todo: 
+// Porque essas variáveis usam o termo 'task'?
+// task é sinonimo de process.
+
+// Variáveis usadas na inicialização de uma nova tarefa.
+
+// Se há uma nova tarefa.
+    start_new_task_status  = (unsigned long) 0;
+// Id dá nova tarefa.
+    start_new_task_id = (int) 0;
+//Endereção da nova tarefa.
+    start_new_task_address = (unsigned long) 0;
+
+// #todo: 
+// Há mais variáveis para serem inicializadas??!!
+
+//
+// Clear thread lists.
+//
+
+// normal threads
+    i=0;
+    while (i < THREAD_COUNT_MAX){
+        threadList[i] = (unsigned long) 0; 
+        i++;
+    };
+
+// i/o threads
+    //i=0;
+    //while ( i < THREAD_COUNT_MAX ){
+    //    io_threadList[i] = (unsigned long) 0; 
+    //    i++;
+    //};
+
+// interactive threads
+    //i=0;
+    //while ( i < THREAD_COUNT_MAX ){
+    //    interactive_threadList[i] = (unsigned long) 0; 
+    //    i++;
+    //};
+
+    // ...
+
+    return 0;
 }
 
 //

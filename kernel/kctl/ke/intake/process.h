@@ -4,8 +4,6 @@
 #ifndef __PS_PROCESS_H
 #define __PS_PROCESS_H    1
 
-extern int copy_process_in_progress;
-
 //#bugbug
 //talvez aqui nao seja o melhor lugar pra definir isso.
 #define gramado_pid_t  pid_t
@@ -916,6 +914,7 @@ unsigned long processList[PROCESS_COUNT_MAX];
 // == Prototypes =====================================================
 //
 
+void close_all_processes(void);
 
 void set_current_process(pid_t pid);
 pid_t get_current_process(void);
@@ -923,20 +922,6 @@ pid_t get_current_process(void);
 pid_t get_current_pid(void);
 struct process_d *get_current_process_pointer(void);
 
-
-//==============
-// clone.c
-
-int 
-copy_process_struct(
-    struct process_d *p1,
-    struct process_d *p2 );
-
-pid_t 
-copy_process( 
-    const char *filename, 
-    pid_t pid, 
-    unsigned long clone_flags );
 
 //==============
 // plib.c
@@ -947,33 +932,12 @@ unsigned long get_process_stats ( pid_t pid, int index );
 
 int getprocessname ( pid_t pid, char *buffer );
 
-struct process_d *processObject (void);
 pid_t getNewPID (void);
 int processTesting (int pid);
 int processSendSignal (struct process_d *p, unsigned long signal);
-void init_processes (void);
-
-void close_all_processes(void);
 
 // ===
-
-// Worker for create_process.
-void ps_initialize_process_common_elements(struct process_d *p);
-    
-struct process_d *create_process ( 
-    struct cgroup_d *cg,
-    unsigned long base_address, 
-    unsigned long priority, 
-    ppid_t ppid, 
-    char *name, 
-    unsigned int cpl,
-    unsigned long pml4_va,
-    unsigned long pdpt0_va,
-    unsigned long pd0_va,
-    int personality );
-
-// ===
-
+  
 unsigned long GetProcessPML4_PA(struct process_d *process);
 unsigned long GetProcessPML4_VA(struct process_d *process);
 
@@ -992,10 +956,6 @@ SetProcessPML4_PA (
 int get_caller_process_id (void);
 void set_caller_process_id (int pid);
 
-int init_process_manager (void);
-
-int alloc_memory_for_image_and_stack(struct process_d *process);
-
 // Critical section
 #define __GATE_CLOSED    0
 #define __GATE_OPEN      1
@@ -1007,8 +967,44 @@ file *process_get_file ( int fd );
 
 int process_get_tty (int pid);
 
+int alloc_memory_for_image_and_stack(struct process_d *process);
+
+// Worker for create_process.
+void ps_initialize_process_common_elements(struct process_d *p);
+
+struct process_d *processObject (void);
+
+//
+// $
+// CREATE OBJECT
+//
+
 // Create and initialize a process structure.
 struct process_d *create_and_initialize_process_object(void);
+
+//
+// $
+// CREATE PROCESS
+//
+
+struct process_d *create_process ( 
+    struct cgroup_d *cg,
+    unsigned long base_address, 
+    unsigned long priority, 
+    ppid_t ppid, 
+    const char *name, 
+    unsigned int cpl,
+    unsigned long pml4_va,
+    unsigned long pdpt0_va,
+    unsigned long pd0_va,
+    int personality );
+
+//
+// $
+// INITIALIZATION
+//
+
+void init_processes (void);
 
 #endif    
 

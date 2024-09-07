@@ -1,7 +1,9 @@
 // create.c
 // Created by Fred Nora.
 
-#include <kernel.h>  
+#include <kernel.h>
+
+const char *init_thread_default_name = "Ring3InitThread";
 
 // ==================================================
 // create_init_thread:
@@ -20,7 +22,7 @@ struct thread_d *create_init_thread(void)
     register int r=0;  // Wait reason
     register int i=0;  // Message queue
     register int q=0;  // Message queue
-    char *ThreadName = "Ring3InitThread";
+    char *ThreadName = init_thread_default_name;
 // Stack pointer.
     void *__initStack;   
 

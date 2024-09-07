@@ -75,7 +75,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 # Everything is a file.
 OBJS = thread.o tlib.o process.o plib.o \
-create.o clone.o \
+ithread.o clone.o \
 ipc.o \
 detect.o \
 ke.o \
@@ -101,7 +101,7 @@ all:
 	$(CC) -c intake/process.c  $(KERNEL_INCLUDE) $(CFLAGS) -o process.o
 	$(CC) -c intake/plib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o plib.o
 
-	$(CC) -c intake/create.c   $(KERNEL_INCLUDE) $(CFLAGS) -o create.o
+	$(CC) -c intake/ithread.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ithread.o
 	$(CC) -c intake/clone.c    $(KERNEL_INCLUDE) $(CFLAGS) -o clone.o
 
 	$(CC) -c intake/ipc.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ipc.o

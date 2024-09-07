@@ -4,63 +4,6 @@
 
 #include <kernel.h>
 
-int 
-link_two_threads( 
-    struct thread_d *primary,
-    struct thread_d *secondary )
-{
-// Link two threads.
-
-    if ((void*) primary == NULL)
-        goto fail;
-    if (primary->magic != 1234)
-        goto fail;
-
-    if ((void*) secondary == NULL)
-        goto fail;
-    if (secondary->magic != 1234)
-        goto fail;
-
-// Link
-    primary->link = (struct thread_d *) secondary;
-    primary->is_linked = TRUE;
-// Link
-    secondary->link = (struct thread_d *) primary;
-    secondary->is_linked = TRUE;
-
-    return 0;
-fail:
-    return (int) -1;
-}
-
-int 
-unlink_two_threads( 
-    struct thread_d *primary,
-    struct thread_d *secondary )
-{
-// Link two threads.
-
-    if ((void*) primary == NULL)
-        goto fail;
-    if (primary->magic != 1234)
-        goto fail;
-
-    if ((void*) secondary == NULL)
-        goto fail;
-    if (secondary->magic != 1234)
-        goto fail;
-
-// Unlink
-    primary->link = NULL;
-    primary->is_linked = FALSE;
-// Unlink
-    secondary->link = NULL;
-    secondary->is_linked = FALSE;
-
-    return 0;
-fail:
-    return (int) -1;
-}
 
 // show_slot:
 // Show info about a thread.
@@ -186,6 +129,101 @@ void show_reg(int tid)
         t->context.rax, t->context.rbx, t->context.rcx, t->context.rdx );
 // r8~r12
 // ...
+}
+
+// threads
+void show_thread_information (void)
+{
+    struct thread_d  *Idle;
+    struct thread_d  *Current;
+
+    printk ("show_thread_information:\n");
+
+// =================================
+// Idle thread
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+    if ((void *) Idle != NULL)
+    {
+        if (Idle->magic == 1234){
+            printk ("Idle->tid = %d\n", Idle->tid );
+        }
+    }
+
+// =================================
+// Current thread
+    Current = (void *) GetCurrentThread();
+    if ((void *) Current != NULL)
+    {
+        if (Current->magic == 1234){
+            printk ("Current->tid   = %d\n", Current->tid );
+            printk ("current_thread = %d\n", current_thread );
+        }
+    }
+
+// Show all the slots
+// see: tlib.c
+    show_slots(); 
+
+    printk("Done\n");
+    refresh_screen();
+}
+
+int 
+link_two_threads( 
+    struct thread_d *primary,
+    struct thread_d *secondary )
+{
+// Link two threads.
+
+    if ((void*) primary == NULL)
+        goto fail;
+    if (primary->magic != 1234)
+        goto fail;
+
+    if ((void*) secondary == NULL)
+        goto fail;
+    if (secondary->magic != 1234)
+        goto fail;
+
+// Link
+    primary->link = (struct thread_d *) secondary;
+    primary->is_linked = TRUE;
+// Link
+    secondary->link = (struct thread_d *) primary;
+    secondary->is_linked = TRUE;
+
+    return 0;
+fail:
+    return (int) -1;
+}
+
+int 
+unlink_two_threads( 
+    struct thread_d *primary,
+    struct thread_d *secondary )
+{
+// Link two threads.
+
+    if ((void*) primary == NULL)
+        goto fail;
+    if (primary->magic != 1234)
+        goto fail;
+
+    if ((void*) secondary == NULL)
+        goto fail;
+    if (secondary->magic != 1234)
+        goto fail;
+
+// Unlink
+    primary->link = NULL;
+    primary->is_linked = FALSE;
+// Unlink
+    secondary->link = NULL;
+    secondary->is_linked = FALSE;
+
+    return 0;
+fail:
+    return (int) -1;
 }
 
 // set_thread_priority:
