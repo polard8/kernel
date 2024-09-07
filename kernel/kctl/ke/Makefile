@@ -79,6 +79,7 @@ create.o clone.o \
 ipc.o \
 detect.o \
 ke.o \
+archhal.o \
 hal.o \
 apic.o apictim.o ioapic.o \
 pit.o ports64.o rtc.o \
@@ -115,6 +116,12 @@ all:
 	$(CC) -c intake/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
 	$(CC) -c intake/sched/schedq.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedq.o  
 
+
+# ---------------------
+# hal/arm/ (HAL)
+
+#	$(CC) -c hal/arm/archhal.c   $(KERNEL_INCLUDE) $(CFLAGS) -o archhal.o
+
 # ---------------------
 # hal/x86_64/ (HAL)
 
@@ -137,8 +144,10 @@ all:
 	$(CC) -c hal/x86_64/x64info.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
 	$(CC) -c hal/x86_64/x64sc.c     $(KERNEL_INCLUDE) $(CFLAGS) -o x64sc.o
 	$(CC) -c hal/x86_64/x64fault.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
+	$(CC) -c hal/x86_64/archhal.c   $(KERNEL_INCLUDE) $(CFLAGS) -o archhal.o
 
-#--------
+# ---------------------
+# Architecture-independent HAL interface
 	$(CC) -c hal/hal.c    $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
 
 #--------

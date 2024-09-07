@@ -136,12 +136,15 @@
 // virt/
 #include "../kctl/kmain/virt/hv.h"
 
-// hal/
+// ==========================================
+// hal/arm
+// #include "../kctl/ke/hal/arm/archhal.h"
+
+// ==========================================
+// hal/x86_64
 #include "../kctl/ke/hal/x86_64/cpuid.h"
 #include "../kctl/ke/hal/x86_64/up/up.h"
-
 #include "../kctl/ke/hal/x86_64/smp/x64smp.h"
-
 #include "../kctl/ke/hal/x86_64/pic.h"
 #include "../kctl/ke/hal/x86_64/smp/apic.h"
 #include "../kctl/ke/hal/x86_64/smp/apictim.h"
@@ -149,6 +152,10 @@
 #include "../kctl/ke/hal/x86_64/pit.h"
 #include "../kctl/ke/hal/x86_64/rtc.h"
 #include "../kctl/ke/hal/x86_64/breaker.h"
+#include "../kctl/ke/hal/x86_64/archhal.h"
+
+// ==========================================
+// Architecture-independent HAL interface
 #include "../kctl/ke/hal/hal.h"
 
 // ==================================

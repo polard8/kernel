@@ -1,7 +1,7 @@
 // hal.c
-// HAL for the x86_64 architecture.
+// HAL interface. Architecture-independent.
+// >> This is a good place for 'detection' routines.
 // Created by Fred Nora.
-
 
 #include <kernel.h>    
 
@@ -13,8 +13,7 @@
 //extern unsigned long gdt;
 //extern unsigned long idt;
 //extern unsigned long tss;
-
-extern void asm_reboot(void);
+//extern void asm_reboot(void);
 
 // hw interrupt breakers.
 // see: 
@@ -99,28 +98,6 @@ struct UPProcessorBlock_d  UPProcessorBlock;
 struct processor_d  *processor;
 
 
-/*
-// Called by the idle handler for up.
-void hal_up_idle(void);
-void hal_up_idle(void)
-{
-    asm ("sti");
-    asm ("hlt");
-    return;
-}
-*/
-
-
-/*
-// Called by the idle handler for mp.
-void hal_mp_idle(void);
-void hal_mp_idle(void)
-{
-    asm ("sti");
-    return;
-}
-*/
-
 void hal_io_delay(void)
 {
     io_delay();
@@ -182,12 +159,11 @@ void hal_reboot(void)
         break;
     };
 
-    debug_print("Calling asm_reboot\n");
-    asm_reboot(); 
+    debug_print("Calling archhal_reboot\n");
+    archhal_reboot();
 
     x_panic("hal_reboot:\n");
 }    
-
 
 /*
  * hal_shutdown: 
@@ -241,60 +217,23 @@ void hal_shutdown (void)
 }
 
 
-
-
-/*
- * Beep support
- * #bugbug: 
- * Não quero comprometer a programação do PIT. 
- */
-
-/*
-void ____Beep_tone (int freq){
-
-    if (freq == 0) {
-        int i = io_in8(0x61);
-        io_out8(0x61, i & 0x0d);
-    
-    } else {
-        int i = 1193180000 / freq;
-        io_out8(0x43, 0xb6);
-        io_out8(0x42, i & 0xff);
-        io_out8(0x42, i >> 8);
-        i = io_in8(0x61);
-        io_out8(0x61, (i | 0x03) & 0x0f);
-    }
-}
-*/ 
-
-
-
 // Speaker ON. 
 // OUT 
 // Play sound using built in speaker
-
 void hal_speaker_on(void)
 {
 // Play the sound using the PC speaker.
 
-    uint8_t tmp=0;
-    tmp = in8(0x61);
-    if (tmp != (tmp | 3))
-    {
-        out8(0x61, tmp | 3);
-    }
+    archhal_speaker_on();
 }
-
 
 // Speaker OFF
 // IN
 void hal_speaker_off (void)
 {
-// make it shutup.
+// Make it shutup.
 
-    uint8_t tmp=0; 
-    tmp = in8(0x61) & 0xFC;
-    out8 (0x61, tmp);
+    archhal_speaker_off();
 }
  
 // Testing speaker.
