@@ -208,3 +208,49 @@ dispatch_current:
     //return 0;
 }
 
+
+//
+// $
+// INITIALIZATION
+//
+
+int init_dispatch(void)
+{
+    register int i=0;
+
+    dispatcherType = 0;
+    dispatcherQueueIndex = 0;
+
+// List
+// Dispatcher ready list.
+// #ps: Maybe it is not used.
+    for ( i=0; i < PRIORITY_MAX; i++ ){
+        dispatcherReadyList[i] = (unsigned long) 0;
+    };
+
+
+// Dispatch Count Block
+// see: dispatch.c
+
+    DispatchCountBlock = (void *) kmalloc( sizeof(struct dispatch_count_d) );
+    if ((void *) DispatchCountBlock == NULL){
+        printk ("init_dispatch: DispatchCountBlock\n");
+        return FALSE;
+    }
+
+    DispatchCountBlock->SelectIdleCount = 0;
+    DispatchCountBlock->SelectInitializedCount = 0;
+    DispatchCountBlock->SelectNextCount = 0;
+    DispatchCountBlock->SelectCurrentCount = 0;
+    DispatchCountBlock->SelectAnyCount = 0;
+    DispatchCountBlock->SelectIdealCount = 0;
+    DispatchCountBlock->SelectDispatcherQueueCount = 0;
+    // ...
+    DispatchCountBlock->used=TRUE;
+    DispatchCountBlock->magic=1234;
+    DispatchCountBlock->initialized = TRUE;
+
+    return 0;
+}
+
+

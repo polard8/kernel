@@ -770,9 +770,15 @@ int keInitializeIntake(void)
 
     //PROGRESS("keInitializeIntake:\n");
 
+// Init dispatcher
+    init_dispatch();
+
 // Init scheduler.
 // See: sched/sched.c
     init_scheduler(0);
+
+// Init taskswitch
+    init_ts();
 
 // Init processes and threads, 
 // See: process.c and thread.c
@@ -788,12 +794,11 @@ int keInitializeIntake(void)
 
     queue = NULL;
 
+/*
 // Dispatch Count Block
 // see: dispatch.c
 
-    DispatchCountBlock = 
-        (void *) kmalloc( sizeof(struct dispatch_count_d) );
-
+    DispatchCountBlock = (void *) kmalloc( sizeof(struct dispatch_count_d) );
     if ((void *) DispatchCountBlock == NULL){
         printk ("keInitializeIntake: DispatchCountBlock\n");
         return FALSE;
@@ -810,6 +815,7 @@ int keInitializeIntake(void)
     DispatchCountBlock->used=TRUE;
     DispatchCountBlock->magic=1234;
     DispatchCountBlock->initialized = TRUE;
+*/
 
 // #debug 
 // A primeira mensagem só aparece após a inicialização da runtime

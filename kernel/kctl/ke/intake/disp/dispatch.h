@@ -99,6 +99,13 @@ extern unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 void IncrementDispatcherCount (int type);
 void dispatcher (int type);
 
+//
+// $
+// INITIALIZATION
+//
+
+int init_dispatch(void);
+
 #endif    
 
 

@@ -860,3 +860,14 @@ void tsTaskSwitch(void)
     __task_switch();
 }
 
+//
+// $
+// INITIALIZATION
+//
+
+int init_ts(void)
+{
+    taskswitch_lock();
+    return 0;
+}
+

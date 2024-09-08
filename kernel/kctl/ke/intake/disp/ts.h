@@ -22,5 +22,12 @@ void tsCallExtraRoutines(void);
 // See also: hw.asm
 void tsTaskSwitch (void);
 
+//
+// $
+// INITIALIZATION
+//
+
+int init_ts(void);
+
 #endif    
 

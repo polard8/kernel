@@ -560,7 +560,7 @@ void I_x64ExecuteInitialProcess(void)
 
 // List
 // Dispatcher ready list.
-// Maybe it is not used.
+// #ps: Maybe it is not used.
     for ( i=0; i < PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) t;
     };
