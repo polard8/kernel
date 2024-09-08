@@ -66,14 +66,14 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
         return;
 
 // ----------------
-// 0 = request
+// packet type: 0 = request
     if ( udp_payload[0] == 'g' && 
          udp_payload[1] == ':' && 
          udp_payload[2] == '0' )
     {
         //printk("[request]\n"); refresh_screen();
         memset(udp_payload, 0, sizeof(udp_payload));
-        ksprintf(udp_payload,"g:1 ");
+        ksprintf(udp_payload,"g:1 ");  // Reply code
         ksprintf(
             (udp_payload + 4),
             "This is a response from Gramado OS\n");
@@ -82,7 +82,7 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
     }
 
 // -----------------------
-// 1 = reply
+// packet type: 1 = reply
     if ( udp_payload[0] == 'g' && 
          udp_payload[1] == ':' && 
          udp_payload[2] == '1' )
@@ -98,7 +98,7 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
     }
 
 // -------------------------
-// 2 = event
+// packet type: 2 = event
     if ( udp_payload[0] == 'g' && 
          udp_payload[1] == ':' && 
          udp_payload[2] == '2' )
@@ -114,7 +114,7 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
     }
 
 // ---------------------------
-// 3 = error
+// packet type: 3 = error
     if ( udp_payload[0] == 'g' && 
          udp_payload[1] == ':' && 
          udp_payload[2] == '3' )
@@ -135,7 +135,7 @@ static void __handle_gprotocol(uint16_t s_port, uint16_t d_port)
     }
 
 // --------------------------
-// 4 = disconnect
+// packet type: 4 = disconnect
     if ( udp_payload[0] == 'g' && 
          udp_payload[1] == ':' && 
          udp_payload[2] == '4' )
