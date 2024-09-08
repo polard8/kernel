@@ -794,29 +794,6 @@ int keInitializeIntake(void)
 
     queue = NULL;
 
-/*
-// Dispatch Count Block
-// see: dispatch.c
-
-    DispatchCountBlock = (void *) kmalloc( sizeof(struct dispatch_count_d) );
-    if ((void *) DispatchCountBlock == NULL){
-        printk ("keInitializeIntake: DispatchCountBlock\n");
-        return FALSE;
-    }
-
-    DispatchCountBlock->SelectIdleCount = 0;
-    DispatchCountBlock->SelectInitializedCount = 0;
-    DispatchCountBlock->SelectNextCount = 0;
-    DispatchCountBlock->SelectCurrentCount = 0;
-    DispatchCountBlock->SelectAnyCount = 0;
-    DispatchCountBlock->SelectIdealCount = 0;
-    DispatchCountBlock->SelectDispatcherQueueCount = 0;
-    // ...
-    DispatchCountBlock->used=TRUE;
-    DispatchCountBlock->magic=1234;
-    DispatchCountBlock->initialized = TRUE;
-*/
-
 // #debug 
 // A primeira mensagem só aparece após a inicialização da runtime
 // por isso não deu pra limpar a tela antes.
