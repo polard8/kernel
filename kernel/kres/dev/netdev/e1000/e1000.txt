@@ -1,4 +1,34 @@
 
-#debug
+Intel PRO/1000 family of Ethernet controllers.
 
-Sometime it faild at the moment we 'start link'.
+=======================================================
+NIC Type	Chip
+
+e1000	    Intel 82540EM
+e1000	    Intel 82545EM
+
+=======================================================
+Virtual box:
+
+  The e1000 driver is working on Virtualbox
+  when the chipset is PIIX3, but not when the chipset is ICH9.
+  The controller is Intel PRO/1000 MT Desktop (82540EM).
+  Bridged adapter, promiscuous mode.
+
+  PCI IDE ISA Xcelerator (PIIX), also known as Intel 82371.
+  82371SB (PIIX3)
+
+see:
+https://en.wikipedia.org/wiki/PIIX
+...
+
+=======================================================
+Qemu:
+
+
+=======================================================
+Baremetal:
+
+
+
+
