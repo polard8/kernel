@@ -320,7 +320,7 @@ static int __CompareStrings(void)
     {
         fsList("[");  // root dir. Same as '/'.
         //fsList("GRAMADO");
-        //fsList("GRAMRE");
+        //fsList("DE");
         goto exit_cmp;
     }
 

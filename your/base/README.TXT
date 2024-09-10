@@ -5,6 +5,4 @@
 
   EFI/       - Standard EFI folder used by the firmware.
   GRAMADO/   - System folder for main boot components.
-  GRAMRE/    - Gramado Recovert Environment.
-
-
+  DE/        - Gramado Recovert Environment.

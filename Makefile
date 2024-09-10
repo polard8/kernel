@@ -107,12 +107,18 @@ build-gramado-os:
 	$(Q)$(MAKE) -C boot/
 
 # Copy stuff created in boot/
+
+# Copy the virtual disk into the rootdir.
 	cp boot/GRAMHV.VHD  .
-	cp boot/MBR0.BIN                $(BASE)/
+# Copy bootloader stuff into rootdir.
 	cp boot/x86/bsp/bin/BM.BIN      $(BASE)/
 	cp boot/x86/bsp/bin/BM2.BIN     $(BASE)/
 	cp boot/x86/bsp/bin/BLGRAM.BIN  $(BASE)/
-
+# Copy bootloader stuff into GRAMADO/ folder.
+	cp boot/x86/bsp/bin/BM.BIN      $(BASE)/GRAMADO
+	cp boot/x86/bsp/bin/BM2.BIN     $(BASE)/GRAMADO
+	cp boot/x86/bsp/bin/BLGRAM.BIN  $(BASE)/GRAMADO
+	cp boot/MBR0.BIN                $(BASE)/GRAMADO
 
 #===================================
 # (2) kernel/
@@ -122,8 +128,10 @@ build-gramado-os:
 
 # Copy to the target folder.
 # We need a backup
+# The bootloader expect this.
+# todo: We need to rethink this backup.
 	cp kernel/KERNEL.BIN  $(BASE)/GRAMADO
-	cp kernel/KERNEL.BIN  $(BASE)/GRAMRE
+	cp kernel/KERNEL.BIN  $(BASE)/DE
 
 #===================================
 # (3) mods/
@@ -135,6 +143,9 @@ build-gramado-os:
 # Not dynlinked modules.
 	cp mods/bin/HVMOD0.BIN  $(BASE)/
 #	cp mods/bin/HVMOD1.BIN  $(BASE)/
+	cp mods/bin/HVMOD0.BIN  $(BASE)/GRAMADO
+#	cp mods/bin/HVMOD1.BIN  $(BASE)/GRAMADO
+
 # ...
 
 #===================================
@@ -179,6 +190,7 @@ build-gramado-os:
 # Copy the assets/
 # We can't survive without this one.
 	cp your/assets/themes/theme01/*.BMP  $(BASE)/
+	cp your/assets/themes/theme01/*.BMP  $(BASE)/GRAMADO
 
 	@echo "~build-gramado-os end?"
 
@@ -192,32 +204,32 @@ copy-extras:
 # ------------------------
 # LEVEL 1: (de/ds) Display servers
 
-	-cp $(DEP_L1)/ds00/bin/DS00.BIN    $(BASE)/
-#-cp $(DEP_L1)/ds01/bin/DS01.BIN    $(BASE)/
+	-cp $(DEP_L1)/ds00/bin/DS00.BIN    $(BASE)/DE
+#-cp $(DEP_L1)/ds01/bin/DS01.BIN    $(BASE)/DE
 
 # ------------------------
 # LEVEL 2: (de/apps) Client-side GUI applications
 
-	-cp $(DEP_L2)/bin/TASKBAR.BIN    $(BASE)/
-	-cp $(DEP_L2)/bin/XTB.BIN        $(BASE)/
-	-cp $(DEP_L2)/bin/TERMINAL.BIN   $(BASE)/
-#-cp $(DEP_L2)/bin/GWS.BIN       $(BASE)/
+	-cp $(DEP_L2)/bin/TASKBAR.BIN    $(BASE)/DE
+	-cp $(DEP_L2)/bin/XTB.BIN        $(BASE)/DE
+	-cp $(DEP_L2)/bin/TERMINAL.BIN   $(BASE)/DE
+#-cp $(DEP_L2)/bin/GWS.BIN       $(BASE)/DE
     # Experimental applications
-    # These need the '@' prefix.
-	-cp $(DEP_L2)/bin/PUBTERM.BIN  $(BASE)/GRAMADO/
-	-cp $(DEP_L2)/bin/DOC.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_L2)/bin/GDM.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_L2)/bin/EDITOR.BIN   $(BASE)/GRAMADO/
+    # These need the '#' prefix.
+	-cp $(DEP_L2)/bin/PUBTERM.BIN  $(BASE)/DE/
+	-cp $(DEP_L2)/bin/DOC.BIN      $(BASE)/DE/
+	-cp $(DEP_L2)/bin/GDM.BIN      $(BASE)/DE/
+	-cp $(DEP_L2)/bin/EDITOR.BIN   $(BASE)/DE/
 
 # (browser/) browser.
 # Teabox web browser
     # Experimental applications
     # These need the '@' prefix.
-	-cp $(DEP_L2)/browser/teabox/bin/TEABOX.BIN  $(BASE)/GRAMADO/
+	-cp $(DEP_L2)/browser/teabox/bin/TEABOX.BIN  $(BASE)/DE/
 
 # 3D demos.
-	-cp $(DEP_L3)/aurora/bin/DEMO00.BIN   $(BASE)
-	-cp $(DEP_L3)/aurora/bin/DEMO01.BIN   $(BASE)
+	-cp $(DEP_L3)/aurora/bin/DEMO00.BIN   $(BASE)/DE/
+	-cp $(DEP_L3)/aurora/bin/DEMO01.BIN   $(BASE)/DE/
 
 	@echo "~ copy-extras"
 
@@ -332,7 +344,7 @@ clean-all: clean
 	-rm -rf $(BASE)/*.BMP
 	-rm -rf $(BASE)/EFI/BOOT/*.EFI 
 	-rm -rf $(BASE)/GRAMADO/*.BIN 
-	-rm -rf $(BASE)/GRAMRE/*.BIN 
+	-rm -rf $(BASE)/DE/*.BIN 
 
 	@echo "~clean-all"
 

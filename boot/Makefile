@@ -55,8 +55,8 @@ clean:
 clean-all:
 	-rm *.o 
 	-rm *.BIN 
-#	-rm -rf arm/bin/*.BIN
-	-rm -rf x86/bin/*.BIN
+#	-rm -rf arm/bsp/bin/*.BIN
+	-rm -rf x86/bsp/bin/*.BIN
 	-rm -rf MBR0.BIN 
 	-rm -rf GRAMHV.VHD 
  

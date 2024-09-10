@@ -35,13 +35,13 @@ const char *image_pathname = "/GRAMADO/KERNEL.BIN";
 const char *image_default_pathname = "/GRAMADO/KERNEL.BIN";
 
 //
-// GRAMRE (Recovering Environment)
+// DE/ (Desktop Environment)
 //
 
 // Load this one
-const char *image_pathname_re = "/GRAMRE/KERNEL.BIN";
+const char *image_pathname_re = "/DE/KERNEL.BIN";
 // or try this one.
-const char *image_default_pathname_re = "/GRAMRE/KERNEL.BIN";
+const char *image_default_pathname_re = "/DE/KERNEL.BIN";
 
 //
 // globals
@@ -140,7 +140,7 @@ bl_clean_memory(
 
 // Kernel image
 static int bl_load_kernel_image(void);
-static int bl_load_kernel_image_for_gramre(void);
+static int bl_load_kernel_image_for_de(void);
 
 // Menu
 static void bl_show_menu(void);
@@ -412,7 +412,7 @@ bl_clean_memory(
 //
 
 /*
- * bl_load_kernel_image_for_gramre: 
+ * bl_load_kernel_image_for_de: 
  *     It loads the kernel image at 0x00100000.
  *     The entry point is at 0x00101000.
  */ 
@@ -423,7 +423,7 @@ bl_clean_memory(
 // if the provide name fail.
 // This routine will build the pathname
 // to search in the default folder.
-static int bl_load_kernel_image_for_gramre(void)
+static int bl_load_kernel_image_for_de(void)
 {
 // Called by bl_main().
 
@@ -438,7 +438,7 @@ static int bl_load_kernel_image_for_gramre(void)
 
     Status = (int) elfLoadKernelImage(image_pathname_re,image_default_pathname_re);
     if (Status < 0){
-        printf ("bl_load_kernel_image_for_gramre: elfLoadKernelImage fail\n");
+        printf ("bl_load_kernel_image_for_de: elfLoadKernelImage fail\n");
         goto fail;
     }
 
@@ -611,9 +611,9 @@ void bl_main(void)
     int Status = (-1);
     int fTest=FALSE;
 
-// Do we need to initialize the GRAMRE.
-    initialize_gramre = FALSE;
-    //initialize_gramre = TRUE;
+// Do we need to initialize the DE/.
+    initialize_de = FALSE;
+    //initialize_de = TRUE;
 
 // root and fat not loaded yet.
     g_fat16_root_status = FALSE;
@@ -767,15 +767,15 @@ void bl_main(void)
     refresh_screen();
 #endif  
 
-// Initialize the gramre kernel environment.
+// Initialize the de kernel environment.
 // #todo:
 // At this moment we need to update the bootblock
 // to tell the kernel that we're loading him from
 // a new perpective.
-    if (initialize_gramre == TRUE){
-        printf("blgram: Initializing gramre kernel\n");
+    if (initialize_de == TRUE){
+        printf("blgram: Initializing de kernel\n");
         refresh_screen();
-        Status = bl_load_kernel_image_for_gramre();
+        Status = bl_load_kernel_image_for_de();
 
 // Initialize the normal kernel environment.
     }else{

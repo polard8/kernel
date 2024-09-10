@@ -6,8 +6,8 @@
 #ifndef __GDEF_H
 #define __GDEF_H    1
 
-// Do we need to initialize the GRAMRE.
-extern int initialize_gramre;
+// Do we need to initialize the DE/.
+extern int initialize_de;
 
 
 //

@@ -680,16 +680,15 @@ fail:
     return 1;
 }
 
-
 // -------------------------------------
-// fsLoadProgramFromGRAMRE:
-// Load an image from GRAMRE/.
+// fsLoadProgramFromDE:
+// Load an image from DE/.
 // IN:
 // + program_name: Program name.
 // + buffer: Pre-allocated buffer.
 // + buffer_size_in_bytes: Buffer size in bytes.
 unsigned long 
-fsLoadProgramFromGRAMRE (
+fsLoadProgramFromDE (
     char *program_name,
     unsigned long buffer,
     unsigned long buffer_size_in_bytes )
@@ -699,30 +698,30 @@ fsLoadProgramFromGRAMRE (
     unsigned long Status=1; // fail
 
     // #debug
-    //printk ("fsLoadProgramFromGRAMRE:\n");
+    //printk ("fsLoadProgramFromDE:\n");
 
 // Parameters:
     if ((void*) buffer == NULL){
-        printk("fsLoadProgramFromGRAMRE: buffer\n");
+        printk("fsLoadProgramFromDE: buffer\n");
         goto fail;
     }
     if (buffer_size_in_bytes == 0){
-        printk("fsLoadProgramFromGRAMRE: buffer_size_in_bytes\n");
+        printk("fsLoadProgramFromDE: buffer_size_in_bytes\n");
         goto fail;
     }
 
-// sdGRAMRE struture.
-    if (sdGRAMRE.initialized != TRUE){
-        printk("fsLoadProgramFromGRAMRE: sdGRAMRE.initialized\n");
+// sdDE struture.
+    if (sdDE.initialized != TRUE){
+        printk("fsLoadProgramFromDE: sdDE.initialized\n");
         goto fail;
     }
-    if (sdGRAMRE.address == 0){
-        printk("fsLoadProgramFromGRAMRE: sdGRAMRE.address\n");
+    if (sdDE.address == 0){
+        printk("fsLoadProgramFromDE: sdDE.address\n");
         goto fail;
     }
 // The memory address for our target directory.
     unsigned long programs_directory_address = 
-        sdGRAMRE.address;
+        sdDE.address;
 
 /*
  *    It loads a file into the memory.
@@ -1317,7 +1316,7 @@ __try_to_load_program_from_special_folder(
         new_filename++;
         fs_fntos((char *) new_filename);
         status = 
-        (unsigned long) fsLoadProgramFromGRAMRE( 
+        (unsigned long) fsLoadProgramFromDE( 
                             new_filename, 
                             image_va, 
                             BUGBUG_IMAGE_SIZE_LIMIT );

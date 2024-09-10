@@ -245,7 +245,7 @@ struct process_d
 // List of root chars
 // 0 = '/' - Regular root dir.
 // 1 = '@' - Access to /GRAMADO/ root dir.
-// 2 = '#' - Access to /GRAMRE/ root dir
+// 2 = '#' - Access to /DE/ root dir
 // TRUE = Can access
 // FALSE = Can't access
     //int root_access[3]; (#todo: put this into the structure)

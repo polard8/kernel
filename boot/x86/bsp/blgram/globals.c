@@ -3,7 +3,6 @@
 
 #include "bl.h"  
 
-// Do we need to initialize the GRAMRE.
-int initialize_gramre = FALSE;
-
+// Do we need to initialize the DE/.
+int initialize_de = FALSE;
 

@@ -3760,25 +3760,25 @@ do_read_file_from_disk (
 // -------------------------------------------
 
 // -------------------------------------------
-// Is it inside the GRAMRE/ folder?
+// Is it inside the DE/ folder?
 // This is not a new root directory for the whole system,
 // it is only the directory where we're gonna serch
 // for the the desired file.
 // Remember: 
 // We can setup the memory address for this directory 
-// in the structure sdGRAMRE.
+// in the structure sdDE.
 
     if (*file_name == '#')
     {
-        if (sdGRAMRE.initialized != TRUE){
-            printk("do_read_file_from_disk: sdGRAMRE.initialized\n");
+        if (sdDE.initialized != TRUE){
+            printk("do_read_file_from_disk: sdDE.initialized\n");
             goto fail;
         }
-        if (sdGRAMRE.address == 0){
-            printk("do_read_file_from_disk: sdGRAMRE.address\n");
+        if (sdDE.address == 0){
+            printk("do_read_file_from_disk: sdDE.address\n");
             goto fail;
         }
-        TargetDirAddress = sdGRAMRE.address;
+        TargetDirAddress = sdDE.address;
         NumberOfEntries = FAT16_ROOT_ENTRIES;
         file_name++;
     }

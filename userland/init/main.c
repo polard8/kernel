@@ -19,7 +19,7 @@
 
 static int isTimeToQuitCmdLine = FALSE;
 
-static const char *app1_name = "ds00.bin";
+static const char *app1_name = "#ds00.bin";  // In DE/
 //static const char *app1_name = "???.bin";
 //static const char *app2_name = "???.bin";
 static const char *app3_name = "netd.bin"; 
@@ -193,13 +193,13 @@ static void do_launch_de2(void)
     rewind(stdin);
     write( fileno(stdin), cmdline1, strlen(cmdline1) );
 // Launch new process.
-    ret_val = (int) rtl_clone_and_execute("ds00.bin");
+    ret_val = (int) rtl_clone_and_execute("#ds00.bin");
     if (ret_val<=0){
         printf("Couldn't clone\n");
         return;
     }
 // Launch new process.
-    ret_val = (int) rtl_clone_and_execute("terminal.bin");
+    ret_val = (int) rtl_clone_and_execute("#terminal.bin");
     if (ret_val<=0){
         printf("Couldn't clone\n");
         return;
@@ -222,12 +222,12 @@ static void do_launch_list(void)
 {
 // Raw and ugly set of programs.
 
-    rtl_clone_and_execute("ds00.bin");
-    rtl_clone_and_execute("taskbar.bin");
-    rtl_clone_and_execute("terminal.bin");
-    //rtl_clone_and_execute("editor.bin");
-    //rtl_clone_and_execute("browser.bin");
-    //rtl_clone_and_execute("fileman.bin");
+    rtl_clone_and_execute("#ds00.bin");
+    rtl_clone_and_execute("#taskbar.bin");
+    rtl_clone_and_execute("#terminal.bin");
+    //rtl_clone_and_execute("#editor.bin");
+    //rtl_clone_and_execute("#browser.bin");
+    //rtl_clone_and_execute("#fileman.bin");
 
 // #
 // Quit the command line.
@@ -371,7 +371,7 @@ static int input_compare_string(void)
 // Initialize the display server.
     if ( strncmp(prompt,"ws",2) == 0 ){
         //printf ("~WS\n");
-        //rtl_clone_and_execute("ds00.bin");
+        //rtl_clone_and_execute("#ds00.bin");
         goto exit_cmp;
     }
 // Initialize the display server and quit the command line.
@@ -430,7 +430,7 @@ static int input_compare_string(void)
         do_clear_console();
         // #todo
         // Let's create a shell command able to run in this environment.
-        //rtl_clone_and_execute("pubsh.bin");
+        //rtl_clone_and_execute("#pubsh.bin");
         //rtl_clone_and_execute("sh7.bin");
         //rtl_clone_and_execute("shell.bin");
         //rtl_clone_and_execute("shell2.bin");
@@ -468,7 +468,7 @@ static int input_compare_string(void)
     if ( strncmp(prompt,"demo00",6) == 0 ){
         printf ("Launch demo00.bin\n");
         do_clear_console();
-        rtl_clone_and_execute("demo00.bin");
+        rtl_clone_and_execute("#demo00.bin");
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
@@ -476,7 +476,7 @@ static int input_compare_string(void)
     if ( strncmp(prompt,"demo01",6) == 0 ){
         printf ("Launch demo01.bin\n");
         do_clear_console();
-        rtl_clone_and_execute("demo01.bin");
+        rtl_clone_and_execute("#demo01.bin");
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
@@ -486,7 +486,7 @@ static int input_compare_string(void)
     if ( strncmp(prompt,"eng",3) == 0 ){
         printf ("Launch demo00.bin\n");
         do_clear_console();
-        rtl_clone_and_execute("demo00.bin");
+        rtl_clone_and_execute("#demo00.bin");
         isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }

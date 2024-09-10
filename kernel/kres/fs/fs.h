@@ -25,7 +25,7 @@ struct system_directory_d
 // see: fs.c
 extern struct system_directory_d  sdROOT;      // '/'
 extern struct system_directory_d  sdGRAMADO;   // '/GRAMADO/'
-extern struct system_directory_d  sdGRAMRE;    // '/GRAMRE/'
+extern struct system_directory_d  sdDE;        // '/DE/'
 
 // Buffers to walk on a pathname,
 // loading until 8 directories.
@@ -680,9 +680,9 @@ fsLoadProgramFromGRAMADO (
     unsigned long buffer,
     unsigned long buffer_size_in_bytes );
 
-// Load an image from GRAMRE/
+// Load an image from DE/
 unsigned long 
-fsLoadProgramFromGRAMRE (
+fsLoadProgramFromDE (
     char *program_name,
     unsigned long buffer,
     unsigned long buffer_size_in_bytes );

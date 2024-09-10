@@ -9,7 +9,7 @@
 struct system_directory_d  sdROOT;          // '/'
 // We do not touch the EFI folder for now.  // '/EFI/
 struct system_directory_d  sdGRAMADO;       // '/GRAMADO/'
-struct system_directory_d  sdGRAMRE;        // '/GRAMRE/''
+struct system_directory_d  sdDE;            // '/DE/''
 
 // FAT for boot partition
 struct system_fat_d  bpFAT;
@@ -19,7 +19,7 @@ const char *root_name = "/";
 
 static void __do_initialize_sdROOT(void);
 static void __do_initialize_sdGRAMADO(void);
-static void __do_initialize_sdGRAMRE(void);
+static void __do_initialize_sdDE(void);
 
 
 // =============================================================
@@ -133,22 +133,22 @@ static void __do_initialize_sdGRAMADO(void)
 }
 
 // ------------------
-// GRAMRE
-// Load the directory GRAMRE/ that belongs 
+// DE/
+// Load the directory DE/ that belongs 
 // to the root dir into the memory and 
-// initialize the sdGRAMRE structure.
-static void __do_initialize_sdGRAMRE(void)
+// initialize the sdDE structure.
+static void __do_initialize_sdDE(void)
 {
 // Called by initialize_FAT_and_main_directories().
     size_t name_size=0;
-    const char *DirectoryName = "GRAMRE";
+    const char *DirectoryName = "DE";
     unsigned long DirectoryBufferAddress=0;
     unsigned long DirectoryBufferSizeInBytes=0;
 
-    sdGRAMRE.initialized = FALSE;
+    sdDE.initialized = FALSE;
 
     if (sdROOT.initialized != TRUE)
-        x_panic("__do_initialize_sdGRAMRE: No sdROOT");
+        x_panic("__do_initialize_sdDE: No sdROOT");
 
 
     // #bugbug
@@ -162,7 +162,7 @@ static void __do_initialize_sdGRAMRE(void)
     //#todo: A lot bigger when possible.
     DirectoryBufferAddress = (unsigned long) allocPages(8);
     if ((void*) DirectoryBufferAddress == NULL){
-        x_panic("__do_initialize_sdGRAMRE: buf");
+        x_panic("__do_initialize_sdDE: buf");
     }
     // Size in bytes = (32 setores)
     //(32*512) = 16384.
@@ -178,23 +178,23 @@ static void __do_initialize_sdGRAMRE(void)
               (unsigned long) DirectoryBufferSizeInBytes );                            
 
     if (Ret!=0){
-        x_panic("__do_initialize_sdGRAMRE: Load");
+        x_panic("__do_initialize_sdDE: Load");
     }
 
-    sdGRAMRE.address = (unsigned long) DirectoryBufferAddress;
-    sdGRAMRE.number_of_entries = FAT16_DEFAULT_NUMBER_OF_ENTRIES;
+    sdDE.address = (unsigned long) DirectoryBufferAddress;
+    sdDE.number_of_entries = FAT16_DEFAULT_NUMBER_OF_ENTRIES;
 // name
     name_size = strlen(DirectoryName);
     if (name_size <= 0 || name_size >= __DIRNAME_SIZE_MAX)
     {
         x_panic("name_size");
     }
-    sdGRAMRE.name_size = (size_t) name_size;
-    memset(sdGRAMRE.name, 0, __DIRNAME_SIZE_MAX);
-    ksprintf( sdGRAMRE.name, DirectoryName );
+    sdDE.name_size = (size_t) name_size;
+    memset(sdDE.name, 0, __DIRNAME_SIZE_MAX);
+    ksprintf( sdDE.name, DirectoryName );
 
 // Set the flags as initialized.
-    sdGRAMRE.initialized = TRUE;
+    sdDE.initialized = TRUE;
 }
 
 
@@ -235,11 +235,11 @@ int fsbp_initialize_bp_directories(void)
     __do_initialize_sdGRAMADO();
 
 // ------------------
-// GRAMRE
-// Load the directory GRAMRE/ that belongs 
+// DE/
+// Load the directory DE/ that belongs 
 // to the root dir into the memory and 
-// initialize the sdGRAMRE structure.
-    __do_initialize_sdGRAMRE();
+// initialize the sdDE structure.
+    __do_initialize_sdDE();
 
     return 0;
 }
