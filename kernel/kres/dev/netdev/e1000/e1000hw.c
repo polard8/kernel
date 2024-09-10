@@ -1150,13 +1150,53 @@ DDINIT_e1000 (
     Vendor = (unsigned short) (data       & 0xffff);
     Device = (unsigned short) (data >> 16 & 0xffff);
 
+
+    /*
+    //old
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
         debug_print("DDINIT_e1000: Expected 82540EM\n");
         panic      ("DDINIT_e1000: Expected 82540EM\n");
     }
+    */
+
     // #debug
     printk("Vendor=%x | Device=%x \n", Vendor, Device );
+
+    int ValidIntelVendor = FALSE;
+    int ValidIntelDevice = FALSE;
+
+// ---------
+// Valid vendor
+    if (Vendor == 0x8086)
+        ValidIntelVendor = TRUE;
+
+// ---------
+// Valid device
+
+    // 82540EM
+    if (Device == 0x100E)
+        ValidIntelDevice = TRUE;
+    if (Device == 0x1015)
+        ValidIntelDevice = TRUE;
+
+    // 82543GC
+    if (Device == 0x1001)
+        ValidIntelDevice = TRUE;
+    if (Device == 0x1004)
+        ValidIntelDevice = TRUE;
+
+    // 82545EM
+    if (Device == 0x100f)
+        ValidIntelDevice = TRUE;
+    if (Device == 0x1011)
+        ValidIntelDevice = TRUE;
+
+// ---------
+    if (ValidIntelVendor != TRUE)
+        panic("DDINIT_e1000: Invalid vendor\n");
+    if (ValidIntelDevice != TRUE)
+        panic("DDINIT_e1000: Invalid device\n");
 
 // pci_device structure.
 // pci device struct

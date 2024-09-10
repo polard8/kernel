@@ -17,8 +17,8 @@ QEMU="qemu-system-x86_64"
 	$QEMU \
 	-smp $GRAMADO_CPUS \
 	-m   $GRAMADO_RAM_SIZE \
-	-device ich9-intel-hda -device hda-duplex \
-	-drive file=$GRAMADO_DISK_IMAGE,format=raw,bus=0 \
+	-device piix3-ide,id=ide \
+	-drive id=disk,file=$GRAMADO_DISK_IMAGE,format=raw,bus=0 \
 	-serial stdio \
 	-netdev type=user,id=net1 -device e1000,netdev=net1
 

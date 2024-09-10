@@ -4,8 +4,23 @@ Intel PRO/1000 family of Ethernet controllers.
 =======================================================
 NIC Type	Chip
 
-e1000	    Intel 82540EM
-e1000	    Intel 82545EM
+e1000	    Intel 82540EM  
+          (Intel PRO/1000 MT DESKTOP)
+          (8086:100e) >>> Working on Virtualbox 7.0
+          (8086:1015) (LOM)
+
+e1000     Intel 82543GC
+          (Intel PRO/1000 T SERVER)
+          (8086:1001) (Fiber)
+          (8086:1004) (Copper)  >>> Working on Virtualbox 7.0
+
+e1000	    Intel 82545EM  
+          (Intel PRO/1000 MT SERVER) 
+          (Gigabit Ethernet Controller)
+          (8086:100f) (Copper)
+          (8086:1011) (Fiber)
+
+
 
 =======================================================
 Virtual box:
@@ -14,6 +29,14 @@ Virtual box:
   when the chipset is PIIX3, but not when the chipset is ICH9.
   The controller is Intel PRO/1000 MT Desktop (82540EM).
   Bridged adapter, promiscuous mode.
+
+82540EM
+(Intel PRO/1000 MT DESKTOP)
+(8086:100e) >>> Working on Virtualbox 7.0
+
+82543GC
+(Intel PRO/1000 T SERVER)
+(8086:1004) (Copper)  >>> Working on Virtualbox 7.0
 
   PCI IDE ISA Xcelerator (PIIX), also known as Intel 82371.
   82371SB (PIIX3)

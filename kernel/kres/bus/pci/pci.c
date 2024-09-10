@@ -701,17 +701,39 @@ pciHandleDevice (
 // see: e1000.c
 // Class 3.
 
+    int ValidIntelVendor = FALSE;
+    int ValidIntelDevice = FALSE;
+
 // Network device: (Class 3)
     if (D->classCode == PCI_CLASSCODE_NETWORK)
     {
         // Network device
         __device_class = DEVICE_CLASS_NETWORK;
 
-        //--------------
-        // e1000: 82545EM-A
-        //if ( (D->Vendor == 0x8086) && (D->Device == 0x100F ) )
-        // e1000: 82540EM-A
-        if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) )
+        // Valid vendor
+        if (D->Vendor == 0x8086)
+            ValidIntelVendor = TRUE;
+
+        // 82540EM
+        if (D->Device == 0x100E)
+            ValidIntelDevice = TRUE;
+        if (D->Device == 0x1015)
+            ValidIntelDevice = TRUE;
+
+        // 82543GC
+        if (D->Device == 0x1001)
+            ValidIntelDevice = TRUE;
+        if (D->Device == 0x1004)
+            ValidIntelDevice = TRUE;
+
+        // 82545EM
+        if (D->Device == 0x100f)
+            ValidIntelDevice = TRUE;
+        if (D->Device == 0x1011)
+            ValidIntelDevice = TRUE;
+
+
+        if (ValidIntelVendor == TRUE && ValidIntelDevice == TRUE)
         {
             //debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found\n");
 
@@ -720,6 +742,7 @@ pciHandleDevice (
             if (USE_E1000 == TRUE)
             {
                 // This thing is working fine on virtualbox with piix3.
+                // see: e1000hw.c
                 Status = 
                     (int) DDINIT_e1000 ( 
                         (unsigned char) D->bus, 
