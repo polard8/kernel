@@ -186,6 +186,8 @@ struct intel_nic_info_d
     int used;
     int magic;
 
+    int initialized;
+
 // The base address for the registers.
     unsigned long registers_base_address;
 
@@ -252,17 +254,26 @@ extern struct intel_nic_info_d  *currentNIC;
 
 void e1000_show_info(void);
 
-void 
-e1000_send(
-    struct intel_nic_info_d *dev, 
-    size_t len, 
-    const char *data );
-
+// See: e1000.c
 int 
 e1000_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg );
+
+
+void 
+e1000hw_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    const char *data );
+
+int 
+e1000_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    const char *data );
+
 
 // Driver initialization
 int 

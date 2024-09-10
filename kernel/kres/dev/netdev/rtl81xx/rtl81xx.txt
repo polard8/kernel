@@ -6,6 +6,15 @@ NIC Type	Chip
 
 rtl81xx     Realtek
 
+Examples:
+RTL8101: Fast Ethernet controller.
+RTL8102: Fast Ethernet controller.
+RTL8103: Fast Ethernet controller.
+RTL8111: Gigabit Ethernet controller.
+RTL8168: Gigabit Ethernet controller.
+RTL8169: Gigabit Ethernet controller.
+RTL8153: USB 3.0 to Gigabit Ethernet controller.
+RTL8156: USB 3.1 to 2.5 Gigabit Ethernet controller12.
 
 =======================================================
 Virtual box:

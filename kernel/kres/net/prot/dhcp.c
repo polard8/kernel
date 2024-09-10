@@ -341,7 +341,23 @@ int network_initialize_dhcp(void)
 // the network support was not initialized yet.
     if (networkGetStatus() != TRUE){
        printk("network_initialize_dhcp: Network not initialized\n");
-       return (int) -1;
+       goto fail;
+    }
+
+// #hackhack
+// No NIC device driver.
+
+    if ((void*) currentNIC == NULL){
+        printk("network_initialize_dhcp: currentNIC\n");
+        goto fail;
+    }
+    if (currentNIC->magic != 1234){
+        printk("network_initialize_dhcp: currentNIC\n");
+        goto fail;
+    }
+    if (currentNIC->initialized != TRUE){
+        printk("network_initialize_dhcp: currentNIC not initialized\n");
+        goto fail;
     }
 
 //
@@ -367,13 +383,10 @@ int network_initialize_dhcp(void)
 
 fail:
     printk("network_initialize_dhcp: fail\n");
+    refresh_screen();
+
     dhcp_info.initialized =  FALSE;
-    
-    // #debug
-    while (1){
-    }
-    
-    return -1;
+    return (int) -1;
 }
 
 //

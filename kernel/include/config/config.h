@@ -23,7 +23,6 @@
 // Enable the initialization of e1000 controller.
 #define USE_E1000          0
 
-
 // ...
 
 // ------------------------------------------------------

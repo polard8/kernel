@@ -1,8 +1,7 @@
-
 # dev/
 # Compile all the files and create ar_dev.o
-
 # Makefile for the kernel device drivers.
+
 
 INCLUDE = ../../include
 
@@ -79,7 +78,7 @@ bldisp.o \
 tty.o console.o pty.o \
 i8042.o kbdmap.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 serial.o \
-e1000.o \
+e1000hw.o e1000.o \
 devmgr.o io.o    
 
 all:
@@ -119,8 +118,15 @@ all:
 
 	$(CC) -c chardev/console/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
 
+# e100
+# ...
+
 # e1000
-	$(CC) -c netdev/e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
+	$(CC) -c netdev/e1000/e1000hw.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000hw.o 
+	$(CC) -c netdev/e1000/e1000.c    $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
+
+# rtl81xx
+# ...
 
 
 # i/o
