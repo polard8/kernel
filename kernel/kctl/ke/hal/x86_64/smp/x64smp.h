@@ -468,6 +468,8 @@ struct smp_info_d
 // if it fails, use MP table.
 
     int probe_via;
+    int probe_via_apci_failed;
+    int probe_via_mp_failed;
 
 // ACPI
     unsigned long RSD_PTR_address;

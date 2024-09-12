@@ -291,16 +291,14 @@ int hal_hardware_detect (void)
 /*
  * halInitialize:
  * Initialize kernel base hal.
- *     Archtecture independent inicialization ...
  */
 // OUT: TRUE if its ok.
 int halInitialize(void)
 {
-// Called by I_Init() in init.c
+// Called by I_initKernelComponents() in x64init.c
 
     int Status = FALSE;
     unsigned char ProcessorType=0;
-
 
 
 //
@@ -321,7 +319,7 @@ int halInitialize(void)
 // 'processor' structuture initialization.
     processor = (void *) kmalloc( sizeof(struct processor_d) ); 
     if ((void *) processor == NULL){
-        printk("I_initKernelComponents: processor\n");
+        printk("halInitialize: processor\n");
         return FALSE;
     }
     memset( processor, 0, sizeof(struct processor_d) );
@@ -375,7 +373,7 @@ int halInitialize(void)
         //Initialize fpu/see support.
         fpu_status = (int) x64_init_fpu_support();
         if (fpu_status<0){
-            printk("I_initKernelComponents: [FAIL] FPU Initialization fail\n");
+            printk("halInitialize: [FAIL] FPU Initialization fail\n");
             return FALSE;
         }
 
@@ -397,7 +395,7 @@ int halInitialize(void)
         break;
     // ...
     default:
-        printk ("I_initKernelComponents: [ERROR] default ProcessorType\n");
+        printk ("halInitialize: [ERROR] default ProcessorType\n");
         return FALSE;
         break;
     };

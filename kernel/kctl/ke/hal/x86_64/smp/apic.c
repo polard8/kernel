@@ -237,9 +237,10 @@ inline void invalidate_cache_flush(void)
 // PAGETABLE_RES5, LAPIC_VA, PD_ENTRY_LAPIC, KERNEL_PD_PA.
 void lapic_initializing(unsigned long lapic_pa)
 {
+// >> Called by I_init in x64init.c
+// >> Called by x64_probe_smp_via_acpi() in x64.c
 // Setup BSP's local APIC.
-// Called by I_init in x64init.c
-// Called by x64_probe_smp_via_acpi() in x64.c
+
 
     printk("lapic_initializing: \n");
 

@@ -1,5 +1,7 @@
-
 // pit.h
+// Programmable Interval Timer (PIT) - (Intel 8253/8254) 
+// 2013 - Created by Fred Nora.
+
 
 #ifndef __KE_PIT_H
 #define __KE_PIT_H    1
@@ -218,6 +220,10 @@ void timerDisableTextCursor(void);
 unsigned long now(void);
 
 void pit_sleep(unsigned long ms);
+
+void pit_speaker_on (void);
+void pit_speaker_off (void);
+
 
 int timerInit(void);
 int early_timer_init(void);
