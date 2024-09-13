@@ -13,8 +13,6 @@ unsigned long threadList[THREAD_COUNT_MAX];
 // ------
 tid_t current_thread=0;
 tid_t foreground_thread=0;
-tid_t active_thread=0;     // This thread will receive the input.
-tid_t next_thread=0;       // next user mode thread.
 // ------
 
 // Ponteiro para a idle thread atual

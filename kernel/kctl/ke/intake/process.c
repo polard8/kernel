@@ -31,8 +31,7 @@ pid_t __gpidWindowServer=0;
 // But we need to use the control thread of the foreground process
 // associated with the console TTY.
 pid_t foreground_process=0;
-// This is the process with the active thread.
-pid_t active_process=0; 
+
 // [Processing time]
 // Only these can read the keyboard input.
 // Sometime it's the terminal.
@@ -1234,15 +1233,15 @@ struct process_d *create_process (
     int personality )
 {
     struct process_d  *Process;
-    pid_t PID = -1;
+    register pid_t PID = -1;
     // Para a entrada vazia no array de processos.
     struct process_d *EmptyEntry;
     unsigned long BasePriority=0;
     unsigned long Priority=0;
     int Personality = personality;
 
-    debug_print ("create_process: #todo\n");
-    printk      ("create_process: #todo\n");
+    debug_print ("create_process:\n");
+    printk      ("create_process:\n");
 
 //=================================
 // check parameters
@@ -1256,28 +1255,29 @@ struct process_d *create_process (
 // Maybe the virtual 0 is n option in the future. Maybe.
 
     if (base_address == 0){
-        panic ("create_process: [ERROR] base_address\n");
+        panic ("create_process: base_address\n");
     }
     if (ppid < 0){
-        panic ("create_process: [ERROR] ppid\n");
+        panic ("create_process: ppid\n");
     }
     if ((void*) name == NULL){
-        panic ("create_process: [ERROR] name\n");
+        panic ("create_process: name\n");
     }
     if ( *name == 0 ){
-        panic ("create_process: [ERROR] *name\n");
+        panic ("create_process: *name\n");
     }
 
 //===============================
+// Tables
 
     if (pml4_va == 0){
-        panic ("create_process: [ERROR] pml4_va\n");
+        panic ("create_process: pml4_va\n");
     }
     if (pdpt0_va == 0){
-        panic ("create_process: [ERROR] pdpt0_va\n");
+        panic ("create_process: pdpt0_va\n");
     }
     if (pd0_va == 0){
-        panic ("create_process: [ERROR] pd0_va\n");
+        panic ("create_process: pd0_va\n");
     }
     // ...
 
@@ -1294,10 +1294,6 @@ struct process_d *create_process (
     //    processNewPID = (int) GRAMADO_PID_BASE;
     //}
 
-
-    BasePriority = (unsigned long) priority; 
-    Priority     = (unsigned long) priority;
-
 // Process
     Process = (void *) kmalloc( sizeof(struct process_d) );
     if ((void *) Process == NULL){
@@ -1305,28 +1301,23 @@ struct process_d *create_process (
     }
     memset( Process, 0, sizeof(struct process_d) );
 
-    Process->personality = (int) Personality;
+// Worker:
+// Initializing the elements common for all types of processes.
+    ps_initialize_process_common_elements((struct process_d *) Process);
 
-// see: layer.h
-    Process->_layer = LAYER_UNDEFINED;
-
-    Process->exit_in_progress = FALSE;
-    Process->base_priority = BasePriority;
-    Process->priority = Priority;
-
-//get_next:
-
+// ====================
+// get_next:
 // Get empty.
 // Obtem um indice para um slot vazio na lista de processos.
 // Se o slot estiver ocupado tentaremos o proximo.
 // Na verdade podemos usar aquela funçao que procura por um vazio. 
 
     while (1){
-        PID = (int) getNewPID();
+        PID = (pid_t) getNewPID();
         if ( PID < GRAMADO_PID_BASE || PID >= PROCESS_COUNT_MAX )
         {
-            debug_print ("create_process: [FAIL] getNewPID\n");
-            printk      ("create_process: [FAIL] getNewPID %d\n", PID);
+            debug_print ("create_process: getNewPID\n");
+            printk      ("create_process: getNewPID %d\n", PID);
             goto fail;
         }
         EmptyEntry = (void *) processList[PID];
@@ -1336,47 +1327,8 @@ struct process_d *create_process (
     };
 // ====================
 
-// Worker
-// Initializing the elements common for 
-// all types of processes.
-    ps_initialize_process_common_elements((struct process_d *) Process);
-
-    //Process->objectType  = ObjectTypeProcess;
-    //Process->objectClass = ObjectClassKernelObjects;
-
-// cpl
-    Process->cpl = (unsigned int) cpl;
-
-    if (cpl != RING0 && cpl != RING3)
-        panic("create_process: cpl\n");
-
-// iopl
-// Qual é o privilágio padrão?
-// weak protection!
-    Process->rflags_iopl = (unsigned int) 3;  //weak protection 
-
-    // Not a protected process!
-    Process->_protected = 0;
-
-    //processNewPID = (int) PID;
-        
-    // Identificadores.
-    // PID. PPID. UID. GID.
-    Process->pid = (int) PID; 
-    Process->ppid = (int) ppid; 
-
-    // sessão crítica.
-    Process->_critical = 0;
-
-    //foi para o fim.
-    //State of process
-    //Process->state = INITIALIZED;  
-
-// #todo: Via argument
-     Process->plane = FOREGROUND_PROCESS;
-
-    //Error.
-    //Process->error = 0;
+    Process->pid = (pid_t) PID; 
+    Process->ppid = (pid_t) ppid;
 
 // Name
 
@@ -1388,7 +1340,43 @@ struct process_d *create_process (
     strcpy ( Process->__processname, (const char *) name);
     Process->processName_len = sizeof(Process->__processname);
 
-    //Process->terminal =
+    BasePriority = (unsigned long) priority; 
+    Process->base_priority = BasePriority;
+
+    Priority = (unsigned long) priority;
+    Process->priority = Priority;
+
+    Process->personality = (int) Personality;
+
+// ------------
+// cpl
+    if (cpl != RING0 && cpl != RING3){
+        panic("create_process: cpl\n");
+    }
+    Process->cpl = (unsigned int) cpl;
+
+// ------------
+// iopl
+// Qual é o privilágio padrão?
+// Weak protection!
+    Process->rflags_iopl = (unsigned int) 3;  //weak protection 
+
+    // Not a protected process!
+    Process->_protected = 0;
+
+    // sessão crítica.
+    Process->_critical = 0;
+
+// see: layer.h
+    Process->_layer = LAYER_UNDEFINED;
+
+// #todo: Via argument
+     Process->plane = FOREGROUND_PROCESS;
+
+    //Error.
+    //Process->error = 0;
+
+    Process->exit_in_progress = FALSE;
 
 //
 // Banco de dados
@@ -1490,24 +1478,19 @@ struct process_d *create_process (
 // argumento, pois nem todos processos come�am no endere�o 
 // default.
 
-//
-// Image
-//
-
-// Endereço virtual e endere�o f�sico.
+// -----------------------------------
+// Image:
+// Virtual and physical address for the image.
 
     Process->Image   = (unsigned long) base_address;  
     Process->ImagePA = (unsigned long) virtual_to_physical ( 
                                            Process->Image, 
                                            gKernelPML4Address ); 
                                                
-
-//
-// Child image
-//
-
-// Endereço virtual e endere�o f�sico de um processo filho.
-// Isso � usado durante a clonagem.
+// -----------------------------------
+// Child Image:
+// Virtual and physical address for the image.
+// This is used during the cloning routine.
 
     Process->childImage = 0;
     Process->childImage_PA = 0;

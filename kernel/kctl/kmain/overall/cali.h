@@ -37,8 +37,7 @@ extern int current_group;
 // But we need to use the control thread of the foreground process
 // associated with the console TTY.
 extern pid_t foreground_process;
-// This is the process with the active thread.
-extern pid_t active_process;    
+
 // [Processing time]
 // Only these can read the keyboard input.
 // Sometime it's the terminal.
@@ -52,10 +51,7 @@ extern pid_t criticalsection_pid;
 // See: ps/thread.c
 extern tid_t current_thread;     // Currently having the processing time.
 extern tid_t foreground_thread;  // Input thread.
-extern tid_t active_thread;      // This thread will receive the input.
-extern tid_t next_thread;        // next user mode thread.
 // ------
-
 
 // Current runlevel. Used in init process.
 extern int current_runlevel;

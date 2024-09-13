@@ -229,6 +229,8 @@ static int I_x64CreateInitialProcess(void)
 // This is a ring 3 process.
 // It loads the first ring3 program, the INIT.BIN.
 
+    pid_t InitProcessPID = -1;
+
 // #debug
     //debug_print ("I_x64CreateInitialProcess: \n");
     //printk      ("I_x64CreateInitialProcess:\n");
@@ -329,11 +331,12 @@ static int I_x64CreateInitialProcess(void)
         return FALSE;
     }
 
-// struct
-// #bugbug: Who gave this pid to this process?
-    if ( InitProcess->pid != GRAMADO_PID_INIT )
-    {
-        printk ("I_x64CreateInitialProcess: pid\n");
+// #bugbug: 
+// Who gave this pid to this process? create_process did?
+
+    InitProcessPID = (pid_t) InitProcess->pid;
+    if ( InitProcessPID != GRAMADO_PID_INIT ){
+        printk ("I_x64CreateInitialProcess: InitProcessPID\n");
         return FALSE;
     }
 
@@ -380,7 +383,7 @@ static int I_x64CreateInitialProcess(void)
     InitProcess->pd0_VA = kernel_mm_data.pd0_va;
     InitProcess->pd0_PA = kernel_mm_data.pd0_pa; 
 
-    fs_initialize_process_cwd ( InitProcess->pid, "/" );
+    fs_initialize_process_cwd ( InitProcessPID, "/" );
 
 //====================================================
 // Create thread
@@ -427,32 +430,11 @@ static int I_x64CreateInitialProcess(void)
     InitThread->pd0_VA   = InitProcess->pd0_VA;
     InitThread->pd0_PA   = InitProcess->pd0_PA;
 
-
-    //IdleThread->ownerPID = (int) InitProcess->pid;
-
-    // #todo #bugbug
+// #todo 
+// #bugbug
     //InitThread->tss = current_tss;
 
-    // [Processing time]
-    //current_process = InitProcess->pid;
-    set_current_process(InitProcess->pid);
-    current_thread  = InitThread->tid;
-
-    // [Focus]
-    //active_process = current_process;
-    active_process = InitProcess->pid;
-    active_thread  = InitThread->tid; //current_thread;
-        
-    // foreground thread ?
-
-    // [Scheduler stuff]
-    next_thread = InitThread->tid;
-
 // ===========================
-
-// #importante
-// A thread de controle do processo init2.bin.
-    InitProcess->control = InitThread;
 
 // #todo #bugbug
 //registra um dos servidores do gramado core.
@@ -464,6 +446,17 @@ static int I_x64CreateInitialProcess(void)
         //(struct thread_d *) InitThread ); 
 
     InitThread->pe_mode = PE_MODE_EFFICIENCY;
+
+// ===========================
+
+// Set the control thread for the init process.
+    InitProcess->control = InitThread;
+
+// Set the current process
+    set_current_process(InitProcessPID);
+
+// Set the current thread
+    current_thread = InitThread->tid;
 
 // Agora ja temos um processo em user mode devidamente 
 // configurado. Então a rotina de inicialização em init/
