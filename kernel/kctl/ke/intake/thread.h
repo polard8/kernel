@@ -238,18 +238,19 @@ struct thread_d
     int used;
     int magic;
 
-// flags:
-// TF_BLOCKED_SENDING - Blocked when trying to send.
-// TF_BLOCKED_RECEIVING - Blocked when trying to receive.
-// ...
-    unsigned long flags;
-
 // type:
 // (SYSTEM, INTERACTIVE, BATCH)
     thread_type_t type;
 
 // Thread ID.
     tid_t tid;
+
+// flags:
+// TF_BLOCKED_SENDING - Blocked when trying to send.
+// TF_BLOCKED_RECEIVING - Blocked when trying to receive.
+// ...
+    unsigned long flags;
+
 
 // The kernel console associated with this thread.
 // 0~3

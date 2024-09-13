@@ -251,12 +251,13 @@ unsigned long rtl_get_system_message2(unsigned long message_buffer,int index,int
 unsigned long rtl_get_system_metrics (int index);
 int rtl_is_qemu(void);
 
-
 unsigned long rtl_jiffies(void);
 unsigned long rtl_memory_size_in_kb(void);
 
 pid_t rtl_current_process(void);
 int rtl_current_thread(void);
+
+unsigned long rtl_instance_id(void);
 
 pthread_t pthread_self(void);
 
@@ -333,6 +334,12 @@ rtl_default_procedure(
     unsigned long long1, 
     unsigned long long2 );
 
+
+
+//
+// $
+// INITIALIZATION
+//
 
 int rtl_cinit(void);
 

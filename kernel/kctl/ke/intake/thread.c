@@ -1334,6 +1334,20 @@ struct thread_d *create_thread (
     }
     memset( Thread, 0, sizeof(struct thread_d) );
 
+    // TID?
+    // Done bellow.
+
+// Belongs to this process.
+    Thread->owner_process = (void *) Process;
+    Thread->owner_pid = (pid_t)  ProcessID;
+
+// Initializing values.
+// For ring0 stack address we will use the value found in the TSS,
+    Thread->HeapStart = 0;
+    Thread->HeapSize = 0;
+    Thread->StackStart = 0;
+    Thread->StackSize = 0;
+
 // The kernel console associated with this thread.
 // 0~3
     Thread->__console_id = (int) CONSOLE0;
@@ -1342,10 +1356,6 @@ struct thread_d *create_thread (
     Thread->is_linked = FALSE;
 
     Thread->exit_in_progress = FALSE;
-
-// Belongs to this process.
-    Thread->owner_process = (void *) Process;
-    Thread->owner_pid = (pid_t)  ProcessID;
 
 // Paging
     Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;

@@ -20,6 +20,9 @@ static int InitialProcessInitialized = FALSE;
 #define INIT_BIN_PATH   "/BIN"
 //...
 
+// The default name for the init process
+const char *kernel_process_default_name = "KERNEL-PROCESS";
+
 // -------------------
 // Ring0 Module.
 // The name of the kernel of the root partition.
@@ -31,6 +34,8 @@ const char *mod_image_name = "HVMOD0  BIN";
 // -------------------
 // Image name for the init process. INIT.BIN
 const char *init_image_name = "INIT    BIN";
+// The default name for the init process
+const char *init_process_default_name = "INIT-PROCESS";
 
 // =========================================
 
@@ -305,7 +310,7 @@ static int I_x64CreateInitialProcess(void)
                      (unsigned long) CONTROLTHREAD_BASE,  //0x00200000 
                      BasePriority, 
                      (int) KernelProcess->pid, 
-                     "INIT-PROCESS", 
+                     init_process_default_name, 
                      RING3, 
                      (unsigned long) init_pml4_va,
                      (unsigned long) kernel_mm_data.pdpt0_va,
@@ -339,11 +344,7 @@ static int I_x64CreateInitialProcess(void)
     InitProcess->egid = (gid_t) GID_INIT;  // effective
     InitProcess->sgid = (gid_t) GID_INIT;  // saved
 
-
-
 // The init process is a system application.
-// GWS.BIN
-
     InitProcess->type = PROCESS_TYPE_SYSTEM;
 
     InitProcess->base_priority = BasePriority;    
@@ -355,6 +356,8 @@ static int I_x64CreateInitialProcess(void)
 // The init process. This is part og the gramland subsystem.
     InitProcess->env_subsystem = GramadoSubsystem;
 
+// -----------------------------------------------
+// init_mm_data
 
     if ( init_mm_data.used != TRUE || 
          init_mm_data.magic != 1234 )
@@ -362,6 +365,8 @@ static int I_x64CreateInitialProcess(void)
         printk ("I_x64CreateInitialProcess: init_mm_data validation\n");
         return FALSE;
     }
+
+// -----------------------------------------------
 
 // Esse foi configurado agora.
     InitProcess->pml4_VA = init_mm_data.pml4_va;
@@ -383,7 +388,7 @@ static int I_x64CreateInitialProcess(void)
 // Criamos um thread em ring3.
 // O valor de eflags é 0x3200. The app is gonna change that.
 // The control thread of the first ring 3 process.
-// See: create.c
+// See: ithread.c
 // Struct, and struct validation.
 
     InitThread = (struct thread_d *) create_init_thread();
@@ -887,19 +892,21 @@ static int I_x64CreateKernelProcess(void)
 // base address, priority, ppid, name, iopl, page directory address.
 // See: process.c
 // KERNELIMAGE_VA
- 
+
+    ppid_t MyPPID = 0;
+
     KernelProcess = 
         (void *) create_process( 
-                     NULL,  
-                     (unsigned long) 0x30000000, 
-                     BasePriority, 
-                     (int) 0,        //ppid
-                     "KERNEL-PROCESS", 
-                     RING0,   
-                     (unsigned long ) gKernelPML4Address,
-                     (unsigned long ) kernel_mm_data.pdpt0_va,
-                     (unsigned long ) kernel_mm_data.pd0_va,
-                     PERSONALITY_GRAMADO );
+                    NULL,  
+                    (unsigned long) 0x30000000, 
+                    BasePriority, 
+                    (int) MyPPID,
+                    kernel_process_default_name, 
+                    RING0,   
+                    (unsigned long ) gKernelPML4Address,
+                    (unsigned long ) kernel_mm_data.pdpt0_va,
+                    (unsigned long ) kernel_mm_data.pd0_va,
+                    PERSONALITY_GRAMADO );
 
 // Struct and struct validation.
     if ((void *) KernelProcess == NULL){

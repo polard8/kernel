@@ -2089,6 +2089,49 @@ void *sci2 (
         return NULL;   
     }
 
+// Get process info given an index.
+// Just some few elements.
+    if (number == 800)
+    {
+        switch (arg2) {
+        // PID
+        case 100:
+            return (void*) p->pid;
+            break;
+        // PPID
+        case 101:
+            return (void*) p->ppid;
+            break;
+        // Instance ID. The physiscal address.
+        case 102:
+            return (void*) p->ImagePA;
+            break;
+        // ...
+        default:
+            return NULL;
+            break;
+        };
+    }
+
+// Get thread info given an index.
+// Just some few elements.
+    if (number == 801)
+    {
+        switch (arg2) {
+        case 100:
+            return (void*) t->tid;
+            break;
+        case 101:
+            return (void*) t->owner_pid;
+            break;
+        // ...
+        default:
+            return NULL;
+            break;
+        };
+    }
+
+
 // ---------------------------
 // 900 - copy process 
 // For rtl_clone_and_execute().
@@ -2585,6 +2628,8 @@ void *sci2 (
         panic("[22777] Deprecated syscall\n");
         return NULL;
     }
+
+
 
 // 44000
 // #important: We're avoiding the callback support.

@@ -3,7 +3,7 @@
 
 #include <kernel.h>
 
-const char *init_thread_default_name = "Ring3InitThread";
+const char *init_thread_default_name = "InitThread-R3";
 
 // ==================================================
 // create_init_thread:
@@ -23,8 +23,6 @@ struct thread_d *create_init_thread(void)
     register int i=0;  // Message queue
     register int q=0;  // Message queue
     char *ThreadName = init_thread_default_name;
-// Stack pointer.
-    void *__initStack;   
 
     debug_print ("create_init_thread:\n");
 
@@ -44,36 +42,33 @@ struct thread_d *create_init_thread(void)
 
     t->objectType = ObjectTypeThread;
     t->objectClass = ObjectClassKernelObject;
-
-    t->exit_in_progress = FALSE;
-    
-    t->link = NULL;
-    t->is_linked = FALSE;
-
-// INIT process control thread.
-// type: system
-// priority: low
-
     t->type = THREAD_TYPE_SYSTEM;
+
+// TID
+    t->tid = (int) (TID & 0xFFFF);
+
+// The pointer for the process we belong to.
+    t->owner_process = (void *) InitProcess;
+// The PID for the process we belong to.
+    t->owner_pid = (pid_t) InitProcess->pid; 
+
+// Low priority
     t->base_priority = PRIORITY_SYSTEM_THRESHOLD;  // Static
     t->priority      = PRIORITY_SYSTEM_THRESHOLD;  // Dynamic
 
+// Initializing values.
+// For ring0 stack address we will use the value found in the TSS,
+    t->HeapStart = 0;
+    t->HeapSize = 0;
+    t->StackStart = 0;
+    t->StackSize = 0;
+
 // #todo
-// #bugbug
-// We need to review that thing!
+// Explain it better.   
+    t->link = NULL;
+    t->is_linked = FALSE;
 
-//
-// TID
-//
-
-    t->tid = (int) (TID & 0xFFFF);
-
-// #bugbug: 
-// Is this a valid pointer?
-// is this a valid pid?
-    t->owner_process = (void *) InitProcess;
-    t->owner_pid = (pid_t) InitProcess->pid; 
-
+    t->exit_in_progress = FALSE;
 
 // The kernel console associated with this thread.
 // 0~3
@@ -87,40 +82,6 @@ struct thread_d *create_init_thread(void)
     t->surface_rect = NULL;
     // ...
     t->input_mode = IM_MESSAGE_INPUT;
-    
-// @todo: 
-// #bugbug: #importante
-// A stack da idle nao deve ficar no heap do kernel.
-// Pois a idle esta em user mode e deve ter sua stack 
-// em user mode para ter permissao de acesso.
-// Mas ficara aqui por enquanto.
-// Obs: Mais abaixo a pilha foi configurada manualmente 
-// no lugar certo.
-
-	//InitThread->Heap = ?;
-	//InitThread->HeapSize = ?;
-	//InitThread->Stack = ?;
-	//InitThread->StackSize = ?;
-
-// Stack. 
-// @todo: A stack deve ser a que esta na TSS
-// #BugBug.
-// Estamos alocando mas nao etamos usando.
-// #podemos usar o alocador de paginas e alocar uma pagina para isso.
-// Stack.
-// #bugbug
-// Não estamos usando isso.
-// 8KB.
-// #bugbug
-// Essa stack está em ring0.
-// Se o processo precisa de uma stack em ring 0 então usaremos essa.
-
-    // 8KB
-    __initStack = (void *) kmalloc(8*1024);
-    if ((void *) __initStack == NULL){
-        panic("create_init_thread: __initStack\n");
-    }
-    memset( __initStack, 0, 8*1024 );
 
 //
 // PML4

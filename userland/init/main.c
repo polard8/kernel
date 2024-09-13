@@ -343,8 +343,18 @@ static int input_compare_string(void)
     }
 */
 
-    if ( strncmp(prompt,"about",5) == 0 ){
-        printf ("INIT.BIN: This is the first user application\n");
+    // #test
+    unsigned long InstanceID=0;
+
+    if ( strncmp(prompt,"about",5) == 0 )
+    {
+        //#test
+        InstanceID = rtl_instance_id();
+
+        //printf ("INIT.BIN: This is the first user application\n");
+        printf ("INIT.BIN: This is the first user application. instance={%x}\n",
+            InstanceID );
+
         goto exit_cmp;
     }
 

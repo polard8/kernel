@@ -928,8 +928,6 @@ int rtl_is_qemu(void)
     return (int) (isQEMU & 0xFFFFFFFF);
 }
 
-
-
 pid_t rtl_current_process(void)
 {
     return (int) rtl_get_system_metrics(140);
@@ -938,6 +936,12 @@ pid_t rtl_current_process(void)
 int rtl_current_thread(void)
 {
     return (int) rtl_get_system_metrics(141);
+}
+
+unsigned long rtl_instance_id(void)
+{
+    unsigned long ID = sc82(800,102,0,0);
+    return (unsigned long) ( ID & 0xFFFFFFFF );
 }
 
 // #todo: __pthread_self ?
@@ -2415,6 +2419,11 @@ rtl_default_procedure(
 // OK
     return (int) 0;
 }
+
+//
+// $
+// INITIALIZATION
+//
 
 // Called by crt0.c
 int rtl_cinit(void)
