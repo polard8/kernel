@@ -1230,8 +1230,8 @@ struct thread_d *create_thread (
     struct rect_d *r;
 
 // #debug
-    debug_print ("create_thread: #todo\n");
-    //printk ("create_thread: #todo\n");
+    debug_print ("create_thread:\n");
+    //printk ("create_thread:\n");
 
 //======================================
 // check parameters.
@@ -1283,31 +1283,22 @@ struct thread_d *create_thread (
 
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
-        debug_print ("create_thread: current_thread fail\n");
-        printk      ("create_thread: current_thread fail\n");
+        debug_print ("create_thread: current_thread\n");
+        printk      ("create_thread: current_thread\n");
         goto fail;
-    }
-
-// #todo
-// Filtrar o processo ao qual a thread pertence.
-// #bugbug:
-// Não sabemos a condição do processo atual para 
-// permitirmos que ele seja o dono da thread.
-
-    ProcessID = (pid_t) pid;
-    if ( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX )
-    {
-        //#bugbug: Isso pode ser um problemão.
-        panic("create_thread: ProcessID");
-        //ProcessID = current_process;
     }
 
 //
 // Process
 //
 
-// Ja temos um PID para o processo que eh dono da thread.
-
+    // PID
+    ProcessID = (pid_t) pid;
+    if ( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX )
+    {
+        panic("create_thread: ProcessID");
+    }
+    // Structure
     Process = (void *) processList[ProcessID]; 
     if ((void *) Process == NULL){
         panic ("create_thread: Process\n");
@@ -1332,104 +1323,12 @@ struct thread_d *create_thread (
     }
     memset( Thread, 0, sizeof(struct thread_d) );
 
-    // TID?
-    // Done bellow.
-
-// Belongs to this process.
-    Thread->owner_process = (void *) Process;
-    Thread->owner_pid = (pid_t)  ProcessID;
-
-// Initializing values.
-// For ring0 stack address we will use the value found in the TSS,
-    Thread->HeapStart = 0;
-    Thread->HeapSize = 0;
-    Thread->StackStart = 0;
-    Thread->StackSize = 0;
-
-// The kernel console associated with this thread.
-// 0~3
-    Thread->__console_id = (int) CONSOLE0;
-
-    Thread->link = NULL;
-    Thread->is_linked = FALSE;
-
-    Thread->exit_in_progress = FALSE;
-
-// Paging
-    Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;
-    Thread->pml4_PA  = (unsigned long ) Process->pml4_PA;
-    Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
-    Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
-    Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
-    Thread->pd0_PA   = (unsigned long ) Process->pd0_PA; 
-
-// Page fault information.
-    Thread->PF.in_pf = FALSE;  // Not in a pf routine.
-    Thread->PF.pf_counter = 0;
-
-//
-// Security
-//
-
-// #todo
-// Include these element into the thread structure.
-
-// ====
-
-// #todo
-// The parameters needs to provide us this information.
-
-    Thread->type = THREAD_TYPE_SYSTEM; 
-    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //static
-    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //dynamic
-
-    Thread->plane = FOREGROUND_THREAD;
-
-// ==============
-// Surface rectangle.
-
-    r = (struct rect_d *) kmalloc ( sizeof(struct rect_d) );
-    if ((void*) r == NULL){
-        panic("create_thread: r\n");
-    }
-    memset( r, 0, sizeof(struct rect_d) );
-
-    r->left = 0;
-    r->top  = 0;
-    r->width  = 50; 
-    r->height = 50;
-    r->dirty = FALSE; 
-    r->used = TRUE;
-    r->magic = 1234;
-    Thread->surface_rect = r;
-
 // ==============
 // local worker
 // Initializing the common basic elements.
     __ps_initialize_thread_common_elements( (struct thread_d *) Thread );
 
-// Input model
-    Thread->input_mode = IM_MESSAGE_INPUT;
-
-// ??
-// Explain it better.
-    Thread->_protected = FALSE;
-
-// Thread name.
-
-    Thread->name_address = (unsigned long) name;
-    //#todo: Usar Thread->name. 
-    //#todo: Thread->cmd.
-    //#test 64 bytes max.
-    strcpy( Thread->__threadname, (const char *) name );
-
-// This thread can be preempted.
-    Thread->is_preemptable = PREEMPTABLE;
-
-    // ...
-
-    // Nothing
-
+// ======================================
 // Loop.
 // Vamos gerar um TID válido.
 
@@ -1463,10 +1362,98 @@ try_next_slot:
         goto try_next_slot;
     }
 
-// ======================================
 // Index Ok.
 // Now we have an index number.
     Thread->tid = (tid_t) i;
+// ======================================
+
+// Belongs to this process.
+    Thread->owner_process = (void *) Process;
+    Thread->owner_pid = (pid_t)  ProcessID;
+
+// Thread name.
+// #test 64 bytes max.
+    Thread->name_address = (unsigned long) name;
+    strcpy( Thread->__threadname, (const char *) name );
+
+// #todo
+// The parameters needs to provide us this information.
+
+    Thread->type = THREAD_TYPE_SYSTEM; 
+    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //static
+    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //dynamic
+
+// Initializing values.
+// For ring0 stack address we will use the value found in the TSS,
+    Thread->HeapStart = 0;
+    Thread->HeapSize = 0;
+    Thread->StackStart = 0;
+    Thread->StackSize = 0;
+
+// The kernel console associated with this thread.
+// 0~3
+    Thread->__console_id = (int) CONSOLE0;
+
+// Paging
+    Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;
+    Thread->pml4_PA  = (unsigned long ) Process->pml4_PA;
+    Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
+    Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
+    Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
+    Thread->pd0_PA   = (unsigned long ) Process->pd0_PA; 
+
+// Page fault information.
+    Thread->PF.in_pf = FALSE;  // Not in a pf routine.
+    Thread->PF.pf_counter = 0;
+
+//
+// Security
+//
+
+// #todo
+// Include these element into the thread structure.
+
+// ====
+
+    Thread->plane = FOREGROUND_THREAD;
+
+// ==============
+// Surface rectangle.
+
+    r = (struct rect_d *) kmalloc ( sizeof(struct rect_d) );
+    if ((void*) r == NULL){
+        panic("create_thread: r\n");
+    }
+    memset( r, 0, sizeof(struct rect_d) );
+
+    r->left = 0;
+    r->top  = 0;
+    r->width  = 50; 
+    r->height = 50;
+    r->dirty = FALSE; 
+    r->used = TRUE;
+    r->magic = 1234;
+    Thread->surface_rect = r;
+
+// Input model
+    Thread->input_mode = IM_MESSAGE_INPUT;
+
+// ??
+// Explain it better.
+    Thread->_protected = FALSE;
+
+// This thread can be preempted.
+    Thread->is_preemptable = PREEMPTABLE;
+
+
+    Thread->link = NULL;
+    Thread->is_linked = FALSE;
+
+    Thread->exit_in_progress = FALSE;
+
+    // ...
+
+    // Nothing
 
 //
 // == Time support ============
