@@ -149,42 +149,55 @@ build-gramado-os:
 # ...
 
 #===================================
-# (4) userland/ in kernel project
-# Build the init process.
+# (4) udrivers/ in kernel project
+
+	$(Q)$(MAKE) -C udrivers/
+
+#	-cp udrivers/bin/VGAD.BIN      $(BASE)/
+
+#===================================
+# (5) uservers/ in kernel project
 # Build the network server and the first client.
+
+	$(Q)$(MAKE) -C uservers/
+
+	-cp uservers/bin/NET.BIN      $(BASE)/
+	-cp uservers/bin/NETD.BIN     $(BASE)/
+
+#===================================
+# (6) usys/ in kernel project
+# Build the init process.
 # Copy the init process.
 # We can't survive without this one. (Only this one).
-	$(Q)$(MAKE) -C userland/
-	$(Q)$(MAKE) -C userland/commands/
+	$(Q)$(MAKE) -C usys/
+	$(Q)$(MAKE) -C usys/commands/
 
 # Copy
-	cp userland/bin/INIT.BIN      $(BASE)/
-	-cp userland/bin/PUBSH.BIN    $(BASE)/
-	-cp userland/bin/SH7.BIN      $(BASE)/
-	-cp userland/bin/SHELL.BIN    $(BASE)/
-#	-cp userland/bin/SHELL00.BIN  $(BASE)/
-	-cp userland/bin/NETD.BIN     $(BASE)/
-	-cp userland/bin/NET.BIN      $(BASE)/
-	-cp userland/bin/TASCII.BIN   $(BASE)/GRAMADO/
-	-cp userland/bin/TPRINTF.BIN  $(BASE)/GRAMADO/
+	cp usys/bin/INIT.BIN      $(BASE)/
+	-cp usys/bin/PUBSH.BIN    $(BASE)/
+	-cp usys/bin/SH7.BIN      $(BASE)/
+	-cp usys/bin/SHELL.BIN    $(BASE)/
+#	-cp usys/bin/SHELL00.BIN  $(BASE)/
+	-cp usys/bin/TASCII.BIN   $(BASE)/GRAMADO/
+	-cp usys/bin/TPRINTF.BIN  $(BASE)/GRAMADO/
 
     # Well consolidated applications
-	-cp userland/commands/base/bin/CAT.BIN       $(BASE)/
-	-cp userland/commands/base/bin/REBOOT.BIN    $(BASE)/
-	-cp userland/commands/base/bin/SHUTDOWN.BIN  $(BASE)/
-	-cp userland/commands/base/bin/UNAME.BIN     $(BASE)/
-	-cp userland/commands/sdk/bin/GRAMCNF.BIN    $(BASE)/
+	-cp usys/commands/base/bin/CAT.BIN       $(BASE)/
+	-cp usys/commands/base/bin/REBOOT.BIN    $(BASE)/
+	-cp usys/commands/base/bin/SHUTDOWN.BIN  $(BASE)/
+	-cp usys/commands/base/bin/UNAME.BIN     $(BASE)/
+	-cp usys/commands/sdk/bin/GRAMCNF.BIN    $(BASE)/
     # Experimental applications
     # These need the '@' prefix.
-	-cp userland/commands/base/bin/FALSE.BIN      $(BASE)/GRAMADO/
-	-cp userland/commands/base/bin/TRUE.BIN       $(BASE)/GRAMADO/
-	-cp userland/commands/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
-	-cp userland/commands/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
-	-cp userland/commands/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
-#-cp userland/commands/sdk/bin/N9.BIN         $(BASE)/GRAMADO/
-#-cp userland/commands/sdk/bin/N10.BIN        $(BASE)/GRAMADO/
-#-cp userland/commands/sdk/bin/N11.BIN        $(BASE)/GRAMADO/
-#-cp userland/commands/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
+	-cp usys/commands/base/bin/FALSE.BIN      $(BASE)/GRAMADO/
+	-cp usys/commands/base/bin/TRUE.BIN       $(BASE)/GRAMADO/
+	-cp usys/commands/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
+	-cp usys/commands/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
+	-cp usys/commands/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
+#-cp usys/commands/sdk/bin/N9.BIN         $(BASE)/GRAMADO/
+#-cp usys/commands/sdk/bin/N10.BIN        $(BASE)/GRAMADO/
+#-cp usys/commands/sdk/bin/N11.BIN        $(BASE)/GRAMADO/
+#-cp usys/commands/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
 
 # Install BMPs from cali assets.
 # Copy the assets/
@@ -325,18 +338,19 @@ clean-all: clean
 	-rm -rf mods/bin/*.BIN
 
 # ==================
-# (4) userland/
-# Clear INIT.BIN, HVNETD.BIN and HVNET.BIN.
-	-rm userland/bin/*.BIN
-	-rm userland/init/*.o
-	-rm userland/init/*.BIN 
-	-rm userland/netd/client/*.o
-	-rm userland/netd/client/*.BIN
-	-rm userland/netd/server/*.o
-	-rm userland/netd/server/*.BIN 
+# (4) usys/
+# Clear INIT.BIN
+	-rm usys/bin/*.BIN
+	-rm usys/init/*.o
+	-rm usys/init/*.BIN 
 
-	-rm userland/commands/bin/*.BIN
-	-rm userland/commands/init/*.o
+	-rm uservers/netd/client/*.o
+	-rm uservers/netd/client/*.BIN
+	-rm uservers/netd/server/*.o
+	-rm uservers/netd/server/*.BIN 
+
+	-rm usys/commands/bin/*.BIN
+	-rm usys/commands/init/*.o
 
 # ==================
 # Clear the disk cache

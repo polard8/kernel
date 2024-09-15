@@ -424,8 +424,8 @@ ssize_t __read_imp(int fd, char *ubuf, size_t count);
 ssize_t __write_imp(int fd, char *ubuf, size_t count);
 
 // syscall
-ssize_t sys_read(int fd, char *ubuf, size_t count);
-ssize_t sys_write(int fd, char *ubuf, size_t count);
+ssize_t sys_read(int fd, const char *ubuf, size_t count);
+ssize_t sys_write(int fd, const char *ubuf, size_t count);
 
 // Implementations
 int 
@@ -457,10 +457,10 @@ int get_saved_sync(void);
 int sys_get_file_sync(int fd, int request);
 void sys_set_file_sync(int fd, int request, int data);
 
-int sys_get_device_number_by_path( char *path );
+int sys_get_device_number_by_path(const char *path);
 int sys_open_device_by_number(int device_index);
 
-unsigned long sys_get_file_size(char *path);
+unsigned long sys_get_file_size(const char *path);
 
 int sys_sleep_if_socket_is_empty(int fd);
 
@@ -624,7 +624,7 @@ do_read_file_from_disk (
 // Wrapper
 int 
 sys_read_file_from_disk ( 
-    char *file_name, 
+    const char *file_name, 
     int flags, 
     mode_t mode );
 
@@ -643,15 +643,14 @@ do_write_file_to_disk (
 // Wrapper
 int
 sys_write_file_to_disk ( 
-    char *file_name, 
+    const char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes,
     char *file_address,
     char flag );
 
-
-int sys_create_empty_file ( char *file_name );
-int sys_create_empty_directory ( char *dir_name );
+int sys_create_empty_file(const char *file_name);
+int sys_create_empty_directory(const char *dir_name);
 void set_global_open_file ( void *file, int Index );
 void *get_global_open_file (int Index);
 void sys_cd_command ( const char *string );

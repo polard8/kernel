@@ -5,7 +5,7 @@
 #include <kernel.h>
 
 
-ssize_t sys_read(int fd, char *ubuf, size_t count)
+ssize_t sys_read(int fd, const char *ubuf, size_t count)
 {
     if (fd<0){
         return (ssize_t) -EINVAL;
@@ -24,8 +24,7 @@ ssize_t sys_read(int fd, char *ubuf, size_t count)
     return (ssize_t) __read_imp(fd, ubuf, count);
 }
 
-
-ssize_t sys_write(int fd, char *ubuf, size_t count)
+ssize_t sys_write(int fd, const char *ubuf, size_t count)
 {
     if (fd<0){
         return (ssize_t) -EINVAL;
@@ -195,8 +194,8 @@ int sys_get_global_sync (int sync_id, int request)
 
     if ( sync_id < 0 || sync_id >= SYNC_COUNT_MAX )
     {
-       //message? panic?
-       return -1;
+        //message? panic?
+        goto fail;
     }
 
     s = (struct kstdio_sync_d *) syncList[sync_id];
@@ -210,7 +209,7 @@ int sys_get_global_sync (int sync_id, int request)
     }
 
 fail:
-    return -1; 
+    return (int) -1; 
 }
 
 // 10002
@@ -471,9 +470,9 @@ fail:
 // Get the device number in the dev_dir[] list
 // given the pathname.
 // ex: "/DEV/DEV1"
-int sys_get_device_number_by_path(char *path)
+int sys_get_device_number_by_path(const char *path)
 {
-    return -1;
+    return (int) -1;
 }
 
 // #test
@@ -562,20 +561,15 @@ fail:
 // sys_get_file_size:
 // 178
 // Only root dir.
-//#todo: 
-// unsigned long sys_get_file_size ( char *path, unsigned long dir_address )
-
-unsigned long sys_get_file_size(char *path)
+unsigned long sys_get_file_size(const char *path)
 {
     unsigned long FileSize=0;
 
 // Parameter
     if ((void*) path == NULL){
-        debug_print("sys_get_file_size: path\n");
         return 0;
     }
     if ( *path == 0 ){
-        debug_print("sys_get_file_size: *path\n");
         return 0;
     }
 
@@ -683,7 +677,7 @@ void sys_pwd(void)
 // Wrapper
 int 
 sys_read_file_from_disk ( 
-    char *file_name, 
+    const char *file_name, 
     int flags, 
     mode_t mode )
 {
@@ -714,11 +708,10 @@ sys_read_file_from_disk (
                     (mode_t) mode );
 }
 
-
 // Wrapper
 int
 sys_write_file_to_disk ( 
-    char *file_name, 
+    const char *file_name, 
     unsigned long file_size,
     unsigned long size_in_bytes,
     char *file_address,
@@ -753,13 +746,10 @@ sys_write_file_to_disk (
                      
 }
 
-
-
 // ==============================
 // Service 43
 // See: see sci.c
-
-int sys_create_empty_file(char *file_name)
+int sys_create_empty_file(const char *file_name)
 {
     int __ret = -1;
     //char *FileName;
@@ -819,13 +809,11 @@ fail:
     return (int) -1;
 }
 
-
 // sys_cd_command:
 // Service 175. cd command.
 // #todo
 // ou usamos o cwd do processo ou
 // o diretorio raiz para paths absolutos.
-
 void sys_cd_command (const char *string)
 {
 
@@ -873,7 +861,7 @@ void sys_cd_command (const char *string)
 // ================================
 // Service 44
 // See: fs_create_empty_directory
-int sys_create_empty_directory(char *dir_name)
+int sys_create_empty_directory(const char *dir_name)
 {
     int __ret=0;
 
@@ -924,5 +912,4 @@ fail:
     refresh_screen();
     return (int) -1;
 }
-
 

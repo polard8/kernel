@@ -124,7 +124,7 @@ void test_mod0(void)
     printk ("RETURN: %d\n",return_value);
 
 // --------------------
-// Reason 1001: Testin printk function.
+// Reason 1001: Testing printk function.
     return_value = 
         (unsigned long) kernel_mod0->entry_point(
             0xFF,
