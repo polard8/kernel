@@ -107,51 +107,53 @@ void test_mod0(void)
     if (kernel_mod0->initialized != TRUE)
         return;
 
+// Entry point validation
+    if ((void*) kernel_mod0->entry_point == NULL)
+        return;
+
 // #test
 // Calling the virtual function, and
 // getting the return value.
-    if ( (void*) kernel_mod0->entry_point != NULL )
-    {
-        // --------------------
-        // Reason 1000: Initializing the module.
-        return_value = 
-            (unsigned long) kernel_mod0->entry_point(
-                0xFF,
-                1000,1234,0,0);
-        printk ("RETURN: %d\n",return_value);
 
-        // --------------------
-        // Reason 1001: Testin printk function.
-        return_value = 
-            (unsigned long) kernel_mod0->entry_point(
-                0xFF,
-                1001,1234,0,0);    
-        printk ("RETURN: %d\n",return_value);
+// --------------------
+// Reason 1000: Initializing the module.
+    return_value = 
+        (unsigned long) kernel_mod0->entry_point(
+            0xFF,
+            1000,1234,0,0);
+    printk ("RETURN: %d\n",return_value);
 
-        // --------------------
-        // Reason 1002:
-        // Exporting the pointer for the function table.
-        fn_table_base = 
-            (unsigned long) &kernel_mod0->fn_table[0];
-        return_value = 
-            (unsigned long) kernel_mod0->entry_point(
-                0xFF,
-                1002, 1234, fn_table_base, fn_table_base );    
-        printk ("RETURN: %d\n",return_value);
+// --------------------
+// Reason 1001: Testin printk function.
+    return_value = 
+        (unsigned long) kernel_mod0->entry_point(
+            0xFF,
+            1001,1234,0,0);    
+    printk ("RETURN: %d\n",return_value);
 
-        // --------------------
-        // Reason 1003:
-        // Exporting the pointer for the module sci.
-        // This way the module can call routines inside the kernel.
-        mod_sci = (unsigned long) &ring0_module_sci;
-        return_value = 
-            (unsigned long) kernel_mod0->entry_point(
-                0xFF,
-                1003, 1234, mod_sci, mod_sci );    
-        printk ("RETURN: %d\n",return_value);
-    }
+// --------------------
+// Reason 1002:
+// Exporting the pointer for the function table.
+    fn_table_base = (unsigned long) &kernel_mod0->fn_table[0];
+    return_value = 
+        (unsigned long) kernel_mod0->entry_point(
+            0xFF,
+            1002, 1234, fn_table_base, fn_table_base );    
+    printk ("RETURN: %d\n",return_value);
 
-    printk ("test_mod0: Done :)\n");
+// --------------------
+// Reason 1003:
+// Exporting the pointer for the module sci.
+// This way the module can call routines inside the kernel.
+    mod_sci = (unsigned long) &ring0_module_sci;
+    return_value = 
+        (unsigned long) kernel_mod0->entry_point(
+            0xFF,
+            1003, 1234, mod_sci, mod_sci );    
+    printk ("RETURN: %d\n",return_value);
+
+// Done:
+    printk ("test_mod0: Done\n");
 }
 
 // Handler for ring0 module syscall.

@@ -1,5 +1,6 @@
 // mod.h
 // see: mod.c
+// Created by Fred Nora.
 
 #ifndef __MOD_MOD_H
 #define __MOD_MOD_H    1
