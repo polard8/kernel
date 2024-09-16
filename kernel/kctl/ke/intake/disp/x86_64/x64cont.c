@@ -1,4 +1,3 @@
-
 // x64cont.c
 // Context support for x86_64 arch.
 // Created by Fred Nora.
@@ -43,7 +42,6 @@ unsigned long contextR12=0;
 unsigned long contextR13=0;
 unsigned long contextR14=0;
 unsigned long contextR15=0;
-
 
 // #todo
 // Debug registers

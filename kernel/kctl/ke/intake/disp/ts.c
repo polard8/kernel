@@ -102,9 +102,9 @@ static void __tsCry(unsigned long flags)
 
 static void __tsOnFinishedExecuting(struct thread_d *t)
 {
-    if ( (void*) t == NULL )
+    if ((void*) t == NULL)
         panic("__tsOnFinishedExecuting: t\n");
-    if (t->magic!=1234)
+    if (t->magic != 1234)
         panic("__tsOnFinishedExecuting: t magic\n");
 
 // #bugbug
@@ -236,9 +236,12 @@ static void __tsOnFinishedExecuting(struct thread_d *t)
 //
 
 /*
- * task_switch:
+ * __task_switch:
  * + Switch the thread.
  * + Save and restore context.
+ * + Preempt thread if the quantum is over.
+ *   In this case we will spawn a new thread if there is one
+ *   in standby state.
  * + Select the next thread and dispatch.
  * + Return to _irq0.
  */
@@ -267,7 +270,7 @@ static void __task_switch(void)
     }
 // structure
     CurrentThread = (void *) threadList[current_thread]; 
-    if ( (void *) CurrentThread == NULL ){
+    if ((void *) CurrentThread == NULL){
         panic ("ts: CurrentThread\n");
     }
     if ( CurrentThread->used != TRUE || CurrentThread->magic != 1234 ){
@@ -280,16 +283,19 @@ static void __task_switch(void)
 
 // pid
     owner_pid = (pid_t) CurrentThread->owner_pid;
-
-    if ( owner_pid < 0 || owner_pid >= PROCESS_COUNT_MAX ){
+    if ( owner_pid < 0 || 
+         owner_pid >= PROCESS_COUNT_MAX )
+    {
         panic ("ts: owner_pid\n");
     }
 // structure
     CurrentProcess = (void *) processList[owner_pid];
-    if ( (void *) CurrentProcess == NULL ){
+    if ((void *) CurrentProcess == NULL){
         panic ("ts: CurrentProcess\n");
     }
-    if ( CurrentProcess->used != TRUE || CurrentProcess->magic != 1234 ){
+    if ( CurrentProcess->used != TRUE || 
+         CurrentProcess->magic != 1234 )
+    {
         panic ("ts: CurrentProcess validation\n");
     }
 // check pid
@@ -303,52 +309,15 @@ static void __task_switch(void)
 // == Conting =================================
 //
 
-// 1 second = 1000 milliseconds
-// sys_time_hz = 600 ticks per second.
-// 1/600 de segundo a cada tick
-// 1000/100 = 10 ms quando em 100HZ.
-// 1000/600 = 1.x ms quando em 600HZ.
-// x = 0 + (x ms); 
-
-// step: 
-// Quantas vezes ela já rodou no total.
+// Increment total ticks.
     CurrentThread->step++;
-// runningCount: 
-// Quanto tempo ela está rodando antes de parar.
-    CurrentThread->runningCount++;
-
-//
-// == #bugbug =========================
-//
-
-// #bugbug
-// Rever essa contagem
-
-/*
-The variables i have are:
-Current->step = How many timer the thread already ran.
-sys_time_hz = The timer frequency. (600Hz).
-No double type, no float type.
-----------
-600Hz means that we have 600 ticks per second.
-With 100 Hz we have 10 milliseconds per tick. ((1000/100)=10)
-With 600Hz we have 1.66666666667 milliseconds per tick.   ((1000/600)=1)
-------
-Maybe i will try 500Hz.
-With 600Hz we have 2 milliseconds per tick.   ((1000/500)=2)
-----
-This is a very poor incrementation method:
-Current->total_time_ms = Current->total_time_ms + (1000/sys_time_hz);
-The remainder ??
-----
-*/
-
-// Quanto tempo em ms ele rodou no total.
+// Total time in ms.
     CurrentThread->total_time_ms = 
         (unsigned long) CurrentThread->total_time_ms + (DEFAULT_PIT_FREQ/sys_time_hz);
 
-// Incrementa a quantidade de ms que ela está rodando antes de parar.
-// isso precisa ser zerado quando ela reiniciar no próximo round.
+// Increment tick counter for the current quantum.
+    CurrentThread->runningCount++;
+// How many ticks in this quantum given in ms.
     CurrentThread->runningCount_ms = 
         (unsigned long) CurrentThread->runningCount_ms + (DEFAULT_PIT_FREQ/sys_time_hz);
 
@@ -356,12 +325,14 @@ The remainder ??
 // -----------------------------------------
 //
 
+// The ts needs to be in an UNLOCKED state.
+
 // Locked?
 // Taskswitch locked? 
 // Return without saving.
     if (task_switch_status == LOCKED){
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
-        debug_print ("ts: Locked $\n");
+        debug_print ("ts: Locked\n");
         return; 
     }
 
@@ -420,9 +391,10 @@ The remainder ??
 // O seu contexto está salvo, mas o handler em assembly
 // vai usar o contexto que ele já possui.
 
-// ::
-// Ainda não esgotou o tempo de processamento.
-// Vamos retornar e permitir que ela continue rodando.
+// :: ----
+// Still in quantum:
+// The thread still have some processing time in its quantum value.
+// Let's return and allow the thread to run for a while.
 
     if ( CurrentThread->runningCount < CurrentThread->quantum ){
 
@@ -458,19 +430,24 @@ The remainder ??
         //debug_print ("s");  // the same again
         return; 
 
-// ::
+// :: ----
 // End of quantum:
-// Preempt thread, check for standby, check for signals ...
-// Agora esgotou o tempo de processamento.
+// The quantum is over, let's preempt the thread,
+// check for a new thread in standby, check for signals, etc ...
 // Preempt: >> MOVEMENT 3 (Running --> Ready).
+
     } else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
         __tsOnFinishedExecuting(CurrentThread);
         // Jumping to this label for the first time.
         goto ZeroGravity;
 
-// ::
-// Estamos perdidos com o tempo de processamento.
-// Can we balance it?
+// :: ----
+// Undefined quantum state.
+// We're lost with the processing time for this thread.
+// #todo:
+// Maybe we can reset the quantum and balance the processing time 
+// for this thread.
+
     }else{
         panic ("ts: CurrentThread->runningCount\n");
     };
@@ -498,7 +475,6 @@ The remainder ??
 ZeroGravity:
 // try_next: 
 
-
 // Two situations:
 // We have '0' threads or only '1' thread.
 // We are in a Uni-Processor mode.
@@ -518,14 +494,23 @@ ZeroGravity:
 // Only 1 thread.
 // The Idle thread is gonna be the scheduler condutor.
 
-
 // No threads.
+// The counter is telling us that there is no thread in 
+// this system.
     if (UPProcessorBlock.threads_counter == 0){
         panic("ts: No threads\n");
     }
 
 // Only one thread.
-    if (UPProcessorBlock.threads_counter == 1){
+// The counter is telling us that there is only on thread in the system.
+// It needs to be the init thread.
+// Let's put this thread in the first place of the current queue.
+    if (UPProcessorBlock.threads_counter == 1)
+    {
+        if ((void *)InitThread != UPProcessorBlock.IdleThread){
+            panic("ts: Invalid single thread\n");
+        }
+
         currentq = (void *) UPProcessorBlock.IdleThread;
         goto go_ahead;
     }
@@ -572,35 +557,25 @@ ZeroGravity:
 // Isso é ruin quando tem poucas threads, mas não faz diferença
 // se o round for composto por muitas threads.
 
+// The queue is over.
 // End of round. Rebuild the round.
     if ((void *) currentq->next == NULL){
         current_thread = (tid_t) psScheduler();
         goto go_ahead;
     }
 
-// Circular.
-// #critério
-// Se ainda temos threads na lista encadeada, então selecionaremos
-// a próxima da lista.
-// #BUGBUG: ISSO PODE SER UM >>> ELSE <<< DO IF ACIMA.
-
-// Get the next thread in the linked list.
+// The queue is not over,
+// let's get the next thread in the linked list.
     if ((void *) currentq->next != NULL){
         currentq = (void *) currentq->next;
         goto go_ahead;
     }
 
-// #fail
-// No thread was selected.
-// Can we use the idle? or reschedule?
-
-    //currentq = ____IDLE;
-    //goto go_ahead;
-
-// #bugbug
-// Not reached yet.
+// Not reached.
+// This is the end of our options when trying to select a thread.
     panic("ts: Unexpected error\n");
 
+// ---------------------------------------------------
 // Go ahead
 // #importante:
 // Nesse momento já temos uma thread selecionada,
@@ -830,14 +805,20 @@ void tsTaskSwitch(void)
     }
 
 // Current thread.
-// Global variable.
 // First check!
+// This variable was set at the last release or the last spawn.
+// Global variable.
+
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
     {
         printk ("psTaskSwitch: current_thread %d", current_thread); 
         die();
     }
+
+//
+// Callback
+//
 
 // Permitindo que o assembly chame o callback.
 // Somente quando o processo interrompido for o init.
@@ -855,6 +836,7 @@ void tsTaskSwitch(void)
             return;
         }
     }
+
 
 // The task switching routine.
     __task_switch();

@@ -154,7 +154,7 @@ _irq0:
     
     ; Stack frame. (all double)
     pop qword [_contextRIP]     ; rip
-    pop qword [_contextCS]      ; cs
+    pop qword [_contextCS]      ; cs  (R3)
     pop qword [_contextRFLAGS]  ; rflags
     pop qword [_contextRSP]     ; rsp
     pop qword [_contextSS]      ; ss
@@ -209,7 +209,7 @@ _irq0:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: x64cont.c
-    mov rax, qword [_contextCS]
+    mov rax, qword [_contextCS]  ;(R3)
     and rax, 3
     mov [_contextCPL], rax
 
@@ -252,7 +252,7 @@ _irq1:
     
     ; Stack frame. (all double)
     pop qword [_contextRIP]     ; rip
-    pop qword [_contextCS]      ; cs
+    pop qword [_contextCS]      ; cs (R3)
     pop qword [_contextRFLAGS]  ; rflags
     pop qword [_contextRSP]     ; rsp
     pop qword [_contextSS]      ; ss
@@ -308,7 +308,7 @@ _irq1:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: x64cont.c
-    mov rax, qword [_contextCS]
+    mov rax, qword [_contextCS]  ;(R3)
     and rax, 3
     mov [_contextCPL], rax
 
@@ -861,7 +861,7 @@ _irq9_nic_handler:
     
     ; Stack frame. (all double)
     pop qword [_contextRIP]     ; rip
-    pop qword [_contextCS]      ; cs
+    pop qword [_contextCS]      ; cs  (R3)
     pop qword [_contextRFLAGS]  ; rflags
     pop qword [_contextRSP]     ; rsp
     pop qword [_contextSS]      ; ss
@@ -917,7 +917,7 @@ _irq9_nic_handler:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: x64cont.c
-    mov rax, qword [_contextCS]
+    mov rax, qword [_contextCS]  ;(R3)
     and rax, 3
     mov [_contextCPL], rax
 
@@ -1186,7 +1186,7 @@ _irq12:
     
     ; Stack frame. (all double)
     pop qword [_contextRIP]     ; rip
-    pop qword [_contextCS]      ; cs
+    pop qword [_contextCS]      ; cs (R3)
     pop qword [_contextRFLAGS]  ; rflags
     pop qword [_contextRSP]     ; rsp
     pop qword [_contextSS]      ; ss
@@ -1242,7 +1242,7 @@ _irq12:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: x64cont.c
-    mov rax, qword [_contextCS]
+    mov rax, qword [_contextCS]  ;(R3)
     and rax, 3
     mov [_contextCPL], rax
 
@@ -1862,7 +1862,7 @@ all_faults:
     cli
 
     pop qword [_contextRIP]     ; rip
-    pop qword [_contextCS]      ; cs
+    pop qword [_contextCS]      ; cs (R3)
     pop qword [_contextRFLAGS]  ; rflags
     pop qword [_contextRSP]     ; rsp
     pop qword [_contextSS]      ; ss
@@ -1904,12 +1904,11 @@ all_faults:
 
 ; cpl
 ; see: x64cont.c
-    mov rax, qword [_contextCS]
+    mov rax, qword [_contextCS] ;(R3)
     and rax, 3
     mov [_contextCPL], rax
 
-
-; Call c routine in x64nmi.c.
+; Call c routine in x64fault.c.
     mov rax, qword [_save_fault_number]
     mov rdi, rax 
     call _x64_all_faults 
