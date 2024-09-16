@@ -118,7 +118,7 @@ static void __test_path(void)
 // so, we only can use four levels for now. (/../../../file.txt)
 
 // Valid shapes
-    //char PathAddress[] = "/GRAMADO/TEST.BMP";
+    //char PathAddress[] = "/GRAMADO/TEST.TXT";
     //char PathAddress[] = "/GRAMADO.TXT";
     //char PathAddress[] = "/GRAMADO/FOLDER/TEST.TXT";
 

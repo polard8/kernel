@@ -164,12 +164,27 @@ int windowLoadGramadoIcons(void)
 // Load .BMP images
 //
 
+// Loading from the rootdir, '/'.
+// #todo:
+// Maybe we can load these files from DE/ folder.
+
+// sdDE struture.
+    if (sdDE.initialized != TRUE){
+        printk("fsLoadProgramFromDE: sdDE.initialized\n");
+        goto fail;
+    }
+    if (sdDE.address == 0){
+        printk("fsLoadProgramFromDE: sdDE.address\n");
+        goto fail;
+    }
+
+
 // app icon
     fRet = 
         (unsigned long) fsLoadFile ( 
                             VOLUME1_FAT_ADDRESS,
-                            VOLUME1_ROOTDIR_ADDRESS, 
-                            FAT16_ROOT_ENTRIES,
+                            sdDE.address, //VOLUME1_ROOTDIR_ADDRESS, 
+                            512,  //FAT16_ROOT_ENTRIES,
                             "APP     BMP", 
                             (unsigned long) icon_cache.app,
                             tmp_size );
@@ -182,8 +197,8 @@ int windowLoadGramadoIcons(void)
     fRet = 
         (unsigned long) fsLoadFile ( 
                             VOLUME1_FAT_ADDRESS,
-                            VOLUME1_ROOTDIR_ADDRESS, 
-                            FAT16_ROOT_ENTRIES, 
+                            sdDE.address, //VOLUME1_ROOTDIR_ADDRESS, 
+                            512,  //FAT16_ROOT_ENTRIES, 
                             "FILE    BMP", 
                             (unsigned long) icon_cache.file,
                             tmp_size );
@@ -196,8 +211,8 @@ int windowLoadGramadoIcons(void)
     fRet = 
         (unsigned long) fsLoadFile ( 
                             VOLUME1_FAT_ADDRESS, 
-                            VOLUME1_ROOTDIR_ADDRESS, 
-                            FAT16_ROOT_ENTRIES,
+                            sdDE.address, //VOLUME1_ROOTDIR_ADDRESS, 
+                            512,  //FAT16_ROOT_ENTRIES,
                             "FOLDER  BMP", 
                             (unsigned long) icon_cache.folder,
                             tmp_size );
@@ -210,8 +225,8 @@ int windowLoadGramadoIcons(void)
     fRet = 
         (unsigned long) fsLoadFile ( 
                             VOLUME1_FAT_ADDRESS, 
-                            VOLUME1_ROOTDIR_ADDRESS, 
-                            FAT16_ROOT_ENTRIES, 
+                            sdDE.address, //VOLUME1_ROOTDIR_ADDRESS, 
+                            512,  //FAT16_ROOT_ENTRIES, 
                             "TERMINALBMP", 
                             (unsigned long) icon_cache.terminal,
                             tmp_size );
@@ -224,8 +239,8 @@ int windowLoadGramadoIcons(void)
     fRet = 
         (unsigned long) fsLoadFile ( 
                             VOLUME1_FAT_ADDRESS, 
-                            VOLUME1_ROOTDIR_ADDRESS, 
-                            FAT16_ROOT_ENTRIES,
+                            sdDE.address, //VOLUME1_ROOTDIR_ADDRESS, 
+                            512,  //FAT16_ROOT_ENTRIES,
                             "CURSOR  BMP", 
                             (unsigned long) icon_cache.cursor,
                             tmp_size );

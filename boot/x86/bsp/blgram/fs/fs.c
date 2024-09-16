@@ -582,7 +582,7 @@ done:
 // =========================
 // path count
 // Credits: Sirius OS.
-int path_count(const char *path)
+int fs_path_count(const char *path)
 {
     int result=0;
     register int i=0;
@@ -590,11 +590,11 @@ int path_count(const char *path)
 
 // Parameter:
     if ((void*) path == NULL){
-        printf ("path_count: path\n");
+        printf ("fs_path_count: path\n");
         goto fail;
     }
     if (*path == 0){
-        printf ("path_count: *path\n");
+        printf ("fs_path_count: *path\n");
         goto fail;
     }
 
@@ -614,22 +614,20 @@ fail:
     return 0;
 }
 
-/*
- * load_path:
- *     Carrega nesse endere�o o arquivo que est� nesse path.
- */
+// fs_load_path:
+// Load in the given physical address, the file in the given pathname.
 // IN:
-// path de dois n�veis, endere�o onde carregar.
-// IN:
-// pathname, virtual address.
+// 2 levels pathname, physical address.
+// OUT:
 //   0 ---> ok.
 // !=0 ---> fail
-int load_path(unsigned char *path, unsigned long address)
+int fs_load_path(const char *path, unsigned long address)
 {
 
 // #test
 // Removing all the abort(),
-// We are giving a chance to the rescur shell.
+// We are giving a chance to the emergency shell.
+
 
     int Ret = -1;    // fail. Usado na fun��o que carrega o arquivo.
     int i=0;         // Deslocamento dentro do buffer.
@@ -659,22 +657,22 @@ int load_path(unsigned char *path, unsigned long address)
 // path
 
     if ((void*) path == NULL){
-        printf("load_path: path\n");
+        printf("fs_load_path: path\n");
         goto fail;
     }
     if (*path == 0){
-        printf("load_path: *path\n");
+        printf("fs_load_path: *path\n");
         goto fail;
     }
     if (*path != '/'){
-        printf("load_path: It's not an absolute path\n");
+        printf("fs_load_path: It's not an absolute path\n");
         goto fail;
     }
 
     p = path;
-    n_levels = (int) path_count(path);
+    n_levels = (int) fs_path_count(path);
     if (n_levels <= 0){
-        printf("load_path: n_levels\n");
+        printf("fs_load_path: n_levels\n");
         goto fail;
     }
     level = 0;
@@ -683,7 +681,7 @@ int load_path(unsigned char *path, unsigned long address)
 // address
 
     if (address == 0){
-        printf("load_path: address\n");
+        printf("fs_load_path: address\n");
         goto fail;
     }
 
@@ -704,7 +702,7 @@ int load_path(unsigned char *path, unsigned long address)
 
         // Tem que come�ar o level com '/'
         if ( p[0] != '/' ){
-            printf("load_path: The level needs to start with '/' \n");
+            printf("fs_load_path: The level needs to start with '/' \n");
             goto fail;
         }
         p++; //pula o '/' 
@@ -726,14 +724,14 @@ int load_path(unsigned char *path, unsigned long address)
             {
                 if ( l != (n_levels-1) )
                 {
-                    printf("load_path: Directory name with '.'\n");
+                    printf("fs_load_path: Directory name with '.'\n");
                     goto fail;
                 }
                 
                 // Se o ponto est� al�m do limite permitido.
                 if (i>=7)
                 {
-                    printf("load_path: '.' fail.\n");
+                    printf("fs_load_path: '.' fail.\n");
                     printf("Name size bigger than 8.\n");
                     goto fail;
                 }
@@ -774,7 +772,7 @@ int load_path(unsigned char *path, unsigned long address)
                 __dst_buffer = (void *) __file_buffer;
                 if ( (void *) __dst_buffer == NULL )
                 {
-                    printf("load_path: __dir\n");
+                    printf("fs_load_path: __dir\n");
                     goto fail;
                 }
 
@@ -791,7 +789,7 @@ int load_path(unsigned char *path, unsigned long address)
                     // Esse n�vel tinha ponto, ent�o deveria ser o �ltimo.
                     if ( l != (n_levels-1) )
                     {
-                        printf("load_path: Directory name with '.'\n");
+                        printf("fs_load_path: Directory name with '.'\n");
                         printf("It needs to be the last level.\n");
                         goto fail;
                     }
@@ -803,7 +801,7 @@ int load_path(unsigned char *path, unsigned long address)
                     break;
 
                 }else{
-                    printf("load_path: Fail loading level 0\n");
+                    printf("fs_load_path: Fail loading level 0\n");
                     goto fail;
                 };
             }
@@ -835,7 +833,7 @@ int load_path(unsigned char *path, unsigned long address)
  
                 __dst_buffer = (void *) malloc (512*32);
                 if ( (void *) __dst_buffer == NULL ){
-                    printf("load_path: __dst_buffer\n");
+                    printf("fs_load_path: __dst_buffer\n");
                     goto fail;
                 }
 
@@ -854,7 +852,7 @@ int load_path(unsigned char *path, unsigned long address)
                     __src_buffer = __dst_buffer;
                     break;
                 }else{
-                    printf("load_path: [FAIL] Fail loading level 0\n");
+                    printf("fs_load_path: [FAIL] Fail loading level 0\n");
                     goto fail;
                 };
             }
@@ -867,7 +865,7 @@ int load_path(unsigned char *path, unsigned long address)
 // Abort?
 // Returning to call the rescue shell.
 fail:
-    printf("load_path: Fail\n");
+    printf("fs_load_path: Fail\n");
     refresh_screen();
     return (int) (-1);
 }

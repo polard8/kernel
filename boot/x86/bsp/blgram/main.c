@@ -25,23 +25,50 @@
 //#define BAREMETAL_VERBOSE    1
 
 
+// ----------------------------
+// GRAMADO/
+// + (1000) Headless server.
+// + (1001) Headless embedded systems.
+// ...
+
+#define GRAMADO_HEADLESS_SERVER           1000
+#define GRAMADO_HEADLESS_EMBEDDED_SYSTEM  1001
+// ...
+
+// ----------------------------
+// DE/
+// + (2000) Servers with GUI experience.
+// + (2001) Workstations.
+// + (2002) Desktop PCs.
+// + (2003) Embedded systems with GUI experience.
+// ...
+
+#define DE_SERVER       2000
+#define DE_WORKSTATION  2001
+#define DE_DESKTOP      2002
+#define DE_EMBEDDED     2003
+// ...
+
+static unsigned int system_type = 0;
+
+
 //
-// GRAMADO (Normal system)
+// GRAMADO/ (Normal system)
 //
 
 // Load this one
 const char *image_pathname = "/GRAMADO/KERNEL.BIN";
-// or try this one.
-const char *image_default_pathname = "/GRAMADO/KERNEL.BIN";
+// or try this one. (BACKUP)
+const char *image_default_pathname = "/GRAMADO/KRNL.BIN";
 
 //
 // DE/ (Desktop Environment)
 //
 
 // Load this one
-const char *image_pathname_re = "/DE/KERNEL.BIN";
-// or try this one.
-const char *image_default_pathname_re = "/DE/KERNEL.BIN";
+const char *image_pathname_de = "/DE/KERNEL.BIN";
+// or try this one. (BACKUP)
+const char *image_default_pathname_de = "/DE/KRNL.BIN";
 
 //
 // globals
@@ -436,7 +463,9 @@ static int bl_load_kernel_image_for_de(void)
 // essa função aborta ao primeiro sinal de perigo.
 // See: loader.c
 
-    Status = (int) elfLoadKernelImage(image_pathname_re,image_default_pathname_re);
+    Status = (int) elfLoadKernelImage(
+                       image_pathname_de, 
+                       image_default_pathname_de );
     if (Status < 0){
         printf ("bl_load_kernel_image_for_de: elfLoadKernelImage fail\n");
         goto fail;

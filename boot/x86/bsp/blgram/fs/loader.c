@@ -28,18 +28,22 @@ void updateProgressBar();
 
 // elfLoadKernelImage: 
 // Load /GRAMADO/KERNEL.BIN into the main memory.
+// First we try the desired pathname, if it fail then we try 
+// the default pathname.
 // Address.
 // pa = 0x00100000.
 // va = 0xC0000000.
+// IN:
+// The desired pathname, The default pathname.
 int elfLoadKernelImage(const char *pathname, const char *default_pathname)
 {
 // Called by blLoadKernelImage() in main.c.
 
     int Status = -1;
     unsigned long kernel_pa = KERNEL_ADDRESS;
-    unsigned long kernel_va = KERNEL_VA;
+    //unsigned long kernel_va = KERNEL_VA;
 // Buffer. 0x00100000.
-    unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;      
+    unsigned char *kernel = (unsigned char *) kernel_pa;      
 // Path
     char Path[64];
     char DefaultPath[64];
@@ -86,20 +90,22 @@ int elfLoadKernelImage(const char *pathname, const char *default_pathname)
 
 // ---------------------------------------
 // Load KERNEL.BIN on a physical address.
-// Search the file in the /LANDOS/ and /BOOT/ subdirectories
-// of the boot partition.
+// First we try the desired pathname, if it fail then we try 
+// the default pathname.
 // See: fs.c
-    Status = (int) load_path( Path, (unsigned long) kernel_pa );
-// Fail
-// Try default pathname.
+
+
+// Try the desired pathname.
+    Status = (int) fs_load_path( Path, (unsigned long) kernel_pa );
+// Try default pathname if it failed.
     if (Status != 0){
-        // Try again.
         printf("%s was not found\n",Path);
         printf("Let's try %s\n",DefaultPath);
         refresh_screen();
-        Status = (int) load_path( DefaultPath,(unsigned long) kernel_pa );
+        Status = (int) fs_load_path( DefaultPath,(unsigned long) kernel_pa );
     }
-// Fail again.
+
+// Failed again
     if (Status != 0){
         printf("elfLoadKernelImage: Couldn't load the kernel image\n");
         goto fail;
@@ -154,21 +160,14 @@ int elfLoadKernelImage(const char *pathname, const char *default_pathname)
 
     return 0; 
 
-// =================================
-// Fail: Couldn1t load the kernel image.
+// Couldn't load the kernel image.
+// Let's return and give to the main routine the chance to 
+// load from another place.
 fail:
     printf("elfLoadKernelImage: Fail\n");
     refresh_screen();
-
-    //#debug
-    //while(1){}
-
-// #test
-// Vamos retornar para dar a chace ao rescue shell.
-    // abort();
     return (int) (-1);
 }
-
 
 /*
 // local

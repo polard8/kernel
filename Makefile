@@ -161,8 +161,8 @@ build-gramado-os:
 
 	$(Q)$(MAKE) -C uservers/
 
-	-cp uservers/bin/NET.BIN      $(BASE)/
-	-cp uservers/bin/NETD.BIN     $(BASE)/
+	-cp uservers/bin/NET.BIN   $(BASE)/GRAMADO/
+	-cp uservers/bin/NETD.BIN  $(BASE)/GRAMADO/
 
 #===================================
 # (6) usys/ in kernel project
@@ -173,37 +173,38 @@ build-gramado-os:
 	$(Q)$(MAKE) -C usys/commands/
 
 # Copy
-	cp usys/bin/INIT.BIN      $(BASE)/
-	-cp usys/bin/PUBSH.BIN    $(BASE)/
-	-cp usys/bin/SH7.BIN      $(BASE)/
-	-cp usys/bin/SHELL.BIN    $(BASE)/
-#	-cp usys/bin/SHELL00.BIN  $(BASE)/
-	-cp usys/bin/TASCII.BIN   $(BASE)/GRAMADO/
-	-cp usys/bin/TPRINTF.BIN  $(BASE)/GRAMADO/
 
-    # Well consolidated applications
-	-cp usys/commands/base/bin/CAT.BIN       $(BASE)/
+	cp usys/bin/INIT.BIN      $(BASE)/
 	-cp usys/commands/base/bin/REBOOT.BIN    $(BASE)/
 	-cp usys/commands/base/bin/SHUTDOWN.BIN  $(BASE)/
-	-cp usys/commands/base/bin/UNAME.BIN     $(BASE)/
 	-cp usys/commands/sdk/bin/GRAMCNF.BIN    $(BASE)/
+
+    # Well consolidated applications
+	-cp usys/bin/PUBSH.BIN                $(BASE)/DE/
+	-cp usys/bin/SH7.BIN                  $(BASE)/DE/
+	-cp usys/bin/SHELL.BIN                $(BASE)/DE/
+#	-cp usys/bin/SHELL00.BIN              $(BASE)/DE/
+	-cp usys/bin/TASCII.BIN               $(BASE)/DE/
+	-cp usys/bin/TPRINTF.BIN              $(BASE)/DE/
+	-cp usys/commands/base/bin/CAT.BIN    $(BASE)/DE/
+	-cp usys/commands/base/bin/UNAME.BIN  $(BASE)/DE/
+
     # Experimental applications
-    # These need the '@' prefix.
-	-cp usys/commands/base/bin/FALSE.BIN      $(BASE)/GRAMADO/
-	-cp usys/commands/base/bin/TRUE.BIN       $(BASE)/GRAMADO/
-	-cp usys/commands/extra/bin/CMP.BIN       $(BASE)/GRAMADO/
-	-cp usys/commands/extra/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
-	-cp usys/commands/extra/bin/SUM.BIN       $(BASE)/GRAMADO/
-#-cp usys/commands/sdk/bin/N9.BIN         $(BASE)/GRAMADO/
-#-cp usys/commands/sdk/bin/N10.BIN        $(BASE)/GRAMADO/
-#-cp usys/commands/sdk/bin/N11.BIN        $(BASE)/GRAMADO/
-#-cp usys/commands/extra/bin/UDPTEST.BIN  $(BASE)/GRAMADO/
+	-cp usys/commands/base/bin/FALSE.BIN      $(BASE)/DE/
+	-cp usys/commands/base/bin/TRUE.BIN       $(BASE)/DE/
+	-cp usys/commands/extra/bin/CMP.BIN       $(BASE)/DE/
+	-cp usys/commands/extra/bin/SHOWFUN.BIN   $(BASE)/DE/
+	-cp usys/commands/extra/bin/SUM.BIN       $(BASE)/DE/
+#-cp usys/commands/sdk/bin/N9.BIN         $(BASE)/DE/
+#-cp usys/commands/sdk/bin/N10.BIN        $(BASE)/DE/
+#-cp usys/commands/sdk/bin/N11.BIN        $(BASE)/DE/
+#-cp usys/commands/extra/bin/UDPTEST.BIN  $(BASE)/DE/
 
 # Install BMPs from cali assets.
 # Copy the assets/
 # We can't survive without this one.
-	cp your/assets/themes/theme01/*.BMP  $(BASE)/
-	cp your/assets/themes/theme01/*.BMP  $(BASE)/GRAMADO
+#	cp your/assets/themes/theme01/*.BMP  $(BASE)/
+	cp your/assets/themes/theme01/*.BMP  $(BASE)/DE
 
 	@echo "~build-gramado-os end?"
 
@@ -359,6 +360,7 @@ clean-all: clean
 	-rm -rf $(BASE)/EFI/BOOT/*.EFI 
 	-rm -rf $(BASE)/GRAMADO/*.BIN 
 	-rm -rf $(BASE)/DE/*.BIN 
+	-rm -rf $(BASE)/DE/*.BMP
 
 	@echo "~clean-all"
 

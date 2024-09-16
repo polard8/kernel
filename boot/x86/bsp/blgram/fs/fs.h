@@ -115,8 +115,8 @@ fsLoadFile (
 
 // Esse é o endereço do arquivo, 
 // que é o último nível do path.
-int load_path ( unsigned char *path, unsigned long address );
-int path_count(const char *path);
+int fs_load_path(const char *path, unsigned long address);
+int fs_path_count(const char *path);
 
 unsigned long fsSearchFile(unsigned char *name);
 
