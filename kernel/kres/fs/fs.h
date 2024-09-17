@@ -532,14 +532,14 @@ void
 fs_load_fat(
     unsigned long fat_address, 
     unsigned long fat_lba, 
-    size_t fat_size );
+    size_t size_in_sectors );
 
 // ROOT
 void 
 fs_load_rootdir(
     unsigned long root_address, 
     unsigned long root_lba, 
-    size_t root_size );
+    size_t size_in_sectors );
 
 // For boot partition
 void fsbp_initialize_fat(void);

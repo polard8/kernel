@@ -1,6 +1,6 @@
-
 // debug.c
 // See: debug.h
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -130,7 +130,7 @@ void disable_serial_debug(void)
     __using_serial_debug = FALSE;
 }
 
-void debug_print(char *data)
+void debug_print (const char *data)
 {
 // Verbose via serial.
 
@@ -160,10 +160,12 @@ void debug_print(char *data)
     };
 }
 
+// PROGRESS:
 // We will use this function to track 
 // the main kernel initialization progress.
 // It will print into the serial port for now.
-void PROGRESS(char *string)
+
+void PROGRESS (const char *string)
 {
 // Verbose via serial.
 
@@ -182,7 +184,6 @@ void PROGRESS(char *string)
     // Select the available method.
     // switch(...
 
-    debug_print("\n");
     debug_print(string);
 }
 

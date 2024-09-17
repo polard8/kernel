@@ -1,5 +1,5 @@
-
 // disk_r.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -155,7 +155,7 @@ void
 fs_load_fat( 
     unsigned long fat_address, 
     unsigned long fat_lba, 
-    size_t fat_size )
+    size_t size_in_sectors )
 {
 
 // #todo
@@ -163,37 +163,28 @@ fs_load_fat(
 // of the table in the memory.
 // maybe 'FATState'
 
-    unsigned long __fatAddress=0;
-    unsigned long __fatLBA=0;
-    size_t        __fatSizeInSectors=0;
+    unsigned long FatAddress=0;
+    unsigned long FatLBA=0;
+    size_t        FatSizeInSectors=0;
 
-    __fatAddress       = fat_address;
-    __fatLBA           = fat_lba;
-    __fatSizeInSectors = (fat_size & 0xFFFF);   //fat size in sectors. 246?
+    FatAddress       = fat_address;
+    FatLBA           = fat_lba;
+    FatSizeInSectors = (size_in_sectors & 0xFFFF);  // 246
 
     debug_print ("fs_load_fat:\n");
 
-//
 // Check cache state.
-//
-    
-    // Se ja está na memória, então não precisamos carregar novamente.
+// Se ja está na memória, então não precisamos carregar novamente.
+
     if (g_fat_cache_loaded == FAT_CACHE_LOADED){
-         debug_print("fs_load_fat: FAT cache already loaded!\n");
-         return;
+        debug_print("fs_load_fat: FAT cache already loaded\n");
+        return;
     }
 
-    //__load_sequential_sectors ( 
-    //    VOLUME1_FAT_ADDRESS, 
-    //    VOLUME1_FAT_LBA, 
-    //    128 );
+// Load
+    __load_sequential_sectors ( FatAddress, FatLBA, FatSizeInSectors );
 
-    __load_sequential_sectors ( 
-        __fatAddress, 
-        __fatLBA, 
-        __fatSizeInSectors );
-
-// Changing the status
+// Change cache state.
     g_fat_cache_loaded = FAT_CACHE_LOADED;
 }
 
@@ -212,7 +203,7 @@ void
 fs_load_rootdir(
     unsigned long root_address, 
     unsigned long root_lba, 
-    size_t root_size )  // in sectors.
+    size_t size_in_sectors )
 {
 
 // #todo
@@ -222,18 +213,16 @@ fs_load_rootdir(
 
     unsigned long RootAddress=0;
     unsigned long RootLBA=0;
-    size_t        RootSize=0;
+    size_t        RootSizeInSectors=0;
 
-    RootAddress = root_address;
-    RootLBA     = root_lba;
-    RootSize    = root_size;    // number of sectors.
+    RootAddress       = root_address;
+    RootLBA           = root_lba;
+    RootSizeInSectors = (size_in_sectors & 0xFFFF);  // 32
 
     debug_print ("fs_load_rootdir:\n");
 
-    __load_sequential_sectors ( 
-        RootAddress, 
-        RootLBA, 
-        RootSize );
+// Load
+    __load_sequential_sectors ( RootAddress, RootLBA, RootSizeInSectors );
 }
 
 //

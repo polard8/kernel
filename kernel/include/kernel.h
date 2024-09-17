@@ -53,7 +53,8 @@
 // kmain/
 #include "../kctl/kmain/info.h"
 #include "../kctl/kmain/request.h"
-#include "../kctl/kmain/debug.h"
+
+#include "../kctl/kmain/overall/debug.h"
 
 // ==================================
 // ke/

@@ -480,7 +480,7 @@ static int __ide_identify_device(uint8_t nport)
     char name_buffer[32];
     struct disk_d  *disk;
 
-    //debug_print("__ide_identify_device: \n");
+    //debug_print("__ide_identify_device:\n");
 
 // #todo
 // What is the limit?
@@ -1844,7 +1844,7 @@ DDINIT_ata (
         case 1:
             //debug_print("init_ata: Initialize ata support\n");
             if (long1 == FORCEPIO){
-                debug_print("ATA in PIO mode\n\n");
+                debug_print("ATA in PIO mode\n");
             }
             // IN: forcepio?
             Status = (int) __ata_initialize((int) long1);
@@ -1861,15 +1861,10 @@ DDINIT_ata (
         //    break;
 
         default:
-            panic("DDINIT_ata: Unsupported service.\n");
+            panic("DDINIT_ata: Unsupported service\n");
             break;
     };
 
     return (int) Status;
 }
-
-
-
-
-
 

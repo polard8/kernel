@@ -1,5 +1,5 @@
-
 // debug.h
+// Created by Fred Nora.
 
 #ifndef __GRAMADO_DEBUG_H 
 #define __GRAMADO_DEBUG_H    1
@@ -13,8 +13,8 @@ void disable_serial_debug(void);
 // Verbose via serial.
 //
 
-void debug_print(char *data);
-void PROGRESS(char *string);
+void debug_print (const char *data);
+void PROGRESS (const char *string);
 
 int debug(void);
 void debug_breakpoint (void);

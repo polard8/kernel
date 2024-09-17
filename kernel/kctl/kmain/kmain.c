@@ -527,7 +527,7 @@ static void preinit_Serial(void)
         //#bugbug
         //Oh boy!, We can't use the serial debug.
     }
-    //PROGRESS("::(2)(1)(3):\n");
+    PROGRESS("Welcome!\n");
     PROGRESS("preinit_Serial: Serial debug initialized\n");
 }
 
@@ -681,7 +681,7 @@ void I_kmain(int arch_type)
 // Booting
 //
 
-    PROGRESS(":: Booting ...\n");
+    PROGRESS(":: BOOTING\n");
     system_state = SYSTEM_BOOTING;
 
 // boot info
@@ -701,7 +701,7 @@ void I_kmain(int arch_type)
 // + Inittialize heap support.
 // + Inittialize stack support. 
 // + Initialize memory sizes.
-    PROGRESS(":: Initialize mm, phase 0\n");
+    PROGRESS(":: MM PHASE 0\n");
     Status = (int) mmInitialize(0);
     if (Status != TRUE){
         __failing_kernel_subsystem = KERNEL_SUBSYSTEM_MM;
@@ -716,7 +716,7 @@ void I_kmain(int arch_type)
 // + Initialize framepoll support.
 // + Initializing the paging infrastructure.
 //   Mapping all the static system areas.
-    PROGRESS(":: Initialize mm, phase 1\n");
+    PROGRESS(":: MM PHASE 1\n");
     Status = (int) mmInitialize(1);
     if (Status != TRUE){
         __failing_kernel_subsystem = KERNEL_SUBSYSTEM_MM;
@@ -743,7 +743,7 @@ void I_kmain(int arch_type)
 // + show banner and resolution info.
 // + Check gramado mode and grab data from linker.
 // + Initialize bootloader display device.
-    PROGRESS(":: Initialize ke, phase 0\n");
+    PROGRESS(":: KE PHASE 0\n");
     Status = (int) keInitialize(0);
     if (Status != TRUE){
         __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
@@ -771,7 +771,7 @@ void I_kmain(int arch_type)
 //   initialize a lot of stuff from the 
 //   current architecture.
 // + PS2 early initialization.
-    PROGRESS(":: Initialize ke, phase 1\n");
+    PROGRESS(":: KE PHASE 1\n");
     Status = (int) keInitialize(1);
     if (Status != TRUE){
         __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
@@ -782,7 +782,7 @@ void I_kmain(int arch_type)
 // Initialize ke phase 2.
 // + Initialize background.
 // + Load BMP icons.
-    PROGRESS(":: Initialize ke, phase 2\n");
+    PROGRESS(":: KE PHASE 2\n");
     Status = (int) keInitialize(2);
     if (Status != TRUE){
         __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
@@ -797,7 +797,7 @@ void I_kmain(int arch_type)
     //printk (":: Creating legacy ptys\n");
     //refresh_screen();
 
-    PROGRESS(":: Create lecacy PTYs\n");
+    PROGRESS(":: PTY\n");
     tty_initialize_legacy_pty();
 
 //
@@ -930,11 +930,20 @@ StartSystemEnd:
 
     if (Status == TRUE)
     {
-        PROGRESS(":: Execute initial process\n");
+        PROGRESS(":: INITIAL PROCESS\n");
+
+        /*
         //#debug
-        //while(1){}
+        refresh_screen();
+        while (1){ 
+            asm volatile ("cli");
+            asm volatile ("hlt"); 
+        };
+        */
+
         ke_x64ExecuteInitialProcess();
     }
+
 
 // Initialization fail
 fail:

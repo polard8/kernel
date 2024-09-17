@@ -1363,7 +1363,7 @@ int I_x64_initialize(void)
 // a process structure to handle the kernel base and the
 // window server's control thread.
 
-    PROGRESS(":: Create kernel process\n"); 
+    PROGRESS("Create kernel process\n"); 
     Status = I_x64CreateKernelProcess();
     if (Status != TRUE){
         debug_print ("Couldn't create the Kernel process\n");
@@ -1374,7 +1374,7 @@ int I_x64_initialize(void)
 // [INIT PROCESS] :: Create the first ring3 process.
 // INIT.BIN.
 
-    PROGRESS(":: Create init process\n"); 
+    PROGRESS("Create init process\n"); 
     Status = I_x64CreateInitialProcess();
     if (Status != TRUE){
         debug_print ("Couldn't create the Initial process\n");
