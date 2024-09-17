@@ -36,10 +36,9 @@ LIBC    = ../libs/rtl/include/
 LIBCOBJ = ../libs/rtl/obj
 
 # Objects
-myObjects = crt0.o main.o libinit.o rtl.o \
+myObjects = crt0.o main.o inittask.o rtl.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o ioctl.o \
 socket.o    
-
 
 .PHONY: all all-c hello-link finalize clean
 
@@ -48,7 +47,7 @@ all: main.o all-c hello-link finalize clean
 main.o:
 	gcc  -c main.c  $(CFLAGS) -I $(LIBC) -o main.o
 all-c:
-	gcc  -c libinit/libinit.c  $(CFLAGS) -I $(LIBC) -o libinit.o
+	gcc  -c inittask/inittask.c  $(CFLAGS) -I $(LIBC) -o inittask.o
 
 	$(Q)cp $(LIBCOBJ)/crt0.o   .
 	$(Q)cp $(LIBCOBJ)/rtl.o  .

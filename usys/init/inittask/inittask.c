@@ -1,9 +1,10 @@
-// libinit.c
+// initask.c
+// Created by Fred Nora.
+
 // Library for init 'driver'.
 // >> The goal here is creating a template library
 // for the 'drivers' like this to receive and response messages.
 // And initialize/finalize.
-// Created by Fred Nora.
 
 #include "../inc/init.h"
 
@@ -144,6 +145,11 @@ void xxxSendResponse(void)
     if (NoReply == TRUE){
         return;
     }
+
+// Invalid target
+    if (NextMessage.target_tid < 0)
+        return;
+
 // Post next response
     RTLEventBuffer[0] = 0;
     RTLEventBuffer[1] = (unsigned long) (NextMessage.msg_code & 0xFFFFFFFF);
@@ -152,6 +158,7 @@ void xxxSendResponse(void)
     rtl_post_system_message( 
         (int) NextMessage.target_tid,
         (unsigned long) RTLEventBuffer );
+
 // Clear message
     NextMessage.target_tid = 0;
     NextMessage.msg_code = 0;
@@ -434,6 +441,8 @@ fail:
 // Maybe we can get some parameters here.
 int msgloop_RunServer_HeadlessMode(void)
 {
+// + It enables the network support.
+
     int Status = -1;
 
 /*

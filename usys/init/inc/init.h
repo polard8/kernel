@@ -15,7 +15,7 @@
 #include "endpoint.h"
 
 // Internal library (Creating a template)
-#include "../libinit/libinit.h"
+#include "../inittask/inittask.h"
 
 
 struct init_d

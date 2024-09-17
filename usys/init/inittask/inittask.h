@@ -1,4 +1,4 @@
-// libinit.h
+// inittask.h
 // 
 
 #ifndef __LIBINIT_LIBINIT_H
