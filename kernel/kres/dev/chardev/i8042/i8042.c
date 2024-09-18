@@ -154,30 +154,6 @@ void wait_then_write( int port, int data )
     out8( port, data );
 }
 
-// Early initialization
-// + Only keyboard.
-// + No mouse initialization.
-int PS2_early_initialization(void)
-{
-    PROGRESS ("PS2_early_initialization:\n");
-
-// Port 1: keyboard
-    ps2kbd_initialize_device();
-    PS2.keyboard_initialized = TRUE;
-
-// Port 2: Mouse
-// We will not call the mouse initialization 
-// in the early ps2 initialization routine.
-    PS2.mouse_initialized = FALSE;
-    PS2Mouse.initialized = FALSE;
-
-    PS2.pooling = FALSE;
-    PS2.used = TRUE;
-    PS2.magic = 1234;
-
-    return 0;
-}
-
 // ---------------------------------
 // DDINIT_ps2:
 // PS2 full initialization
@@ -190,13 +166,65 @@ int DDINIT_ps2(void)
 
     PROGRESS("DDINIT_ps2:\n");
 
+//
+// Keyboard
+//
+
+// Initialize the driver.
+    ps2kbd_initialize_driver();
+
+// Initialize the device
 // Port 1: Keyboard
     ps2kbd_initialize_device();
     PS2.keyboard_initialized = TRUE;
 
+//
+// Mouse
+//
+
+// Initialize the driver.
+    ps2mouse_initialize_driver();
+
+// Initialize the device.
 // Port 2: Mouse
     ps2mouse_initialize_device();
     PS2.mouse_initialized = TRUE;
+
+    PS2.pooling = FALSE;
+    PS2.used = TRUE;
+    PS2.magic = 1234;
+
+    return 0;
+}
+
+// Early initialization
+// + Only keyboard.
+// + No mouse initialization.
+int DDINIT_ps2_early_initialization(void)
+{
+    PROGRESS ("DDINIT_ps2_early_initialization:\n");
+
+//
+// Keyboard
+//
+
+// Initialize the driver.
+    ps2kbd_initialize_driver();
+
+// Initialize the device
+// Port 1: keyboard
+    ps2kbd_initialize_device();
+    PS2.keyboard_initialized = TRUE;
+
+//
+// Mouse
+//
+
+// Port 2: Mouse
+// We will not call the mouse initialization 
+// in the early ps2 initialization routine.
+    PS2.mouse_initialized = FALSE;
+    PS2Mouse.initialized = FALSE;
 
     PS2.pooling = FALSE;
     PS2.used = TRUE;

@@ -10,8 +10,6 @@ struct ps2_keyboard_d  PS2Keyboard;
 static int __prefix=0;
 unsigned char ps2kbd_led_status=0;
 
-const char *device_name_ps2kbd = "PS2KBD";
-
 //
 // == private functions: prototypes ================
 //
@@ -463,37 +461,6 @@ void ps2kbd_initialize_device (void)
     PS2Keyboard.irq_is_working = FALSE;
     PS2Keyboard.use_polling = FALSE;
     PS2Keyboard.last_jiffy = jiffies;
-
-//====================================
-// #test
-// register device
-// create file.
-    file *fp;
-    fp = (file *) kmalloc( sizeof(file) );
-    if ((void *) fp == NULL){
-        panic("kbd: fp\n");
-    }
-    memset ( fp, 0, sizeof(file) );
-    fp->used = TRUE;
-    fp->magic = 1234;
-    fp->____object = ObjectTypeFile;
-    fp->isDevice = TRUE;
-// #todo
-    fp->dev_major = 0;
-    fp->dev_minor = 0;
-
-// #todo: Initialize the file structure ... buffer ...
-
-// #test
-// Registrando o dispositivo.
-    devmgr_register_device ( 
-        (file *) fp, 
-        device_name_ps2kbd,  // name 
-        DEVICE_CLASS_CHAR,   // class (char, block, network)
-        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
-        NULL,                // Not a pci device.
-        NULL );              // Not a tty device. (not for now)
-//====================================
 
 // globals
     keyboard_init_lock_keys();

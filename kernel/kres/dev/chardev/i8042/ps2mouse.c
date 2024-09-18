@@ -8,8 +8,6 @@
 // see: ps2mouse.h
 struct ps2_mouse_d  PS2Mouse;
 
-const char *device_name_ps2mouse = "PS2MOUSE";
-
 /*
  #todo
  enable mouse?
@@ -651,7 +649,6 @@ void ps2mouse_initialize_device(void)
 {
     unsigned char status=0;
     unsigned char device_id=0;
-    file *fp;
 
     debug_print ("ps2mouse_initialize_device:\n");
 
@@ -660,39 +657,6 @@ void ps2mouse_initialize_device(void)
     PS2Mouse.use_polling = FALSE;
     PS2Mouse.last_jiffy = jiffies;
 
-//====================================
-// #test
-// register device
-// create file.
-    fp = (file *) kmalloc( sizeof(file) );
-    if ((void *) fp == NULL){
-        panic("ps2mouse.c: fp\n");
-    }
-    memset ( fp, 0, sizeof(file) );
-    fp->used = TRUE;
-    fp->magic = 1234;
-    fp->____object = ObjectTypeFile;
-
-    fp->isDevice = TRUE;
-// #todo
-    fp->dev_major = 0;
-    fp->dev_minor = 0;
-
-// #todo: 
-// Initialize the file structure ... buffer ...
-// IN:
-// fp, pathname, class, type, pcidevice?, ttydevice?
-
-// #test
-// Register the device.
-    devmgr_register_device ( 
-        (file *) fp, 
-        device_name_ps2mouse,  // name 
-        DEVICE_CLASS_CHAR,     // class (char, block, network)
-        DEVICE_TYPE_LEGACY,    // type (pci, legacy)
-        NULL,                  // Not a pci device.
-        NULL );                // Not a tty device. (not for now)
-//====================================
 
 // Pointer
     __initialize_mouse_position();

@@ -240,16 +240,16 @@ void ps2kbd_initialize_device (void);
 void ps2mouse_initialize_device (void);
 
 // ================
-// Early initialization
-// Only the keyboard.
-// It is working
-int PS2_early_initialization(void);
-
-// ================
 // This is the full initialization.
 // #bugbug This is a test yet.
 // It fails in the real machine.
 int DDINIT_ps2(void);
+
+// ================
+// Early initialization
+// Only the keyboard.
+// It is working
+int DDINIT_ps2_early_initialization(void);
 
 #endif    
 

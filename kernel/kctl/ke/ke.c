@@ -928,8 +928,8 @@ int keInitialize(int phase)
         // It fails in the real machine.
 
         //PROGRESS(":: Early PS2 initialization\n"); 
-        PS2_early_initialization();
-        //PS2_initialization();
+        DDINIT_ps2_early_initialization();
+        //DDINIT_ps2(); // (full initialization)
 
         //================================
         // Initialize all the kernel graphics support.
