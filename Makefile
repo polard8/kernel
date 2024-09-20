@@ -153,7 +153,7 @@ build-gramado-os:
 
 	$(Q)$(MAKE) -C udrivers/
 
-#	-cp udrivers/bin/VGAD.BIN      $(BASE)/
+	-cp udrivers/bin/VGAD.BIN  $(BASE)/GRAMADO/
 
 #===================================
 # (5) uservers/ in kernel project
