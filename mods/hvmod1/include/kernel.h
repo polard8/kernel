@@ -7,25 +7,24 @@
 
 #include "config.h"
 
-#include "arch/head.h"
+#include "../x86_64/head.h"
 
-#include "crt/klimits.h"
-#include "crt/ktypes.h"
-#include "crt/ktypes2.h"
-#include "crt/kstddef.h"
-#include "crt/kstdarg.h"
-#include "crt/kmemory.h"
-#include "crt/kstring.h"
-#include "crt/kstdio.h"
+#include "../crt/klimits.h"
+#include "../crt/ktypes.h"
+#include "../crt/ktypes2.h"
+#include "../crt/kstddef.h"
+#include "../crt/kstdarg.h"
+#include "../crt/kmemory.h"
+#include "../crt/kstring.h"
+#include "../crt/kstdio.h"
 
 #include "globals.h"
 
-#include "ke/ports64.h"
-#include "ke/hal.h"
-#include "ke/kal.h"
+#include "../ke/ports64.h"
+#include "../ke/hal.h"
+#include "../ke/kal.h"
 
 #include "../dev/display.h"
 
 #endif  
-
 

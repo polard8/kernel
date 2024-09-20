@@ -1,4 +1,3 @@
-
 // mmain.c
 // Generic kernel side component for
 // the ring3 main subsystem.
@@ -50,8 +49,7 @@ mmain (
         case 1000:
             // Initialize the server functions.
             Status = (int) newm0_initialize();
-            if (Status == TRUE)
-            {
+            if (Status == TRUE){
                 printk("Initialization OK\n");
                 return 1234;
             }

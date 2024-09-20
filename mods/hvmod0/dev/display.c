@@ -7,6 +7,11 @@
 // See:
 struct display_info_d  DisplayInfo;
 
+
+//
+// =================================================
+//
+
 // :: Step1
 // Initialize display information
 // Called only by the display server.

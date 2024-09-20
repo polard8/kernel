@@ -1,8 +1,10 @@
-
 // display.h
+// Created by Fred Nora.
 
 #ifndef __DISPLAY_H
 #define __DISPLAY_H    1
+
+
 
 struct display_info_d
 {
@@ -21,8 +23,12 @@ struct display_info_d
 
     // ...
 };
-extern struct display_info_d DisplayInfo;
+extern struct display_info_d  DisplayInfo;
 
+
+//
+// ================================================
+//
 
 // Step1
 unsigned long 

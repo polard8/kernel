@@ -12,6 +12,7 @@ EXTRAVERSION =
 
 linkTarget = HVMOD1.BIN  
 
+
 # Make variables (CC, etc...)
 AS	= as
 LD	= ld
@@ -88,12 +89,13 @@ display.o ports64.o hal.o kal.o
 
 all: head.o ports64.o mmain.o all-c gws-link finalize clean
 	@echo "Ok?"
+
 head.o:
-	$(CC)  -c  x86_64/head.c  $(user_ccflags) $(INCLUDES) -o head.o
+	$(CC)  -c x86_64/head.c $(user_ccflags) $(INCLUDES) -o head.o
 ports64.o:
-	$(CC)  -c  ke/ports64.c  $(user_ccflags) $(INCLUDES) -o ports64.o
+	$(CC)  -c ke/ports64.c  $(user_ccflags) $(INCLUDES) -o ports64.o
 mmain.o:
-	$(CC)  -c  mmain.c       $(user_ccflags) $(INCLUDES) -o mmain.o
+	$(CC)  -c mmain.c       $(user_ccflags) $(INCLUDES) -o mmain.o
 
 all-c:
 
@@ -121,5 +123,4 @@ clean:
 clean-all:
 	-rm *.o
 	-rm $(linkTarget)
-
 
