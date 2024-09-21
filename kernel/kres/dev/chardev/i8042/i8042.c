@@ -164,6 +164,8 @@ int DDINIT_ps2(void)
 // Called by hv_ps2_full_initialization in hv.c
 // Called by I_x64main in x64init.c
 
+    unsigned int i=0;
+
     PROGRESS("DDINIT_ps2:\n");
 
 //
@@ -190,6 +192,11 @@ int DDINIT_ps2(void)
     ps2mouse_initialize_device();
     PS2.mouse_initialized = TRUE;
 
+// Drain
+    for (i=0; i<100; i++){
+        in8(0x60);
+    };
+
     PS2.pooling = FALSE;
     PS2.used = TRUE;
     PS2.magic = 1234;
@@ -202,6 +209,8 @@ int DDINIT_ps2(void)
 // + No mouse initialization.
 int DDINIT_ps2_early_initialization(void)
 {
+    unsigned int i=0;
+
     PROGRESS ("DDINIT_ps2_early_initialization:\n");
 
 //
@@ -225,6 +234,11 @@ int DDINIT_ps2_early_initialization(void)
 // in the early ps2 initialization routine.
     PS2.mouse_initialized = FALSE;
     PS2Mouse.initialized = FALSE;
+
+// Drain
+    for (i=0; i<100; i++){
+        in8(0x60);
+    };
 
     PS2.pooling = FALSE;
     PS2.used = TRUE;
