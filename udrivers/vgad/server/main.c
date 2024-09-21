@@ -54,6 +54,7 @@ External Registers --
 
 
 
+unsigned long vgaModes[32];
 
 // --------------------------------------
 
@@ -79,11 +80,10 @@ unsigned char *VGA_address;
  * TAKEN FROM http://wiki.osdev.org/VGA_Hardware
  */
 
-unsigned char mode_800_480[] = {
+// graphics mode 0x12, 640x480 16 colors.
+unsigned char mode_640_480[] = {
 
 //
-// #bugbug
-// Actually this configuration is (800x480)
 //  Considering multiples of 10 width and 10 height.
 //
 
@@ -114,7 +114,7 @@ unsigned char mode_800_480[] = {
  * 0x03 = 11
  * Bits 1,0 - Synchronous reset.
  */
-    0x03,
+    0x01,
 /**
  * Index 0x01: (Clocking mode).
  * bit 0: (8/9 Dot Clocks).
@@ -138,7 +138,7 @@ unsigned char mode_800_480[] = {
  * Index 0x04: (Sequencer Memory mode).
  * Enables ch4, odd/even, extended memory
  */
-    0x0E,
+    0x06,
 
 //-----------------------------
 /* CRTC */
@@ -164,28 +164,28 @@ unsigned char mode_800_480[] = {
 // Horizontal:
 // Char width is '10'.
 
-// h  0x00
-// Horizontal Total
+// 0x00 h   | Horizontal Total
     0x5F,
-// h1 0x01  
-// Horizontal Display Enable End 
-// (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 (vm) <<<----
-// 0x39 ... 64*8=512.
+
+// 0x01 h1  | Horizontal Display Enable End 
     0x4F,
-// h2 0x02  
-// Horizontal Blanking Start  
-    0x50,
-// h  0x03  
+
+// 0x02 h2  | Horizontal Blanking Start 
+    0x50,  
+
+// 0x03 h    
 // Horizontal Blanking End | 
 // Horizontal Display Skew (5.6) | 
 // Horizontal Blanking End (bits 0..4) 
 // 1000 0010
 // '100' '00010'
-    0x82,  
-// h3 0x04  
+    0x82, 
+
+// 0x04 h3   
 // Horizontal retrace pulse start
     0x54,
-// h  0x05  
+
+// 0x05 h    
 // Horizontal retrace end | 
 // H. Blanking End (bit 5) 7? | 
 // Horizontal Retrace End (0..4)   1000 0000
@@ -195,30 +195,29 @@ unsigned char mode_800_480[] = {
 // Vertical:
 // Char width is '?'.
 
-
-    0xBF,  // 0x06 v  vertical total
-    0x1F,  // 0x07 v  overflow
+    0x0B,  // 0x06 v  vertical total
+    0x3E,  // 0x07 v  overflow
     0x00,  // 0x08    present row scan
-    0x41,  // 0x09 v  maximum scanline
+    0x40,  // 0x09 v  maximum scanline
     0x00,  // 0x0A    cursor start
     0x00,  // 0x0B    cursor end
     0x00,  // 0x0C    start address high  (#bugbug)
     0x00,  // 0x0D    start address low   (#bugbug)
     0x00,  // 0x0E    cursor location high
     0x00,  // 0x0F    cursor location low
-    0x9C,  // 0x10 v3 Vertical Retrace Start (bits 0..7)
-    0x0E,  // 0x11 v  Vertical Retrace End
+    0xEA,  // 0x10 v3 Vertical Retrace Start (bits 0..7)
+    0x8C,  // 0x11 v  Vertical Retrace End
 // 0x12 v1 
 // Vertical Display Enable End 
 // (bits 0..7) (vm) <<<----
 // 0x39 ... 64*8=512.
 // 0x19 ... 32*8=256.
-    0x19, //0x39,  //0x8F,  
+    0xDF, //0x39,  //0x8F,  
     0x28,  // 0x13    offset
-    0x40,  // 0x14    underline location
-    0x96,  // 0x15 v2 Vertical Blanking Start (bits 0..7)
-    0xB9,  // 0x16 v  Vertical Blanking End (bits 0..6)
-    0xA3,  // 0x17    CRT mode control
+    0x00,  // 0x14    underline location
+    0xE7,  // 0x15 v2 Vertical Blanking Start (bits 0..7)
+    0x04,  // 0x16 v  Vertical Blanking End (bits 0..6)
+    0xE3,  // 0x17    CRT mode control
     0xFF,  // 0x18    line compare
 
 //-----------------------------
@@ -228,7 +227,7 @@ unsigned char mode_800_480[] = {
     0x00,  // 0x02  color compare
     0x00,  // 0x03  data rotate
     0x00,  // 0x04  read map select
-    0x40,  // 0x05  graphics mode: 256-Color Shift (bit6) | Interleaved Shift (bit 5).
+    0x00,  // 0x05  graphics mode: 256-Color Shift (bit6) | Interleaved Shift (bit 5).
     0x05,  // 0x06  Miscellaneous
     0x0F,  // 0x07  color don't care
     0xFF,  // 0x08  Bit Mask
@@ -242,17 +241,17 @@ unsigned char mode_800_480[] = {
     0x03,  // 0x03
     0x04,  // 0x04
     0x05,  // 0x05
-    0x06,  // 0x06
+    0x14,  // 0x06
     0x07,  // 0x07
-    0x08,  // 0x08
-    0x09,  // 0x09
-    0x0A,  // 0x0A
-    0x0B,  // 0x0B
-    0x0C,  // 0x0C
-    0x0D,  // 0x0D
-    0x0E,  // 0x0E
-    0x0F,  // 0x0F  | end of palette stuff
-    0x41,  // 0x10  Mode control
+    0x38,  // 0x08
+    0x39,  // 0x09
+    0x3A,  // 0x0A
+    0x3B,  // 0x0B
+    0x3C,  // 0x0C
+    0x3D,  // 0x0D
+    0x3E,  // 0x0E
+    0x3F,  // 0x0F  | end of palette stuff
+    0x01,  // 0x10  Mode control
     0x00,  // 0x11  Overscan color Register
     0x0F,  // 0x12  Color Plane Enable
     0x00,  // 0x13  Horizontal Pixel Panning
@@ -267,6 +266,7 @@ unsigned char mode_800_480[] = {
  * TAKEN FROM http://wiki.osdev.org/VGA_Hardware
  */
 
+// graphics mode 0x13, 320x200 256 colors.
 unsigned char mode_320_200[] = {
 
 //
@@ -290,8 +290,8 @@ unsigned char mode_320_200[] = {
 // 0x63 - mode 13h (320x200 linear 256-color mode)
 // 0xE3 - mode X   (320x240 planar 256 color mode)
 
-    //0x63,    // 0110 0011     // xlines, free, hz, enable ram, do use the other port.
-    0xE3,  // 1100 0011   // 480, free, hz, enable ram, do use the other port.
+    0x63,    // 0110 0011     // 200, free, hz, enable ram, do use the other port.
+    //0xE3,  // 1100 0011   // 480, free, hz, enable ram, do use the other port.
 
 //-----------------------------
 /* SEQ */
@@ -300,7 +300,7 @@ unsigned char mode_320_200[] = {
  * 0x03 = 11
  * Bits 1,0 - Synchronous reset.
  */
-    0x03,
+    0x01,
 /**
  * Index 0x01: (Clocking mode).
  * bit 0: (8/9 Dot Clocks).
@@ -353,6 +353,7 @@ unsigned char mode_320_200[] = {
 // h  0x00
 // Horizontal Total
     0x5F,
+
 // h1 0x01  
 // Horizontal Display Enable End 
 // (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 (vm) <<<----
@@ -364,6 +365,7 @@ unsigned char mode_320_200[] = {
 // h2 0x02  
 // Horizontal Blanking Start  
     0x50,
+
 // h  0x03  
 // Horizontal Blanking End | 
 // Horizontal Display Skew (5.6) | 
@@ -371,9 +373,11 @@ unsigned char mode_320_200[] = {
 // 1000 0010
 // '100' '00010'
     0x82,  
+
 // h3 0x04  
 // Horizontal retrace pulse start
     0x54,
+
 // h  0x05  
 // Horizontal retrace end | 
 // H. Blanking End (bit 5) 7? | 
@@ -391,7 +395,7 @@ unsigned char mode_320_200[] = {
     // 0x41 = 640, considering granularity of 10 in height.
     // 0x30 = 480, considering granularity of 10 in height.
     // Isso mudou a resolução para h=48 h=0x30
-    0x30,  // 0x09 v  maximum scanline
+    0x41,  // 0x09 v  maximum scanline
     0x00,  // 0x0A    cursor start
     0x00,  // 0x0B    cursor end
     0x00,  // 0x0C    start address high  (#bugbug)
@@ -399,13 +403,13 @@ unsigned char mode_320_200[] = {
     0x00,  // 0x0E    cursor location high
     0x00,  // 0x0F    cursor location low
     0x9C,  // 0x10 v3 Vertical Retrace Start (bits 0..7)
-    0x0E,  // 0x11 v  Vertical Retrace End
+    0x8E,  // 0x11 v  Vertical Retrace End
 // 0x12 v1 
 // Vertical Display Enable End 
 // (bits 0..7) (vm) <<<----
 // 0x39 ... 64*8=512.
 // 0x19 ... 32*8=256.
-    0x19, //0x39,  //0x8F,  
+    0x8F, //0x39,  //0x8F,  
     0x28,  // 0x13    offset
     0x40,  // 0x14    underline location
     0x96,  // 0x15 v2 Vertical Blanking Start (bits 0..7)
@@ -455,7 +459,7 @@ unsigned char mode_320_200[] = {
 static void serial_write_char (char data);
 
 // vga
-static void write_registers(void);
+static void write_registers(int mode_index);
 void VGA_clear_screen(void);
 void VGA_init(int width, int height, int bpp);
 // ============================================================
@@ -474,7 +478,7 @@ static void serial_write_char (char data)
 
 // #todo: 
 // The DAC is still in an undefined state. 
-static void write_registers(void)
+static void write_registers(int mode_index)
 {
     unsigned int i=0;
 
@@ -486,9 +490,27 @@ static void write_registers(void)
 // Or maybe we can connect this driver with the display server,
 // and send requests to the server.
 
+    //int desired_mode = 0;
+    int desired_mode = 1;
+
+
+// Setup the table of modes
+    vgaModes[0] = (unsigned long) &mode_640_480[0];
+    vgaModes[1] = (unsigned long) &mode_320_200[0];
+    // ...
+
+// ===============================
+
+    if (desired_mode < 0){
+        printf("desired_mode\n");
+        return;
+    }
+
+    unsigned long TargetMode = 0;
+    TargetMode = (unsigned long) vgaModes[desired_mode];
+    
 // #tests
-    unsigned char *regs = (unsigned char *) &mode_800_480[0];
-    //unsigned char *regs = (unsigned char *) &mode_320_200[0];
+    unsigned char *regs = (unsigned char *) TargetMode;
 
     printf ("write_registers:\n");
 
@@ -644,7 +666,8 @@ VGA_init(
    VGA_address = 0xA0000;
 
 // Enables the mode 13 state
-   write_registers();
+// IN: mode index
+   write_registers(0);
 
 
 // Clears the screen
