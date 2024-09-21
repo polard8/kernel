@@ -1,16 +1,11 @@
-
 // io.c
+// Created by Fred Nora.
 
 #include <kernel.h> 
 
-int ioInit(void)
-{
-    int Status = 0;
+// see: io.h
+struct io_control_d  IOControl;
 
-    debug_print ("ioInit: [TODO]\n");
-    // ...
-    return (int) Status;
-}
 
 //==========================================
 // This is called by ioctl() in ring3.
@@ -71,24 +66,25 @@ io_ioctl (
     file *f;
     int ObjectType = -1;
 
-    debug_print ("io_ioctl: [TODO]\n");
-    //printk ("io_ioctl: [TODO]\n");
+    debug_print ("io_ioctl:\n");
 
-    if ( fd < 0 || fd >= OPEN_MAX ){
+// Parameter:
+    if ( fd < 0 || 
+         fd >= OPEN_MAX )
+    {
         return (int) (-EBADF);
     }
 
 // Get file pointer.
     f = (file *) get_file_from_fd(fd);
     if ((void *) f == NULL){
-        debug_print("io_ioctl: [FAIL] f\n");
-        return -1;
+        goto fail;
     }
     if (f->used != TRUE){
-        return -1;
+        goto fail;
     }
-    if ( f->magic != 1234 ){
-        return -1;
+    if (f->magic != 1234){
+        goto fail;
     }
 
 // Object types.
@@ -98,53 +94,51 @@ io_ioctl (
     ObjectType = (int) f->____object;
 
     if (ObjectType < 0){
-        debug_print("io_ioctl: ObjectType\n");
-        return -1;
+        goto fail;
     }
 
     switch (ObjectType){
 
     // Pode isso ??
-    // Normal file ???
-    // See: lib/kstdio.c
+    // Normal file?
+    // See: kstdio.c
     case ObjectTypeFile:
-        debug_print ("io_ioctl: ObjectTypeFile [TEST]\n");
+        debug_print ("io_ioctl: ObjectTypeFile\n");
         return (int) regularfile_ioctl ( 
-                         (int) fd, 
-                         (unsigned long) request, 
-                         (unsigned long) arg );
+                        (int) fd, 
+                        (unsigned long) request, 
+                        (unsigned long) arg );
         break;
 
     // tty object
-    // See: drivers/tty/tty.c
+    // See: tty.c
     case ObjectTypeTTY:
     //case ObjectTypeTerminal: 
         debug_print ("io_ioctl: ObjectTypeTTY\n"); 
         return (int) tty_ioctl ( 
-                         (int) fd, 
-                         (unsigned long) request, 
-                         (unsigned long) arg );
+                        (int) fd, 
+                        (unsigned long) request, 
+                        (unsigned long) arg );
         break;
 
     // socket object
-    // see: net/socket.c ?
+    // see: socket.c ?
     case ObjectTypeSocket:
         debug_print ("io_ioctl: ObjectTypeSocket\n");
-        //do_credits_by_tid(current_thread);
         return (int) socket_ioctl ( 
-                         (int) fd, 
-                         (unsigned long) request, 
-                         (unsigned long) arg );
+                        (int) fd, 
+                        (unsigned long) request, 
+                        (unsigned long) arg );
         break;
 
     // Console object
-    // See: user/console.c
+    // See: console.c
     case ObjectTypeVirtualConsole: 
         debug_print ("io_ioctl: ObjectTypeVirtualConsole\n");
         return (int) console_ioctl ( 
-                         (int) fd, 
-                         (unsigned long) request, 
-                         (unsigned long) arg );
+                        (int) fd, 
+                        (unsigned long) request, 
+                        (unsigned long) arg );
         break; 
 
     // keyboard
@@ -154,19 +148,30 @@ io_ioctl (
     // ...
 
     default:
-        debug_print ("io_ioctl: [FAIL] default object\n");
-        return -1;  //ENOTTY maybe
+        debug_print ("io_ioctl: default\n");
+        // ENOTTY maybe
+        goto fail;
         break;
     };
 
-    //fail
+
+fail:
     debug_print ("io_ioctl: Fail\n");
-    return -1;
+    return (int) -1;
 }
 
 
+//
+// $
+// INITIALIZATION
+//
 
+int ioInit(void)
+{
+    int Status = 0;
 
-
-
+    debug_print ("ioInit: [TODO]\n");
+    // ...
+    return (int) Status;
+}
 

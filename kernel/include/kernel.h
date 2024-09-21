@@ -62,11 +62,6 @@
 #include "../kctl/ke/hal/jiffies.h"
 
 // ==================================
-// dev/
-// Setup input mode.
-#include "../kres/dev/io_ctrl.h"
-
-// ==================================
 // crt/
 // Libc support.
 #include "../kctl/clibs/ktypes.h"

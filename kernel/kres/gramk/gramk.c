@@ -27,6 +27,9 @@ void gramk_putchar_in_fgconsole(unsigned long _char)
 {
     int c = (int) (_char & 0xFF);
 
+    //if (fg_console < 0)
+        //return;
+
 // Draw and refresh.
     console_outbyte2 ( c, fg_console );
 }
@@ -87,6 +90,7 @@ static void __x_panic_show_message(const char *final_string, unsigned long flags
 
 void x_panic(const char *final_string)
 {
+
 // Print the string
     __x_panic_show_message(final_string,0);
 
@@ -99,6 +103,7 @@ void x_panic(const char *final_string)
 
 void gramk_panic(const char *final_string)
 {
+
 // Print the string
     __x_panic_show_message(final_string,1);
 

@@ -341,7 +341,6 @@ static int __devmgr_init_device_list(void)
 {
     register int i=0;
 
-    debug_print ("__devmgr_init_device_list:\n");
     for (i=0; i<DEVICE_LIST_MAX; i++){
         deviceList[i] = 0;
     };
