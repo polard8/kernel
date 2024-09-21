@@ -695,6 +695,8 @@ int main(int argc, char *argv[])
 // QEMU/QEMUkvm: 
 // It doesn't change the resolution at all.
 
+// #test
+// It works on Virtualbox ()
     VGA_init(320,200,256);
 
 
