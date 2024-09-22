@@ -87,6 +87,32 @@
     ( 1 + VGA_NUM_SEQ_REGS + VGA_NUM_CRTC_REGS + VGA_NUM_GC_REGS + VGA_NUM_AC_REGS )
 
 
+
+struct vga_info_d
+{
+    int initialized;
+
+    int current_mode;
+    unsigned long ptr_modes[32];
+    
+    // w, h, bpp.
+    unsigned int width;
+    unsigned int height;
+    unsigned int bpp;
+
+// #bugbug
+// We can't write on this address from ring3.
+    unsigned long lfb_address;
+};
+extern struct vga_info_d  VGAInfo;
+
+//
+// =====================================================
+//
+
+int vgad_main(void);
+
+
 #endif   
 
 
