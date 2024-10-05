@@ -1,6 +1,6 @@
-# Gramado Kernel
-# License: BSD License
-# Compiling on gcc 11.4.0
+# Polar D8 Kernel
+# License: MIT License
+# Compiling on gcc 11.4.0 (Ubuntu on wsl)
 # Linking on ld 2.38
 
 BASE = your/base
@@ -9,7 +9,9 @@ BASE = your/base
 DEP_L1  = ../de/ds
 # Client-side GUI applications
 DEP_L2  = ../de/apps
+# 3D demos
 DEP_L3  = ../games
+
 
 # Make variables (CC, etc...)
 AS      = as

@@ -1,28 +1,29 @@
-# kernel - GramadoKernel
+# kernel - Polar D8 kernel
 
-The kernel for Gramado OS.
+This project includes basicaly the bootloader, the core kernel and the init process.
 
 > [!IMPORTANT]
-> GramadoKernel is in a pre-alpha state, and only suitable for use by developers.
+> Polar D8 kernel is in a pre-alpha state, and only suitable for use by developers.
 >
 
 ## This image shows the first process that runs after the kernel initialization.
 ![Screenshot](https://raw.githubusercontent.com/igapo/screenshots/main/kernel-01.png)
 
- You can install a desktop environment on top of the kernel. The default 
-desktop environment can be found in the gramado/kernel repository.
+You can install a desktop environment on top of the kernel. The default, the desktop environment 
+can be found in the polard8/de/ repository.
 
-## What is Gramado Kernel?
+## What is Polar D8 Kernel?
 
-Gramado Kernel is the main component of the Gramado Operating System.
+This project includes basicaly the bootloader, the core kernel and the init process.
 
 ## What is Gramado Operating System?
 
 GramadoOS is a 64bit graphical operating system. It has a bootloader, a kernel and a desktop environment.
+This is the first ditribution created using the Polar D8 kernel.
 
 ## What is the category it belongs to? 
 
-Gramado is a hobby operating system, not a commercial operating system, 
+Gramado OS is a hobby operating system, not a commercial operating system, 
 because it is a small system and has only some few features, 
 not all the features needed by a commercial operating system.
 
@@ -69,14 +70,14 @@ not all the features needed by a commercial operating system.
 ```
   You can find the source code on Github on the internet, 
   where you can clone the repository, contribute to the project or
-  download the code. The address is https://github.com/gramado/kernel.
+  download the code. The address is https://github.com/polard8/kernel.
 
-  We need to import some dependencies to get the posix commands, 
-  the display server and client-side GUI applications. 
-  The address is https://github.com/gramado/de.
+  We need to import some dependencies to get the display server and 
+  client-side GUI applications. 
+  The address is https://github.com/polard8/de.
 ```
 
-## A description of the directories in the Gramado source code.
+## A description of the directories in the source code.
 
     The next few lines has a brief description of the subdirectories:
 
@@ -201,18 +202,20 @@ Please make some comments on Github or send messages to Fred Nora.
 
 ## How to Build?
 
-> See the [Gramado OS build instructions](https://github.com/gramado/kernel/blob/main/your/docs/build/build.md)
+> See the [Gramado OS build instructions](https://github.com/polard8/kernel/blob/main/your/docs/build/build.md)
 
 # Folders
 
  Stating with code and ending with data and binary images.
 
 ```
-  * boot/      - Gramado boot loader.
-  * kernel/    - The core kernel.
-  * mods/      - Kernel modules.
-  * userland/  - Init process and ring3 services.
-  * your/      - Your stuff.
+  * boot/    - The bootloader.
+  * kernel/  - The core kernel.
+  * mods/    - Kernel modules.
+  * udrivers - Ring3 device drivers.
+  * uservers - Ring3 servers.
+  * usys/    - Init process and commands.
+  * your/    - Your stuff.
 ```
 
 # Warning
@@ -224,7 +227,7 @@ You're reaching the boring area of this document!
 The project has a folder for documentation and design notes. 
 The folder is docs/.
 
-> See the [docs](https://github.com/gramado/kernel/tree/main/your/docs).
+> See the [docs](https://github.com/polard8/kernel/tree/main/your/docs).
 
 The project is looking for some people to create a better documentation, for free, 
 as a contribuition to the open source community. To create this new documentation 
@@ -233,12 +236,11 @@ found all over the project.
 
 ## License
 
-Gramado is a Free and Open Source operating system.
-The source code uses the BSD license.
+Gramado OS is a Free and Open Source operating system.
+The source code uses the MIT license.
 
 ## Quotes:
 
 ```
-  * Transfiguration
-  * "Close to the borders and beyond." (Grace).
+    "Come Thou fount of every blessing"
 ```
