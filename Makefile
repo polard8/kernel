@@ -1,4 +1,6 @@
 # Polar D8 Kernel
+# Codename: Lamb
+
 # License: MIT License
 # Compiling on gcc 11.4.0 (Ubuntu on wsl)
 # Linking on ld 2.38
